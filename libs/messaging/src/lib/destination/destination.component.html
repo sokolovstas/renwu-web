@@ -1,0 +1,76 @@
+@if (destination) {
+  <div
+    [rwTooltip]="displayTooltip ? destination?.info?.name : ''"
+    tooltipWidth="auto"
+    tooltipDirection="top"
+    textAlign="left"
+    class="renwu-messaging-destination__item"
+    [class.item-active]="itemActive"
+    >
+    @if (destination.info.destination.type === DestinationType.FAV) {
+      <div class="renwu-messaging-destination__item__icon">
+        <rw-icon icon="favorite-1"></rw-icon>
+      </div>
+      <div class="renwu-messaging-destination__item__label">
+        <div class="renwu-messaging-destination__item__label">
+          {{ 'messaging.favorite-messages' | transloco }}
+        </div>
+      </div>
+    }
+    @if (
+      destination.type === DestinationType.USER && destination.item
+      | async; as user
+      ) {
+      <renwu-avatar
+        [user]="user"
+        size="2rem"
+        class="renwu-messaging-destination__item__icon"
+      ></renwu-avatar>
+      <div class="renwu-messaging-destination__item__label">
+        <div class="renwu-messaging-destination__item__label-text">
+          {{ user.full_name }}
+        </div>
+        <div class="renwu-messaging-destination__item__label-text">
+          {{ user.username }}
+        </div>
+      </div>
+    }
+    @if (
+      destination.type === DestinationType.ISSUE && destination.item
+      | async; as issue
+      ) {
+      <renwu-avatar
+        [showOnline]="false"
+        [color]="issue?.status?.color"
+        [initials]="
+        issue?.status?.symbol ||
+        issue?.status?.label[0] + issue?.status?.label[1]
+        "
+        size="2rem"
+        class="renwu-messaging-destination__item__icon"
+      ></renwu-avatar>
+      <div class="renwu-messaging-destination__item__label">
+        <div class="renwu-messaging-destination__item__label-text">
+          {{ issue.key }}
+        </div>
+        <div class="renwu-messaging-destination__item__label-text">
+          {{ issue.title }}
+        </div>
+      </div>
+      <renwu-message-counter
+        [allowMark]="true"
+        [destination]="destination"
+        (unreadClick)="onUnreadClick()"
+        (pulseClick)="onPulseClick()"
+        class="renwu-messaging-destination__item__counter"
+        >
+      </renwu-message-counter>
+      <rw-icon
+        class="renwu-messaging-destination__item__arrow-icon"
+        icon="keyboard_arrow_right"
+        (click)="openIssue(issue)"
+        >
+      </rw-icon>
+    }
+  </div>
+}

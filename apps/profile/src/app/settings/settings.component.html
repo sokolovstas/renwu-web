@@ -1,0 +1,94 @@
+@if (user | async; as user) {
+  <renwu-page
+    title="{{ user.full_name }} ({{ user.username }})"
+    >
+    <form [formGroup]="userForm" class="lg:grid-cols-2 grid grid-cols-1 gap-4">
+      <div class="flex flex-row w-full lg:col-span-2">
+        <div class="mr-4">
+          <renwu-avatar [user]="user" size="9em"></renwu-avatar>
+        </div>
+        <div class="w-full">
+          <label class="form-label">
+            <rw-text-input
+              formControlName="initials_text"
+              prompt="{{ 'settings.initials-text' | transloco }}"
+            ></rw-text-input>
+          </label>
+          <div class="form-supporting-text">
+            {{ 'settings.initials-color' | transloco }}
+          </div>
+          <label class="form-label">
+            <rw-color-picker formControlName="initials_color"></rw-color-picker>
+          </label>
+        </div>
+      </div>
+      <label class="form-label">
+        <rw-text-input
+          formControlName="full_name"
+          [prompt]="'profile.full-name' | transloco"
+        ></rw-text-input>
+      </label>
+      <label class="form-label">
+        <rw-text-input
+          formControlName="phone"
+          [prompt]="'profile.phone' | transloco"
+        ></rw-text-input>
+      </label>
+      <ng-container formGroupName="settings">
+        <label class="form-label">
+          <rw-select
+            modelName="Timezones"
+            [prompt]="'profile.time-zone' | transloco"
+            formControlName="time_zone_name"
+          ></rw-select>
+        </label>
+        <ng-container formGroupName="profile">
+          <label class="form-label">
+            <rw-select
+              modelName="AppLanguages"
+              [prompt]="'profile.language' | transloco"
+              formControlName="language"
+            ></rw-select>
+          </label>
+          <label class="form-label">
+            <rw-select
+              modelName="AppDateFormat"
+              [prompt]="'profile.date-format' | transloco"
+              formControlName="formats"
+            ></rw-select>
+          </label>
+          <label class="form-label">
+            <rw-select
+              modelName="AppThemes"
+              [prompt]="'profile.theme' | transloco"
+              formControlName="theme"
+            ></rw-select>
+          </label>
+          <label class="form-label">
+            <rw-checkbox
+              formControlName="relative_dates"
+              [label]="'profile.relative-dates' | transloco"
+            ></rw-checkbox>
+          </label>
+          <label class="form-label">
+            <rw-checkbox
+              formControlName="relative_dates"
+              [label]="'profile.send-chat-messages-with-modifier' | transloco"
+            ></rw-checkbox>
+          </label>
+          <!-- <div formGroupName="labs">
+          <label class="form-label">
+            <rw-checkbox
+              formControlName="global_milestones"
+              [label]="'profile.global-milestones' | transloco"
+            ></rw-checkbox>
+          </label>
+        </div> -->
+      </ng-container>
+    </ng-container>
+  </form>
+  <rw-button (clicked)="saveUser()" action>{{
+    'profile.save-changes' | transloco
+  }}</rw-button>
+</renwu-page>
+}

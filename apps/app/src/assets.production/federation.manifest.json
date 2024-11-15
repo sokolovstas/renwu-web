@@ -1,0 +1,12 @@
+{
+  "documents": "/app/modules/documents/remoteEntry.json",
+  "projects": "/app/modules/projects/remoteEntry.json",
+  "boards": "/app/modules/boards/remoteEntry.json",
+  "tasks": "/app/modules/tasks/remoteEntry.json",
+  "task": "/app/modules/task/remoteEntry.json",
+  "settings": "/app/modules/settings/remoteEntry.json",
+  "profile": "/app/modules/profile/remoteEntry.json",
+  "messenger": "/app/modules/messenger/remoteEntry.json",
+  "todos": "/app/modules/todos/remoteEntry.json",
+  "dashboard": "/app/modules/dashboard/remoteEntry.json"
+}

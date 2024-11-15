@@ -1,0 +1,146 @@
+<renwu-page [title]="getDictionaryTitle(dictionaryName | async)">
+  <div
+    class="w-full text-sm"
+    rwSortTable="dictionary"
+    (sortTableCompleted)="sortCompleted($event)"
+    >
+    <div class="flex flex-row" [rwSortTableRow]="-1">
+      <div rwSortTableColumnHead="order">
+        {{ 'settings.order' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="label">
+        {{ 'settings.label' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="color">
+        {{ 'settings.color' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="symbol">
+        {{ 'settings.symbol' | transloco }}
+      </div>
+      @if ((dictionaryName | async) === 'status') {
+        <div rwSortTableColumnHead="checkbox">
+          {{ 'settings.closed' | transloco }}
+        </div>
+        <div rwSortTableColumnHead="checkbox">
+          {{ 'settings.log-time' | transloco }}
+        </div>
+        <!-- <div rwSortTableColumnHead="checkbox">{{'settings.account-time' | transloco}}</div> -->
+        <div rwSortTableColumnHead="checkbox">
+          {{ 'settings.completed' | transloco }}
+        </div>
+        <div rwSortTableColumnHead="checkbox">
+          {{ 'settings.in-progress' | transloco }}
+        </div>
+        <div rwSortTableColumnHead="checkbox">
+          {{ 'settings.rebot' | transloco }}
+        </div>
+      }
+      <div rwSortTableColumnHead="checkbox">
+        {{ 'settings.default' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="checkbox"></div>
+    </div>
+
+    @if (dictionary | async) {
+      <form [formGroup]="dictionaryForm">
+        <ng-container formArrayName="data">
+          @for (
+            dataEntry of dictionaryForm.controls.data.controls; track
+            dataEntry; let i = $index) {
+            <div
+              [formGroup]="dataEntry"
+              [rwSortTableRow]="i"
+              class="flex flex-row items-center"
+              >
+              <div
+                class="px-6 py-4"
+                rwSortTableColumn="order"
+                [rwSortTableRowHandler]="i"
+                >
+                <rw-icon icon="menu"></rw-icon>
+              </div>
+              <div rwSortTableColumn="label">
+                <rw-text-input
+                  formControlName="label"
+                  [borderless]="true"
+                ></rw-text-input>
+              </div>
+              <div rwSortTableColumn="color">
+                <rw-color-picker formControlName="color"></rw-color-picker>
+              </div>
+              <div rwSortTableColumn="symbol">
+                <rw-text-input
+                  formControlName="symbol"
+                  [borderless]="true"
+                ></rw-text-input>
+              </div>
+              @if ((dictionaryName | async) === 'status') {
+                <div rwSortTableColumn="checkbox">
+                  <rw-checkbox formControlName="closed"></rw-checkbox>
+                </div>
+                <div rwSortTableColumn="checkbox">
+                  <rw-checkbox formControlName="log_time"></rw-checkbox>
+                </div>
+                <!-- <div rwSortTableColumn="checkbox">
+                <rw-checkbox formControlName="account_time"></rw-checkbox>
+              </div> -->
+              <div rwSortTableColumn="checkbox">
+                <rw-checkbox formControlName="completed"></rw-checkbox>
+              </div>
+              <div rwSortTableColumn="checkbox">
+                <rw-checkbox formControlName="in_progress"></rw-checkbox>
+              </div>
+              <div rwSortTableColumn="checkbox">
+                <rw-checkbox formControlName="rebot"></rw-checkbox>
+              </div>
+            }
+            <div rwSortTableColumn="checkbox">
+              <rw-checkbox formControlName="default"></rw-checkbox>
+            </div>
+            <div rwSortTableColumn="checkbox">
+              <rw-button
+                iconClass="trash"
+                [double]="true"
+                typeButton="icon"
+                (clicked)="removeItem(i)"
+              ></rw-button>
+            </div>
+          </div>
+        }
+      </ng-container>
+    </form>
+  }
+  @if ((dictionaryName | async) === 'status') {
+    <div>
+      <b>{{ 'settings.closed' | transloco }}</b> -
+      {{ 'settings.closed-text' | transloco }}
+    </div>
+    <div>
+      <b>{{ 'settings.log-time' | transloco }}</b> -
+      {{ 'settings.log-time-text' | transloco }}
+    </div>
+    <!-- <div><b>Account time</b> - ???</div> -->
+    <div>
+      <b>{{ 'settings.completed' | transloco }}</b> -
+      {{ 'settings.completed-text' | transloco }}
+    </div>
+    <div>
+      <b>{{ 'settings.in-progress' | transloco }}</b> -
+      {{ 'settings.in-progress-text' | transloco }}
+    </div>
+    <div>
+      <b>{{ 'settings.rebot' | transloco }}</b> -
+      {{ 'settings.rebot-text' | transloco }}
+    </div>
+  }
+</div>
+<rw-button action (clicked)="save()">{{
+  'settings.save-changes' | transloco
+}}</rw-button>
+<rw-button
+  action
+  iconClass="add-bold"
+  typeButton="primary"
+  (clicked)="addItem()"
+></rw-button>
+</renwu-page>

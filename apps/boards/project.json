@@ -1,0 +1,105 @@
+{
+  "name": "boards",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/boards/src",
+  "prefix": "renwu-boards",
+  "targets": {
+    "esbuild": {
+      "executor": "@angular-devkit/build-angular:browser-esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/boards",
+        "index": "apps/boards/src/index.html",
+        "main": "apps/boards/src/main.ts",
+        "polyfills": ["zone.js", "es-module-shims"],
+        "tsConfig": "apps/boards/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/boards/src/assets"],
+        "styles": ["apps/boards/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "500kb"
+            }
+          ],
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "environments/environment.ts",
+              "with": "environments/environment.prod.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "build": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {},
+      "configurations": {
+        "production": {
+          "target": "boards:esbuild:production"
+        },
+        "development": {
+          "target": "boards:esbuild:development",
+          "dev": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "target": "boards:esbuild:development",
+        "rebuildDelay": 0,
+        "dev": true,
+        "port": 4203
+      }
+    },
+    "extract-i18n": {
+      "command": "npm run i18n:extract -- --project apps/boards"
+    },
+    "extract-scoped-i18n": {
+      "command": "npm run i18n:extract-scoped-libs -- --skip-gitignore --dist apps/boards/src/i18n"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/boards/**/*.ts", "apps/boards/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/boards/jest.config.ts"
+      }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/dist/.playwright/apps/boards"],
+      "options": {
+        "config": "apps/boards/playwright.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

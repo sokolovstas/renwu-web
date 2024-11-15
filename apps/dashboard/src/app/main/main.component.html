@@ -1,0 +1,71 @@
+<renwu-page-with-sidebar>
+  <div sidebar>
+    <!-- <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+    {{ 'dashboard.dashboard' | transloco }}
+  </div> -->
+  <ul>
+    <li>
+      <a class="active">{{ 'dashboard.tasks' | transloco }}</a>
+    </li>
+  </ul>
+</div>
+<renwu-page title="{{ 'dashboard.tasks' | transloco }}">
+  @if ((issues | async)?.length) {
+    <div class="font-extralight text-2xl mb-6">
+      {{ 'dashboard.assigned-to-me' | transloco }}
+    </div>
+    <renwu-issue-table
+      class="w-full flex-shrink-0"
+      (clicked)="issueClick($event)"
+      [issues]="issuesDisplay | async"
+      ><div footer class="flex w-full justify-end mt-4">
+      <rw-pager
+        [currentPage]="issuesPage | async"
+        [pagesCountLimit]="3"
+        [pageSize]="rows"
+        [rowsCount]="(issues | async)?.length"
+        [showPages]="true"
+        (pageChanged)="issuesPage.next($event)"
+      ></rw-pager></div
+    ></renwu-issue-table>
+  }
+  @if ((recentIssues | async)?.length) {
+    <div class="font-extralight text-2xl mb-6">
+      {{ 'dashboard.recently-opened' | transloco }}
+    </div>
+    <renwu-issue-table
+      class="w-full flex-shrink-0"
+      (clicked)="issueClick($event)"
+      [issues]="recentIssuesDisplay | async"
+      ><div footer class="flex w-full justify-end mt-4">
+      <rw-pager
+        [currentPage]="recentIssuesPage | async"
+        [pagesCountLimit]="3"
+        [pageSize]="rows"
+        [rowsCount]="(recentIssues | async)?.length"
+        [showPages]="true"
+        (pageChanged)="recentIssuesPage.next($event)"
+      ></rw-pager></div
+    ></renwu-issue-table>
+  }
+  @if ((watched | async)?.length) {
+    <div class="font-extralight text-2xl mb-6">
+      {{ 'dashboard.watched' | transloco }}
+    </div>
+    <renwu-issue-table
+      class="w-full flex-shrink-0 mb-4"
+      (clicked)="issueClick($event)"
+      [issues]="watchedDisplay | async"
+      ><div footer class="flex w-full justify-end mt-4">
+      <rw-pager
+        [currentPage]="watchedPage | async"
+        [pagesCountLimit]="3"
+        [pageSize]="rows"
+        [rowsCount]="(watched | async)?.length"
+        [showPages]="true"
+        (pageChanged)="watchedPage.next($event)"
+      ></rw-pager></div
+    ></renwu-issue-table>
+  }
+</renwu-page>
+</renwu-page-with-sidebar>

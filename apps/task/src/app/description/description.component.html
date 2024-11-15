@@ -1,0 +1,6 @@
+<form [formGroup]="issueService.issueForm" class="flex flex-col w-full">
+  <div class="mt-4 mx-2 font-extralight text-2xl mb-2">
+    {{ 'task.description' | transloco }}
+  </div>
+  <rw-text-area class="pt-0" formControlName="description"></rw-text-area>
+</form>

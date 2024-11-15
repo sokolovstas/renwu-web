@@ -1,0 +1,50 @@
+@if (milestone()) {
+  <renwu-page
+    title="{{ milestone().title }} - {{ milestone().date | rwDate: 'P' }}"
+    [breadcrumbs]="[
+    { title: 'projects.projects' | transloco, url: '../../../' },
+    { title: currentProject().key, url: '../../' },
+    { title: 'projects.milestones' | transloco, url: '../' }
+    ]"
+    >
+    @if (tasks | async; as tasks) {
+      <div>
+        <renwu-issue-table
+          class="text-sm"
+          [issues]="tasks"
+          (clicked)="issueClick($event)"
+          [groupable]="true"
+          [sortable]="true"
+          [showExport]="true"
+          [listOptions]="listOptions()"
+          (listOptionsChange)="updateListOptions($event)"
+          >
+          <renwu-issue-status-bar
+            header
+            class="mb-4"
+            [issues]="tasks"
+            [groupBy]="[listOptions().group.field]"
+            (itemClick)="filterByBar($event)"
+          ></renwu-issue-status-bar>
+          <div
+            footer
+            class="text-sm text-gray-500 flex flex-row flex-wrap items-center"
+            >
+            {{ listOptions().queryString }}&nbsp;&nbsp;<rw-button
+            typeButton="link"
+            (clicked)="resetFilter()"
+            >{{ 'projects.reset-filter' | transloco }}</rw-button
+            >
+          </div></renwu-issue-table
+          >
+        </div>
+      }
+      <rw-button
+        action
+        iconClass="add-bold"
+        typeButton="primary"
+        (clicked)="addTaskToMilestone()"
+        >{{ 'projects.add-task' | transloco }}</rw-button
+        >
+      </renwu-page>
+    }

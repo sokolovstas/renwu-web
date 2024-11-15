@@ -1,0 +1,26 @@
+@use '../../styles/rw_variables.scss' as *;
+
+rw-icon {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  transition: all 0.1s ease-in-out;
+}
+.icon-size-large {
+  font-size: $icons-fontsize-large;
+}
+.icon-size-x-large {
+  font-size: $icons-fontsize-x-large;
+}
+.icon-size-xx-large {
+  font-size: $icons-fontsize-xx-large;
+}
+.icon-size-small {
+  font-size: $icons-fontsize-small;
+}
+.icon-size-normal {
+  font-size: $icons-fontsize-normal;
+}
+.icon-size-inherit {
+  font-size: inherit;
+}

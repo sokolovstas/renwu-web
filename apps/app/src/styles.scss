@@ -1,0 +1,27 @@
+@import '../../../styles/styles.scss';
+@import 'styles/nprogess';
+
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  background-image: none;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.preloader.default {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('assets/icons/icon-transparent.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 200px;
+  z-index: 1000;
+}

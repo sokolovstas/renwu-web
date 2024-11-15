@@ -1,0 +1,13 @@
+<div class="flex flex-row w-full h-full">
+  <div
+    #sidebar
+    class="app-second-sidebar flex flex-col bg-gray-100 h-full hide-empty {{
+      sidebarClass
+    }}"
+  >
+    <ng-content select="[sidebar]"></ng-content>
+  </div>
+  <div class="flex flex-col w-full h-full overflow-hidden app-main-content">
+    <ng-content></ng-content>
+  </div>
+</div>

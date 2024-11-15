@@ -1,0 +1,18 @@
+<ul class="scrollable-menu" #list ozPreventParentScroll>
+  @for (item of items; track item; let i = $index) {
+    <rw-mentions-list-item
+      [active]="activeIndex === i"
+      [item]="item"
+      [labelKey]="labelKey"
+      [itemComponent]="itemComponent"
+      (click)="select(item, $event)"
+      (mouseenter)="activeIndex = i; activeItem = item"
+      >
+    </rw-mentions-list-item>
+  }
+  @if (!items || items.length === 0) {
+    <div class="no-items">
+      <span>{{ 'core.no-records-found' | transloco }}</span>
+    </div>
+  }
+</ul>

@@ -1,0 +1,48 @@
+@if (issue) {
+  <div
+    class="flags"
+    [class.no-assignee]="flagNoAssignee"
+    [class.warning]="flagWarning"
+    [class.not-posted]="flagNotPosted"
+    [class.not-planning]="flagNotPlanning"
+    [class.hidden]="isRoot"
+    >
+    @if (flagNotPosted || flagWarning || flagNoAssignee || flagNotPlanning) {
+      <rw-icon icon="warning"></rw-icon>
+      @if (flagNotPosted) {
+        <div
+          class="flag-tooltip"
+          rwTooltip="{{ 'core.manual-task-is-not-scheduled' | transloco }}"
+          tooltipDirection="right"
+          tooltipWidth="auto"
+        ></div>
+      }
+      @if (flagNoAssignee) {
+        <div
+          class="flag-tooltip"
+          rwTooltip="{{ 'core.suitable-assignee-not-found' | transloco }}"
+          tooltipDirection="right"
+          tooltipWidth="auto"
+        ></div>
+      }
+      @if (flagWarning) {
+        <div
+          class="flag-tooltip"
+          rwTooltip="{{ 'core.uncompleted-task-in-the-past' | transloco }}"
+          tooltipDirection="right"
+          tooltipWidth="auto"
+        ></div>
+      }
+      @if (flagNotPlanning) {
+        <div
+          class="flag-tooltip"
+          rwTooltip="{{
+          'core.current-issue-status-prevents-it-from-scheduling' | transloco
+          }}"
+          tooltipDirection="right"
+          tooltipWidth="auto"
+        ></div>
+      }
+    }
+  </div>
+}

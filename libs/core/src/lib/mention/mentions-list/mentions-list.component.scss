@@ -1,0 +1,50 @@
+@import '../../../styles/variables';
+
+.scrollable-menu {
+  display: block;
+  height: auto;
+  max-height: 400px;
+  overflow: auto;
+  line-height: 1.2;
+  min-width: 12.5em;
+  background-color: $white;
+  color: $black;
+  box-shadow: $overlay-box-shadow;
+  text-align: left;
+  list-style: none;
+
+  &-item {
+    cursor: pointer;
+    padding: 0.5em;
+    // border-top: 1px dotted #aaa;
+
+    &-cursor {
+      background-color: $gray-200;
+    }
+  }
+  // &-item:first-child {
+  //   border-top: none;
+  // }
+}
+
+.hidden {
+  display: none !important;
+}
+
+rw-dropdown {
+  width: 500px;
+}
+
+.no-items {
+  text-align: center;
+  padding: 20px;
+}
+
+.user-mention {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  renwu-avatar {
+    margin-right: 10px;
+  }
+}

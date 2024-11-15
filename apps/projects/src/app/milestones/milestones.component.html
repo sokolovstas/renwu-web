@@ -1,0 +1,89 @@
+<renwu-page
+  title="{{ 'projects.milestones' | transloco }}"
+  [breadcrumbs]="[
+  { title: 'projects.projects' | transloco, url: '../../' },
+  { title: (currentProject | async).key, url: '../' }
+  ]"
+  >
+  <rw-checkbox
+    class="flex self-end"
+    [ngModel]="showArchived | async"
+    (ngModelChange)="showArchived.next($event)"
+    [label]="'projects.show-archived-milestones' | transloco"
+  ></rw-checkbox>
+  <div
+    rwSortTable="milestones"
+    class="flex flex-col w-full"
+    (sortTableCompleted)="sortCompleted($event)"
+    >
+    <div class="flex flex-row w-full" [rwSortTableRow]="-1">
+      <div rwSortTableColumnHead="order" class="hidden sm:block">
+        {{ 'projects.sort' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="name">{{ 'projects.name' | transloco }}</div>
+      <!-- <div rwSortTableColumnHead="key">{{ 'projects.key' | transloco }}</div> -->
+      <div rwSortTableColumnHead="labels">
+        {{ 'projects.labels' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="milestone_date">
+        {{ 'projects.date-estimated' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="milestone_date_calc">
+        {{ 'projects.date-calculated' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="checkbox">
+        {{ 'projects.archived' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="editicon"></div>
+    </div>
+    @for (milestone of milestones | async; track milestone; let i = $index) {
+      <a
+        class="flex flex-row w-full"
+        [rwSortTableRow]="i"
+        >
+        <div
+          class="px-6 py-4 hidden sm:block"
+          rwSortTableColumn="order"
+          [rwSortTableRowHandler]="i"
+          >
+          <rw-icon icon="menu"></rw-icon>
+        </div>
+        <div
+          rwSortTableColumn="name"
+          [routerLink]="[milestone.id]"
+          class="cursor-pointer"
+          >
+          {{ milestone.title }}
+        </div>
+        <!-- <div
+        rwSortTableColumn="key"
+        [routerLink]="[milestone.id]"
+        class="cursor-pointer"
+        >
+        {{ milestone.key }}
+      </div> -->
+      <div rwSortTableColumn="labels">
+        {{ milestone.labels }}
+      </div>
+      <div rwSortTableColumn="milestone_date">
+        {{ milestone.date | rwDate: 'PP' }}
+      </div>
+      <div rwSortTableColumn="milestone_date_calc">
+        {{ milestone.date_calc | rwDate: 'PP' }}
+      </div>
+      <div rwSortTableColumn="checkbox">
+        <rw-checkbox
+          [disabled]="true"
+          [ngModel]="milestone.archived"
+        ></rw-checkbox>
+      </div>
+      <div rwSortTableColumn="editicon">
+        <rw-icon icon="pen" (click)="edit($event, milestone)"></rw-icon>
+      </div>
+    </a>
+  }
+</div>
+<rw-button action iconClass="add-bold" (clicked)="add()">{{
+  'projects.add-milestone' | transloco
+}}</rw-button>
+</renwu-page>

@@ -1,0 +1,502 @@
+@use '../libs/core/src/styles/variables.scss' as *;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500;700&display=swap');
+@import './icons/style';
+
+$side-width: 95vw;
+
+html,
+body,
+renwu-root {
+  display: flex;
+  overflow-y: hidden;
+  overscroll-behavior-y: none;
+  width: 100%;
+  height: 100%;
+}
+
+@layer base {
+  html {
+    font-family: 'Open Sans', system-ui, sans-serif;
+    font-weight: 500;
+  }
+}
+
+html {
+  .app-second-sidebar,
+  .app-task-view,
+  .app-main-content {
+    padding: max(env(safe-area-inset-top), 1rem) env(safe-area-inset-right) 0
+      env(safe-area-inset-left);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-400) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background-color: var(--gray-100);
+    border-radius: 13px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--gray-400);
+    border-radius: 13px;
+    border: 2px solid var(--gray-100);
+  }
+}
+
+html.standalone {
+  .app-second-sidebar,
+  .app-task-view,
+  .app-main-content {
+    padding-top: max(env(safe-area-inset-top), 30px);
+  }
+}
+
+.fade-out {
+  animation: fade 1s;
+}
+
+@keyframes fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+$accent-color: #2aa6e0; //700
+$accent-primary-color: #218cbd; //600
+$accent-secondary-color: #1473a0; //500
+$info-color: #45baec;
+$success-color: #31e64f;
+$warn-color: #fdcf37;
+$error-color: #ef4957;
+$sidebar-width: 80px;
+$unread-color: #db6668;
+$online-color: #44d889;
+$pulse-color: #339fce;
+
+$message-edit-color: #fdcf37;
+
+// .renwu-messaging-item__message-wrapper {
+//   margin: 10px 5px !important;
+//   align-self: flex-start;
+//   display: flex;
+//   flex: 1 1 auto;
+//   border-radius: 10px;
+//   background-color: var(--gray-100);
+// }
+// .renwu-messaging-item__message-wrapper.author {
+//   align-self: flex-end;
+// }
+
+@mixin applyTheme($black, $white, $always-black, $always-white) {
+  --black: #{$black};
+  --white: #{$white};
+  --always-white: #{$always-white};
+  --always-black: #{$always-black};
+
+  --gray-100: #{mix($white, $black, 96%)};
+  --gray-200: #{mix($white, $black, 92%)};
+  --gray-300: #{mix($white, $black, 80%)};
+  --gray-400: #{mix($white, $black, 70%)};
+  --gray-500: #{mix($white, $black, 50%)};
+  --gray-600: #{mix($white, $black, 30%)};
+  --gray-700: #{mix($white, $black, 20%)};
+  --gray-800: #{mix($white, $black, 10%)};
+  --gray-900: #{mix($white, $black, 0%)};
+
+  --dark-100: #{darken($white, 3)};
+  --dark-200: #{darken($white, 6)};
+  --dark-300: #{darken($white, 9)};
+  --dark-400: #{darken($white, 12)};
+  --dark-500: #{darken($white, 15)};
+  --dark-600: #{darken($white, 18)};
+  --dark-700: #{darken($white, 21)};
+  --dark-800: #{darken($white, 24)};
+  --dark-900: #{darken($white, 27)};
+
+  --accent-color: #{$accent-color};
+  --accent-primary-color: #{$accent-primary-color};
+  --accent-secondary-color: #{$accent-primary-color};
+  --accent-darker-color: #{mix($black, $accent-color, 20%)};
+  --accent-lighter-color: #{mix($white, $accent-color, 75%)};
+  --info-color: #{$info-color};
+  --success-color: #{$success-color};
+  --warn-color: #{$warn-color};
+  --error-color: #{$error-color};
+
+  --unread-color: #{$unread-color};
+  --online-color: #{$online-color};
+  --pulse-color: #{$pulse-color};
+
+  --toast-info-background-color: #{lighten($info-color, 30)};
+  --toast-info-color: #{darken($info-color, 20)};
+  --toast-success-background-color: #{lighten($success-color, 40)};
+  --toast-success-color: #{darken($success-color, 20)};
+  --toast-warn-background-color: #{lighten($warn-color, 30)};
+  --toast-warn-color: #{darken($warn-color, 20)};
+  --toast-error-background-color: #{lighten($error-color, 30)};
+  --toast-error-color: #{darken($error-color, 20)};
+
+  --switch-color: #{darken($accent-primary-color, 20)};
+
+  --rw-control-border-color-invalid: #a00;
+  --rw-control-border-hover-color-invalid: #f00;
+  --rw-button-tab-hover-background-color: #f9fdff;
+  --rw-button-disabled: #777;
+  --rw-button-disabled-hover: #999;
+
+  --component-popup-background: #{rgba(0, 0, 0, 0.5)};
+  --modal-wrapper-box-shadow: 0 0 30px #{rgba(0, 0, 0, 0.2)};
+
+  --rw-modal-overlay-background: #{rgba(18, 22, 25, 0.8)};
+
+  --rw-placeholder-background: #{rgba($black, 0.05)};
+  --rw-avatar-online: #{darken($success-color, 10)};
+
+  --rw-button-attention: #{mix($error-color, $always-black, 70%)};
+  --rw-button-attention-hover: #{mix($error-color, $always-black, 80%)};
+
+  --message-item-marked: #{mix($info-color, $white, 30%)};
+  --message-item-edit: rgb(170 236 69 / 25%);
+  --message-item-delete: #{mix($error-color, $white, 30%)};
+  --message-item-selected: #{mix($warn-color, $white, 30%)};
+
+  --messages-unread-color: #db6668;
+  --messages-online-color: #44d889;
+  --messages-pulse-color: #339fce;
+
+  --button-primary-radius: 30px;
+  --button-secondary-radius: 30px;
+
+  --rw-control-bg-color: var(--gray-100);
+
+  --rw-control-border-disabled-color: var(--gray-200);
+  --rw-control-border-hover-color: var(--gray-200);
+}
+
+html.light {
+  $black: #1f1f1f;
+  $white: #ffffff;
+
+  body {
+    background-color: var(--white) !important;
+  }
+
+  background-color: var(--white) !important;
+  color: var(--black) !important;
+
+  --sidebar-bg: #{darken($white, 9)};
+  --sidebar-text: #{rgba($black, 1)};
+  --sidebar-bg-hover: #{darken($white, 9)};
+  --sidebar-text-hover: #{rgba($black, 1)};
+  --sidebar-bg-active: #{darken($white, 9)};
+  --sidebar-text-active: #{rgba($black, 1)};
+
+  --accent-900: #{mix($white, $accent-color, 30%)};
+  --accent-800: #{mix($white, $accent-color, 35%)};
+  --accent-700: #{mix($white, $accent-color, 40%)};
+  --accent-600: #{mix($white, $accent-color, 45%)};
+  --accent-500: #{mix($white, $accent-color, 50%)};
+  --accent-400: #{mix($white, $accent-color, 55%)};
+  --accent-300: #{mix($white, $accent-color, 60%)};
+  --accent-200: #{mix($white, $accent-color, 65%)};
+  --accent-100: #{mix($white, $accent-color, 70%)};
+  --accent-50: #{mix($white, $accent-color, 75%)};
+  --accent-25: #{mix($white, $accent-color, 80%)};
+
+  @include applyTheme($black, $white, $black, $white);
+}
+
+html.dark {
+  $black: #e3e3e3;
+  $white: #1f1f1f;
+
+  body {
+    background-color: var(--white) !important;
+  }
+
+  background-color: var(--white) !important;
+  color: var(--black) !important;
+
+  --sidebar-bg: #{darken($white, 9)};
+  --sidebar-text: #{rgba($black, 1)};
+  --sidebar-bg-hover: #{darken($white, 9)};
+  --sidebar-text-hover: #{rgba($black, 1)};
+  --sidebar-bg-active: #{darken($white, 9)};
+  --sidebar-text-active: #{rgba($black, 1)};
+
+  --accent-900: #{mix($white, $accent-color, 30%)};
+  --accent-800: #{mix($white, $accent-color, 35%)};
+  --accent-700: #{mix($white, $accent-color, 40%)};
+  --accent-600: #{mix($white, $accent-color, 45%)};
+  --accent-500: #{mix($white, $accent-color, 50%)};
+  --accent-400: #{mix($white, $accent-color, 55%)};
+  --accent-300: #{mix($white, $accent-color, 60%)};
+  --accent-200: #{mix($white, $accent-color, 65%)};
+  --accent-100: #{mix($white, $accent-color, 70%)};
+  --accent-50: #{mix($white, $accent-color, 75%)};
+  --accent-25: #{mix($white, $accent-color, 80%)};
+
+  @include applyTheme($black, $white, $white, $black);
+}
+
+.rw-modalcontainer {
+  @include modal();
+  z-index: $overlays-z-index;
+}
+
+.hidden-important {
+  display: none !important;
+}
+
+.rw-sorttablecolumn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 8px 5px;
+  &:last-of-type {
+    border-right: none;
+  }
+}
+
+.rw-sorttablecolumnhead {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  padding: 8px 5px;
+}
+.rw-sorttablerow {
+  &:nth-child(even) {
+    background-color: var(--gray-100);
+  }
+  &:not(.hidden):last-of-type {
+    border-bottom: none;
+  }
+  &:hover {
+    background-color: var(--gray-200);
+  }
+  &-move {
+    z-index: 1;
+    position: relative;
+    transition: all 0.2s ease-out;
+  }
+  &-drag {
+    box-shadow: 0 0 10px var(--always-black);
+    position: relative;
+    transition: none;
+    z-index: 5;
+    border-bottom: none;
+  }
+  border-bottom: 1px solid var(--gray-300);
+  transition: background-color 0.1s ease-in-out;
+  align-items: center;
+}
+form {
+  .form-label {
+    display: flex;
+    flex-direction: column;
+    @apply mb-4;
+  }
+  .form-supporting-text {
+    @apply text-sm;
+    @apply text-gray-500;
+    margin: 0 $rw-control-default-padding * 2;
+    @apply mt-2;
+  }
+}
+
+.hide-empty:empty {
+  display: none;
+}
+
+ng-component {
+  display: flex;
+  flex: 1 1 100%;
+  overflow: hidden;
+}
+
+img.logo {
+  filter: drop-shadow(0px 0px 11px #0004);
+  width: 3rem;
+  height: 3rem;
+}
+
+.app-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  outline: 1px dashed lightgray;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  position: relative;
+}
+.app-sidebar {
+  user-select: none;
+  position: fixed;
+  height: calc(70px + env(safe-area-inset-bottom));
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  flex-shrink: 0;
+  .main-sidebar__section-button {
+    opacity: 0.7;
+  }
+  .main-sidebar__section-button.active {
+    rw-icon {
+      background-color: var(--accent-200);
+    }
+    opacity: 1;
+  }
+}
+html.keyboard .app-sidebar {
+  height: 0;
+}
+
+.app-main-view,
+.app-task-view {
+  height: calc(100% - (70px + env(safe-area-inset-bottom)));
+}
+
+html.keyboard .app-main-view,
+html.keyboard .app-task-view {
+  height: 100%;
+}
+
+.app-main-view {
+  position: absolute;
+  left: 0;
+  width: calc(193vw);
+  flex-shrink: 0;
+}
+.app-task-view {
+  position: absolute;
+  left: 193vw;
+  width: 93vw;
+  overflow: hidden;
+  border-radius: 20px 0px 0px 0px;
+  flex-shrink: 0;
+}
+.app-second-sidebar,
+.app-task-view {
+  box-shadow: 0 0 10px rgb(0 0 0/0.2);
+  padding-top: 0.75rem;
+}
+.app-second-sidebar {
+  user-select: none;
+  width: calc(93vw);
+  flex-shrink: 0;
+  overflow: hidden;
+  // margin-top: 10px;
+  border-radius: 0px 20px 0px 0px;
+  ul {
+    li > * {
+      @apply px-2;
+      @apply py-1;
+      @apply rounded-full;
+      @apply mx-2;
+      @apply flex;
+      @apply overflow-hidden;
+    }
+    li > renwu-messaging-destination {
+      @apply pl-1;
+    }
+    li > *.active {
+      @apply bg-accent-200;
+    }
+  }
+}
+.app-main-content {
+  width: calc(100vw);
+  flex-shrink: 0;
+}
+.app-snap-right,
+.app-snap-left,
+.app-snap-center {
+  scroll-snap-align: center;
+  width: 100vw;
+  height: 100vw;
+  flex: none;
+  z-index: -1;
+}
+.app-snap-right {
+  scroll-snap-align: end;
+  width: calc(93vw - 0px);
+  // width: 93vw;
+}
+.app-snap-left {
+  scroll-snap-align: start;
+  width: 93vw;
+}
+.app-main-view.app-main-view-full {
+  width: calc(193vw);
+}
+.rw-toast-container__list {
+  left: 10px !important;
+  position: fixed;
+  bottom: 90px !important;
+  right: 10px !important;
+  box-shadow: 0 0 15px rgb(0 0 0/0.2) !important;
+  z-index: 600;
+  border-radius: 5px;
+  overflow: hidden;
+}
+@screen md {
+  .app-snap-right,
+  .app-snap-left,
+  .app-snap-center {
+    display: none;
+  }
+  .app-sidebar {
+    position: initial;
+    height: 100%;
+    width: 80px;
+  }
+  .app-second-sidebar {
+    position: initial;
+    width: 200px;
+    margin-top: 0;
+    border-radius: 0px 20px 20px 0px;
+    // border-radius: 0;
+  }
+  .app-second-sidebar-large {
+    width: 280px;
+  }
+  .app-main-view {
+    position: initial;
+    width: calc(60vw - $sidebar-width);
+    height: 100%;
+  }
+  .app-task-view {
+    position: initial;
+    width: calc(40vw);
+    left: 0;
+    margin-top: 0;
+    margin-right: 0;
+    border-radius: 20px 0px 0px 20px;
+    height: 100%;
+    // border-radius: 0;
+  }
+  .app-main-content {
+    width: 100%;
+    flex-shrink: 1;
+  }
+  .app-main-view.app-main-view-full {
+    width: calc(100vw - $sidebar-width);
+  }
+  .rw-toast-container__list {
+    left: 90px !important;
+    bottom: 10px !important;
+    right: initial !important;
+  }
+}

@@ -1,0 +1,14 @@
+<div class="rw-toast-container__list">
+  @for (toast of toastService.toasts; track toast) {
+    <rw-toast
+      [hide]="toast.hide"
+      [level]="toast.level"
+      [text]="toast.text"
+      [hide]="toast.hide"
+      [persistant]="toast.persistant"
+      (toastClick)="clickToast(toast)"
+      (closeClick)="closeToast(toast, $event)"
+      >
+    </rw-toast>
+  }
+</div>

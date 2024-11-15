@@ -1,0 +1,29 @@
+<renwu-page-with-sidebar>
+  <div sidebar>
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      {{ 'tasks.filters' | transloco }}
+    </div>
+    <ul class="flex flex-col overflow-auto w-full">
+      @for (query of queries | async; track query) {
+        <li>
+          <a
+            class="flex p-4"
+            (click)="filterClick()"
+            [routerLink]="['list', query.id || query.hash]"
+            routerLinkActive="active"
+            >{{ query.title }}</a
+            >
+          </li>
+        }
+      </ul>
+      <!-- <rw-button
+      class="mt-4"
+      iconClass="add-bold"
+      typeButton="secondary"
+      (clicked)="addTask()"
+
+      >{{ 'add-new-task' | transloco }}</rw-button
+      > -->
+    </div>
+    <router-outlet></router-outlet>
+  </renwu-page-with-sidebar>

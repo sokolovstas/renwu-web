@@ -1,0 +1,73 @@
+{
+  "$schema": "../../../node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "navigationUrls": [
+    "/**",
+    "!/**/*.*",
+    "!/**/*__*",
+    "!/**/*__*/**",
+    "!/bypass/service/worker",
+    "!/account/bypass-service-worker**",
+    "!/bypass-service-worker**"
+  ],
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**",
+          "/media/**",
+          "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
+        ]
+      }
+    },
+    {
+      "name": "modules",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "urls": [
+          "http://localhost:*/*.*",
+          "https://renwu.ru/app/modules/*.*",
+          "https://dev.renwu.ru/app/modules/*.*"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "core",
+      "urls": ["/v1/issue/**"],
+      "cacheConfig": {
+        "maxAge": "2d",
+        "strategy": "freshness",
+        "maxSize": 100
+      }
+    },
+    {
+      "name": "core",
+      "urls": ["/v1/**"],
+      "cacheConfig": {
+        "maxAge": "2d",
+        "strategy": "freshness",
+        "maxSize": 1000
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+@import '../../styles/variables';
+
+:host {
+  display: flex;
+  position: relative;
+  line-height: 1;
+  border-radius: 9999px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  color: $white;
+  font-size: 14px;
+  text-align: center;
+  font-weight: $global-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $gray-300;
+  border-radius: 9999px;
+  user-select: none;
+  cursor: default;
+  position: relative;
+}
+
+.status {
+  background-color: $gray-300;
+  width: 25%;
+  height: 25%;
+  border-radius: 99999px;
+  position: absolute;
+  right: 4.5%;
+  bottom: 4.5%;
+  border: 1px solid var(--black);
+  box-shadow: 0 0 0px 2px var(--white);
+}
+.status.online {
+  background-color: var(--rw-avatar-online);
+  border: none;
+}
+.initials-text {
+  margin-top: -0.07em;
+}
+.image,
+.initials {
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: default;
+  line-height: 0;
+  border-radius: 9999px;
+}
+
+.initials > div {
+  font-size: 2em;
+  display: flex;
+  font-weight: $global-weight-bolder;
+}
+
+rw-icon {
+  color: $black;
+}
+
+.avatar.placeholder {
+  @include placeholder(100%);
+  border-radius: 9999px;
+  .initials {
+    display: none;
+  }
+}

@@ -1,0 +1,76 @@
+@use '../../styles/rw_variables.scss' as *;
+
+:host {
+  @include component;
+  @include component-focus;
+  @include component-invalid;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  width: 100%;
+
+  .add {
+    flex: 0 0 1.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: $rw-control-default-border solid $rw-control-border-color;
+  }
+
+  &-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 2em;
+  }
+
+  .textinput {
+    flex: 1 1 100%;
+  }
+
+  .wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+  }
+
+  .icon {
+    top: 0;
+    right: 0;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ddd;
+    background-color: $white;
+  }
+}
+
+.body {
+  display: flex;
+  flex-wrap: wrap;
+
+  .item {
+    margin-top: 0.3em;
+    margin-right: 0.3em;
+  }
+}
+::ng-deep rw-select-group rw-button {
+  .button-tab {
+    border-radius: 2em;
+    border: $rw-button-tab-border;
+    padding: 0.3em 1.2em !important;
+    &-selected {
+      border: $rw-button-tab-selected-border;
+    }
+  }
+  .button-tab:hover {
+    border: $rw-button-tab-hover-border;
+    &-selected {
+      border: $rw-button-tab-hover-border;
+    }
+  }
+}

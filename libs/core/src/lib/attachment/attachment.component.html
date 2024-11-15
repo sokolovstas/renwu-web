@@ -1,0 +1,36 @@
+@if (flagButton) {
+  <div class="button">
+    <label for="attachment-files-{{ num }}">
+      @if (classButton) {
+        <i class="button {{ classButton }}"></i>
+      }
+    </label>
+  </div>
+}
+
+@if (flagDropZone && flagFileDrop) {
+  <div
+    class="drop-zone"
+    [style.padding]="padding"
+  ></div>
+}
+
+@if (flagDropZone && flagFileDrop) {
+  <div
+    class="drop-zone-wrapper"
+    [style.padding]="padding"
+    >
+    <div class="drop-zone-filling" [style.font-size]="fontSize">
+      <div>{{ 'core.drop-files-here-to-attach' | transloco }}</div>
+      <div class="icon"><i class="icon-add"></i></div>
+    </div>
+  </div>
+}
+
+<input
+  class="input"
+  type="file"
+  id="attachment-files-{{ num }}"
+  multiple
+  (change)="getFiles($event)"
+  />

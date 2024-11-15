@@ -1,0 +1,35 @@
+@use '../../../styles/variables.scss' as *;
+
+:host {
+  @include modal;
+}
+
+::ng-deep list-exporter-modal .modal-wrapper {
+  width: 90% !important;
+  height: 90% !important;
+}
+.wrapper {
+  padding: 1em 1.5em 0;
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.head {
+  flex-direction: row;
+  display: flex;
+  margin-bottom: 1em;
+  flex: 0 0 auto;
+  align-items: flex-end;
+}
+.result {
+  overflow: scroll;
+  display: flex;
+  flex: 1 1 100%;
+  flex-direction: column;
+  border: 1px solid $rw-control-border-color;
+  padding: 1em;
+}
+a {
+  color: $accent-darker-color;
+}

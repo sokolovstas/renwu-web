@@ -1,0 +1,119 @@
+@use '../../styles/rw_variables.scss' as *;
+
+:host {
+  @include component;
+  @include component-focus;
+  @include component-invalid;
+  border-bottom: $rw-control-default-border solid $rw-control-border-color;
+  background-color: $rw-control-bg-color;
+  padding: $rw-control-default-padding $rw-control-default-padding * 2;
+  padding-top: $rw-control-default-padding * 5;
+  border-radius: $rw-control-border-radius $rw-control-border-radius 0 0;
+}
+
+:host.disabled {
+  border-bottom: $rw-control-default-border solid transparent;
+}
+.icon {
+  display: inline-block;
+}
+
+.dropdown-wrapper {
+  display: flex;
+  flex: 1 1 100%;
+  width: 100%;
+  flex-direction: column;
+}
+.picker-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+}
+.date-time-wrapper {
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+}
+.rw-date-picker {
+  &-clear-button {
+    text-align: center;
+    display: block;
+  }
+
+  &-value {
+    cursor: pointer;
+    padding: $rw-control-default-padding 0;
+    display: flex;
+    position: relative;
+    width: 100%;
+    min-height: 2em;
+
+    &-empty {
+      color: $rw-control-prompt-color;
+      font-weight: $rw-control-prompt-font-weight;
+    }
+  }
+
+  &-prompt {
+    font-style: $rw-control-prompt-font-style;
+    padding: 0;
+    font-weight: inherit;
+    position: absolute;
+    left: 0;
+    top: -5px;
+    width: 100%;
+    color: $rw-control-prompt-color;
+    transition: all 0.1s linear;
+    transform-origin: left top;
+  }
+
+  &-prompt-active {
+    transform: scale(0.8) translateY(-12px);
+  }
+
+  &-popup-calendar {
+    flex: 1 1 100%;
+    padding: 10px 10px;
+  }
+}
+.separator {
+  display: flex;
+  margin: 14px;
+  background-color: $rw-control-border-color;
+  flex: 0 0 1px;
+}
+.helpers-buttons {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  padding-right: 7px;
+}
+.buttons {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 100%;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 10px;
+}
+.helpers {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+}
+.helper-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 210px;
+  width: 210px;
+  padding: 15px;
+  rw-button {
+    margin-bottom: 5px;
+  }
+}
+
+.disabled {
+  .icon {
+    display: none;
+  }
+}

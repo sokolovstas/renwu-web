@@ -1,0 +1,116 @@
+<renwu-page
+  title="{{ 'projects.team' | transloco }}"
+  [breadcrumbs]="[
+    { title: 'projects.projects' | transloco, url: '../../' },
+    { title: (currentProject | async).key, url: '../' }
+  ]"
+>
+  <div class="text-lg">{{ 'projects.internal' | transloco }}</div>
+  <div class="flex flex-row">
+    <renwu-avatar
+      [size]="'50px'"
+      class="my-2 mr-2"
+      *ngFor="let it of internalTeam | async"
+      [user]="it.user"
+      (click)="removeUserFrom(it.user, 'internal')"
+    ></renwu-avatar>
+    <rw-select
+      [borderless]="true"
+      [model]="internalModelUser"
+      (changed)="addUserTo($event, 'internal')"
+    >
+      <ng-template #selectedItemTemplate let-select="select">
+        <div class="summary-user-add-new">
+          <div class="value" (click)="select.switchPopup()">
+            <renwu-avatar
+              [size]="'50px'"
+              class="my-2"
+              [newUser]="true"
+            ></renwu-avatar>
+          </div>
+        </div>
+      </ng-template>
+    </rw-select>
+  </div>
+  <div class="text-lg mt-8">{{ 'projects.external' | transloco }}</div>
+  <div class="flex flex-row">
+    <renwu-avatar
+      [size]="'50px'"
+      class="my-2 mr-2"
+      *ngFor="let et of externalTeam | async"
+      [user]="et.user"
+      (click)="removeUserFrom(et.user, 'external')"
+    ></renwu-avatar>
+    <rw-select
+      [borderless]="true"
+      [model]="externalModelUser"
+      (changed)="addUserTo($event, 'external')"
+    >
+      <ng-template #selectedItemTemplate let-select="select">
+        <div class="summary-user-add-new">
+          <div class="value" (click)="select.switchPopup()">
+            <renwu-avatar
+              [size]="'50px'"
+              class="my-2"
+              [newUser]="true"
+            ></renwu-avatar>
+          </div>
+        </div>
+      </ng-template>
+    </rw-select>
+  </div>
+  <div class="text-lg mt-8">{{ 'projects.managers' | transloco }}</div>
+  <div class="flex flex-row">
+    <renwu-avatar
+      [size]="'50px'"
+      class="my-2 mr-2"
+      *ngFor="let mg of managers | async"
+      [user]="mg"
+      (click)="removeUserFrom(mg, 'managers')"
+    ></renwu-avatar>
+    <rw-select
+      [borderless]="true"
+      [model]="managerModelUser"
+      (changed)="addUserTo($event, 'managers')"
+    >
+      <ng-template #selectedItemTemplate let-select="select">
+        <div class="summary-user-add-new">
+          <div class="value" (click)="select.switchPopup()">
+            <renwu-avatar
+              [size]="'50px'"
+              class="my-2"
+              [newUser]="true"
+            ></renwu-avatar>
+          </div>
+        </div>
+      </ng-template>
+    </rw-select>
+  </div>
+  <div class="text-lg mt-8">{{ 'projects.admin' | transloco }}</div>
+  <div class="flex flex-row">
+    <renwu-avatar
+      [size]="'50px'"
+      class="my-2 mr-2"
+      *ngFor="let ad of admins | async"
+      [user]="ad"
+      (click)="removeUserFrom(ad, 'admins')"
+    ></renwu-avatar>
+    <rw-select
+      [borderless]="true"
+      [model]="adminModelUser"
+      (changed)="addUserTo($event, 'admins')"
+    >
+      <ng-template #selectedItemTemplate let-select="select">
+        <div class="summary-user-add-new">
+          <div class="value" (click)="select.switchPopup()">
+            <renwu-avatar
+              [size]="'50px'"
+              class="my-2"
+              [newUser]="true"
+            ></renwu-avatar>
+          </div>
+        </div>
+      </ng-template>
+    </rw-select>
+  </div>
+</renwu-page>

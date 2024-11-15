@@ -1,0 +1,12 @@
+diff --git a/node_modules/@angular-architects/native-federation/src/builders/build/builder.js b/node_modules/@angular-architects/native-federation/src/builders/build/builder.js
+index 7312e00..146c195 100644
+--- a/node_modules/@angular-architects/native-federation/src/builders/build/builder.js
++++ b/node_modules/@angular-architects/native-federation/src/builders/build/builder.js
+@@ -30,6 +30,7 @@ function runBuilder(nfOptions, context) {
+         const write = !runServer;
+         const watch = !!runServer || nfOptions.watch;
+         options.watch = watch;
++        options.baseHref = nfOptions.baseHref;
+         const rebuildEvents = new rebuild_events_1.RebuildHubs();
+         const adapter = (0, angular_esbuild_adapter_1.createAngularBuildAdapter)(options, context, rebuildEvents);
+         (0, build_2.setBuildAdapter)(adapter);

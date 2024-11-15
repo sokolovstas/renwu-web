@@ -1,0 +1,22 @@
+@use '../../../styles/rw_variables.scss' as *;
+
+:host {
+  position: absolute;
+  padding: 0.4em 0.7em;
+  width: auto;
+  max-width: 80%;
+
+  background-color: rgba(0, 0, 0, 0.7);
+  color: $always-white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: $rw-control-border-radius;
+  font-weight: $global-weight-bolder;
+
+  font-size: 90%;
+  word-wrap: break-word;
+}
+
+:host.hide-back {
+  background-color: transparent;
+  padding: 0;
+}

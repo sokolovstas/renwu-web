@@ -1,0 +1,95 @@
+<renwu-page title="{{ 'profile.notification-settings' | transloco }}">
+  <div class="mb-4">
+    {{ 'profile.notification-settings-text' | transloco }}
+  </div>
+  <div rwSortTable="notifications" class="mb-8">
+    <div class="flex flex-row" [rwSortTableRow]="-1">
+      <div rwSortTableColumnHead="title">{{ 'profile.event' | transloco }}</div>
+      <div rwSortTableColumnHead="checkbox">
+        {{ 'profile.email' | transloco }}
+      </div>
+      <div rwSortTableColumnHead="checkbox">
+        {{ 'profile.push' | transloco }}
+      </div>
+    </div>
+    <div class="flex flex-row pl-2" [rwSortTableRow]="0">
+      <div rwSortTableColumn="title">{{ 'profile.messaging' | transloco }}</div>
+      <div rwSortTableColumn="checkbox">
+        <rw-checkbox
+          [ngModel]="false"
+          (ngModelChange)="setCheckbox(messagingKeys, 'email', $event)"
+        ></rw-checkbox>
+      </div>
+      <div rwSortTableColumn="checkbox">
+        <rw-checkbox
+          [ngModel]="false"
+          (ngModelChange)="setCheckbox(messagingKeys, 'push', $event)"
+        ></rw-checkbox>
+      </div>
+    </div>
+    @for (ck of messagingKeys; track ck; let mi = $index) {
+      <div
+        class="flex flex-row pl-8"
+        [rwSortTableRow]
+        >
+        <div rwSortTableColumn="title">{{ translate(ck) }}</div>
+        <div rwSortTableColumn="checkbox">
+          <rw-checkbox
+            class="inline-block"
+            (ngModelChange)="setCheckbox([ck], 'email', $event)"
+            [ngModel]="getCheckbox(ck, 'email')"
+          ></rw-checkbox>
+        </div>
+        <div rwSortTableColumn="checkbox">
+          <rw-checkbox
+            class="inline-block"
+            (ngModelChange)="setCheckbox([ck], 'push', $event)"
+            [ngModel]="getCheckbox(ck, 'push')"
+          ></rw-checkbox>
+        </div>
+      </div>
+    }
+    <div class="flex flex-row pl-2" [rwSortTableRow]>
+      <div rwSortTableColumn="title">{{ 'profile.pulse' | transloco }}</div>
+      <div rwSortTableColumn="checkbox">
+        <rw-checkbox
+          [ngModel]="false"
+          (ngModelChange)="setCheckbox(pulseKeys, 'email', $event)"
+          class="inline-block"
+        ></rw-checkbox>
+      </div>
+      <div rwSortTableColumn="checkbox">
+        <rw-checkbox
+          [ngModel]="false"
+          (ngModelChange)="setCheckbox(pulseKeys, 'push', $event)"
+          class="inline-block"
+        ></rw-checkbox>
+      </div>
+    </div>
+    @for (pk of pulseKeys; track pk; let pi = $index) {
+      <div
+        class="flex flex-row pl-8"
+        [rwSortTableRow]
+        >
+        <div rwSortTableColumn="title">{{ translate(pk) }}</div>
+        <div rwSortTableColumn="checkbox">
+          <rw-checkbox
+            class="inline-block"
+            (ngModelChange)="setCheckbox([pk], 'email', $event)"
+            [ngModel]="getCheckbox(pk, 'email')"
+          ></rw-checkbox>
+        </div>
+        <div rwSortTableColumn="checkbox">
+          <rw-checkbox
+            class="inline-block"
+            (ngModelChange)="setCheckbox([pk], 'push', $event)"
+            [ngModel]="getCheckbox(pk, 'push')"
+          ></rw-checkbox>
+        </div>
+      </div>
+    }
+  </div>
+  <rw-button action (clicked)="save()">{{
+    'profile.save' | transloco
+  }}</rw-button>
+</renwu-page>

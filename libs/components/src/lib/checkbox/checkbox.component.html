@@ -1,0 +1,18 @@
+<div
+  class="checkbox"
+  (click)="onClickCheckbox($event)"
+  [class.disabled]="disabled"
+  >
+  @if (value) {
+    <rw-icon icon="check-bold"></rw-icon>
+  }
+</div>
+@if (label) {
+  <div
+    class="checkbox-label"
+    [class.disabled]="disabled"
+    (click)="onClickCheckbox($event)"
+    >
+    {{ label }}
+  </div>
+}

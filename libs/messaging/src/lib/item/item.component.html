@@ -1,0 +1,355 @@
+@if (message && message.new | async) {
+  <div
+    class="renwu-messaging-item__new-messages"
+    [@readedTransition]="'ok'"
+    >
+    <div class="renwu-messaging-item__new-messages__line"></div>
+    <div class="renwu-messaging-item__new-messages__text">
+      <span>new messages</span>
+    </div>
+  </div>
+}
+@if (message && (message.type === MessageType.REGULAR || !message.type)) {
+  <div
+    [@newMessage]="!!message"
+    class="renwu-messaging-item__message-wrapper"
+    [class.no-avatar]="(message.displayAvatar | async) === false"
+    [class.hover]="!textOnly"
+    [class.marked]="message.isMarked"
+    [class.delete]="deleting"
+    [class.edit]="(message.destination.editMessage | async)?.id === message.id"
+    [class.author]="message.author.id === currentUserId"
+    [class.selected]="
+    (message.destination.selectedMessage | async)?.id === message.id
+    "
+    >
+    @if (!textOnly) {
+      <div
+        class="renwu-messaging-item__message-wrapper__avatar-wrapper"
+        >
+        @if (
+          (message.author && (message.displayAvatar | async)) || threadStarter
+          ) {
+          <renwu-avatar
+            class="renwu-messaging-item__message-wrapper__avatar"
+            size="40px"
+            [user]="message.author"
+            >
+          </renwu-avatar>
+        }
+        @if ((message.displayAvatar | async) === false) {
+          <div
+            class="renwu-messaging-item__message-wrapper__right"
+            >
+            @if (message.favorite) {
+              <rw-icon
+                class="renwu-messaging-item__message-wrapper__right__icon"
+                icon="favorite-1"
+              ></rw-icon>
+            }
+            @if (message.pinned) {
+              <rw-icon
+                class="renwu-messaging-item__message-wrapper__right__icon"
+                icon="pin-1"
+              ></rw-icon>
+            }
+            @if (!message.sending) {
+              <p
+                class="renwu-messaging-item__message-wrapper__right__time"
+                >
+                {{ message.datetime | rwDate: 'HH:mm' }}
+              </p>
+            }
+          </div>
+        }
+      </div>
+    }
+    <div class="renwu-messaging-item__message-body" id="{{ message.id }}">
+      <div class="renwu-messaging-item__message-body__message">
+        @if (((message.displayAvatar | async) && !textOnly) || threadStarter) {
+          <div
+            class="renwu-messaging-item__message-body__up-part"
+            >
+            @if (message.author) {
+              <div
+                class="renwu-messaging-item__message-body__author"
+                >
+                @if (message.isExternalAuthor) {
+                  <i
+                    [rwTooltip]="'messaging.external-user' | transloco"
+                    class="renwu-messaging-item__message-body__icon-team"
+                  ></i>
+                }
+                {{ message.author | rwFormatUser }}
+                <!-- <renwu-personal-page-href [user]="message.author">
+              </renwu-personal-page-href> -->
+            </div>
+          }
+          @if (!message.sending) {
+            <div
+              class="renwu-messaging-item__message-body__time"
+              >
+              {{
+              message.datetime | rwDate: settingsService.user.relativeDateFormat
+              }}
+              @if (message.editTime.getTime() !== message.createTime.getTime()) {
+                <span
+                  >
+                  *
+                </span>
+              }
+            </div>
+          }
+          @if (message.favorite) {
+            <rw-icon
+              class="renwu-messaging-item__message-body__icon"
+              size="small"
+              icon="favorite-1"
+            ></rw-icon>
+          }
+          @if (message.pinned) {
+            <rw-icon
+              class="renwu-messaging-item__message-body__icon"
+              size="small"
+              icon="pin-1"
+            ></rw-icon>
+          }
+        </div>
+      }
+      <div
+        class="renwu-messaging-item__message-body__text markdown-box"
+        [class.not-sent]="message.sending"
+        [class.emoji-only]="message.emoji"
+        >
+        @if (message.isExternalMessage) {
+          <div
+            [rwTooltip]="'messaging.visible-to-external-users' | transloco"
+            class="renwu-messaging-item__message-wrapper__external"
+            >
+            &nbsp;
+          </div>
+        }
+        <div [innerHTML]="formatted"></div>
+      </div>
+      @if (message.sendError) {
+        <div
+          class="renwu-messaging-item__message-wrapper__dialog-delete-or-resend"
+          >
+          (<span>{{
+          'messaging.this-message-send-failed-would-you-like-to' | transloco
+          }}</span
+          ><a
+          class="renwu-messaging-item__message-wrapper__link"
+          (click)="resendMessage()"
+          >{{ 'messaging.resend' | transloco }}</a
+          >
+          •
+          <a
+            class="renwu-messaging-item__message-wrapper__link"
+            (click)="removeMessage()"
+            >{{ 'messaging.remove' | transloco }}</a
+            >
+            ?)
+          </div>
+        }
+        <div class="renwu-messaging-item__message-wrapper__reads">
+          @if (message.read?.length > 0) {
+            <rw-icon
+              [@setCheck]="true"
+              icon="check"
+              size="small"
+              class="renwu-messaging-item__message-wrapper__read-icon"
+              >
+            </rw-icon>
+          }
+          @if (message.read?.length > 1) {
+            <div
+              class="renwu-messaging-item__message-wrapper__read-count"
+              >
+              {{ message.read?.length }}
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    @if (!textOnly) {
+      <div class="renwu-messaging-item__message-wrapper__icons">
+        @if (message.canStartThread) {
+          <div
+            class="renwu-messaging-item__message-wrapper__icon"
+            (click)="onGotoThread()"
+            >
+            <rw-icon
+              icon="response"
+              rwTooltip="{{ 'messaging.open-thread-message' | transloco }}"
+            ></rw-icon>
+          </div>
+        }
+        <!-- <div
+        class="renwu-messaging-item__message-wrapper__icon"
+        (click)="copyLink()"
+        >
+        <rw-icon
+          icon="link"
+          rwTooltip="{{ 'messaging.copy-link' | transloco }}"
+        ></rw-icon>
+      </div> -->
+      <div
+        class="renwu-messaging-item__message-wrapper__icon"
+        (click)="message.fav()"
+        >
+        <rw-icon
+          [state]="message.favorite"
+          [states]="{ true: 'favorite-1', false: 'favorite-0' }"
+          rwTooltip="{{ 'messaging.add-message-to-favorite' | transloco }}"
+        ></rw-icon>
+      </div>
+      <div
+        class="renwu-messaging-item__message-wrapper__icon"
+        (click)="message.pin()"
+        >
+        <rw-icon
+          [state]="message.pinned"
+          [states]="{ true: 'pin-1', false: 'pin-0' }"
+          rwTooltip="{{ 'messaging.pin-message' | transloco }}"
+        ></rw-icon>
+      </div>
+      @if (message.isMessageAuthor) {
+        <div
+          class="renwu-messaging-item__message-wrapper__icon"
+          (click)="onEdit()"
+          >
+          <rw-icon
+            icon="pen"
+            rwTooltip="{{ 'messaging.edit-message' | transloco }}"
+          ></rw-icon>
+        </div>
+      }
+      @if (message.isMessageAuthor && !message.subMessageCount) {
+        <div
+          class="renwu-messaging-item__message-wrapper__icon"
+          (click)="onDelete()"
+          >
+          <rw-icon
+            icon="trash"
+            rwTooltip="{{ 'messaging.delete-message' | transloco }}"
+          ></rw-icon>
+        </div>
+      }
+    </div>
+  }
+</div>
+}
+
+@if (
+  message &&
+  message.type === MessageType.PULSE &&
+  (message.newsData || message.text)
+  ) {
+  <div
+    [@newMessage]="!!message"
+    class="renwu-messaging-item__pulse"
+    >
+    <rw-icon class="renwu-messaging-item__pulse__icon" icon="pulse" size="large">
+    </rw-icon>
+    <div class="renwu-messaging-item__pulse__body">
+      @if (message.author) {
+        <div class="renwu-messaging-item__pulse__author">
+          {{ message.author | rwFormatUser }}
+          <!-- <renwu-personal-page-href [user]="message.author">
+        </renwu-personal-page-href> -->
+      </div>
+    }
+    @if (message.newsData) {
+      <renwu-issue-history-item
+        class="renwu-messaging-item__pulse__history-item"
+        [value]="message.newsData"
+        idField="id"
+        [showAuthor]="false"
+        [showTime]="false"
+        [showSource]="false"
+        >
+      </renwu-issue-history-item>
+    }
+  </div>
+  @if (message.message && !message.newsData) {
+    <div
+      class="renwu-messaging-item__pulse__text"
+      [innerHTML]="formatted"
+    ></div>
+  }
+  <div class="renwu-messaging-item__pulse__time">
+    {{ message.datetime | rwDate: settingsService.user.relativeDateFormat }}
+  </div>
+</div>
+}
+
+@if (message && message.subMembers && !textOnly && !threadStarter) {
+  <div
+    class="renwu-messaging-item__childs"
+    >
+    <div class="renwu-messaging-item__childs__avatar-hidden">
+      <div
+        class="renwu-messaging-item__childs__arrow-wrapper"
+        (click)="onOpenThread()"
+        >
+        <div class="renwu-messaging-item__childs__arrow">
+          @if (displayChilds) {
+            <i
+              class="renwu-messaging-item__icon-keyboard_arrow_up"
+            ></i>
+          }
+          @if (!displayChilds) {
+            <i
+              class="renwu-messaging-item__icon-keyboard_arrow_down"
+            ></i>
+          }
+        </div>
+        <div class="renwu-messaging-item__childs__line-wrapper">
+          @if (displayChilds) {
+            <div
+              class="renwu-messaging-item__childs__line"
+            ></div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="renwu-messaging-item__childs__body">
+      @if (displayChilds) {
+        @for (child of message.children; track child; let i = $index) {
+          <renwu-messaging-item
+            class="renwu-messaging-item__childs__message-item"
+            [message]="child"
+            [scrollMonitorContainer]="scrollMonitorContainer"
+          ></renwu-messaging-item>
+        }
+      }
+      <div
+        class="renwu-messaging-item__childs__href"
+        [class.display-childs]="displayChilds"
+        (click)="onGotoThread()"
+        >
+        @for (id of message.subMembers; track id) {
+          <div
+            class="renwu-messaging-item__childs__href-avatar-wrapper"
+            >
+            <renwu-avatar [user]="{ id: id }" size="1.5em"></renwu-avatar>
+          </div>
+        }
+        <div class="renwu-messaging-item__childs__href-title">
+          <span>{{ 'messaging.go-to-thread' | transloco }}</span>
+          &nbsp;
+          <div class="renwu-messaging-item__childs__href-title-icon">
+            <rw-icon icon="keyboard_arrow_right" size="small"></rw-icon>
+          </div>
+        </div>
+        @if (message.subDestination) {
+          <renwu-message-counter
+            class="renwu-messaging-item__childs__counter"
+            [destination]="message.subDestination"
+          ></renwu-message-counter>
+        }
+      </div>
+    </div>
+  </div>
+}

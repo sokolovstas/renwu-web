@@ -1,0 +1,145 @@
+<div
+  class="renwu-issue-table__wrapper"
+  rwSortTable="issues"
+  [autohideColumns]="true"
+  >
+  <ng-content select="[header]"></ng-content>
+  <div class="renwu-issue-table__header" [rwSortTableRow]="-1">
+    <!-- <div rwSortTableColumnHead="key">{{ 'core.key' | transloco }}</div> -->
+    <div rwSortTableColumnHead="title">{{ 'core.title' | transloco }}</div>
+    <renwu-issue-table-header-column
+      rwSortTableColumnHead="priority"
+      [groupable]="groupable"
+      [sortable]="sortable"
+      [listOptions]="listOptions"
+      (listOptionsChange)="updateListOptions($event)"
+      key="priority"
+      label="{{ 'core.priority' | transloco }}"
+    ></renwu-issue-table-header-column>
+    <renwu-issue-table-header-column
+      rwSortTableColumnHead="type"
+      [groupable]="groupable"
+      [sortable]="sortable"
+      [listOptions]="listOptions"
+      (listOptionsChange)="updateListOptions($event)"
+      key="type"
+      label="{{ 'core.type' | transloco }}"
+    ></renwu-issue-table-header-column>
+    <renwu-issue-table-header-column
+      rwSortTableColumnHead="resolution"
+      [groupable]="groupable"
+      [sortable]="sortable"
+      [listOptions]="listOptions"
+      (listOptionsChange)="updateListOptions($event)"
+      key="resolution"
+      label="{{ 'core.resolution' | transloco }}"
+    ></renwu-issue-table-header-column>
+    <div rwSortTableColumnHead="estimated_time">
+      {{ 'core.estimated-time' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="completion">
+      {{ 'core.completion' | transloco }}
+    </div>
+    <renwu-issue-table-header-column
+      rwSortTableColumnHead="status"
+      [groupable]="groupable"
+      [sortable]="sortable"
+      [listOptions]="listOptions"
+      (listOptionsChange)="updateListOptions($event)"
+      key="status"
+      label="{{ 'core.status' | transloco }}"
+    ></renwu-issue-table-header-column>
+    <div rwSortTableColumnHead="assignes">
+      {{ 'core.assignes' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="skill">{{ 'core.skill' | transloco }}</div>
+    <div rwSortTableColumnHead="milestones">
+      {{ 'core.milestones' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="affected_versions">
+      {{ 'core.affected-versions' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="reporter">
+      {{ 'core.reporter' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="date_created">
+      {{ 'core.date-created' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="date_status_changed">
+      {{ 'core.date-status-changed' | transloco }}
+    </div>
+    <div rwSortTableColumnHead="date_last_update">
+      {{ 'core.date-last-update' | transloco }}
+    </div>
+  </div>
+  <ng-content select="[subheader]"></ng-content>
+  <div
+    class="renwu-issue-table__body"
+    [class.renwu-issue-table__body-scrollable]="fixedHeader"
+    >
+    @for (issue of issues; track issue; let i = $index) {
+      <div
+        class="renwu-issue-table__body-wrapper"
+        (click)="clicked.next(issue)"
+        [rwSortTableRow]="i"
+        >
+        <!-- <div rwSortTableColumn="key">{{ issue.key }}</div> -->
+        <div rwSortTableColumn="title">{{ issue.key }} - {{ issue.title }}</div>
+        <div rwSortTableColumn="priority">
+          <renwu-issue-priority [value]="issue.priority"></renwu-issue-priority>
+        </div>
+        <div rwSortTableColumn="type">
+          <renwu-issue-type [value]="issue.type"></renwu-issue-type>
+        </div>
+        <div rwSortTableColumn="resolution">
+          {{ issue.resolution?.label }}
+        </div>
+        <div rwSortTableColumn="estimated_time">
+          {{ issue.estimated_time | rwDurationToString: ['hours'] }}
+        </div>
+        <div rwSortTableColumn="completion">{{ issue.completion }}</div>
+        <div rwSortTableColumn="status">
+          <renwu-issue-status [value]="issue.status"></renwu-issue-status>
+        </div>
+        <div rwSortTableColumn="assignes">
+          <renwu-issue-assignees [issue]="issue"></renwu-issue-assignees>
+        </div>
+        <div rwSortTableColumn="skill">{{ issue.skill }}</div>
+        <div rwSortTableColumn="milestones">
+          <renwu-issue-milestones
+            [value]="issue.milestones"
+          ></renwu-issue-milestones>
+        </div>
+        <div rwSortTableColumn="affected_versions">
+          {{ issue.affected_versions }}
+        </div>
+        <div rwSortTableColumn="reporter">
+          <renwu-avatar [user]="issue.reporter"></renwu-avatar>
+        </div>
+        <div rwSortTableColumn="date_created">
+          {{ issue.date_created | rwDate: 'P p' }}
+        </div>
+        <div rwSortTableColumn="date_status_changed">
+          {{ issue.date_status_changed | rwDate: 'P p' }}
+        </div>
+        <div rwSortTableColumn="date_last_update">
+          {{ issue.date_last_update | rwDate: 'P p' }}
+        </div>
+      </div>
+    }
+  </div>
+  <div class="flex flex-row">
+    <div class="flex flex-row flex-1 basis-full">
+      <ng-content select="[footer]"></ng-content>
+    </div>
+
+    @if (showExport) {
+      <rw-button
+        class="ml-4 items-end"
+        typeButton="link"
+        (clicked)="openExporter()"
+        >{{ 'core.export-list' | transloco }}</rw-button
+        >
+      }
+    </div>
+  </div>

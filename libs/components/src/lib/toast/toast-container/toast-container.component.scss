@@ -1,0 +1,6 @@
+@use '../../../styles/rw_variables.scss' as *;
+
+.rw-toast-container__list {
+  @include toast-list-style;
+  z-index: $toasts-z-index;
+}

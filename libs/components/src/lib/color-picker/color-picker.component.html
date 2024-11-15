@@ -1,0 +1,56 @@
+<div
+  class="value"
+  #valueElement
+  (click)="switchPopup(true)"
+  [class.value-active]="opened"
+  >
+  <div class="value-color" [style.background-color]="color.getHex()">
+    &nbsp;
+    <rw-icon class="icon" icon="keyboard_arrow_down" size="small"></rw-icon>
+  </div>
+</div>
+<rw-dropdown
+  #dropdown
+  class="dropdown"
+  [bindElement]="valueElement"
+  [closeByClickElement]="false"
+  [displayBackground]="true"
+  >
+  <ng-template #dropdownContent>
+    <div class="color-items">
+      <div class="color-items-line">
+        @for (color of baseColors; track color) {
+          <div
+            class="color-item"
+            [style.background-color]="color.getHex()"
+            (click)="selectColor(color)"
+          ></div>
+        }
+      </div>
+      <div class="color-horizontal-line"></div>
+      @for (colorLine of colors; track colorLine) {
+        <div class="color-items-line">
+          @for (color of colorLine; track color) {
+            <div
+              class="color-item"
+              [style.background-color]="color.getHex()"
+              (click)="selectColor(color)"
+            ></div>
+          }
+        </div>
+      }
+      <div class="color-horizontal-line"></div>
+      <rw-text-input
+        [ngModel]="textValue"
+        (ngModelChange)="parseColor($event)"
+        [borderless]="true"
+        >
+      </rw-text-input>
+    </div>
+    <!-- <div class="recent-colors-title"><span>Recent colors</span>:</div>
+    <div class="color-items-line">
+      <div class="color-item" *ngFor="let color of recentLine" [style.background-color]="color.getHex()">
+      </div>
+    </div> -->
+  </ng-template>
+</rw-dropdown>

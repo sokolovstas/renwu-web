@@ -1,0 +1,7 @@
+<!-- <div *ngIf="autoassignee" rwTooltip="Auto assigned">❉&nbsp;</div> -->
+@if (!assignee) {
+  <div>{{ label }}</div>
+}
+<div>@if (assignee) {
+  <renwu-avatar [user]="assignee"></renwu-avatar>
+}</div>

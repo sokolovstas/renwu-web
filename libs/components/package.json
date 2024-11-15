@@ -1,0 +1,19 @@
+{
+  "name": "@renwu/components",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "17.0.0",
+    "@angular/core": "17.0.0",
+    "moment": "^2.29.4"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "i18n": [
+    {
+      "scope": "components",
+      "path": "src/i18n",
+      "strategy": "join"
+    }
+  ]
+}

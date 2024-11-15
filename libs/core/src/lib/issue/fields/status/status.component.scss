@@ -1,0 +1,42 @@
+@use '../../../../styles/variables.scss' as *;
+
+:host {
+  display: flex;
+  flex: 0 0 auto;
+  line-height: 1;
+  // justify-content: center;
+  color: var(--always-black);
+}
+.status {
+  flex: 0 0 auto;
+  font-weight: $global-weight-bold;
+  // width: 8em;
+  // height: 1.5em;
+  border-radius: 5px;
+  background-color: $white;
+  // border: 2px solid;
+  padding: 0.25rem 0.5rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  // text-align: center;
+  display: flex;
+  // align-items: center;
+  // justify-content: center;
+}
+
+.status-label {
+  flex: 0 0 auto;
+  display: flex;
+  vertical-align: middle;
+  // text-align: center;
+}
+
+.status.placeholder {
+  @include placeholder(8em);
+  border: 0;
+  height: 1.5em;
+  .status-label {
+  }
+}

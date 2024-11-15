@@ -1,0 +1,62 @@
+<div
+  class="flex flex-col w-full h-full"
+  [ngClass]="{
+  'overflow-auto md:overflow-hidden': !fixedHeader
+  }"
+  >
+  <div
+    class="w-full flex flex-col pb-4 border-b-2 border-gray-200 z-10 px-4 md:px-6"
+    >
+    <div class="flex flex-row items-center">
+      <div class="flex flex-col w-full overflow-hidden">
+        @if (breadcrumbs) {
+          <div
+            class="text-sm flex flex-row font-extralight whitespace-nowrap text-ellipsis overflow-hidden"
+            >
+            @for (b of breadcrumbs; track b) {
+              <a
+                class="flex flex-row"
+                [routerLink]="b.url"
+                (click)="action(b)"
+                >
+                <div class="">{{ b.title }}</div>
+                <rw-icon class="mx-1" [icon]="'keyboard_arrow_right'"></rw-icon>
+              </a>
+            }
+            <div class="whitespace-nowrap text-ellipsis overflow-hidden">
+              {{ title }}
+            </div>
+          </div>
+        }
+        @if (title && !hideTitle) {
+          <div
+            class="text-2xl font-extralight overflow-hidden text-ellipsis whitespace-nowrap w-full"
+            >
+            {{ title }}
+          </div>
+        }
+      </div>
+      <div class="flex flex-row gap-2">
+        <ng-content select="[action]"></ng-content>
+      </div>
+    </div>
+    <ng-content select="[subtitle]"></ng-content>
+  </div>
+
+  <div
+    class="flex flex-col h-full w-full"
+    [ngClass]="{
+    'pt-2 md:pt-4 px-4 md:px-6': !noPadding,
+    'overflow-auto': fixedHeader,
+    'overflow-visible md:overflow-auto': !fixedHeader
+    }"
+    >
+    <ng-content></ng-content>
+  </div>
+  <div
+    class="flex flex-row justify-end hide-empty py-4 gap-4"
+    [ngClass]="{ 'px-4 md:px-6': !noPadding }"
+    >
+    <ng-content select="[action]"></ng-content>
+  </div>
+</div>

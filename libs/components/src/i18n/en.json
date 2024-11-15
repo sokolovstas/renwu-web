@@ -1,0 +1,23 @@
+{
+  "enter-value": "enter value",
+  "last-3-hours": "last 3 hours",
+  "last-6-hours": "last 6 hours",
+  "last-12-hours": "last 12 hours",
+  "last-24-hours": "last 24 hours",
+  "last-2-days": "last 2 days",
+  "last-7-days": "last 7 days",
+  "last-30-days": "last 30 days",
+  "today": "today",
+  "yesterday": "yesterday",
+  "day-before-yesterday": "day before yesterday",
+  "this-day-last-week": "ths day last wee",
+  "previous-week": "previous week",
+  "this-week": "this week",
+  "this-month": "this month",
+  "clear-date": "clear date",
+  "Apply": "Apply",
+  "from": "from",
+  "loading": "loading",
+  "type-for-search": "type for search",
+  "load-more": "load more"
+}

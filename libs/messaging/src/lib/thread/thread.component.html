@@ -1,0 +1,62 @@
+<div class="renwu-messaging-thread__scroller" #scroller (scroll)="onScroll()">
+  @if (pinnedMessages?.length > 0) {
+    <div
+      class="renwu-messaging-thread__pinned"
+      >
+      <rw-icon icon="pin-1"></rw-icon>
+      @for (message of pinnedMessages; track message; let i = $index) {
+        <renwu-messaging-item
+          [message]="message"
+          [destination]="destination"
+          [scrollMonitorContainer]="scrollMonitorContainer"
+          (clickSubDestination)="clickedSubDestination($event)"
+        ></renwu-messaging-item>
+      }
+    </div>
+  }
+  @if (leftMessagesBefore) {
+    <div #loadPrev>
+      <rw-button
+        class="renwu-messaging-thread__load-button"
+        typeButton="link"
+        (clicked)="onLoadPrev()"
+        [inProgress]="loadingMessages"
+        >{{
+        'messaging.%leftMessagesBefore%-previous-messages'
+        | transloco: { leftMessagesBefore }
+        }}</rw-button
+        >
+      </div>
+    }
+    @if (threadStartMessage) {
+      <renwu-messaging-item
+        [message]="threadStartMessage"
+        [threadStarter]="true"
+        [destination]="destination"
+        (clickSubDestination)="clickedSubDestination($event)"
+      ></renwu-messaging-item>
+    }
+
+    @for (message of messages; track message; let i = $index) {
+      <renwu-messaging-item
+        [message]="message"
+        [destination]="destination"
+        [scrollMonitorContainer]="scrollMonitorContainer"
+        (clickSubDestination)="clickedSubDestination($event)"
+      ></renwu-messaging-item>
+    }
+    @if (leftMessagesAfter) {
+      <div #loadNext>
+        <rw-button
+          class="renwu-messaging-thread__load-button"
+          typeButton="link"
+          (clicked)="onLoadNext()"
+          [inProgress]="loadingMessages"
+          >{{
+          'messaging.%leftMessagesAfter%-next-messages'
+          | transloco: { leftMessagesAfter }
+          }}</rw-button
+          >
+        </div>
+      }
+    </div>

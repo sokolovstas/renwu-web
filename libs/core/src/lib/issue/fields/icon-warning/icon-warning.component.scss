@@ -1,0 +1,46 @@
+@use '../../../../styles/variables.scss' as *;
+
+:host {
+  display: flex;
+}
+
+.flags {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.flags.no-assignee,
+.flags.warning {
+  color: rgba($error-color, 0.5);
+}
+
+.flags.not-posted,
+.flags.not-planning {
+  color: rgba($warn-color, 0.5);
+}
+
+.flag-tooltip {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.flags.hidden {
+  overflow: hidden;
+  height: 0;
+}
+
+.icon-warning {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  padding-right: 0.5em;
+  margin-left: 0.5em;
+  flex: 0 0;
+}

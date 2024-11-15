@@ -1,0 +1,67 @@
+<renwu-page-with-sidebar>
+  <div sidebar>
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      {{ 'projects.projects' | transloco }}
+    </div>
+    <ul class="flex flex-col overflow-auto w-full mb-4">
+      @for (container of containers | async; track container) {
+        <li>
+          <a
+            class="flex p-4"
+            [routerLink]="container.key"
+            [renwuTourAnchor]="'projects-container-' + container.key"
+            routerLinkActive="router-link-active"
+            >{{ container.title }} ({{ container.key }})</a
+          >
+        </li>
+      }
+    </ul>
+  </div>
+  <renwu-page title="{{ 'projects.projects' | transloco }}">
+    <rw-checkbox
+      class="flex self-end"
+      [ngModel]="showArchived | async"
+      (ngModelChange)="showArchived.next($event)"
+      [label]="'projects.show-archived-projects' | transloco"
+    ></rw-checkbox>
+    <div rwSortTable="users" class="flex flex-col w-full">
+      <div class="flex flex-row w-full">
+        <div rwSortTableColumnHead="key">{{ 'projects.key' | transloco }}</div>
+        <div rwSortTableColumnHead="title">
+          {{ 'projects.name' | transloco }}
+        </div>
+        <div rwSortTableColumnHead="checkbox">
+          {{ 'projects.archived' | transloco }}
+        </div>
+      </div>
+      @for (container of containers | async; track container; let i = $index) {
+        <a
+          class="flex flex-row w-full"
+          [rwSortTableRow]="i"
+          [routerLink]="container.key"
+          routerLinkActive="router-link-active"
+        >
+          <div rwSortTableColumn="key">
+            {{ container.key }}
+          </div>
+          <div rwSortTableColumn="title">
+            {{ container.title }}
+          </div>
+          <div rwSortTableColumn="checkbox">
+            <rw-checkbox
+              class="inline-block"
+              [ngModel]="container.archived"
+            ></rw-checkbox>
+          </div>
+        </a>
+      }
+    </div>
+    <rw-button
+      action
+      iconClass="add-bold"
+      (clicked)="addProject()"
+      [renwuTourAnchor]="'projects-add'"
+      >{{ 'projects.add-project' | transloco }}</rw-button
+    ></renwu-page
+  >
+</renwu-page-with-sidebar>

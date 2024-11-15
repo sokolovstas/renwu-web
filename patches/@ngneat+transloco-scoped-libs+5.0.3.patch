@@ -1,0 +1,21 @@
+diff --git a/node_modules/@ngneat/transloco-scoped-libs/src/index.js b/node_modules/@ngneat/transloco-scoped-libs/src/index.js
+index 5fc3d55..333113c 100755
+--- a/node_modules/@ngneat/transloco-scoped-libs/src/index.js
++++ b/node_modules/@ngneat/transloco-scoped-libs/src/index.js
+@@ -8,12 +8,13 @@ const transloco_scoped_libs_1 = tslib_1.__importDefault(require("./lib/transloco
+ const optionDefinitions = [
+     { name: 'watch', alias: 'w', type: Boolean, defaultValue: false },
+     { name: 'skip-gitignore', alias: 'm', type: Boolean, defaultValue: false },
++    { name: 'dist', alias: 'd', type: String, defaultValue: false },
+ ];
+-const { watch, ['skip-gitignore']: skipGitIgnoreUpdate } = (0, command_line_args_1.default)(optionDefinitions);
+-const { rootTranslationsPath, scopedLibs } = (0, transloco_utils_1.getGlobalConfig)();
++const { watch, dist, ['skip-gitignore']: skipGitIgnoreUpdate } = (0, command_line_args_1.default)(optionDefinitions);
++const { rootTranslationsPath, scopedLibs } = (0, transloco_utils_1.getGlobalConfig)(dist);
+ (0, transloco_scoped_libs_1.default)({
+     watch,
+     skipGitIgnoreUpdate,
+-    rootTranslationsPath,
++    rootTranslationsPath: rootTranslationsPath || dist,
+     scopedLibs,
+ });

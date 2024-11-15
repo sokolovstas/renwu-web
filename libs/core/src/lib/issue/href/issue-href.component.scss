@@ -1,0 +1,14 @@
+:host {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  display: block;
+  span.container {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+  }
+}

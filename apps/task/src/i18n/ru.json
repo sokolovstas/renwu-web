@@ -1,0 +1,21 @@
+{
+  "add_new_task": "Добавить новую задачу",
+  "title": "Заголовок",
+  "container": "Проект",
+  "milestones": "Вехи",
+  "type": "Тип",
+  "todo": "ToDo",
+  "todo-add": "добавить todo",
+  "priority": "Приоритет",
+  "status": "Статус",
+  "affected-version": "Затронутые версии",
+  "assignee": "Исполнители",
+  "estimated-time": "Оценка",
+  "watchers": "Наблюдатели",
+  "labels": "Метки",
+  "description": "Описание",
+  "comments": "Комментарии",
+  "create": "Создать",
+  "create-and-add-another": "Создать и добавить еще",
+  "issue-%issue.key%-created-successfully": "Задача {{issue.key}} успешно создана"
+}

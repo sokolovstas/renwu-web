@@ -1,0 +1,32 @@
+<div
+  class="rw-modal-background {{ state }}"
+  [@backgroundState]="state"
+  (click)="close()"
+></div>
+<div
+  class="rw-modal-wrapper {{ state }}"
+  [@state]="state"
+  [hidden]="state !== 'show'"
+>
+  <div class="rw-modal-title-bar">
+    <div class="rw-modal-title">
+      <ng-content select="[rwModalHeader]"></ng-content>
+    </div>
+    <div class="rw-modal-sub-title">
+      <ng-content select="[rwModalSubHeader]"></ng-content>
+    </div>
+    <div class="rw-modal-title-buttons">
+      <ng-content select="[rwModalHeaderButtons]"></ng-content>
+    </div>
+    <rw-button
+      class="rw-modal-close-button"
+      typeButton="icon"
+      iconClass="close"
+      iconSize="x-large"
+      (clicked)="close()"
+    >
+    </rw-button>
+  </div>
+  <ng-content select="[rwModalBody]"></ng-content>
+  <ng-content select="[rwModalFooter]"></ng-content>
+</div>

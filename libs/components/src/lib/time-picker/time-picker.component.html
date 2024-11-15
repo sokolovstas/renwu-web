@@ -1,0 +1,64 @@
+<div
+  class="component-container"
+  [class.component-container-active]="editOpened"
+  #valueElement
+  >
+  <div
+    [tabindex]="-1"
+    class="rw-time-picker-prompt"
+    [class.rw-time-picker-prompt-active]="valueInput || editOpened"
+    >
+    {{ prompt }}
+  </div>
+  <div class="input-container" [class.container-active]="editOpened">
+    <rw-text-input
+      #input
+      [borderless]="true"
+      [ngModel]="editOpened ? valueInput : getLabel()"
+      (keydown)="onKeyDown($event)"
+      (ngModelChange)="onInputChange($event)"
+      >
+    </rw-text-input>
+  </div>
+  @if (!disabled && !editOpened) {
+    <rw-icon
+      [tabindex]="-1"
+      class="popup-icon button"
+      [icon]="icon"
+      size="normal"
+      (mousedown)="enableSelectMode($event)"
+      >
+    </rw-icon>
+  }
+  @if (showClear && value > 0) {
+    <rw-icon
+      [tabindex]="-1"
+      class="clear"
+      icon="close"
+      size="normal"
+      (mousedown)="onClear($event)"
+      >
+    </rw-icon>
+  }
+</div>
+<rw-dropdown
+  #dropdown
+  class="rw-select-dropdown dropdown rw-timepicker-dropdown"
+  [bindElement]="valueElement"
+  [displayBackground]="true"
+  [placement]="'bottom'"
+  [useBindWidth]="false"
+  >
+  <ng-template #dropdownContent>
+    <div class="popup-helpers">
+      @for (helper of helpers; track helper) {
+        <div
+          class="popup-helpers-item"
+          (click)="setFromHelper(helper)"
+          >
+          {{ helper | rwDurationToString: ['hours'] }}
+        </div>
+      }
+    </div>
+  </ng-template>
+</rw-dropdown>

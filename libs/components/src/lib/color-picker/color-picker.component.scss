@@ -1,0 +1,77 @@
+@use '../../styles/rw_variables.scss' as *;
+
+:host {
+  @include component;
+  @include component-focus;
+  @include component-invalid;
+}
+
+.background {
+  @include component-popup-background;
+}
+
+.background-active {
+  display: block;
+}
+
+.value {
+  cursor: pointer;
+  color: $rw-control-text-color;
+  display: flex;
+  align-items: center;
+  flex-basis: 100%;
+}
+
+.value-color {
+  border-radius: $rw-control-border-radius * 2;
+  padding: $rw-control-default-padding $rw-control-default-padding;
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 26px;
+}
+
+.dropdown {
+  padding: 15px;
+}
+
+.color-items {
+  display: flex;
+  flex-direction: column;
+  padding: $rw-modal-padding-v $rw-modal-padding-h;
+}
+
+.color-items-line {
+  display: flex;
+  flex-direction: row;
+}
+
+.color-item {
+  width: 25px;
+  height: 25px;
+  margin: 1px;
+  border-radius: $rw-control-border-radius * 2;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.color-item:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.recent-colors-title {
+  margin: 15px 3px;
+}
+
+.color-horizontal-line {
+  width: 100%;
+  height: 1px;
+  background-color: $gray-100;
+  margin: 5px 0;
+}
+rw-text-input {
+  text-align: center;
+}

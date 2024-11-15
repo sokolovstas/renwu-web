@@ -1,0 +1,15 @@
+<div
+  class="item item-{{ level }}"
+  [class.item-hide]="hide"
+  [class.pointer]="object?.onClick"
+  (click)="toastClick.next($event)"
+  >
+  <div class="item-text">
+    {{ text }}
+  </div>
+  @if (persistant) {
+    <div class="item-close" (click)="closeClick.next($event)">
+      &#215;
+    </div>
+  }
+</div>

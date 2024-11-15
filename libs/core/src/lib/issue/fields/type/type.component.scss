@@ -1,0 +1,19 @@
+@use '../../../../styles/variables.scss' as *;
+
+:host {
+  display: flex;
+  position: relative;
+  text-align: center;
+  user-select: none;
+  cursor: default;
+  align-items: center;
+  flex-direction: column;
+}
+
+.value {
+  width: 100%;
+}
+
+.value.placeholder {
+  @include placeholder(1.5em);
+}

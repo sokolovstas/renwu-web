@@ -1,0 +1,83 @@
+@if (workflow | async; as w) {
+  <renwu-page
+    title="{{ w.title }}"
+    [breadcrumbs]="[{ url: '../', title: 'settings.workflows' | transloco }]"
+    >
+    <form
+      [formGroup]="workflowForm"
+      class="flex w-full h-full flex-col overflow-hidden"
+      >
+      <rw-text-input
+        formControlName="title"
+        prompt="{{ 'settings.title' | transloco }}"
+        class="mb-4"
+      ></rw-text-input>
+      <div class="flex flex-row w-full h-full gap-2 overflow-hidden">
+        <div class="flex-col w-full h-full gap-2 overflow-auto">
+          @for (status of groupedTransitions; track status; let i = $index) {
+            <div>
+              <div
+                [formGroup]="status"
+                class="flex flex-col items-start p-4 bg-gray-100 rounded-2xl mb-4"
+                >
+                {{ 'settings.transition-from' | transloco }}
+                <renwu-issue-status
+                  class="my-4"
+                  [value]="status.controls.step.value"
+                ></renwu-issue-status>
+                {{ 'settings.transition-to' | transloco }}
+                @for (to of status.controls.tos.controls; track to; let i = $index) {
+                  <div>
+                    <div
+                      [formGroup]="to"
+                      class="flex flex-row items-center gap-2 mt-4"
+                      >
+                      <rw-select
+                        class="w-40"
+                        modelName="Status"
+                        formControlName="to"
+                        [borderless]="true"
+                        prompt="{{ 'settings.to-status' | transloco }}"
+                        >
+                        <ng-template #selectedItemTemplate let-select="select">
+                          <div (click)="select.switchPopup()">
+                            <renwu-issue-status
+                              [value]="to.controls.to.value"
+                            ></renwu-issue-status>
+                          </div>
+                        </ng-template>
+                      </rw-select>
+                      <rw-text-input
+                        formControlName="label"
+                        prompt="{{ 'settings.translation-label' | transloco }}"
+                        [borderless]="true"
+                      ></rw-text-input>
+                      <rw-button
+                        iconClass="trash"
+                        [double]="true"
+                        typeButton="icon"
+                        (clicked)="removeStep(status, i)"
+                      ></rw-button>
+                    </div>
+                  </div>
+                }
+                <rw-button
+                  class="mt-4"
+                  iconClass="add-bold"
+                  (clicked)="addStep(status)"
+                  >{{ 'settings.add' | transloco }}</rw-button
+                  >
+                </div>
+              </div>
+            }
+          </div>
+          <div class="flex-col w-full h-full hidden md:flex">
+            <svg class="w-full h-full" id="workflowGraph"></svg>
+          </div>
+        </div>
+      </form>
+      <rw-button action (clicked)="save()">{{
+        'settings.save' | transloco
+      }}</rw-button>
+    </renwu-page>
+  }

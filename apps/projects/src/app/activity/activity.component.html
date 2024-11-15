@@ -1,0 +1,42 @@
+<renwu-page
+  [title]="'projects.recent-activity' | transloco"
+  [breadcrumbs]="[
+  { title: 'projects.projects' | transloco, url: '../../' },
+  { title: (currentProject | async).key, url: '../' }
+  ]"
+  >
+  <div class="">
+    @for (h of history | async; track h) {
+      <renwu-issue-history-item
+        class="pb-4"
+        [value]="h"
+        idField="id"
+        [showAuthor]="true"
+        [showTime]="true"
+        [showSource]="true"
+        >
+      </renwu-issue-history-item>
+    }
+    @if (destination?.leftBefore | async; as leftBefore) {
+      <div
+        class="padding-bottom"
+        (click)="loadMore()"
+        >
+        <div class="border-left"></div>
+        @if (!loading) {
+          <div class="text">
+            {{ 'projects.%leftBefore%-old-messages' | transloco: { leftBefore } }}
+          </div>
+        }
+        @if (loading) {
+          <div class="text spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+          </div>
+        }
+        <div class="border-right"></div>
+      </div>
+    }
+  </div>
+</renwu-page>

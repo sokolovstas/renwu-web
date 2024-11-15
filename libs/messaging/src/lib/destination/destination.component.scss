@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+.renwu-messaging-destination {
+  &__item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+    &__icon {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      margin-right: 0.5rem;
+      width: 2rem;
+      height: 2rem;
+      flex-shrink: 0;
+    }
+    &__label {
+      width: 100%;
+      overflow: hidden;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+    &__label-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      white-space: nowrap;
+      line-height: 1rem;
+    }
+    &__arrow-icon {
+      margin-right: 0.25rem;
+    }
+    &__counter {
+      margin-right: 0.25rem;
+    }
+  }
+}

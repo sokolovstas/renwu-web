@@ -1,0 +1,518 @@
+@if (canDisplay()) {
+  <div class="news">
+    @if (showAuthor || showTime) {
+      <div class="author-time-source">
+        <div class="author-source">
+          @if (value.source_id && value.source && showSource) {
+            <renwu-issue-href
+              class="source"
+              [issue]="value.source"
+              [linkButton]="true"
+              [copyOnDoubleClick]="true"
+              [key]="value.source.key"
+              [title]="value.source.title"
+              >
+            </renwu-issue-href>
+          }
+          {{ value.author | rwFormatUser }}
+        </div>
+        @if (showTime) {
+          <div
+            class="time"
+            [rwTooltip]="value.date | rwDate: 'PPP pp'"
+            >
+            {{ value.date | rwDate: settingsService.user.relativeDateFormat }}
+          </div>
+        }
+      </div>
+    }
+    <div class="changes">
+      @if (value.type === 'issue_favorite') {
+        <div class="change">
+          <div><span>Add to favorites</span></div>
+        </div>
+      }
+      @if (value.type === 'issue_unfavorite') {
+        <div class="change">
+          <div><span>Remove from favorites</span></div>
+        </div>
+      }
+      @if (value.type === 'issue_create') {
+        <div class="change">
+          <div>
+            <span>Create <span class="field-name">task</span></span>
+          </div>
+        </div>
+      }
+      @if (value.type === 'issue_delete') {
+        <div class="change">
+          <div>
+            <span>Delete <span class="field-name">task</span></span>
+          </div>
+        </div>
+      }
+      @if (
+        value.type === undefined ||
+        value.type === 'issue_update' ||
+        value.type === 'issue_timelog' ||
+        (value.type === 'issue_transition' &&
+        value.fields_changes &&
+        value.fields_changes.length > 0)
+        ) {
+        @for (field of value.fields_changes; track field) {
+          @if (field.field_name === 'status') {
+            <div class="change">
+              <div>Set <span class="field-name">status</span> to</div>
+              <!-- &nbsp;<issue-status [value]="value.fields_changes[0].old_value"></issue-status>&nbsp;
+              <div>to</div> -->
+              &nbsp;&nbsp;<renwu-issue-status
+              [value]="field.new_value"
+              ></renwu-issue-status
+              >&nbsp;
+            </div>
+          }
+          @if (field.field_name === 'estimated_time') {
+            <div class="change">
+              <div>Set <span class="field-name">estimated time</span> to</div>
+              <!-- &nbsp;<div>"{{field.old_value.duration/1000000 | rwDurationToString}}"</div>&nbsp;
+              <div>to</div> -->
+              <div class="field-value">
+                &nbsp;{{
+                field.new_value.duration / 1000 | rwDurationToString
+                }}&nbsp;
+              </div>
+            </div>
+          }
+          @if (field.field_name === 'completion') {
+            <div class="change">
+              <div>Set <span class="field-name">completion</span> to</div>
+              <!-- &nbsp;<div>"{{field.old_value.duration/1000000 | rwDurationToString}}"</div>&nbsp;
+              <div>to</div> -->
+              &nbsp;
+              <div class="field-value">{{ field.new_value }}%</div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'type') {
+            <div class="change">
+              <div>Set <span class="field-name">type</span> to</div>
+              <!-- &nbsp;<issue-type [value]="field.old_value"></issue-type>&nbsp;
+              <div>to</div> -->
+              &nbsp;<renwu-issue-type
+              [withLabel]="true"
+              [value]="field.new_value"
+              ></renwu-issue-type
+              >&nbsp;
+            </div>
+          }
+          @if (field.field_name === 'priority') {
+            <div class="change">
+              <div>Set <span class="field-name">priority</span> to</div>
+              <!-- &nbsp;<issue-priority [value]="field.old_value"></issue-priority>&nbsp;
+              <div>to</div> -->
+              &nbsp;<renwu-issue-priority
+              [withLabel]="true"
+              [value]="field.new_value"
+              ></renwu-issue-priority
+              >&nbsp;
+            </div>
+          }
+          @if (field.field_name === 'labels') {
+            @if (getAdded(field); as added) {
+              <div class="change">
+                <div>Add <span class="field-name">labels</span></div>
+                :&nbsp;
+                <div class="field-value">{{ added }}</div>
+              </div>
+            }
+            @if (getRemoved(field); as removed) {
+              <div class="change">
+                <div>Remove <span class="field-name">labels</span></div>
+                :&nbsp;
+                <div class="field-value">{{ removed }}</div>
+              </div>
+            }
+          }
+          @if (field.field_name === 'affected_versions') {
+            @if (getAdded(field, idField, 'title'); as added) {
+              <div
+                class="change"
+                >
+                <div>Add <span class="field-name">affected version</span></div>
+                :&nbsp;
+                <div class="field-value">{{ added }}</div>
+              </div>
+            }
+            @if (getRemoved(field, idField, 'title'); as removed) {
+              <div
+                class="change"
+                >
+                <div>Remove <span class="field-name">affected version</span></div>
+                :&nbsp;
+                <div class="field-value">{{ removed }}</div>
+              </div>
+            }
+          }
+          @if (field.field_name === 'skill') {
+            <div class="change">
+              <div>Set <span class="field-name">skill</span> to</div>
+              <!-- &nbsp;<div>"{{field.old_value}}"</div>&nbsp;
+              <div>to</div> -->
+              &nbsp;
+              <div class="field-value">{{ field.new_value || '---' }}</div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'assignes') {
+            <div class="change">
+              <div>Set <span class="field-name">assignee</span> to</div>
+              <!-- &nbsp;<div>"{{field.old_value[0] | rwFormatUser}}"</div>&nbsp;
+              <div>to</div> -->
+              &nbsp;
+              <div class="field-value">{{ field.new_value[0] | rwFormatUser }}</div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'container') {
+            <div class="change">
+              <div>Move to <span class="field-name">project</span></div>
+              &nbsp;
+              <div class="field-value">{{ field.new_value.title }}</div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'date_start') {
+            <div class="change">
+              <div>Change <span class="field-name">date start</span> to</div>
+              &nbsp;
+              <div class="field-value">
+                {{ field.new_value.time | rwDate: 'LL' }}
+              </div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'date_end') {
+            <div class="change">
+              <div>Change <span class="field-name">date end</span> to</div>
+              &nbsp;
+              <div class="field-value">
+                {{ field.new_value.time | rwDate: 'LL' }}
+              </div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'time_logged') {
+            <div class="change">
+              <div>Change <span class="field-name">time logged</span> to</div>
+              &nbsp;
+              <div class="field-value">
+                {{ field.new_value.duration / 1000 | rwDurationToString }}
+              </div>
+              &nbsp;
+            </div>
+          }
+          @if (field.field_name === 'milestones') {
+            @if (getAdded(field, idField, 'title'); as added) {
+              <div
+                class="change"
+                >
+                <div>Add <span class="field-name">milestones</span></div>
+                :&nbsp;
+                <div class="field-value">{{ added }}</div>
+              </div>
+            }
+            @if (getRemoved(field, idField, 'title'); as removed) {
+              <div
+                class="change"
+                >
+                <div>Remove <span class="field-name">milestones</span></div>
+                :&nbsp;
+                <div class="field-value">{{ removed }}</div>
+              </div>
+            }
+          }
+          @if (field.field_name === 'title') {
+            <div class="change">
+              <div>Change <span class="field-name">title</span></div>
+              : &nbsp;
+              <div
+                class="field-value-description"
+                [innerHtml]="getDescriptionDiff(field)"
+              ></div>
+            </div>
+          }
+          @if (field.field_name === 'description') {
+            <div class="change">
+              <div>Change <span class="field-name">description</span></div>
+              : &nbsp;
+              <div
+                class="field-value-description"
+                [innerHtml]="getDescriptionDiff(field)"
+              ></div>
+            </div>
+          }
+          @if (field.field_name === 'watchers') {
+            {{ getAdded(field, idField, 'username') }}
+            @if (getAdded(field, idField, 'username'); as added) {
+              <div
+                class="change"
+                >
+                <div>Add <span class="field-name">watchers</span></div>
+                :&nbsp;
+                <div class="field-value">{{ added }}</div>
+              </div>
+            }
+            @if (getRemoved(field, idField, 'username'); as removed) {
+              <div
+                class="change"
+                >
+                <div>Remove <span class="field-name">watchers</span></div>
+                :&nbsp;
+                <div class="field-value">{{ removed }}</div>
+              </div>
+            }
+          }
+          @if (field.field_name === 'todos') {
+            @if (getToDoDiff(field); as diff) {
+              @if (diff.added) {
+                <div class="change">
+                  <div>Add <span class="field-name">ToDo</span></div>
+                  :&nbsp;
+                  <div class="field-value">{{ diff.added }}</div>
+                </div>
+              }
+              @if (diff.removed) {
+                <div class="change">
+                  <div>Remove <span class="field-name">ToDo</span></div>
+                  :&nbsp;
+                  <div class="field-value">{{ diff.removed }}</div>
+                </div>
+              }
+              @if (diff.done) {
+                <div class="change">
+                  <div>Mark <span class="field-name">ToDo</span> as done</div>
+                  :&nbsp;
+                  <div class="field-value">{{ diff.done }}</div>
+                </div>
+              }
+              @if (diff.undone) {
+                <div class="change">
+                  <div>Mark <span class="field-name">ToDo</span> as not done</div>
+                  :&nbsp;
+                  <div class="field-value">{{ diff.undone }}</div>
+                </div>
+              }
+              @if (diff.text) {
+                <div class="change">
+                  <div>Change <span class="field-name">ToDo</span> text</div>
+                  : &nbsp;
+                  <div
+                    class="field-value-description"
+                    [innerHtml]="diff.text"
+                  ></div>
+                </div>
+              }
+            }
+          }
+          @if (field.field_name === 'attachments') {
+            <ng-container class="change">
+              @if (getAdded(field, idField, 'file_name'); as added) {
+                <div
+                  class="change"
+                  >
+                  <div>Add <span class="field-name">attachment</span></div>
+                  :&nbsp;
+                  <div class="field-value">{{ added }}</div>
+                </div>
+              }
+              @if (getRemoved(field, idField, 'file_name'); as removed) {
+                <div
+                  class="change"
+                  >
+                  <div>Remove <span class="field-name">attachment</span></div>
+                  :&nbsp;
+                  <div class="field-value">{{ removed }}</div>
+                </div>
+              }
+            </ng-container>
+          }
+          @if (field.field_name === 'auto_scheduling') {
+            @if (field.new_value) {
+              <div class="change">
+                <div>Set <span class="field-name">scheduling type</span></div>
+                :&nbsp;
+                <div class="field-value">AUTO</div>
+              </div>
+            }
+            @if (!field.new_value) {
+              <div class="change">
+                <div>Set <span class="field-name">scheduling type</span></div>
+                :&nbsp;
+                <div class="field-value">MANUAL</div>
+              </div>
+            }
+          }
+          @if (field.field_name === 'time_logs') {
+            @if (getTimeLogsDiff(field); as diff) {
+              @if (diff.added) {
+                <div class="change">
+                  <div>
+                    Add <span class="field-name">time log</span> with duration
+                  </div>
+                  :&nbsp;
+                  <div class="field-value">
+                    {{ diff.added.value.duration / 1000 | rwDurationToString }}
+                  </div>
+                </div>
+              }
+              @if (diff.removed) {
+                <div class="change">
+                  <div>
+                    Remove <span class="field-name">time log</span> with duration
+                  </div>
+                  :&nbsp;
+                  <div class="field-value">
+                    {{ diff.removed.value.duration / 1000 | rwDurationToString }}
+                  </div>
+                </div>
+              }
+              @if (diff.changed) {
+                <div class="change">
+                  <div>
+                    Change <span class="field-name">time log from</span> ({{
+                    diff.changed.date_created.time | rwDate
+                    }}) duration to
+                  </div>
+                  :&nbsp;
+                  <div class="field-value">
+                    {{ diff.changed.value.duration / 1000 | rwDurationToString }}
+                  </div>
+                </div>
+              }
+            }
+          }
+          @if (field.field_name === 'links') {
+            @if (getLinksDiff(field); as diff) {
+              @if (diff.next.added) {
+                <div class="change">
+                  <div>Add <span class="field-name">next link</span> with</div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.next.added"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.next.added.key"
+                    [title]="diff.next.added.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.next.removed) {
+                <div class="change">
+                  <div>Remove <span class="field-name">next link</span> with</div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.next.removed"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.next.removed.key"
+                    [title]="diff.next.removed.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.prev.added) {
+                <div class="change">
+                  <div>Add <span class="field-name">previous link</span> with</div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.prev.added"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.prev.added.key"
+                    [title]="diff.prev.added.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.prev.removed) {
+                <div class="change">
+                  <div>
+                    Remove <span class="field-name">previous link</span> with
+                  </div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.prev.removed"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.prev.removed.key"
+                    [title]="diff.prev.removed.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.related.added) {
+                <div class="change">
+                  <div>Add <span class="field-name">related link</span> with</div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.related.added"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.related.added.key"
+                    [title]="diff.related.added.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.related.removed) {
+                <div class="change">
+                  <div>
+                    Remove <span class="field-name">related link</span> with
+                  </div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.related.removed"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.related.removed.key"
+                    [title]="diff.related.removed.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.parent.added) {
+                <div class="change">
+                  <div>Add <span class="field-name">parent link</span> with</div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.parent.added"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.parent.added.key"
+                    [title]="diff.parent.added.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+              @if (diff.parent.removed) {
+                <div class="change">
+                  <div>Remove <span class="field-name">parent link</span> with</div>
+                  &nbsp;
+                  <renwu-issue-href
+                    [issue]="diff.parent.removed"
+                    [linkButton]="true"
+                    [copyOnDoubleClick]="true"
+                    [key]="diff.parent.removed.key"
+                    [title]="diff.parent.removed.title"
+                    >
+                  </renwu-issue-href>
+                </div>
+              }
+            }
+          }
+        }
+      }
+    </div>
+  </div>
+}

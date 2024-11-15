@@ -1,0 +1,12 @@
+<div
+  class="value"
+  [style.color]="value?.color"
+  [rwTooltip]="value?.label"
+  tooltipDirection="bottom"
+  [tooltipDisabled]="tooltipDisabled"
+  [tooltipTimeout]="1000"
+  >
+  {{ value?.symbol }}@if (withLabel) {
+  <span>- {{ value?.label }}</span>
+}
+</div>

@@ -1,0 +1,21 @@
+{
+  "add_new_task": "Add new task",
+  "title": "Title",
+  "container": "Project",
+  "milestones": "Milestones",
+  "type": "Type",
+  "todo": "ToDo",
+  "todo-add": "add todo",
+  "priority": "Priority",
+  "status": "Status",
+  "affected-version": "Affected versions",
+  "assignee": "Assignee",
+  "estimated-time": "Estimated time",
+  "watchers": "Watchers",
+  "labels": "Labels",
+  "description": "Description",
+  "comments": "Comments",
+  "create": "Create",
+  "create-and-add-another": "Create and add another",
+  "issue-%issue.key%-created-successfully": "Task {{issue.key}} created"
+}

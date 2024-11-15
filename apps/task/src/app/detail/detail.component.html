@@ -1,0 +1,219 @@
+@if (issueService.issue | async) {
+  <div class="w-full h-full overflow-x-hidden">
+    <form
+      [formGroup]="issueService.issueForm"
+      class="flex flex-col w-full h-full"
+      >
+      <div
+        class="flex flex-col w-full px-4 items-start z-10 border-b-2 border-b-gray-200"
+        >
+        <div class="flex flex-row w-full items-center">
+          <span
+            class="text-2xl whitespace-nowrap"
+            [class.mb-2]="issueService.newIssue | async"
+            [style.color]="issueService.issueForm.value.status?.color"
+            >{{
+            (issueService.newIssue | async)
+            ? ('task.add_new_task' | transloco)
+            : issueService.issueForm.value.key
+            }}</span
+            >
+            <div class="flex flex-row w-full overflow-auto mx-4">
+              @for (t of issueService.transitions | async; track t) {
+                <rw-button
+                  class="mr-2 color-white"
+                  [color]="t.to.color"
+                  [borderColor]="t.to.color"
+                  padding="0 0.5rem"
+                  typeButton="secondary"
+                  borderRadius="0.5rem"
+                  (clicked)="transit(t)"
+                  >{{ t.label || t.to.label }}</rw-button
+                  >
+                }
+              </div>
+              <div class="gap-2 flex flex-row">
+                @if ((issueService.favorite | async) === false) {
+                  <rw-button
+                    typeButton="icon"
+                    (clicked)="addToFav()"
+                    iconClass="favorite-0"
+                  ></rw-button>
+                }
+                @if (issueService.favorite | async) {
+                  <rw-button
+                    typeButton="icon"
+                    (clicked)="removeFromFav()"
+                    iconClass="favorite-1"
+                  ></rw-button>
+                }
+                @if ((issueService.newIssue | async) === false) {
+                  <rw-button
+                    typeButton="icon"
+                    (clicked)="remove()"
+                    iconClass="trash"
+                  ></rw-button>
+                }
+                <rw-button
+                  typeButton="icon"
+                  (clicked)="close()"
+                  iconClass="close"
+                ></rw-button>
+              </div>
+            </div>
+            @if ((issueService.newIssue | async) === false) {
+              <rw-text-input
+                #title
+                [required]="true"
+                class="w-full"
+                [live]="issueService.newIssue | async"
+                [borderless]="true"
+                [multiline]="true"
+                formControlName="title"
+              ></rw-text-input>
+            }
+          </div>
+          <div class="flex flex-col w-full h-full overflow-y-auto relative">
+            <div class="grid grid-cols-2 gap-2 p-2 w-full">
+              @if (issueService.newIssue | async) {
+                <rw-text-input
+                  #title
+                  [required]="true"
+                  class="col-span-2"
+                  prompt="{{ 'task.title' | transloco }}"
+                  [live]="issueService.newIssue | async"
+                  formControlName="title"
+                ></rw-text-input>
+              }
+              <rw-select
+                class=""
+                [required]="true"
+                modelName="Container"
+                formControlName="container"
+                prompt="{{ 'task.container' | transloco }}"
+              ></rw-select>
+              <rw-select
+                class=""
+                [model]="milestoneSelectModel"
+                formControlName="milestones"
+                [tags]="true"
+                [closeOnSelect]="false"
+                [prompt]="'task.milestones' | transloco"
+              ></rw-select>
+              <rw-select
+                class=""
+                modelName="Type"
+                formControlName="type"
+                [prompt]="'task.type' | transloco"
+              ></rw-select>
+              <rw-select
+                class=""
+                modelName="Priority"
+                formControlName="priority"
+                [prompt]="'task.priority' | transloco"
+              ></rw-select>
+              @if ((issueService.newIssue | async) === false) {
+                <rw-select
+                  class=""
+                  [model]="transitionSelectModel"
+                  formControlName="status"
+                  [prompt]="'task.status' | transloco"
+                ></rw-select>
+              }
+              @if (issueService.newIssue | async) {
+                <rw-select
+                  class=""
+                  modelName="Status"
+                  formControlName="status"
+                  [prompt]="'task.status' | transloco"
+                ></rw-select>
+              }
+              <rw-select
+                class=""
+                modelName="Milestone"
+                formControlName="affected_versions"
+                [tags]="true"
+                [closeOnSelect]="false"
+                [prompt]="'task.affected-version' | transloco"
+              ></rw-select>
+              <rw-select
+                modelName="Assignee"
+                formControlName="assignes"
+                manyLayout="vertical"
+                [emptyItem]="{
+                id: 0,
+                label:
+                (issueService.issue | async)?.assignes_calc | rwFormatUser: true
+                }"
+                [prompt]="'task.assignee' | transloco"
+              ></rw-select>
+              <rw-time-picker
+                [required]="true"
+                formControlName="estimated_time"
+                [prompt]="'task.estimated-time' | transloco"
+              ></rw-time-picker>
+              <rw-select
+                class=""
+                modelName="Watcher"
+                formControlName="watchers"
+                manyLayout="vertical"
+                [tags]="true"
+                [closeOnSelect]="false"
+                [prompt]="'task.watchers' | transloco"
+              ></rw-select>
+              <rw-select
+                class=""
+                modelName="Label"
+                formControlName="labels"
+                [tags]="true"
+                [closeOnSelect]="false"
+                [prompt]="'task.labels' | transloco"
+              ></rw-select>
+              <div class="col-span-2">
+                @for (section of sections | async; track section) {
+                  <renwu-task-section-wrapper
+                    [section]="section"
+                  ></renwu-task-section-wrapper>
+                }
+              </div>
+            </div>
+            @if ((issueService.newIssue | async) === false) {
+              <div class="mt-4 mx-4 font-extralight text-2xl mb-2">
+                {{ 'task.comments' | transloco }}
+              </div>
+              <renwu-messaging-thread
+                [destination]="thread | async"
+                [noScroll]="true"
+                >
+              </renwu-messaging-thread>
+              <renwu-messaging-input
+                class="pb-2"
+                [destination]="thread | async"
+              ></renwu-messaging-input>
+            }
+            @if (issueService.newIssue | async) {
+              <div
+                class="flex justify-center w-full mb-6 md:mb-4 mt-8"
+                >
+                <rw-button
+                  class="mr-4"
+                  [disabled]="
+                  (issueService.issueForm.statusChanges | async) !== 'VALID'
+                  "
+                  (clicked)="create(false)"
+                  >{{ 'task.create' | transloco }}</rw-button
+                  >
+                  <rw-button
+                    class=""
+                    (clicked)="create(true)"
+                    [disabled]="
+                    (issueService.issueForm.statusChanges | async) !== 'VALID'
+                    "
+                    >{{ 'task.create-and-add-another' | transloco }}</rw-button
+                    >
+                  </div>
+                }
+              </div>
+            </form>
+          </div>
+        }

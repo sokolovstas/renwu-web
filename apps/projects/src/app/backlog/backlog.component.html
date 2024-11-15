@@ -1,0 +1,6 @@
+@for (status of (backlog | async)?.summary; track status) {
+  <div>
+    <span class="font-bold">{{ status.label }}</span
+      >: {{ status.count }} ({{ status.estimate | rwDurationToString }})
+    </div>
+  }

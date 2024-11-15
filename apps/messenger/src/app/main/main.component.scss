@@ -1,0 +1,26 @@
+renwu-messenger-main {
+  width: 100%;
+  height: 100%;
+  renwu-messaging-destinations {
+    .renwu-messaging-destinations__search {
+      margin: 0rem 0.7rem 1rem 0.7rem;
+      padding: 0.5rem 1rem !important;
+      background-color: var(--gray-200) !important;
+      border-radius: 35px !important;
+    }
+    ul {
+      renwu-messenger-destination {
+        padding: 0.7rem 1rem;
+      }
+      renwu-messenger-destination.active {
+        background-color: var(--gray-200);
+      }
+      renwu-messenger-destination.favorite {
+        padding: 0.7rem;
+      }
+    }
+  }
+  renwu-messaging-input {
+    border-top: 2px solid var(--gray-200);
+  }
+}

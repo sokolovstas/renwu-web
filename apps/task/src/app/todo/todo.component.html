@@ -1,0 +1,64 @@
+<div class="mt-4 mx-2 font-extralight text-2xl mb-2">
+  {{ 'task.todo' | transloco }}
+  <rw-button
+    class="inline-block"
+    iconClass="add-bold"
+    typeButton="icon"
+    (clicked)="openAdd()"
+  ></rw-button>
+</div>
+<div
+  class="w-full text-sm"
+  rwSortTable="dictionary"
+  (sortTableCompleted)="sortCompleted($event)"
+  >
+  <form [formGroup]="issueService.issueForm">
+    @for (dataEntry of todos.controls; track dataEntry; let i = $index) {
+      <div
+        [formGroup]="dataEntry"
+        [rwSortTableRow]="i"
+        class="flex flex-row items-center px-2"
+        >
+        <div class="px-1" rwSortTableColumn="order" [rwSortTableRowHandler]="i">
+          <rw-icon class="opacity-30 hover:opacity-100" icon="menu"></rw-icon>
+        </div>
+        <div class="px-1" rwSortTableColumn="checkbox">
+          <rw-checkbox formControlName="is_done"></rw-checkbox>
+        </div>
+        <div class="px-1 w-full overflow-hidden" rwSortTableColumn="title">
+          <rw-text-area
+            class="w-full flex"
+            [class.line-through]="dataEntry.getRawValue().is_done"
+            [class.opacity-30]="dataEntry.getRawValue().is_done"
+            [borderless]="true"
+            [doneOnEnter]="true"
+            formControlName="description"
+          ></rw-text-area>
+        </div>
+        <div class="px-1" rwSortTableColumn="checkbox">
+          <rw-button
+            class="opacity-30 hover:opacity-100"
+            iconClass="trash"
+            [double]="true"
+            typeButton="icon"
+            (clicked)="remove(i)"
+          ></rw-button>
+        </div>
+      </div>
+    }
+  </form>
+  @if (addTodo) {
+    <div class="flex flex-row items-center px-1">
+      <div class="px-1 w-full" rwSortTableColumn="title">
+        <rw-text-area
+          #newTodoInput
+          class="w-full flex"
+          [live]="true"
+          (enter)="add()"
+          [(ngModel)]="newTodo"
+          prompt="{{ 'task.todo-add' | transloco }}"
+        ></rw-text-area>
+      </div>
+    </div>
+  }
+</div>

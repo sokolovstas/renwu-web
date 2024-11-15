@@ -1,0 +1,87 @@
+@if (user) {
+  <rw-modal>
+    <div rwModalHeader>
+      @if (!user.id) {
+        <span>{{ 'settings.add-new-user' | transloco }}</span>
+      }
+      @if (user?.id) {
+        <span>{{ 'settings.invite-user' | transloco }}</span>
+      }
+    </div>
+    <div rwModalBody class="w-96">
+      <form [formGroup]="userForm">
+        <label class="form-label">
+          <rw-text-input
+            #email
+            formControlName="email"
+            prompt="{{ 'settings.email' | transloco }}"
+            [live]="true"
+          ></rw-text-input>
+          <div class="form-supporting-text">
+            {{ 'settings.leave-empty-to-create-dummy-user' | transloco }}
+          </div>
+        </label>
+        <label class="form-label">
+          <rw-text-input
+            #username
+            formControlName="username"
+            prompt="{{ 'settings.username' | transloco }}"
+            [live]="true"
+          ></rw-text-input>
+          <div class="form-supporting-text">
+            {{ 'settings.letters-a-z-numbers-and-underscore' | transloco }}
+          </div>
+        </label>
+        <label class="form-label">
+          <rw-text-input
+            formControlName="full_name"
+            prompt="{{ 'settings.full-name' | transloco }}"
+          ></rw-text-input>
+        </label>
+        <label class="form-label">
+          <rw-select
+            formControlName="type"
+            modelName="UserType"
+            prompt="{{ 'settings.select-user-type' | transloco }}"
+          ></rw-select>
+          <div class="form-supporting-text">
+            {{
+            'settings.dummy-user-dont-have-email-but-can-work-in-projects'
+            | transloco
+            }}
+          </div>
+        </label>
+      </form>
+    </div>
+    <div rwModalFooter>
+      @if (
+        !user.id &&
+        user.type !== 'external' &&
+        (userForm.valueChanges | async)?.email === ''
+        ) {
+        <rw-button
+          [disabled]="(userForm.statusChanges | async) !== 'VALID'"
+          (clicked)="addUser()"
+          [tabindex]="0"
+          >{{ 'settings.create' | transloco }}</rw-button
+          >
+        }
+        @if (!user.id && (userForm.valueChanges | async)?.email !== '') {
+          <rw-button
+            [disabled]="(userForm.statusChanges | async) !== 'VALID'"
+            (clicked)="addUserAndInvite()"
+            [tabindex]="0"
+            >{{ 'settings.create-and-invite' | transloco }}</rw-button
+            >
+          }
+          @if (user.id) {
+            <rw-button
+              [disabled]="(userForm.statusChanges | async) !== 'VALID'"
+              (clicked)="inviteUser()"
+              [tabindex]="0"
+              >{{ 'settings.invite' | transloco }}</rw-button
+              >
+            }
+          </div>
+        </rw-modal>
+      }

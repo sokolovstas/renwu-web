@@ -1,0 +1,44 @@
+<rw-modal>
+  <div rwModalHeader>
+    <span>{{ 'projects.add-new-project' | transloco }}</span>
+  </div>
+  <div rwModalBody class="w-96">
+    <form [formGroup]="projectForm">
+      <label class="form-label">
+        <rw-text-input
+          [renwuTourAnchor]="'projects-add-name'"
+          formControlName="title"
+          [prompt]="'projects.project-name' | transloco"
+        ></rw-text-input>
+      </label>
+      <label class="form-label">
+        <rw-text-input
+          [renwuTourAnchor]="'projects-add-key'"
+          formControlName="key"
+          [prompt]="'projects.project-key' | transloco"
+          [uppercase]="true"
+          [live]="true"
+        ></rw-text-input>
+      </label>
+      <div formGroupName="settings">
+        <label class="form-label">
+          <rw-select
+            [renwuTourAnchor]="'projects-add-scope'"
+            formControlName="external_user_scope"
+            modelName="ExternalUserScope"
+            [prompt]="'projects.project-external-user-scope' | transloco"
+          ></rw-select>
+        </label>
+      </div>
+    </form>
+  </div>
+  <div rwModalFooter>
+    <rw-button
+      [renwuTourAnchor]="'projects-add-add'"
+      [disabled]="(projectForm.statusChanges | async) !== 'VALID'"
+      (clicked)="add()"
+      [tabindex]="0"
+      >{{ 'projects.add' | transloco }}</rw-button
+    >
+  </div>
+</rw-modal>

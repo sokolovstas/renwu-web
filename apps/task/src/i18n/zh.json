@@ -1,0 +1,21 @@
+{
+  "add_new_task": "task.add_new_task",
+  "title": "task.title",
+  "container": "task.container",
+  "milestones": "task.milestones",
+  "type": "task.type",
+  "todo": "task.todo",
+  "todo-add": "task.todo-add",
+  "priority": "task.priority",
+  "status": "task.status",
+  "affected-version": "task.affected-version",
+  "assignee": "task.assignee",
+  "estimated-time": "task.estimated-time",
+  "watchers": "task.watchers",
+  "labels": "task.labels",
+  "description": "task.description",
+  "comments": "task.comments",
+  "create": "task.create",
+  "create-and-add-another": "task.create-and-add-another",
+  "issue-%issue.key%-created-successfully": "task.issue-%issue.key%-created-successfully"
+}

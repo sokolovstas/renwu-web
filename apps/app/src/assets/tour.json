@@ -1,0 +1,32 @@
+[
+  {
+    "anchorId": "sidebar-dashboard",
+    "title": "Dashboard",
+    "content": "Here you can find your dashboards. For now we only have preconfigured tasks dashboard."
+  },
+  {
+    "anchorId": "sidebar-project",
+    "title": "Projects",
+    "content": "Projects settings and milestones"
+  },
+  {
+    "anchorId": "sidebar-task",
+    "title": "Tasks",
+    "content": "Task list and search"
+  },
+  {
+    "anchorId": "sidebar-messenger",
+    "title": "Messenger",
+    "content": "Chats on task and with people"
+  },
+  {
+    "anchorId": "sidebar-add-task",
+    "title": "Add",
+    "content": "Add new task"
+  },
+  {
+    "anchorId": "sidebar-avatar",
+    "title": "Profile",
+    "content": "Profile and system settings"
+  }
+]

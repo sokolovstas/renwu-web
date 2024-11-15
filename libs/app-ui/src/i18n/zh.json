@@ -1,0 +1,9 @@
+{
+  "dashboard": "renwu.dashboard",
+  "projects": "renwu.projects",
+  "tasks": "renwu.tasks",
+  "messenger": "renwu.messenger",
+  "add-task": "renwu.add-task",
+  "settings": "renwu.settings",
+  "profile": "renwu.profile"
+}

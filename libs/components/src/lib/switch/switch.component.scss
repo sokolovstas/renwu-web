@@ -1,0 +1,65 @@
+@use '../../styles/rw_variables.scss' as *;
+
+:host {
+  @include component;
+  @include component-focus;
+  border-radius: $rw-control-border-radius;
+  border-bottom: $rw-control-default-border solid transparent;
+  padding: $rw-control-default-padding - 2px 0;
+}
+
+.wrapper {
+  position: relative;
+  border-radius: $rw-control-border-radius + 1;
+  transition: background-color 0.3s $switch-transition;
+  border: 2px solid $switch-color;
+  background-color: $switch-color;
+  display: flex;
+  color: rgba($always-white, 0.7);
+
+  input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  label {
+    display: flex;
+    cursor: pointer;
+  }
+}
+
+.wrapper.checked {
+  background-color: $switch-color;
+  border-color: $switch-color;
+}
+
+.switch {
+  position: absolute;
+  height: 100%;
+  transition: 0.3s;
+  left: 0;
+  background-color: $always-white;
+  color: $switch-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $rw-control-border-radius;
+  pointer-events: none;
+}
+
+.switch.checked {
+  color: $switch-color;
+  left: 50%;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 5px;
+  pointer-events: none;
+}
+
+.item.active {
+  opacity: 0;
+}

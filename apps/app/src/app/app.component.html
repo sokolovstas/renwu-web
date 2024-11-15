@@ -1,0 +1,60 @@
+<div id="nprogress">
+  <div
+    class="bar bar-{{ loaderService.loaderState | async }}"
+    role="bar"
+    [style.width.%]="loaderService.loadingProgress | async"
+  ></div>
+  <div
+    class="bar bar-bot bar-{{ loaderService.workbotState | async }}"
+    role="bar"
+    [style.width.%]="100"
+    >
+    <span></span>
+  </div>
+  <div
+    class="spinner spinner-{{ loaderService.loaderState | async }}"
+    role="spinner"
+    >
+    <div class="spinner-icon"></div>
+  </div>
+</div>
+
+@if (stateService.ready | async) {
+  <div class="flex flex-row w-full">
+    <div #scrollContainer class="app-scroll-container">
+      <div class="app-snap-left"></div>
+      <div class="app-snap-center"></div>
+      @if (mainRouteExist | async) {
+        <div class="app-snap-right"></div>
+      }
+      <renwu-sidebar class="app-sidebar z-10"></renwu-sidebar>
+      <div
+        class="app-main-view flex flex-grow-1"
+        [ngClass]="{ 'app-main-view-full': (mainRouteExist | async) === false }"
+        >
+        <router-outlet></router-outlet>
+      </div>
+      @if (mainRouteExist | async) {
+        <div
+          class="app-task-view flex flex-grow-1 z-10 bg-gray-100 overflow-visible"
+          >
+          <router-outlet name="section"></router-outlet>
+        </div>
+      }
+    </div>
+    <div
+      class="rw-modal-container"
+      rwModalContainer
+      [ngClass]="{ 'hidden-important': (modalService.opened | async) === false }"
+      >
+      <div #modalContainer></div>
+    </div>
+    @if (alertService.current) {
+      <rw-alert
+        [alert]="alertService.current"
+      ></rw-alert>
+    }
+    <rw-toast-container></rw-toast-container>
+    <rw-tooltip-container></rw-tooltip-container>
+  </div>
+}

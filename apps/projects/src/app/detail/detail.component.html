@@ -1,0 +1,85 @@
+@if (project | async; as p) {
+  <renwu-page-with-sidebar>
+    <div sidebar>
+      <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+        <a class="flex" routerLink="../">
+          <!-- <rw-icon class="pr-2" [icon]="'keyboard_arrow_left'"></rw-icon> -->
+          {{ p.title }}</a
+        >
+      </div>
+      <ul class="flex flex-col overflow-auto w-full">
+        <li>
+          <a
+            class="px-5 py-3 rounded-full mx-3 flex"
+            routerLinkActive="active"
+            [renwuTourAnchor]="'projects-detail-summary'"
+            routerLink="summary"
+            (click)="sidebarClick()"
+            >{{ 'projects.summary' | transloco }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="px-5 py-3 rounded-full mx-3 flex"
+            routerLinkActive="active"
+            [renwuTourAnchor]="'projects-detail-milestone'"
+            routerLink="milestone"
+            (click)="sidebarClick()"
+            >{{ 'projects.milestones' | transloco }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="px-5 py-3 rounded-full mx-3 flex"
+            routerLinkActive="active"
+            [renwuTourAnchor]="'projects-detail-activity'"
+            routerLink="activity"
+            (click)="sidebarClick()"
+            >{{ 'projects.activity' | transloco }}</a
+          >
+        </li>
+        <!-- <li>
+                <a
+                  class="px-5 py-3 rounded-full mx-3 flex"
+                  routerLinkActive="active"
+                  [renwuTourAnchor]="'projects-detail-backlog'"
+                  routerLink="{{ 'backlog' | transloco }}"
+                  (click)="sidebarClick()"
+                  >backlog</a
+                  >
+                </li> -->
+        <li>
+          <a
+            class="px-5 py-3 rounded-full mx-3 flex"
+            routerLinkActive="active"
+            [renwuTourAnchor]="'projects-detail-team'"
+            routerLink="team"
+            (click)="sidebarClick()"
+            >{{ 'projects.team' | transloco }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="px-5 py-3 rounded-full mx-3 flex"
+            routerLinkActive="active"
+            [renwuTourAnchor]="'projects-detail-template'"
+            routerLink="template"
+            (click)="sidebarClick()"
+            >{{ 'projects.template' | transloco }}</a
+          >
+        </li>
+        <li>
+          <a
+            class="px-5 py-3 rounded-full mx-3 flex"
+            routerLinkActive="active"
+            [renwuTourAnchor]="'projects-detail-settings'"
+            routerLink="settings"
+            (click)="sidebarClick()"
+            >{{ 'projects.settings' | transloco }}</a
+          >
+        </li>
+      </ul>
+    </div>
+    <router-outlet></router-outlet>
+  </renwu-page-with-sidebar>
+}

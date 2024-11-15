@@ -1,0 +1,17 @@
+<div class="title-bar">
+  <div class="title">{{ title }}</div>
+  <rw-button
+    class="close"
+    typeButton="icon"
+    iconClass="close"
+    iconSize="x-large"
+    (clicked)="onEnd()"
+  >
+  </rw-button>
+</div>
+<div class="body">{{ text }}</div>
+<div class="footer">
+  <rw-button (clicked)="onPrev()">Prev</rw-button>
+  <div class="w-full px-6 text-center">{{ step }} of {{ totalSteps }}</div>
+  <rw-button (clicked)="onNext()">Next</rw-button>
+</div>

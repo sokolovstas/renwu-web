@@ -1,0 +1,70 @@
+@use '../../../../../components/src/styles/rw_variables.scss' as *;
+:host {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px;
+  box-shadow: $modal-wrapper-box-shadow;
+  max-height: 95vh;
+  width: 20rem;
+  height: auto;
+  background-color: $rw-modal-background;
+  overflow: hidden;
+  pointer-events: initial;
+}
+
+.title {
+  font-size: $rw-modal-header-font-size;
+  font-weight: $global-weight-light;
+  display: flex;
+  overflow: hidden;
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.title-bar {
+  display: flex;
+  flex: 0 0 auto;
+  max-width: 100%;
+  flex-direction: row;
+  align-items: center;
+  padding: $rw-modal-padding-v $rw-modal-padding-h 1em;
+  background-color: $white;
+  overflow: hidden;
+}
+
+.close {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.footer {
+  flex: 0 0 auto;
+  padding: 1.5em;
+  padding-top: 1em;
+  // border-top: 1px solid $gray-300;
+  // background-color: $gray-100;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+::ng-deep .footer {
+  rw-button {
+    .button {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+.body {
+  padding: $rw-modal-padding-v $rw-modal-padding-h;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0px 0px $rw-control-border-radius $rw-control-border-radius;
+  background-color: $white;
+  text-align: left;
+}

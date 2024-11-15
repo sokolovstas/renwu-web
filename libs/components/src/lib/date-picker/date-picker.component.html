@@ -1,0 +1,210 @@
+<div
+  class="rw-date-picker-value"
+  #valueElement
+  [class.disabled]="disabled"
+  (click)="openDateSelector()"
+  >
+  <div
+    class="rw-date-picker-prompt"
+    [class.rw-date-picker-prompt-active]="opened || value"
+    >
+    {{ prompt }}
+  </div>
+  <span>{{ label }}</span>
+</div>
+<rw-icon class="icon" icon="keyboard_arrow_down" size="small"> </rw-icon>
+
+<rw-dropdown
+  #dropdown
+  class="rw-date-picker-popup"
+  [useBindWidth]="true"
+  positionVertical="down-inside"
+  [bindElement]="el.nativeElement"
+  (closed)="close()"
+  [closeByClickElement]="false"
+  [displayBackground]="true"
+  >
+  <ng-template #dropdownContent>
+    <div class="dropdown-wrapper" [class.range]="range">
+      <div class="picker-wrapper">
+        <div class="date-time-wrapper">
+          <rw-text-input
+            [(ngModel)]="labelStart"
+            [prompt]="prompt"
+          ></rw-text-input>
+          <rw-calendar
+            class="rw-date-picker-popup-calendar"
+            [hideOverflow]="true"
+            [selectionStart]="selectionStart"
+            [selectionEnd]="selectionEnd"
+            [currentDate]="selectionStart || now"
+            [hideOverflow]="false"
+            [minDate]="minDate"
+            [maxDate]="maxDate"
+            (changed)="onCalendarChangeStart($event)"
+          ></rw-calendar>
+        </div>
+        @if (range) {
+          <div class="separator"></div>
+        }
+        @if (range) {
+          <div class="date-time-wrapper">
+            <rw-text-input [(ngModel)]="labelEnd"></rw-text-input>
+            <rw-calendar
+              class="rw-date-picker-popup-calendar"
+              [hideOverflow]="true"
+              [selectionStart]="selectionStart"
+              [selectionEnd]="selectionEnd"
+              [currentDate]="selectionEnd || now"
+              [hideOverflow]="false"
+              [minDate]="minDate"
+              [maxDate]="maxDate"
+              (changed)="onCalendarChangeEnd($event)"
+            ></rw-calendar>
+          </div>
+        }
+        @if (range && helpers) {
+          <div class="separator"></div>
+        }
+        @if (range && helpers) {
+          <div class="helpers-buttons">
+            <div class="helpers">
+              <div class="helper-column">
+                @if (showTime) {
+                  <rw-button
+                    typeButton="link"
+                    (clicked)="setRelative('-3h', 'now')"
+                    [disabled]="!!minDate || !!maxDate"
+                    >{{ 'components.last-3-hours' | transloco }}</rw-button
+                    >
+                  }
+                  @if (showTime) {
+                    <rw-button
+                      typeButton="link"
+                      (clicked)="setRelative('-6h', 'now')"
+                      [disabled]="!!minDate || !!maxDate"
+                      >{{ 'components.last-6-hours' | transloco }}</rw-button
+                      >
+                    }
+                    @if (showTime) {
+                      <rw-button
+                        typeButton="link"
+                        (clicked)="setRelative('-12h', 'now')"
+                        [disabled]="!!minDate || !!maxDate"
+                        >{{ 'components.last-12-hours' | transloco }}</rw-button
+                        >
+                      }
+                      @if (showTime) {
+                        <rw-button
+                          typeButton="link"
+                          (clicked)="setRelative('-24h', 'now')"
+                          [disabled]="!!minDate || !!maxDate"
+                          >{{ 'components.last-24-hours' | transloco }}</rw-button
+                          >
+                        }
+                        <rw-button
+                          typeButton="link"
+                          (clicked)="setRelative('-2d', 'now')"
+                          [disabled]="!!minDate || !!maxDate"
+                          >{{ 'components.last-2-days' | transloco }}</rw-button
+                          >
+                          <rw-button
+                            typeButton="link"
+                            (clicked)="setRelative('-7d', 'now')"
+                            [disabled]="!!minDate || !!maxDate"
+                            >{{ 'components.last-7-days' | transloco }}</rw-button
+                            >
+                            <rw-button
+                              typeButton="link"
+                              (clicked)="setRelative('-30d', 'now')"
+                              [disabled]="!!minDate || !!maxDate"
+                              >{{ 'components.last-30-days' | transloco }}</rw-button
+                              >
+                            </div>
+                            <div class="helper-column">
+                              <rw-button
+                                typeButton="link"
+                                (clicked)="setRelative('now/d', 'now/d')"
+                                [disabled]="!!minDate || !!maxDate"
+                                >{{ 'components.today' | transloco }}</rw-button
+                                >
+                                <rw-button
+                                  typeButton="link"
+                                  (clicked)="setRelative('-1d/d', '-1d/d')"
+                                  [disabled]="!!minDate || !!maxDate"
+                                  >{{ 'components.yesterday' | transloco }}</rw-button
+                                  >
+                                  <rw-button
+                                    typeButton="link"
+                                    (clicked)="setRelative('-2d/d', '-2d/d')"
+                                    [disabled]="!!minDate || !!maxDate"
+                                    >{{ 'components.day-before-yesterday' | transloco }}</rw-button
+                                    >
+                                    <rw-button
+                                      typeButton="link"
+                                      (clicked)="setRelative('-7d/d', '-7d/d')"
+                                      [disabled]="!!minDate || !!maxDate"
+                                      >{{ 'components.this-day-last-week' | transloco }}</rw-button
+                                      >
+                                      <rw-button
+                                        typeButton="link"
+                                        (clicked)="setRelative('-1w/w', '-1w/w')"
+                                        [disabled]="!!minDate || !!maxDate"
+                                        >{{ 'components.previous-week' | transloco }}</rw-button
+                                        >
+                                        <rw-button
+                                          typeButton="link"
+                                          (clicked)="setRelative('now/w', 'now/w')"
+                                          [disabled]="!!minDate || !!maxDate"
+                                          >{{ 'components.this-week' | transloco }}</rw-button
+                                          >
+                                          <rw-button
+                                            typeButton="link"
+                                            (clicked)="setRelative('now/M', 'now/M')"
+                                            [disabled]="!!minDate || !!maxDate"
+                                            >{{ 'components.this-month' | transloco }}</rw-button
+                                            >
+                                          </div>
+                                        </div>
+                                        <div class="buttons">
+                                          @if (allowNull) {
+                                            <rw-button
+                                              [isAttention]="true"
+                                              class="rw-date-picker-clear-button"
+                                              (clicked)="onClearDate()"
+                                              >{{ 'components.clear-date' | transloco }}</rw-button
+                                              >
+                                            }
+                                            @if (confirmRequired) {
+                                              <rw-button
+                                                class="rw-date-picker-clear-button"
+                                                (clicked)="onApply()"
+                                                >{{ 'components.Apply' | transloco }}</rw-button
+                                                >
+                                              }
+                                            </div>
+                                          </div>
+                                        }
+                                      </div>
+                                      @if (!range || !helpers) {
+                                        <div class="buttons">
+                                          @if (allowNull) {
+                                            <rw-button
+                                              [isAttention]="true"
+                                              class="rw-date-picker-clear-button"
+                                              (clicked)="onClearDate()"
+                                              >{{ 'components.clear-date' | transloco }}</rw-button
+                                              >
+                                            }
+                                            @if (confirmRequired) {
+                                              <rw-button
+                                                class="rw-date-picker-clear-button"
+                                                (clicked)="onApply()"
+                                                >{{ 'components.Apply' | transloco }}</rw-button
+                                                >
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      </ng-template>
+                                    </rw-dropdown>

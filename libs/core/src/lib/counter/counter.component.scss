@@ -1,0 +1,56 @@
+@import '../../styles/variables';
+
+:host {
+  flex: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 0 0 auto;
+  color: var(--always-white);
+}
+.pulse-count,
+.unread-count {
+  font-size: 13px;
+  padding: 2px 7px 4px;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-weight: 600;
+  display: flex;
+  flex: 0 0 auto;
+  background-color: var(--pulse-color);
+}
+
+.pulse-count,
+.unread-count {
+  rw-icon {
+    visibility: hidden;
+    position: absolute;
+  }
+}
+
+.pulse-count.allow-mark:hover,
+.unread-count.allow-mark:hover {
+  span {
+    visibility: hidden;
+  }
+  rw-icon {
+    visibility: visible;
+  }
+}
+
+.pulse-count.both {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.unread-count {
+  background-color: var(--unread-color);
+}
+
+.unread-count.both {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}

@@ -1,0 +1,21 @@
+<renwu-page title="{{ 'settings.workflows' | transloco }}">
+  <div rwSortTable="workflows" class="w-full overflow-hidden">
+    @for (workflow of workflows | async; track workflow; let i = $index) {
+      <a
+        [routerLink]="[workflow.id]"
+        >
+        <div class="flex flex-row w-full overflow-auto" [rwSortTableRow]="i">
+          <div rwSortTableColumn="title">
+            {{ workflow.title }}
+          </div>
+          <div rwSortTableColumn="description">
+            {{ workflow.description }}
+          </div>
+        </div>
+      </a>
+    }
+  </div>
+  <rw-button action [routerLink]="['new']">{{
+    'settings.add-workflow' | transloco
+  }}</rw-button>
+</renwu-page>

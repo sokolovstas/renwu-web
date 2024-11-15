@@ -1,0 +1,108 @@
+{
+  "name": "messenger",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/messenger/src",
+  "prefix": "renwu-messenger",
+  "targets": {
+    "esbuild": {
+      "executor": "@angular-devkit/build-angular:browser-esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/messenger",
+        "index": "apps/messenger/src/index.html",
+        "main": "apps/messenger/src/main.ts",
+        "polyfills": ["zone.js", "es-module-shims"],
+        "tsConfig": "apps/messenger/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/messenger/src/assets"],
+        "styles": ["apps/messenger/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "500kb"
+            }
+          ],
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "environments/environment.ts",
+              "with": "environments/environment.prod.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "build": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {},
+      "configurations": {
+        "production": {
+          "target": "messenger:esbuild:production"
+        },
+        "development": {
+          "target": "messenger:esbuild:development",
+          "dev": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "target": "messenger:esbuild:development",
+        "rebuildDelay": 0,
+        "dev": true,
+        "port": 4208
+      }
+    },
+    "extract-i18n": {
+      "command": "npm run i18n:extract -- --project apps/messenger"
+    },
+    "extract-scoped-i18n": {
+      "command": "npm run i18n:extract-scoped-libs -- --skip-gitignore --dist apps/messenger/src/i18n"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "apps/messenger/**/*.ts",
+          "apps/messenger/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/messenger/jest.config.ts"
+      }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/dist/.playwright/apps/messenger"],
+      "options": {
+        "config": "apps/messenger/playwright.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

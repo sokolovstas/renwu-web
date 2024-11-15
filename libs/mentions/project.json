@@ -1,0 +1,43 @@
+{
+  "name": "mentions",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/mentions/src",
+  "prefix": "renwu",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/mentions/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/mentions/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/mentions/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/mentions/jest.config.ts"
+      }
+    },
+    "extract-i18n": {
+      "command": "npm run i18n:extract -- --project libs/mentions"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/mentions/**/*.ts", "libs/mentions/**/*.html"]
+      }
+    }
+  },
+  "tags": []
+}

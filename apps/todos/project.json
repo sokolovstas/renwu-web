@@ -1,0 +1,105 @@
+{
+  "name": "todos",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/todos/src",
+  "prefix": "renwu-todos",
+  "targets": {
+    "esbuild": {
+      "executor": "@angular-devkit/build-angular:browser-esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/todos",
+        "index": "apps/todos/src/index.html",
+        "main": "apps/todos/src/main.ts",
+        "polyfills": ["zone.js", "es-module-shims"],
+        "tsConfig": "apps/todos/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/todos/src/assets"],
+        "styles": ["apps/todos/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "500kb"
+            }
+          ],
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "environments/environment.ts",
+              "with": "environments/environment.prod.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "build": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {},
+      "configurations": {
+        "production": {
+          "target": "todos:esbuild:production"
+        },
+        "development": {
+          "target": "todos:esbuild:development",
+          "dev": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "target": "todos:esbuild:development",
+        "rebuildDelay": 0,
+        "dev": true,
+        "port": 4209
+      }
+    },
+    "extract-i18n": {
+      "command": "npm run i18n:extract -- --project apps/todos"
+    },
+    "extract-scoped-i18n": {
+      "command": "npm run i18n:extract-scoped-libs -- --skip-gitignore --dist apps/todos/src/i18n"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/todos/**/*.ts", "apps/todos/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/todos/jest.config.ts"
+      }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/dist/.playwright/apps/todos"],
+      "options": {
+        "config": "apps/todos/playwright.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

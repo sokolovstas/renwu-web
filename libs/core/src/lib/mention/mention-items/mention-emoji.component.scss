@@ -1,0 +1,10 @@
+@import '../../../styles/variables';
+:host {
+  display: flex;
+  flex-direction: row;
+  padding: 4px 10px;
+  align-items: center;
+}
+:host.active {
+  background-color: $rw-control-hover-color;
+}

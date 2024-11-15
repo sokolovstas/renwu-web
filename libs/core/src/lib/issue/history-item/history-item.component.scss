@@ -1,0 +1,101 @@
+@use '../../../styles/variables.scss' as *;
+
+:host {
+  display: flex;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+issue-href {
+  text-decoration: underline;
+  color: $accent-darker-color;
+}
+.news {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+  overflow: hidden;
+
+  &-item {
+    flex: 1 1 100%;
+
+    &-comment {
+      padding-left: 10px;
+    }
+  }
+
+  &-time {
+    flex: 1 1 27em;
+    color: $gray-600;
+    padding-left: 2em;
+    text-align: right;
+
+    .value {
+      position: relative;
+    }
+  }
+
+  &:hover .news-time-tooltip {
+    display: block;
+  }
+}
+.changes {
+  display: flex;
+  flex-direction: column;
+  color: $gray-600;
+}
+.change {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 100%;
+  align-items: center;
+}
+.field-value {
+  color: $black;
+  font-weight: $global-weight-bolder;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+.field-value-description {
+  margin-top: 0.5em;
+  flex: 1 1 100%;
+  color: $black;
+  white-space: pre;
+}
+.author-time-source {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.5em;
+  font-size: 90%;
+  .author-source {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .author {
+    flex: 0 0 auto;
+  }
+  .source {
+    flex: 0 0 auto;
+  }
+  .time {
+    flex: 0 0 auto;
+  }
+}
+.field-name {
+  // font-weight: $global-weight-bolder;
+}
+issue-type,
+issue-priority {
+  padding: 0;
+}
+::ng-deep.text-remove {
+  background-color: rgba(255, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 0.1em;
+}
+::ng-deep.text-add {
+  background-color: rgba(0, 200, 0, 0.2);
+  border-radius: 4px;
+  padding: 0.1em;
+}

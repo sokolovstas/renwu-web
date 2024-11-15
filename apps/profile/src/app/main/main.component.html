@@ -1,0 +1,23 @@
+<renwu-page-with-sidebar sidebarClass="app-second-sidebar-large">
+  <div sidebar>
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      {{ 'profile.profile' | transloco }}
+    </div>
+    <ul class="flex flex-col overflow-auto w-full">
+      <li>
+        <a class="p-4 flex" routerLinkActive="active" routerLink="settings">{{
+          'profile.settings' | transloco
+        }}</a>
+      </li>
+      <li>
+        <a
+          class="p-4 flex"
+          routerLinkActive="active"
+          routerLink="notifications"
+          >{{ 'profile.notifications' | transloco }}</a
+        >
+      </li>
+    </ul>
+  </div>
+  <router-outlet></router-outlet>
+</renwu-page-with-sidebar>

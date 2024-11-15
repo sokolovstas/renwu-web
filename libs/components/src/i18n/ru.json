@@ -1,0 +1,23 @@
+{
+  "enter-value": "введите значение",
+  "last-3-hours": "last-3 часа",
+  "last-6-hours": "Последние 6 часов",
+  "last-12-hours": "Последние 12 часов",
+  "last-24-hours": "Последние 24 часа",
+  "last-2-days": "Последние 2 дня",
+  "last-7-days": "Последние 7 дней",
+  "last-30-days": "Последние 30 дней",
+  "today": "Сегодня",
+  "yesterday": "Вчера",
+  "day-before-yesterday": "Позавчера",
+  "this-day-last-week": "Этот день на прошлой неделе",
+  "previous-week": "Предыдущая неделя",
+  "this-week": "Эта неделя",
+  "this-month": "Этот месяц",
+  "clear-date": "Очистить дату",
+  "Apply": "Применить",
+  "from": "из",
+  "loading": "загрузка",
+  "type-for-search": "поиск",
+  "load-more": "загрузить еще"
+}

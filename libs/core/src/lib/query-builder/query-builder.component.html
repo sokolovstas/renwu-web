@@ -1,0 +1,80 @@
+<div
+  class="wrapper-textinput"
+  [class.wrapper-textinput-with-hints]="showHintsContainer()"
+  [class.error]="errors() > 0 && queryString()"
+>
+  <div class="wrapper-textinput-input">
+    <div class="text-builder">
+      <input
+        type="text"
+        class="search-input"
+        #searchInput
+        (focus)="inputFocus.set(true)"
+        (blur)="inputFocus.set(false)"
+        [ngModel]="queryString()"
+        (ngModelChange)="setQueryString($event)"
+        (click)="onInputClick($event)"
+        (keydown)="onSearchKeyDown($event)"
+        (keyup)="onSearchKeyUp($event)"
+      />
+    </div>
+    <rw-icon
+      class="icon"
+      icon="search"
+      cursor="pointer"
+      (click)="onSearch()"
+    ></rw-icon>
+  </div>
+  @if (showHintsContainer()) {
+
+  <div class="hints-container">
+    <div class="hints">
+      @for (hint of hints(); track i;let i = $index) {
+      <div class="hint" (mousedown)="selectHint(hint)">
+        <div
+          class="hint-text"
+          (mouseover)="hintHovered.set(i)"
+          [class.hovered]="hintHovered() === i"
+        >
+          {{ hint.label }}
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>
+<rw-dropdown #hintDropdown class="hints-popup" [displayBackground]="true">
+  <ng-template #dropdownContent>
+    <div class="hints">
+      @for (hint of hints(); track i; let i = $index) {
+      <div class="hint" (mousedown)="selectHint(hint)">
+        @if(multipleSelectHint()) {
+        <rw-checkbox
+          class="hint-option"
+          [ngModel]="hint.selected"
+          (ngModelChange)="selectHint($event)"
+          (mousedown)="onCheckboxClick($event)"
+          (mouseover)="hintHovered = undefined"
+        ></rw-checkbox>
+        }
+        <div
+          class="hint-text"
+          (mouseover)="hintHovered.set(i)"
+          [class.hovered]="hintHovered() === i"
+        >
+          {{ hint.label }}
+        </div>
+      </div>
+      }
+    </div>
+    @if(multipleSelectHint()) {
+    <rw-button
+      class="ok-button"
+      (mouseover)="hintHovered = undefined"
+      (clicked)="setHintValue()"
+      >Ok</rw-button
+    >
+    }
+  </ng-template></rw-dropdown
+>

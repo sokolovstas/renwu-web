@@ -1,0 +1,53 @@
+@if (!showOne) {
+  @if (destination?.unreadCount | async) {
+    <div
+      [@transition]="'SHOW'"
+      class="unread-count"
+      (click.stop)="unreadClick.next()"
+      [class.both]="destination.pulseCount | async"
+      [class.allow-mark]="allowMark"
+      >
+      <span class="text">{{ destination?.unreadCount | async }}</span>
+      <rw-icon icon="check" size="small"> </rw-icon>
+    </div>
+  }
+  @if (destination?.pulseCount | async) {
+    <div
+      [@transition]="'SHOW'"
+      class="pulse-count"
+      (click.stop)="pulseClick.next()"
+      [class.both]="destination.unreadCount | async"
+      [class.allow-mark]="allowMark"
+      >
+      <span class="text">{{ destination?.pulseCount | async }}</span>
+      <rw-icon icon="check" size="small"> </rw-icon>
+    </div>
+  }
+}
+@if (showOne) {
+  @if (destination?.unreadCount | async) {
+    <div
+      [@transition]="'SHOW'"
+      (click.stop)="unreadClick.next()"
+      class="unread-count"
+      [class.allow-mark]="allowMark"
+      >
+      <span class="text">{{ destination?.unreadCount | async }}</span>
+      <rw-icon icon="check" size="small"> </rw-icon>
+    </div>
+  }
+  @if (
+    (destination?.pulseCount | async) &&
+    (destination?.unreadCount | async) === 0
+    ) {
+    <div
+      [@transition]="'SHOW'"
+      (click.stop)="pulseClick.next()"
+      class="pulse-count"
+      [class.allow-mark]="allowMark"
+      >
+      <span class="text">{{ destination?.pulseCount | async }}</span>
+      <rw-icon icon="check" size="small"> </rw-icon>
+    </div>
+  }
+}

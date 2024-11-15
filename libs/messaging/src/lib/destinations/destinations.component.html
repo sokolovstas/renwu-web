@@ -1,0 +1,107 @@
+<div class="renwu-messaging-destinations__list">
+  <rw-text-input
+    #searchTextInput
+    class="renwu-messaging-destinations__search"
+    prompt="{{ 'messaging.search' | transloco }}"
+    [borderless]="true"
+    [(ngModel)]="searchValue"
+    [live]="true"
+    [liveDebounce]="100"
+    (ngModelChange)="searchChange()"
+    [showClear]="true"
+    >
+  </rw-text-input>
+  @if (taskDestinations?.length > 0) {
+    <div
+      class="renwu-messaging-destinations__header"
+      >
+      {{ 'messaging.tasks' | transloco }}
+    </div>
+  }
+  <ul class="renwu-messaging-destinations__destinations-list">
+    @for (item of taskDestinations; track item) {
+      <li>
+        <renwu-messaging-destination
+          [destination]="item"
+          [ngClass]="{
+          active: (activeRoute | async)?.includes(item.id)
+          }"
+          (click)="selectDestination(item)"
+        ></renwu-messaging-destination>
+      </li>
+    }
+  </ul>
+  @if ((quickSearchTaskDestinations | async)?.length > 0) {
+    <div
+      class="renwu-messaging-destinations__header"
+      >
+      {{ 'messaging.quick-search-tasks' | transloco }}
+    </div>
+  }
+  <ul class="renwu-messaging-destinations__destinations-list">
+    @for (item of quickSearchTaskDestinations | async; track item) {
+      <li>
+        <renwu-messaging-destination
+          [destination]="item"
+          [ngClass]="{
+          active: (activeRoute | async)?.includes(item.id)
+          }"
+          (click)="selectDestination(item)"
+        ></renwu-messaging-destination>
+      </li>
+    }
+  </ul>
+
+  @if (policyService.canCreatePrivateMessage() | async) {
+    @if (userDestinations?.length > 0) {
+      <div
+        class="renwu-messaging-destinations__header"
+        >
+        {{ 'messaging.users' | transloco }}
+      </div>
+    }
+    <ul class="renwu-messaging-destinations__destinations-list">
+      @for (item of userDestinations; track item) {
+        <li>
+          <renwu-messaging-destination
+            [ngClass]="{
+            active: (activeRoute | async)?.includes(item.id)
+            }"
+            (click)="selectDestination(item)"
+            [destination]="item"
+            [isUser]="true"
+          ></renwu-messaging-destination>
+        </li>
+      }
+    </ul>
+    @if (userDestinationsLength > maxUsers && showRecentUsers) {
+      <div
+        class=""
+        (click)="showRecentUsers = false; searchChange()"
+        >
+        {{ 'messaging.show-all' | transloco }}
+      </div>
+    }
+    @if (userDestinationsLength > maxUsers && !showRecentUsers) {
+      <div
+        class=""
+        (click)="showRecentUsers = true; searchChange()"
+        >
+        {{ 'messaging.show-less' | transloco }}
+      </div>
+    }
+  }
+  <br />
+  <ul class="renwu-messaging-destinations__destinations-list">
+    <li>
+      <renwu-messaging-destination
+        class=""
+        [ngClass]="{
+        active: (activeRoute | async)?.includes('fav')
+        }"
+        (click)="selectDestination(favDestination)"
+        [destination]="favDestination"
+      ></renwu-messaging-destination>
+    </li>
+  </ul>
+</div>

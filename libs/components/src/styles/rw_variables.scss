@@ -1,0 +1,286 @@
+// Put this file to /styles for override
+$black: var(--black);
+$white: var(--white);
+$always-white: var(--always-white);
+$always-black: var(--always-black);
+
+$gray-100: var(--gray-100);
+$gray-200: var(--gray-200);
+$gray-300: var(--gray-300);
+$gray-400: var(--gray-400);
+$gray-500: var(--gray-500);
+$gray-600: var(--gray-600);
+
+$global-weight-light: 100 !default;
+$global-weight-normal: 400 !default;
+$global-weight-bold: 500 !default;
+$global-weight-bolder: 600 !default;
+
+$global-lineheight: 1.5;
+$global-fontsize: 15px;
+$global-textheight: floor($global-lineheight * $global-fontsize);
+
+/////////////////////////////////////
+//// Colors
+/////////////////////////////////////
+
+$accent-color: var(--accent-color);
+$accent-primary-color: var(--accent-primary-color);
+$accent-secondary-color: var(--accent-secondary-color);
+$accent-darker-color: var(--accent-darker-color);
+$accent-lighter-color: var(--accent-lighter-color);
+$info-color: var(--info-color);
+$success-color: var(--success-color);
+$warn-color: var(--warn-color);
+$error-color: var(--error-color);
+
+/////////////////////////////////////
+//// Toasts
+/////////////////////////////////////
+$toast-info-background-color: var(--toast-info-background-color);
+$toast-info-color: var(--toast-info-color);
+$toast-success-background-color: var(--toast-success-background-color);
+$toast-success-color: var(--toast-success-color);
+$toast-warn-background-color: var(--toast-warn-background-color);
+$toast-warn-color: var(--toast-warn-color);
+$toast-error-background-color: var(--toast-error-background-color);
+$toast-error-color: var(--toast-error-color);
+
+/////////////////////////////////////
+//// Switch
+/////////////////////////////////////
+$switch-color: var(--switch-color);
+$switch-transition: ease-in-out;
+
+/////////////////////////////////////
+//// Common
+/////////////////////////////////////
+$rw-control-focus: var(--accent-secondary-color);
+$rw-control-hover-color: var(--accent-lighter-color);
+$rw-control-border-radius: 5px;
+$rw-control-border-color: var(--gray-300);
+$rw-control-border-disabled-color: var(--rw-control-border-disabled-color);
+$rw-control-border-hover-color: var(--rw-control-border-hover-color);
+$rw-control-border-color-invalid: var(--rw-control-border-color-invalid);
+$rw-control-border-hover-color-invalid: var(
+  --rw-control-border-hover-color-invalid
+);
+
+$rw-control-bg-color: var(--rw-control-bg-color);
+
+$rw-control-default-padding: 4px;
+$rw-control-default-border: 2px;
+$rw-control-prompt-color: var(--gray-500);
+$rw-control-prompt-font-weight: var(--global-weight-normal);
+$rw-control-prompt-font-style: normal;
+$rw-control-text-color: var(--black);
+$rw-control-text-interactive-color: var(--accent-darker-color);
+
+/////////////////////////////////////
+//// Buttons
+/////////////////////////////////////
+
+// Primary
+$rw-button-primary-radius: var(--button-primary-radius);
+
+$rw-button-primary-color: var(--always-white);
+$rw-button-primary-background: var(--accent-primary-color);
+
+$rw-button-primary-hover-color: var(--always-white);
+$rw-button-primary-hover-background: var(--accent-secondary-color);
+
+$rw-button-primary-active-color: var(--always-white);
+$rw-button-primary-active-background: var(--accent-darker-color);
+
+// Secondary
+$rw-button-secondary-radius: var(--button-secondary-radius);
+
+$rw-button-secondary-color: var(--accent-secondary-color);
+$rw-button-secondary-background: transparent;
+$rw-button-secondary-border: 2px solid var(--accent-secondary-color);
+
+$rw-button-secondary-hover-color: var(--accent-darker-color);
+$rw-button-secondary-hover-background: transparent;
+$rw-button-secondary-hover-border: 2px solid var(--accent-darker-color);
+
+$rw-button-secondary-active-color: var(--accent-secondary-color);
+$rw-button-secondary-active-background: transparent;
+
+// Tab
+$rw-button-tab-color: var(--accent-darker-color);
+$rw-button-tab-background-color: var(--white);
+$rw-button-tab-border: 2px solid transparent;
+
+$rw-button-tab-hover-background-color: var(
+  --rw-button-tab-hover-background-color
+);
+$rw-button-tab-hover-border: 2px solid var(--accent-secondary-color);
+
+$rw-button-tab-selected-background-color: var(--accent-lighter-color);
+$rw-button-tab-selected-border: 2px solid var(--accent-color);
+
+$rw-button-disabled: var(--rw-button-disabled);
+$rw-button-disabled-hover: var(--rw-button-disabled-hover);
+
+$rw-button-attention: var(--rw-button-attention);
+$rw-button-attention-hover: var(--rw-button-attention-hover);
+
+/////////////////////////////////////
+//// Calendar
+/////////////////////////////////////
+
+$font-size-calendar: 9pt;
+$rw-calendar-width: $font-size-calendar * 16;
+$rw-calendar-koef: 7.4;
+
+/////////////////////////////////////
+//// Z Index
+/////////////////////////////////////
+
+$outlets-z-index: 100;
+$sidebar-z-index: 200;
+$overlays-z-index: 300;
+$rw-control-popup-z-index: 400;
+$alert-z-index: 500;
+$toasts-z-index: 600;
+$tooltip-z-index: 700;
+
+$component-popup-background: var(--component-popup-background);
+$component-focus-padding-bottom: 2px;
+$modal-wrapper-box-shadow: var(----modal-wrapper-box-shadow);
+
+/////////////////////////////////////
+//// Icon
+/////////////////////////////////////
+
+$icons-fontsize-small: 12px;
+$icons-fontsize-normal: 15px;
+$icons-fontsize-large: 19px;
+$icons-fontsize-x-large: 22px;
+$icons-fontsize-xx-large: 30px;
+
+/////////////////////////////////////
+//// Component mixin
+/////////////////////////////////////
+@mixin component() {
+  font-size: 100%;
+  outline: none;
+}
+@mixin component-focus() {
+  border-bottom: $component-focus-padding-bottom solid transparent;
+  $current: &;
+  @at-root {
+    #{$current}:focus:not(.disabled):not(.borderless) {
+      border-bottom: $rw-control-default-border solid
+        var(--accent-secondary-color);
+    }
+    #{$current}.focus:not(.disabled):not(.borderless) {
+      border-bottom: $rw-control-default-border solid
+        var(--accent-secondary-color);
+    }
+  }
+}
+@mixin component-invalid() {
+  border-bottom: $component-focus-padding-bottom solid transparent;
+  &.ng-invalid.ng-dirty {
+    border-bottom: $rw-control-default-border solid var(--error-color);
+  }
+  &.required div[class*='-prompt']::after {
+    content: '*';
+    color: var(--warn-color);
+    position: absolute;
+    font-size: 1.5rem;
+    margin: -0.1rem 0px 0px 0.3rem;
+  }
+}
+
+/////////////////////////////////////
+//// Modal
+/////////////////////////////////////
+$rw-modal-header-font-size: 200%;
+$rw-modal-sub-header-font-size: 150%;
+$rw-modal-padding-v: 15px;
+$rw-modal-padding-h: 20px;
+$rw-modal-overlay-background: var(--rw-modal-overlay-background);
+$rw-modal-background: var(--white);
+
+@mixin modal() {
+  display: flex;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin component-popup-background() {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: var(--component-popup-background);
+  left: 0;
+  top: 0;
+  z-index: $rw-control-popup-z-index;
+  display: none;
+}
+
+/////////////////////////////////////
+//// Responsive
+/////////////////////////////////////
+
+@mixin for-phone-only {
+  @media (max-width: 599px) {
+    @content;
+  }
+}
+@mixin for-tablet-portrait-up {
+  @media (min-width: 600px) {
+    @content;
+  }
+}
+@mixin for-tablet-landscape-up {
+  @media (min-width: 900px) {
+    @content;
+  }
+}
+@mixin for-desktop-up {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
+@mixin for-big-desktop-up {
+  @media (min-width: 1800px) {
+    @content;
+  }
+}
+
+/////////////////////////////////////
+//// Placeholders
+/////////////////////////////////////
+@mixin placeholder($width) {
+  width: $width;
+  max-width: 100%;
+  background-color: var(--rw-placeholder-background);
+  height: $global-lineheight * 1rem;
+  border-radius: 1rem;
+  transition: all 0.5s linear;
+}
+
+@mixin FF-only {
+  @-mrw-document url-prefix() {
+    @content;
+  }
+}
+
+@mixin toast-list-style {
+  position: fixed;
+  bottom: 10px;
+  left: 20px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+/////////////////////////////////////
+//// Other
+/////////////////////////////////////
+$messages-online-color: $success-color;
+$overlay-box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);

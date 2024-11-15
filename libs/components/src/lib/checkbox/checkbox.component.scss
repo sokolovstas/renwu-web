@@ -1,0 +1,46 @@
+@use '../../styles/rw_variables.scss' as *;
+
+:host {
+  @include component;
+  @include component-focus;
+
+  padding: $rw-control-default-padding $rw-control-default-padding * 2;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.checkbox-label {
+  margin-left: 0.8rem;
+  cursor: pointer;
+  font-style: $rw-control-prompt-font-style;
+  color: $rw-control-prompt-color;
+}
+
+.checkbox {
+  // padding: 0.49em;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid $rw-control-border-color;
+  border-radius: $rw-control-border-radius;
+  width: $global-textheight;
+  height: $global-textheight;
+  min-width: $global-textheight;
+  min-height: $global-textheight;
+
+  rw-icon {
+    color: $rw-button-primary-background;
+    font-size: 80%;
+  }
+}
+.checkbox.disabled {
+  border: none;
+}
+
+:host.disabled .checkbox-label,
+:host.disabled .checkbox {
+  cursor: default;
+}

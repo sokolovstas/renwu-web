@@ -1,0 +1,6 @@
+{
+  "tasks": "dashboard.tasks",
+  "assigned-to-me": "dashboard.assigned-to-me",
+  "recently-opened": "dashboard.recently-opened",
+  "watched": "dashboard.watched"
+}

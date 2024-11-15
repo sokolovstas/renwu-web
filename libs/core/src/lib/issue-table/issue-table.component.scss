@@ -1,0 +1,26 @@
+:host {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+.renwu-issue-table__wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.renwu-issue-table__header {
+  display: flex;
+  flex-direction: row;
+}
+.renwu-issue-table__body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.renwu-issue-table__body-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+.renwu-issue-table__body-scrollable {
+  overflow: auto;
+}

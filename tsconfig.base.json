@@ -1,0 +1,31 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2022",
+    "module": "esnext",
+    "lib": ["es2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@renwu/board": ["libs/board/src/index.ts"],
+      "@renwu/components": ["libs/components/src/index.ts"],
+      "@renwu/core": ["libs/core/src/index.ts"],
+      "@renwu/mentions": ["libs/mentions/src/index.ts"],
+      "@renwu/messaging": ["libs/messaging/src/index.ts"],
+      "@renwu/app-ui": ["libs/app-ui/src/index.ts"],
+      "@renwu/utils": ["libs/utils/src/index.ts"]
+    },
+    "strictNullChecks": false
+  },
+  "exclude": ["node_modules", "tmp", "apps/old"]
+}

@@ -1,0 +1,27 @@
+@if (statusChilds) {
+  <div
+    class="progress-childs"
+    rwTooltip
+    [tooltipData]="progress"
+    [tooltipType]="tooltipParents"
+    [tooltipTimeout]="1000"
+    [tooltipDisabled]="statusChilds.length === 0"
+    [class.empty]="statusChilds.length === 0"
+    >
+    @for (child of statusChilds; track child) {
+      <div
+        class="child"
+        [style.width.%]="child.progress"
+        [style.background-color]="child.value.color || '#777'"
+        (click)="itemClick.next(child.value)"
+        rwTooltip="{{ child.value.label }}: {{ child.count }} ({{
+        child.duration | rwDurationToString: ['hours']
+        }})"
+        [tooltipTimeout]="1000"
+        tooltipDirection="bottom"
+        >
+        {{ child.value.label }}
+      </div>
+    }
+  </div>
+}

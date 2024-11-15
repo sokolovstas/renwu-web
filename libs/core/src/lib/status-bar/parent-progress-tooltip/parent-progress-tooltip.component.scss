@@ -1,0 +1,30 @@
+@import '../../../styles/variables';
+
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip-label {
+  font-size: 95%;
+  padding: 0.2em 0.2em 0.5em;
+}
+
+.tooltip-label:last-child {
+  padding-bottom: 0;
+}
+
+.progress-childs {
+  content: '';
+  width: 100%;
+  padding-top: 1em;
+  padding-bottom: 0.9em;
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+
+  .child {
+    content: '';
+    height: 0.5em;
+  }
+}

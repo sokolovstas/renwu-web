@@ -1,0 +1,119 @@
+:host {
+  display: block;
+  cursor: pointer;
+  flex-direction: row;
+  user-select: none;
+  align-items: center;
+  position: relative;
+  // justify-content: center;
+}
+
+.head-label,
+rw-text-with-tooltip {
+  padding-right: 3px;
+  flex: 0 0 auto;
+  display: inline-block;
+  vertical-align: middle;
+  // width: 100%;
+}
+
+:host.sort {
+  color: var(--accent-400);
+}
+.icon-sort {
+  // right: 3px;
+  // position: absolute;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon-sort.none {
+  opacity: 0.2;
+}
+
+::ng-deep issue-table-header-column {
+  rw-text-input {
+    .rw-text-input-prompt {
+      color: var(--black) !important;
+      opacity: 1 !important;
+      font-style: normal !important;
+    }
+  }
+}
+
+.header-filter {
+  flex: 1 1 100%;
+}
+.header-filter.active {
+  color: var(--accent-400);
+}
+
+.sort-bar {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  bottom: 0;
+  left: 0;
+  padding: 0 5px;
+  width: 100%;
+  margin-bottom: -3px;
+}
+.sort-bar-item {
+  height: 3px;
+  margin: 7px 0;
+  transition: all 0.1s ease-in-out;
+}
+.sort-bar-item:nth-child(1) {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  width: 30%;
+}
+.sort-bar-item:nth-child(2) {
+  width: 20%;
+}
+.sort-bar-item:nth-child(3) {
+  width: 35%;
+}
+.sort-bar-item:nth-child(4) {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  width: 15%;
+}
+.sort-bar {
+  .sort-bar-item:nth-child(1) {
+    background-color: var(--black);
+    opacity: 0.15;
+  }
+  .sort-bar-item:nth-child(2) {
+    background-color: var(--black);
+    opacity: 0.2;
+  }
+  .sort-bar-item:nth-child(3) {
+    background-color: var(--black);
+    opacity: 0.1;
+  }
+  .sort-bar-item:nth-child(4) {
+    background-color: var(--black);
+    opacity: 0.25;
+  }
+}
+.sort-bar:hover,
+.sort-bar-active {
+  .sort-bar-item:nth-child(1) {
+    background-color: rgb(57, 203, 238);
+    opacity: 1;
+  }
+  .sort-bar-item:nth-child(2) {
+    background-color: rgb(117, 97, 195);
+    opacity: 1;
+  }
+  .sort-bar-item:nth-child(3) {
+    background-color: rgb(153, 209, 48);
+    opacity: 1;
+  }
+  .sort-bar-item:nth-child(4) {
+    background-color: rgb(226, 183, 11);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,54 @@
+<rw-modal>
+  <div rwModalHeader>
+    <span i18n>Export list</span>
+  </div>
+  <div rwModalBody>
+    <div class="wrapper">
+      <div class="head">
+        <rw-button
+          i18n
+          typeButton="tab"
+          [selected]="format === 'list' ? true : false"
+          (clicked)="format = 'list'"
+          >List
+        </rw-button>
+        <rw-button
+          i18n
+          typeButton="tab"
+          [selected]="format === 'markdown' ? true : false"
+          (clicked)="format = 'markdown'"
+          >Markdown
+        </rw-button>
+        <rw-button
+          i18n
+          typeButton="tab"
+          [selected]="format === 'stripes' ? true : false"
+          (clicked)="format = 'stripes'"
+          >Stripes
+        </rw-button>
+        <rw-button
+          i18n
+          typeButton="tab"
+          [selected]="format === 'html' ? true : false"
+          (clicked)="format = 'html'"
+          >HTML
+        </rw-button>
+      </div>
+      <rw-text-input
+        [prompt]="'Template' | transloco"
+        [(ngModel)]="templates[format]"
+        [multiline]="true"
+        [live]="true"
+        (ngModelChange)="saveCustom($event)"
+      ></rw-text-input>
+      <br />
+      <div class="result" [attr.contenteditable]="format !== 'list'">
+        @for (item of list; track item) {
+          <div class="result-row">
+            <div [innerHtml]="renderTemplate(item, templates[format])"></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</rw-modal>

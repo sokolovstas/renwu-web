@@ -1,0 +1,42 @@
+<renwu-page
+  title="{{ query()?.title }}"
+  [breadcrumbs]="[{ title: 'tasks.filters' | transloco, showSidebar: true }]"
+  >
+  <div subtitle>
+    <renwu-query-builder
+      [query]="queryString()"
+      (queryChange)="updateQuery($event)"
+    ></renwu-query-builder>
+    <!-- <div
+    class="header -mb-1 text-sm text-gray-500 flex-row items-center flex md:hidden"
+    >
+    {{ queryString() }}&nbsp;&nbsp;<rw-button
+    typeButton="link"
+    (clicked)="resetFilter()"
+    >{{ 'projects.reset-filter' | transloco }}</rw-button
+    >
+  </div> -->
+</div>
+@if (allTask | async; as issues) {
+  <renwu-issue-table
+    class="w-full text-sm"
+    [issues]="issues"
+    (clicked)="issueClick($event)"
+    [sortable]="true"
+    [groupable]="true"
+    [showExport]="true"
+    [listOptions]="listOptions()"
+    (listOptionsChange)="updateListOptions($event)"
+    >
+    <renwu-issue-status-bar
+      header
+      class="mb-2"
+      [issues]="issues"
+      [groupBy]="[listOptions().group.field]"
+      (itemClick)="filterByBar($event)"
+    ></renwu-issue-status-bar>
+  </renwu-issue-table>
+}
+
+<!-- <rw-button action>{{'save'|transloco}}</rw-button> -->
+</renwu-page>

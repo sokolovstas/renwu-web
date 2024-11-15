@@ -1,0 +1,22 @@
+<div class="tooltip-label">
+  <span [innerHTML]="'core.total-progress-nbsp' | transloco"></span>
+  <span>{{ data.percents }}</span
+  >%
+</div>
+<div class="tooltip-label">
+  <span [innerHTML]="'core.estimated-time-remaining-nbsp' | transloco"></span>
+  <span
+    >{{ data.estimateRemaining | rwDurationToString: ['hours'] }}
+    <span>{{ 'core.of' | transloco }}</span>
+    {{ data.estimatedTotal | rwDurationToString: ['hours'] }}
+  </span>
+</div>
+<div class="tooltip-label">
+  <span [innerHTML]="'core.completed-nbsp' | transloco"></span>
+  <span
+    >{{ data.issueResolved }}
+    <span>{{ 'core.of' | transloco }}</span>
+    {{ data.issueTotal }}
+  </span>
+  <span>tasks</span>
+</div>

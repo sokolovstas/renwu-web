@@ -1,0 +1,100 @@
+@use '../../styles/variables.scss' as *;
+
+renwu-messaging-input {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+.renwu-messaging-input {
+  &__message-input-box {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 100%;
+    padding: 5px 5px 0px 10px;
+    align-items: flex-end;
+  }
+  &__message-input-box:after {
+    top: -1px;
+    border-top: 1px solid $gray-300;
+    width: 100%;
+    content: '';
+    position: absolute;
+    z-index: 100;
+  }
+  &__text-area {
+    flex: 1 1 100%;
+    max-height: 400px;
+  }
+
+  &__input-container {
+    flex: 1 1 100%;
+    display: flex;
+    position: relative;
+    padding-bottom: 5px;
+  }
+  &__buttons {
+    cursor: pointer;
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    max-height: 100%;
+    font-size: 130%;
+    overflow: hidden;
+  }
+  &__button {
+    padding: 0.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  &__button-emoji {
+    padding: 0;
+  }
+
+  &__button.disabled {
+    opacity: 0.5;
+    background-color: $gray-100;
+  }
+
+  &__button.external {
+    background-color: $error-color;
+  }
+
+  &__message-external {
+    border-color: $error-color;
+
+    &:after {
+      border-color: $error-color;
+    }
+  }
+  &__edit-wrapper {
+    background-color: var(--message-item-edit);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+  &__edit-cancel {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    opacity: 0.8;
+    padding: 10px;
+  }
+  &__edit-title {
+    opacity: 0.8;
+    padding: 10px;
+    display: flex;
+  }
+  &__edit-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+    overflow: hidden;
+  }
+}

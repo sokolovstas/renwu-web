@@ -1,0 +1,12 @@
+{
+  "documents": "http://localhost:4201/remoteEntry.json",
+  "projects": "http://localhost:4202/remoteEntry.json",
+  "boards": "http://localhost:4203/remoteEntry.json",
+  "tasks": "http://localhost:4204/remoteEntry.json",
+  "task": "http://localhost:4205/remoteEntry.json",
+  "settings": "http://localhost:4206/remoteEntry.json",
+  "profile": "http://localhost:4207/remoteEntry.json",
+  "messenger": "http://localhost:4208/remoteEntry.json",
+  "todos": "http://localhost:4209/remoteEntry.json",
+  "dashboard": "http://localhost:4210/remoteEntry.json"
+}

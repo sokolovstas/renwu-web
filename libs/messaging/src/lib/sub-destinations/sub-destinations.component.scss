@@ -1,0 +1,43 @@
+@use '../../styles/variables.scss' as *;
+
+.renwu-messaging-sub-destinations {
+  &__wrapper {
+    display: flex;
+    flex-direction: row;
+    padding: 0.1rem;
+    flex-wrap: nowrap;
+    overflow: auto;
+  }
+  &__title {
+    font-size: small;
+    //   margin-left: 0.5rem;
+    //   margin-right: 0.5rem;
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__destination {
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    margin: 0.25rem;
+    background-color: var(--gray-200);
+  }
+  &__destination.selected {
+    background-color: $accent-lighter-color;
+  }
+  &__avatars {
+    margin-left: 0.5rem;
+    margin-right: 0.25rem;
+    display: flex;
+    flex-direction: row;
+    &__avatar {
+      margin-right: -0.25rem;
+    }
+  }
+  &__counter {
+    // margin-left: 0.5rem;
+  }
+}

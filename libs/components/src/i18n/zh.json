@@ -1,0 +1,23 @@
+{
+  "enter-value": "components.enter-value",
+  "last-3-hours": "components.last-3-hours",
+  "last-6-hours": "components.last-6-hours",
+  "last-12-hours": "components.last-12-hours",
+  "last-24-hours": "components.last-24-hours",
+  "last-2-days": "components.last-2-days",
+  "last-7-days": "components.last-7-days",
+  "last-30-days": "components.last-30-days",
+  "today": "components.today",
+  "yesterday": "components.yesterday",
+  "day-before-yesterday": "components.day-before-yesterday",
+  "this-day-last-week": "components.this-day-last-week",
+  "previous-week": "components.previous-week",
+  "this-week": "components.this-week",
+  "this-month": "components.this-month",
+  "clear-date": "components.clear-date",
+  "Apply": "components.Apply",
+  "from": "components.from",
+  "loading": "components.loading",
+  "type-for-search": "components.type-for-search",
+  "load-more": "components.load-more"
+}

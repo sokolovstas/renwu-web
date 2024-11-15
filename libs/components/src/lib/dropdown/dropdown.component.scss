@@ -1,0 +1,43 @@
+@use '../../styles/rw_variables.scss' as *;
+
+:host {
+  position: fixed;
+  z-index: $rw-control-popup-z-index;
+  display: flex;
+  flex-direction: column;
+  .dropdownContainer {
+    overflow: hidden;
+    z-index: $rw-control-popup-z-index + 1;
+    background-color: $white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: $rw-control-border-radius;
+    // border: 1px solid $rw-control-border-color;
+    display: flex;
+    flex-direction: inherit;
+    height: 100%;
+  }
+
+  .background {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: $component-popup-background;
+    left: 0;
+    top: 0;
+  }
+  @media (max-width: 768px) {
+    .background {
+      backdrop-filter: blur(5px);
+    }
+    .dropdownContainer {
+      position: fixed;
+      left: max(env(safe-area-inset-left), 20px);
+      top: max(env(safe-area-inset-top), 20px);
+      right: max(env(safe-area-inset-right), 20px);
+      bottom: max(env(safe-area-inset-bottom), 20px);
+      width: auto;
+      height: auto;
+    }
+  }
+}

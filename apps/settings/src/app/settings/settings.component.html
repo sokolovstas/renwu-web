@@ -1,0 +1,67 @@
+<renwu-page-with-sidebar>
+  <div sidebar>
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      {{ 'settings.settings' | transloco }}
+    </div>
+    <ul class="flex flex-col overflow-auto w-full">
+      <li>
+        <a class="p-4 flex" routerLinkActive="active" routerLink="users">{{
+          'settings.users' | transloco
+        }}</a>
+      </li>
+      <li>
+        <a
+          class="p-4 flex"
+          routerLinkActive="active"
+          routerLink="dictionary/type"
+          >{{ 'settings.types' | transloco }}</a
+        >
+      </li>
+      <li>
+        <a
+          class="p-4 flex"
+          routerLinkActive="active"
+          routerLink="dictionary/status"
+          >{{ 'settings.statuses' | transloco }}</a
+        >
+      </li>
+      <li>
+        <a
+          class="p-4 flex"
+          routerLinkActive="active"
+          routerLink="dictionary/priority"
+          >{{ 'settings.priorities' | transloco }}</a
+        >
+      </li>
+      <li>
+        <a
+          class="p-4 flex"
+          routerLinkActive="active"
+          routerLink="dictionary/resolution"
+          >{{ 'settings.resolutions' | transloco }}</a
+        >
+      </li>
+      <li>
+        <a class="p-4 flex" routerLinkActive="active" routerLink="workflows">{{
+          'settings.wokflows' | transloco
+        }}</a>
+      </li>
+      <!-- <li> 
+        <a class="p-4 flex" routerLinkActive="active" routerLink="calendars">{{
+          'settings.calendars' | transloco
+        }}</a>
+      </li>
+      <li>
+        <a class="p-4 flex" routerLinkActive="active" routerLink="system">{{
+          'settings.system' | transloco
+        }}</a> 
+      </li> -->
+      <li>
+        <a class="p-4 flex" [href]="billingLink" target="_blank">{{
+          'settings.billing' | transloco
+        }}</a>
+      </li>
+    </ul>
+  </div>
+  <router-outlet></router-outlet>
+</renwu-page-with-sidebar>

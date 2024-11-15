@@ -1,0 +1,34 @@
+renwu-messaging-thread {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+}
+.renwu-messaging-thread {
+  &__scroller {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: auto;
+  }
+  &__load-button {
+    width: 100%;
+  }
+  &__pinned {
+    background-color: var(--gray-100);
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+  }
+}
+renwu-messaging-thread.noscroll {
+  height: initial;
+  .renwu-messaging-thread__scroller {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: auto;
+  }
+}

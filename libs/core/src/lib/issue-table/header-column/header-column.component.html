@@ -1,0 +1,45 @@
+@if (!filterable) {
+  <rw-text-with-tooltip label="{{ label }}">
+  </rw-text-with-tooltip>
+}
+@if (filterable) {
+  <rw-text-input
+    class="header-filter"
+    [class.active]="!!listOptions?.textFilter[key]"
+    [(ngModel)]="listOptions?.textFilter[key]"
+    [live]="true"
+    [liveDebounce]="350"
+    (ngModelChange)="changeFilter()"
+    prompt="{{ label }}"
+    [showClear]="true"
+    >
+  </rw-text-input>
+}
+@if (
+  filterable ||
+  (listOptions?.sort?.direction && listOptions?.sort?.field === key)
+  ) {
+  <rw-icon
+    class="icon-sort"
+    [class.none]="
+    !(listOptions?.sort?.direction && listOptions?.sort?.field === key)
+    "
+    [states]="{ down: 'sort-dsc', up: 'sort-asc', undefined: 'sort-none' }"
+    size="normal"
+    [state]="
+    listOptions?.sort?.field === key ? listOptions?.sort?.direction : undefined
+    "
+  ></rw-icon>
+}
+@if (groupable) {
+  <div
+    class="sort-bar"
+    [class.sort-bar-active]="listOptions?.group?.field === key"
+    (click)="onGroup(key, $event)"
+    >
+    <div class="sort-bar-item">&nbsp;</div>
+    <div class="sort-bar-item">&nbsp;</div>
+    <div class="sort-bar-item">&nbsp;</div>
+    <div class="sort-bar-item">&nbsp;</div>
+  </div>
+}

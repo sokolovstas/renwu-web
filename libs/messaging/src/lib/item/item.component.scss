@@ -1,0 +1,376 @@
+@use '../../styles/variables.scss' as *;
+
+renwu-messaging-item {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  position: relative;
+  img {
+    border: 2px solid var(--gray-300);
+    border-radius: 10px;
+    margin: 10px 0px;
+  }
+}
+
+.renwu-messaging-item__pulse {
+  padding: 7px 7px 7px 16px;
+  display: flex;
+  font-size: 85%;
+  width: 100%;
+  align-items: flex-start;
+  background-color: var(--accent-25);
+  &__icon {
+    flex: 0 0 40px;
+  }
+  &__top-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+  }
+  &__body {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-left: 16px;
+  }
+  &__author {
+    flex: 0 0 auto;
+    padding-right: 10px;
+  }
+  &__time {
+    padding-right: 5px;
+    flex: 0 0 auto;
+  }
+  &__history-item {
+    padding-right: 10px;
+  }
+  &__text {
+    padding-left: 10px;
+    padding-right: 10px;
+    flex: 1 1 100%;
+  }
+}
+
+.renwu-messaging-item__message-wrapper {
+  padding: 0 7px 0 16px;
+  display: flex;
+  margin: 1px;
+
+  &:hover {
+    background-color: var(--gray-200);
+
+    .renwu-messaging-item__message-wrapper__icons {
+      display: flex;
+    }
+    .renwu-messaging-item__message-wrapper__right {
+      display: flex;
+    }
+    .renwu-messaging-item__message-wrapper__right__time {
+      display: flex;
+    }
+    .renwu-messaging-item__message-wrapper__right__icon {
+      display: none;
+    }
+  }
+  &.marked {
+    background-color: var(--message-item-marked);
+  }
+  &.edit {
+    background-color: var(--message-item-edit);
+  }
+  &.delete {
+    background-color: var(--message-item-delete);
+  }
+  &.selected {
+    background-color: var(--message-item-selected);
+  }
+  &__avatar-wrapper {
+    flex: 0 0 40px;
+    display: flex;
+  }
+
+  &__avatar {
+    padding-top: 8px;
+  }
+
+  &__right {
+    display: flex;
+    opacity: 0.7;
+    align-items: center;
+    flex: 1 1 100%;
+    justify-content: center;
+    font-size: 90%;
+    &__time {
+      display: none;
+    }
+  }
+
+  &__time-with-external {
+  }
+  &__icons {
+    flex: 0 0 auto;
+    flex-direction: row;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 5px;
+    top: -23px;
+    border: 1px solid $rw-control-border-color;
+    border-radius: $rw-control-border-radius;
+    background-color: var(--white);
+    z-index: 2;
+  }
+  &__icon {
+    font-size: 125%;
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid $rw-control-border-color;
+    opacity: 0.5;
+  }
+
+  &__icon:last-child {
+    border-right: none;
+  }
+
+  &__icon:hover {
+    opacity: 1;
+    font-weight: 900;
+  }
+
+  &__icons.active {
+    display: flex;
+  }
+  &__reads {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 0px;
+    bottom: 5px;
+  }
+  &__read-icon,
+  &__read-count {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+  &__read-icon {
+    font-size: 10px;
+  }
+  &__read-many {
+    margin-right: -8px;
+  }
+
+  &__link {
+    color: $rw-button-primary-background;
+  }
+
+  &__dialog-delete-or-resend {
+    color: $black;
+    padding-top: 5px;
+    font-size: 80%;
+  }
+}
+
+.renwu-messaging-item__message-body {
+  padding-left: 16px;
+  display: flex;
+  flex: 1 1 100%;
+  position: relative;
+  line-height: 1.7;
+  overflow: hidden;
+
+  &__message {
+    flex: 1 1 100%;
+    flex-direction: column;
+    display: flex;
+    overflow: hidden;
+    word-break: break-all;
+  }
+  &__text {
+    display: flex;
+    flex: 0 0 auto;
+    overflow-y: auto;
+    margin-right: 30px;
+    word-spacing: 0;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+  &__text > div {
+    overflow: auto;
+  }
+  &__text.not-sent {
+    opacity: 0.5;
+  }
+  &__up-part {
+    display: flex;
+    align-items: baseline;
+  }
+  &__author {
+    font-weight: $global-weight-bolder;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__time {
+    padding-left: 16px;
+    opacity: 0.5;
+    font-size: 80%;
+    white-space: nowrap;
+  }
+
+  &__new {
+    padding-left: 16px;
+    font-size: 80%;
+  }
+
+  &__icon {
+    margin-left: 4px;
+  }
+}
+
+.renwu-messaging-item__new-messages {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  font-size: 80%;
+
+  &__line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: auto 0;
+    height: 1px;
+    background-color: $error-color;
+  }
+
+  &__text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 1px;
+
+    span {
+      padding: 0 7px;
+      color: var(--messages-unread-color);
+      background-color: var(--white);
+      position: relative;
+      margin-right: 24px;
+      border-radius: 15px;
+    }
+  }
+}
+
+.renwu-messaging-item__external {
+  display: inline-block;
+  position: relative;
+  height: 100%;
+  width: 3px;
+  margin-right: 3px;
+  cursor: default;
+  background-color: $error-color;
+}
+
+.renwu-messaging-item__childs {
+  display: flex;
+
+  &__avatar-hidden {
+    position: relative;
+    padding-left: 27px;
+    display: flex;
+    flex-direction: column;
+  }
+  &__avatar-icon {
+    opacity: 0;
+  }
+
+  &__arrow-wrapper {
+    position: absolute;
+    // height: 100%;
+    top: 10px;
+    bottom: 7px;
+    width: 100%;
+    padding-right: 7px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  &__arrow {
+    font-size: 130%;
+    padding: 0;
+    color: var(--gray-300);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 2px;
+  }
+
+  &__line-wrapper {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+  &__line {
+    position: absolute;
+    height: 100%;
+    width: 2px;
+    left: 50%;
+    background-color: var(--gray-300);
+  }
+  &__body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 7px 24px;
+  }
+  &__message-item {
+    width: 100%;
+    flex: 0 0 auto;
+  }
+
+  &__href {
+    cursor: pointer;
+    display: flex;
+    border: 1px solid var(--gray-400);
+    border-radius: 9999px;
+    margin-left: 21px;
+    align-items: center;
+  }
+  &__href-avatar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  &__href-title {
+    color: #b5b5b5;
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+  }
+  &__href-title-icon {
+    padding-right: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 120%;
+  }
+  &__href.display-childs {
+    margin-left: 16px;
+    margin-top: 16px;
+  }
+
+  &__counter {
+    margin-right: 5px;
+  }
+}

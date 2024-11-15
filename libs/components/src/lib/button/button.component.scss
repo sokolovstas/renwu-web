@@ -1,0 +1,259 @@
+@use '../../styles/rw_variables.scss' as *;
+
+@mixin hover() {
+  .button {
+    &-primary {
+      background: $rw-button-primary-hover-background;
+      color: $rw-button-primary-hover-color;
+      &.disabled {
+        background: $rw-button-disabled;
+      }
+    }
+
+    &-secondary {
+      background: $rw-button-secondary-hover-background;
+      color: $rw-button-secondary-hover-color;
+      &.disabled {
+        background: $rw-button-secondary-background;
+        color: $rw-button-secondary-color;
+      }
+    }
+
+    &-link {
+      text-decoration: underline;
+
+      &.disabled {
+        color: $rw-button-disabled;
+        pointer-events: none;
+        text-decoration: none;
+      }
+    }
+
+    &-tab {
+      border-bottom: $rw-button-tab-hover-border;
+    }
+    &-tab-selected {
+      // background-color: $rw-button-tab-selected-background-color;
+      border-bottom: $rw-button-tab-hover-border;
+    }
+  }
+}
+:host {
+  @include component;
+  outline: none;
+  font-weight: $global-weight-bold;
+  justify-content: center;
+  transition: background-color 0.1s ease-in-out;
+
+  $current: &;
+
+  @at-root {
+    html[data-focus-source='key'] #{$current}:focus {
+      @include hover;
+    }
+  }
+  &:hover {
+    @include hover;
+  }
+
+  &:active {
+    .button {
+      &-primary {
+        background: $rw-button-primary-active-background;
+        color: $rw-button-primary-active-color;
+      }
+
+      &-secondary {
+        background: $rw-button-secondary-active-background;
+        color: $rw-button-secondary-active-color;
+      }
+
+      &-tab {
+        // background: $rw-button-secondary-active-background;
+        color: $rw-button-secondary-active-color;
+      }
+    }
+  }
+}
+
+.button {
+  cursor: pointer;
+  user-select: none;
+  // display: block;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+  outline: none;
+  transition: background-color 0.1s ease-in-out;
+
+  &-primary {
+    padding: $rw-control-default-padding + $component-focus-padding-bottom 1.2em;
+    border-radius: $rw-button-primary-radius;
+    color: $rw-button-primary-color;
+    border: 2px solid transparent;
+    vertical-align: middle;
+    background: $rw-button-primary-background;
+  }
+
+  &-link {
+    padding: 5px 0px;
+    color: $rw-button-tab-color;
+    vertical-align: middle;
+    // rw-icon {
+    //   display: inline-block;
+    //   i {
+    //     font-size: inherit;
+    //   }
+    // }
+  }
+
+  &-outline-primary {
+    color: #dc3545;
+    background-color: transparent;
+    background-image: none;
+    border-color: #dc3545;
+  }
+
+  &-icon {
+    font-size: inherit;
+    vertical-align: middle;
+    display: inline-block;
+    flex: 0 0 auto;
+    color: inherit;
+  }
+
+  &-secondary {
+    padding: $rw-control-default-padding + $component-focus-padding-bottom 1.2em;
+    border-radius: $rw-button-secondary-radius;
+    color: $rw-button-secondary-color;
+    border: $rw-button-secondary-border;
+    vertical-align: middle;
+    background: $rw-button-secondary-background;
+  }
+
+  &-tab {
+    font-weight: $global-weight-normal;
+    color: $rw-button-tab-color;
+    padding: 0.8em 1.2em;
+    // background-color: $rw-button-tab-background-color;
+    border-bottom: $rw-button-tab-border;
+    &-selected {
+      border-bottom: $rw-button-tab-selected-border;
+      // background-color: $rw-button-tab-selected-background-color;
+    }
+  }
+}
+
+.button-primary.disabled {
+  background: $rw-button-disabled;
+
+  &:hover {
+    background: $rw-button-disabled-hover;
+  }
+}
+
+.button-secondary.disabled {
+  opacity: 0.6;
+}
+
+.disabled.button-icon {
+  background: transparent;
+  .icon {
+    color: $rw-button-disabled;
+  }
+}
+
+.disabled.button-link {
+  color: $rw-button-disabled;
+  pointer-events: none;
+}
+
+.in-progress {
+  opacity: 0;
+}
+
+.spinner {
+  width: 70px;
+  text-align: center;
+  position: absolute;
+}
+
+// .icon {
+//   min-height: $global-lineheight * 1rem;
+// }
+
+.spinner > div {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  background-color: $rw-button-secondary-color;
+}
+
+.button-primary {
+  .spinner > div {
+    background-color: $rw-button-primary-hover-color;
+  }
+}
+
+.button-secondary,
+.button-tab {
+  .spinner > div {
+    background-color: $rw-button-secondary-color;
+  }
+}
+
+.button-primary.attention {
+  background-color: $rw-button-attention;
+  &:hover {
+    background-color: $rw-button-attention-hover;
+  }
+}
+
+.button-secondary.attention {
+}
+
+.button-icon.attention {
+  &:hover {
+    color: $error-color;
+  }
+}
+
+.button-secondary.attention {
+}
+
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+
+@keyframes sk-bouncedelay {
+  0%,
+  80%,
+  100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+.button.double {
+  color: $error-color;
+  transform: scale(1.1);
+}
+
+:host.link {
+  display: inline-block;
+}

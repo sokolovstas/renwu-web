@@ -1,0 +1,18 @@
+@if (issue) {
+  <a
+    [class.link-button]="linkButton"
+    href="{{ getHref() }}"
+    [rwTooltip]="title"
+    [tooltipDisabled]="displayTooltip"
+    >
+    <span class="container">
+      @if (title && issue.is_external) {
+        <i
+          [rwTooltip]="'core.visible-to-external-users' | transloco"
+          class="icon icon-team"
+        ></i>
+      }
+      <span>{{ getLabel() }}</span>
+    </span>
+  </a>
+}

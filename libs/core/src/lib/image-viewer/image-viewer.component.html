@@ -1,0 +1,90 @@
+<div class="controls">
+  <div class="controls-buttons">
+    <div class="filename">
+      {{ imageViewer?.file_name || imageViewer?.href }}
+    </div>
+  </div>
+  <div class="controls-buttons-auto">
+    <rw-icon
+      class="close"
+      icon="close"
+      size="x-large"
+      cursor="pointer"
+      (click)="closeViewer()"
+    ></rw-icon>
+  </div>
+</div>
+<div class="image" [class.broken]="broken" (click)="imageClick($event)">
+  <rw-icon
+    class="left"
+    icon="keyboard_arrow_left"
+    size="x-large"
+    cursor="pointer"
+    (click)="prevImage()"
+  ></rw-icon>
+  @if (broken) {
+    <rw-icon
+      class="broken"
+      size="inherit"
+      icon="picture"
+    ></rw-icon>
+  }
+  <div class="image-wrapper" [class.zoomed]="zoomed">
+    <img
+      #img
+      src="{{ imageViewer?.href }}"
+      [class.zoomed]="zoomed"
+      (load)="onLoad()"
+      (error)="onError()"
+      />
+  </div>
+</div>
+<div class="controls">
+  @if (images?.length > 1) {
+    <div class="controls-arrows">
+      <rw-icon
+        class="left"
+        icon="keyboard_arrow_left"
+        size="x-large"
+        cursor="pointer"
+        (click)="prevImage()"
+      ></rw-icon>
+      <span>{{ currentIndex + 1 }}</span
+        ><span class="{{ 'core.from' | transloco }}">from</span
+        ><span>{{ images?.length }}</span>
+        <rw-icon
+          class="right"
+          icon="keyboard_arrow_right"
+          size="x-large"
+          cursor="pointer"
+          (click)="nextImage()"
+        ></rw-icon>
+      </div>
+    }
+    <div class="controls-buttons">
+      <a
+        href="{{ imageViewer?.href_file_name }}"
+        target="_blank"
+        download="{{ imageViewer?.file_name }}"
+        >
+        <rw-icon icon="download" size="x-large" cursor="pointer"></rw-icon>
+      </a>
+      @if (!disableZoom) {
+        <rw-icon
+          icon="search"
+          size="x-large"
+          [style.opacity]="zoomed ? 0.5 : 1"
+          cursor="pointer"
+          (click)="switchZoom()"
+        ></rw-icon>
+      }
+      ю/сссю/чЯячювюяюжююююю@if (imageViewer?.id) {
+      <rw-icon
+        icon="trash"
+        size="x-large"
+        cursor="pointer"
+        (click)="onDeleteImage()"
+      ></rw-icon>
+    }
+  </div>
+</div>

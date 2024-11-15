@@ -1,0 +1,84 @@
+<div
+  class="rw-text-input"
+  [class.showClear]="showClear"
+  [style.opacity]="opacity"
+  >
+  @if (multiline) {
+    <div
+      class="rw-text-input-container resize-text"
+      [tabindex]="-1"
+      [class.container-borderless]="borderless"
+      (click)="switchPopup(true)"
+      >
+      {{ getDisplayValue() }}@if (percentage) {
+      <span>%</span>
+      }&nbsp;
+    </div>
+  }
+  @if (prompt) {
+    <div
+      [tabindex]="-1"
+      class="rw-text-input-prompt"
+      [class.rw-text-input-prompt-borderless]="borderless"
+      [class.rw-text-input-prompt-active]="
+      opened || (value !== '' && value !== null && value !== '')
+      "
+      [class.rw-text-input-prompt-filled]="
+      value !== '' && value !== null && value !== ''
+      "
+      >
+      {{ prompt }}
+    </div>
+  }
+
+  @if (!multiline) {
+    <input
+      [tabindex]="-1"
+      class="rw-text-input-container"
+      [class.rw-text-input-container-borderless]="borderless"
+      [class.rw-text-input-container-active]="opened"
+      [class.uppercase]="uppercase"
+      [type]="inputType"
+      [(ngModel)]="value"
+      [maxlength]="maxlength"
+      [disabled]="disabled"
+      (keydown)="onKeyDown()"
+      (focusin)="onFocusIn()"
+      (focus)="focused.next()"
+      (click)="switchPopup(true)"
+      (blur)="blured.next()"
+      (paste)="onPaste()"
+      autocomplete="off"
+      #container
+      />
+  }
+  @if (multiline) {
+    <textarea
+      [tabindex]="-1"
+      class="rw-text-input-container multiline-textarea"
+      [class.rw-text-input-container-borderless]="borderless"
+      [class.rw-text-input-container-active]="opened"
+      [class.uppercase]="uppercase"
+      [(ngModel)]="value"
+      [maxlength]="maxlength"
+      [disabled]="disabled"
+      (keydown)="onKeyDown()"
+      (focusin)="onFocusIn()"
+      (focus)="focused.next()"
+      (blur)="blured.next()"
+      (paste)="onPaste()"
+      #container
+    ></textarea>
+  }
+
+  @if (showClear && value !== undefined && value !== '') {
+    <rw-icon
+      [tabindex]="-1"
+      class="rw-text-input-clear"
+      icon="close"
+      size="normal"
+      (mousedown)="onClear($event)"
+      >
+    </rw-icon>
+  }
+</div>

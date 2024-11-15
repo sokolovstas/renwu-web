@@ -1,0 +1,128 @@
+@if (group) {
+  @if (group.label !== 'root' && !groupOnly) {
+    <div
+      class="renwu-board-group__title"
+      >
+      <div class="renwu-board-group__title-wrapper" (click)="collapse()">
+        {{ group.label }} ({{ group.reduce?.count }})
+      </div>
+      &nbsp;
+      <rw-icon
+        [states]="{
+        true: 'keyboard_arrow_right',
+        false: 'keyboard_arrow_down'
+        }"
+        (click)="collapse()"
+        [state]="collapsed"
+        >
+      </rw-icon>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      @if (group.issue) {
+        <rw-button
+          class="renwu-board-group__add-button"
+          typeButton="icon"
+          iconClass="add-bold"
+          iconSize="normal"
+          (clicked)="onAddTask(group)"
+          >{{ 'boards.add-task' | transloco }}
+        </rw-button>
+      }
+    </div>
+  }
+<!-- </renwu-issue-timelog-table-item> -->
+@if (group.groups.length === 0 && config && config.view) {
+  <div
+    class="renwu-board-group__issues-container renwu-board-group__issues-container-{{
+    config.type.id
+    }}"
+    >
+    @if (!collapsed || groupOnly) {
+      <div
+        class="renwu-board-group__issues renwu-board-group__issues-{{
+        config.view.id
+        }}"
+        >
+        @for (
+          issue of group.items
+          | renwuSortList: { sort: { field: 'key', direction: 'up' } }
+          ; track
+          issue) {
+          <a
+            >
+            @if (
+              config.view.id === 'cards-v' ||
+              config.view.id === 'cards-h' ||
+              config.view.id === 'cards-hw'
+              ) {
+              <renwu-boards-card
+                [issue]="issue"
+                [type]="config.type.id"
+              ></renwu-boards-card>
+            }
+          </a>
+        }
+      </div>
+    }
+  </div>
+}
+@if (
+  groupsFixed.length !== 0 || (groupsNotFixed.length !== 0 && !collapsed)
+  ) {
+  <div
+    class="renwu-board-group__groups-wrapper renwu-board-group__groups-wrapper-{{
+    group.config.view.id
+    }}"
+    >
+    @for (
+      g of groupsFixed
+      | renwuSortList
+      : { sort: { field: group.config.field.sort, direction: 'up' } }
+      : 'up'
+      : 'sort'
+      ; track
+      g) {
+      <renwu-board-group
+        class="renwu-board-group__group-{{
+        group.config.view.id
+        }} renwu-board-group__group-{{
+        config.view.id
+        }} renwu-board-group__group-fixed"
+        (check)="onIssueCheck($event)"
+        (addTask)="onAddTask($event)"
+        [parentGroup]="group"
+        [group]="g"
+        [config]="config"
+        >
+      </renwu-board-group>
+    }
+    <div class="renwu-board-group__groups-container">
+      <div
+        class="renwu-board-group__groups renwu-board-group__groups-{{
+        group.config.view.id
+        }}"
+        >
+        @for (
+          g of groupsNotFixed
+          | renwuSortList
+          : { sort: { field: group.config.field.sort, direction: 'up' } }
+          : 'up'
+          : 'sort'
+          ; track
+          g) {
+          <renwu-board-group
+            class="renwu-board-group__group-{{
+            group.config.view.id
+            }} renwu-board-group__group-{{ config.view.id }}"
+            (check)="onIssueCheck($event)"
+            (addTask)="onAddTask($event)"
+            [parentGroup]="group"
+            [group]="g"
+            [config]="config"
+            >
+          </renwu-board-group>
+        }
+      </div>
+    </div>
+  </div>
+}
+}

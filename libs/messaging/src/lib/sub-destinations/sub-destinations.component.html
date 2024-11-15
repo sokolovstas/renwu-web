@@ -1,0 +1,52 @@
+@if (
+  (destination?.subDestinations | async)?.length >= 1 || state !== 'normal'
+  ) {
+  <div
+    class="renwu-messaging-sub-destinations__wrapper"
+    >
+    <div
+      [@.disabled]="true"
+      [@show]="true"
+      class="renwu-messaging-sub-destinations__destination"
+      [class.selected]="destination === subDestination"
+      (click)="onSelectDestination(destination)"
+      >
+      <div class="renwu-messaging-sub-destinations__title">Main</div>
+      <renwu-message-counter
+        class="renwu-messaging-sub-destinations__counter"
+        [destination]="destination"
+      ></renwu-message-counter>
+    </div>
+    @for (sb of destination?.subDestinations | async; track sb; let i = $index) {
+      <div
+        [@show]="true"
+        class="renwu-messaging-sub-destinations__destination"
+        [class.selected]="sb === subDestination"
+        (click)="onSelectDestination(sb)"
+        >
+        <!-- <rw-icon class="mr-1" icon="close" (click)="onCloseDestination(sb)">
+      </rw-icon> -->
+      <div class="renwu-messaging-sub-destinations__title">
+        {{ sb.info.name }}
+      </div>
+      @if ((sb.subMembers | async).length > 0) {
+        <div
+          class="renwu-messaging-sub-destinations__avatars"
+          >
+          @for (id of sb.subMembers | async; track id) {
+            <renwu-avatar
+              class="renwu-messaging-sub-destinations__avatar"
+              [user]="{ id: id }"
+              size="20px"
+            ></renwu-avatar>
+          }
+        </div>
+      }
+      <renwu-message-counter
+        class="renwu-messaging-sub-destinations__counter"
+        [destination]="sb"
+      ></renwu-message-counter>
+    </div>
+  }
+</div>
+}

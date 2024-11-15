@@ -1,0 +1,36 @@
+<div
+  class="avatar"
+  [style.width]="size"
+  [style.height]="size"
+  [class.add]="newUser"
+  [rwTooltip]="name"
+  tooltipDirection="bottom"
+  [tooltipDisabled]="!showTooltip"
+  >
+  @if ((!newUser && !avatarUrl) || error) {
+    <div
+      class="initials"
+      [style.background-color]="color"
+      [style.color]="textColor"
+      >
+      <div class="initials-text" [style.fontSize]="fontSize">
+        {{ getInitials() }}
+      </div>
+    </div>
+  }
+  @if (!newUser && !!avatarUrl && !error) {
+    <div
+      class="initials"
+      [style.background-color]="'#fff'"
+      >
+      <img src="{{ avatarUrl }}" class="image" (error)="error = true" />
+    </div>
+  }
+
+  @if (newUser) {
+    <rw-icon icon="add"></rw-icon>
+  }
+  @if (showOnline) {
+    <div class="status" [class.online]="online"></div>
+  }
+</div>

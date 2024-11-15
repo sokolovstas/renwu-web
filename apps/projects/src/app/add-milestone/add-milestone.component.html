@@ -1,0 +1,87 @@
+<rw-modal>
+  <div rwModalHeader>
+    @if (!milestoneForm.value.id) {
+      <span>{{ 'projects.add-new-milestone' | transloco }}</span>
+    }
+    @if (milestoneForm.value.id) {
+      <span>{{ 'projects.edit-milestone' | transloco }}</span>
+    }
+  </div>
+  <div rwModalBody class="w-96 min-w-30">
+    <form [formGroup]="milestoneForm">
+      <label class="form-label">
+        <rw-text-input
+          formControlName="title"
+          [prompt]="'projects.name' | transloco"
+        ></rw-text-input>
+      </label>
+      <label class="form-label">
+        <rw-select
+          modelName="Container"
+          formControlName="container"
+          [prompt]="'projects.container' | transloco"
+        ></rw-select>
+      </label>
+      <label class="form-label">
+        <rw-text-input
+          formControlName="key"
+          [prompt]="'projects.key' | transloco"
+          [uppercase]="true"
+          [live]="true"
+        ></rw-text-input>
+        <div class="form-supporting-text">
+          {{ 'projects.letters-a-z' | transloco }}
+        </div>
+      </label>
+      <label class="form-label">
+        <rw-date-picker
+          [prompt]="'projects.date' | transloco"
+          formControlName="date"
+        ></rw-date-picker>
+      </label>
+      <label class="form-label">
+        <rw-text-area
+          formControlName="description"
+          [prompt]="'projects.description' | transloco"
+        ></rw-text-area>
+      </label>
+      <label class="form-label">
+        <rw-select
+          modelName="MilestoneLabel"
+          formControlName="labels"
+          [tags]="true"
+          [prompt]="'projects.labels' | transloco"
+        ></rw-select>
+      </label>
+    </form>
+  </div>
+  <div rwModalFooter>
+    @if (!milestoneForm.value.id) {
+      <rw-button
+        [disabled]="(milestoneForm.statusChanges | async) !== 'VALID'"
+        (clicked)="add()"
+        [tabindex]="0"
+        >{{ 'projects.add' | transloco }}</rw-button
+      >
+    }
+    @if (milestoneForm.value.id && milestoneForm.value.archived) {
+      <rw-button (clicked)="unarchive()" [tabindex]="0">{{
+        'projects.unarchive' | transloco
+      }}</rw-button>
+    }
+    @if (milestoneForm.value.id && !milestoneForm.value.archived) {
+      <rw-button (clicked)="archive()" [tabindex]="0">{{
+        'projects.archive' | transloco
+      }}</rw-button>
+    }
+    <div class="flex w-full"></div>
+    @if (milestoneForm.value.id) {
+      <rw-button
+        [disabled]="(milestoneForm.statusChanges | async) !== 'VALID'"
+        (clicked)="add()"
+        [tabindex]="0"
+        >{{ 'projects.save' | transloco }}</rw-button
+      >
+    }
+  </div>
+</rw-modal>

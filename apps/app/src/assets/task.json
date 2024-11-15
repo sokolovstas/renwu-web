@@ -1,0 +1,6 @@
+{
+  "sections": [
+    { "element": "renwu-task-description" },
+    { "element": "renwu-task-todo" }
+  ]
+}

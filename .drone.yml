@@ -1,0 +1,182 @@
+kind: pipeline
+type: docker
+name: build
+
+environment:
+  GOOS: 'linux'
+  GOARCH: 'amd64'
+
+volumes:
+  - name: sock
+    host:
+      path: /var/run/docker.sock
+  - name: cache-node
+    host:
+      path: /tmp/drone/cache/node_modules
+  - name: cache-nx
+    host:
+      path: /tmp/drone/cache/.nx
+  - name: cache-angular
+    host:
+      path: /tmp/drone/cache/.angular
+
+steps:
+  - name: cache-clean
+    image: cypress/included:12.17.2
+    volumes:
+      - name: cache-node
+        path: /drone/src/node_modules
+      - name: cache-nx
+        path: /drone/src/.nx
+      - name: cache-angular
+        path: /drone/src/.angular
+    commands:
+      - npm uninstall -g @angular/cli
+      - rm -rf ./node_modules/*
+      - npm install -g @angular/cli
+      - npm install --legacy-peer-deps
+    when:
+      event:
+        - promote
+      target:
+        - clean
+
+  - name: test
+    image: cypress/included:12.17.2
+    volumes:
+      - name: cache-node
+        path: /drone/src/node_modules
+      - name: cache-nx
+        path: /drone/src/.nx
+      - name: cache-angular
+        path: /drone/src/.angular
+    commands:
+      - echo npm run test
+
+    when:
+      target:
+        exclude:
+          - production
+          - dev
+          - clean
+
+  - name: build
+    image: cypress/included:12.17.2
+    volumes:
+      - name: cache-node
+        path: /drone/src/node_modules
+      - name: cache-nx
+        path: /drone/src/.nx
+      - name: cache-angular
+        path: /drone/src/.angular
+    commands:
+      - npm install --legacy-peer-deps
+      - npx nx build app --bundle=true --baseHref /app/
+      - npx nx build dashboard --bundle=true --baseHref /app/modules/dashboard/
+      - npx nx build projects --bundle=true --baseHref /app/modules/projects/
+      - npx nx build tasks --bundle=true --baseHref /app/modules/tasks/
+      - npx nx build task --bundle=true --baseHref /app/modules/task/
+      - npx nx build profile --bundle=true --baseHref /app/modules/profile/
+      - npx nx build settings --bundle=true --baseHref /app/modules/settings/
+      - npx nx build messenger --bundle=true --baseHref /app/modules/messenger/
+      - npx nx build todos --baseHref /app/modules/todos/
+      - npx nx build boards --baseHref /app/modules/boards/
+      - npx nx build documents --baseHref /app/modules/documents/
+    when:
+      event:
+        - promote
+      target:
+        - production
+        - dev
+
+  - name: docker
+    image: plugins/docker
+    volumes:
+      - name: sock
+        path: /var/run/docker.sock
+    settings:
+      dockerfile: ./apps/Dockerfile
+      context: ./dist/apps
+      repo: code.renwu.ru/renwu/client-web
+      registry: https://code.renwu.ru
+      tags:
+        - v2
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      event:
+        - promote
+      target:
+        - production
+
+  - name: deploy
+    image: appleboy/drone-ssh
+    network_mode: host
+    settings:
+      host: renwu.ru
+      username: drone
+      key:
+        from_secret: prod_ssh_key
+      port: 22
+      script:
+        - cd /opt/renwu/
+        - docker compose pull
+        - docker compose up -d --force-recreate --no-deps client-web
+    when:
+      event:
+        - promote
+      target:
+        - production
+
+  - name: rename-dev
+    image: golang:1.19
+    commands:
+      - find dist/ -type f -exec sed -i 's#renwu.ru#dev.renwu.ru#g' {} \;
+    when:
+      event:
+        - promote
+      target:
+        - dev
+
+  - name: docker-dev
+    image: plugins/docker
+    volumes:
+      - name: sock
+        path: /var/run/docker.sock
+    settings:
+      dockerfile: ./apps/Dockerfile
+      context: ./dist/apps
+      repo: code.renwu.ru/renwu/client-web
+      registry: https://code.renwu.ru
+      tags:
+        - v2-dev
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      event:
+        - promote
+      target:
+        - dev
+
+  - name: deploy-dev
+    image: appleboy/drone-ssh
+    network_mode: host
+    settings:
+      host: renwu.ru
+      username: drone
+      key:
+        from_secret: prod_ssh_key
+      port: 22
+      script:
+        - cd /opt/renwu-dev/
+        - docker compose pull
+        - docker compose up -d --force-recreate --no-deps client-web
+    when:
+      event:
+        - promote
+      target:
+        - dev

@@ -1,0 +1,21 @@
+<div class="flex flex-row h-full">
+  <div class="app-second-sidebar flex flex-col bg-gray-100 h-full">
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      Table of content
+    </div>
+    <ul class="flex flex-col overflow-auto w-full">
+      <!-- <li *ngFor="let query of queries | async">
+          <a
+            class="flex p-4"
+            [routerLink]="['.']"
+            [queryParams]="{ q: query.hash }"
+            routerLinkActive="router-link-active"
+            >{{ query.title }}</a
+          >
+        </li> -->
+    </ul>
+  </div>
+  <div class="app-main-content overflow-auto h-full w-full">
+    <router-outlet></router-outlet>
+  </div>
+</div>

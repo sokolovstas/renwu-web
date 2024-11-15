@@ -1,0 +1,44 @@
+<renwu-page-with-sidebar sidebarClass="app-second-sidebar-large">
+  <renwu-messaging-destinations
+    sidebar
+    class="w-full h-full flex overflow-auto"
+    (selected)="selectDestination($event)"
+  ></renwu-messaging-destinations>
+  <renwu-page
+    [noPadding]="true"
+    [fixedHeader]="true"
+    [title]="(destination | async)?.info?.name"
+    [hideTitle]="true"
+    [breadcrumbs]="[{ title: 'Chats', showSidebar: true }]"
+  >
+    <div subtitle>
+      <renwu-messaging-destination
+        class="pt-3 pb-1"
+        [destination]="destination | async"
+      ></renwu-messaging-destination>
+      <renwu-messaging-sub-destinations
+        #subdestinations
+        class="flex -mr-4 -ml-4"
+        [destination]="destination | async"
+        [subDestination]="thread | async"
+        (selected)="selectSubDestination($event)"
+      >
+      </renwu-messaging-sub-destinations>
+    </div>
+
+    <div class="overflow-hidden h-full w-full flex flex-col relative">
+      <renwu-messaging-thread
+        class="flex h-full overflow-hidden"
+        [autoload]="true"
+        [destination]="thread | async"
+        (clickSubDestination)="selectSubDestination($event)"
+      ></renwu-messaging-thread>
+      <renwu-messaging-input
+        #input
+        class="flex pb-2"
+        [destination]="thread | async"
+      >
+      </renwu-messaging-input>
+    </div>
+  </renwu-page>
+</renwu-page-with-sidebar>

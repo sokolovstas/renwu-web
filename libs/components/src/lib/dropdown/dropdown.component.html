@@ -1,0 +1,14 @@
+@if (displayBackground) {
+  <div
+    class="background"
+    [@opacityAnim]="state"
+    (click)="closeDropdown()"
+  ></div>
+}
+<div
+  #dropdownContainer
+  class="dropdownContainer {{ finalPlacement }} "
+  [@opacityAnim]="state"
+  >
+  <ng-container *ngTemplateOutlet="dropdownContent"> </ng-container>
+</div>

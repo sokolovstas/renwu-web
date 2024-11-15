@@ -1,0 +1,34 @@
+<div class="head">
+  <rw-text-input
+    class="textinput"
+    [(ngModel)]="this.model"
+    [live]="true"
+    [keepFocus]="true"
+    (keydown)="onSearchKeyDown($event)"
+    >
+  </rw-text-input>
+  @if (model.createNewOption) {
+    <div class="add">
+      <rw-button
+        [disabled]="!this.model"
+        typeButton="icon"
+        iconClass="add"
+        (clicked)="onEnter()"
+        >
+      </rw-button>
+    </div>
+  }
+</div>
+<div class="body">
+  @for (item of model.list | async; track item; let i = $index) {
+    <div class="item">
+      <rw-button
+        class="select-group-item-button"
+        typeButton="tab"
+        [selected]="model.isSelected(item)"
+        (clicked)="model.select(i)"
+        >{{ item.label }}
+      </rw-button>
+    </div>
+  }
+</div>

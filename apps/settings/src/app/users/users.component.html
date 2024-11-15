@@ -1,0 +1,36 @@
+<renwu-page title="{{ 'settings.users' | transloco }}">
+  <div rwSortTable="users" class="w-full">
+    @for (user of users | async; track user; let i = $index) {
+      <div
+        class="flex flex-row w-full overflow-auto"
+        [rwSortTableRow]="i"
+        (click)="openUser(user)"
+        >
+        <div class="p-2 w-full" rwSortTableColumn="avatar" flex="2rem">
+          <renwu-avatar [user]="user" class=""></renwu-avatar>
+        </div>
+        <div rwSortTableColumn="username" class="p-2 w-full md:block">
+          {{ user.username }}
+        </div>
+        <div rwSortTableColumn="full_name" class="p-2 w-full hidden md:block">
+          {{ user.full_name }}
+        </div>
+        <div rwSortTableColumn="email" class="p-2 w-full">
+          {{ user.email }}
+        </div>
+        <div rwSortTableColumn="phone" class="p-2 w-full hidden md:block">
+          {{ user.phone }}
+        </div>
+        <div rwSortTableColumn="user_type" class="p-2 w-full hidden md:block">
+          {{ user.type }}
+        </div>
+        <div rwSortTableColumn="status" class="p-2 w-full hidden md:block">
+          {{ user.status }}
+        </div>
+      </div>
+    }
+  </div>
+  <rw-button action (clicked)="addUser()">{{
+    'settings.add-user' | transloco
+  }}</rw-button>
+</renwu-page>

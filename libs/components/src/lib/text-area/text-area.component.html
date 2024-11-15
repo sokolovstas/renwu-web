@@ -1,0 +1,52 @@
+<div class="rw-text-area">
+  <div class="rw-text-area-container" #textarea></div>
+  <!-- <div (click)="inactiveClick($event)">
+  <div
+    *ngIf="value && !opened"
+    class="rw-text-area-text markdown-box"
+    [class.rw-text-area-text-disabled]="disabled"
+    [class.rw-text-area-text-active]="opened"
+    [innerHTML]="value"
+  ></div> -->
+  <div
+    class="rw-text-area-prompt"
+    [class.rw-text-area-prompt-active]="opened || value"
+    >
+    {{ prompt }}
+  </div>
+<!-- </div> -->
+@if (opened) {
+  <div class="rw-text-area-tool-buttons">
+    @if (editButton && !opened) {
+      <rw-button
+        [tabindex]="-1"
+        class="rw-text-area-tool-button rw-text-area-tool-button-edit"
+        typeButton="icon"
+        iconClass="pen"
+        (clicked)="onEditButton()"
+        >
+      </rw-button>
+    }
+    @if ((editButton && opened) || (doneButton && opened)) {
+      <rw-button
+        [tabindex]="-1"
+        class="rw-text-area-tool-button"
+        typeButton="icon"
+        iconClass="check"
+        (clicked)="onDoneButton()"
+        >
+      </rw-button>
+    }
+    @if (editButton && opened) {
+      <rw-button
+        [tabindex]="-1"
+        class="rw-text-area-tool-button"
+        typeButton="icon"
+        iconClass="close"
+        (clicked)="onCancelButton()"
+        >
+      </rw-button>
+    }
+  </div>
+}
+</div>

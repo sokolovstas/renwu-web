@@ -1,0 +1,20 @@
+<div class="flex flex-row h-full w-full">
+  <div class="app-second-sidebar flex flex-col bg-gray-100 h-full">
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">Boards</div>
+    <ul class="flex flex-col overflow-auto w-full">
+      @for (board of boards | async; track board) {
+        <li>
+          <a
+            class="flex p-4"
+            [routerLink]="[board.id]"
+            routerLinkActive="router-link-active"
+            >{{ board.title }}</a
+            >
+          </li>
+        }
+      </ul>
+    </div>
+    <div class="app-main-content overflow-auto h-full w-full">
+      <router-outlet></router-outlet>
+    </div>
+  </div>

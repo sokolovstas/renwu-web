@@ -1,0 +1,38 @@
+<div class="flex flex-row h-full">
+  <div class="app-second-sidebar flex flex-col bg-gray-100 h-full">
+    <ul class="flex flex-col overflow-auto w-full">
+      <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">Lists</div>
+      <li>
+        <a class="flex p-4" routerLink="inbox" routerLinkActive="active"
+          >Inbox</a
+        >
+      </li>
+      <li>
+        <a class="flex p-4" routerLink="today" routerLinkActive="active"
+          >Today</a
+        >
+      </li>
+    </ul>
+    <div class="text-2xl p-4 flex flex-row font-extralight">Labels</div>
+    <ul class="flex flex-col overflow-auto w-full">
+      <li>
+        <a class="flex p-4" routerLink="label/red" routerLinkActive="active"
+          >Red</a
+        >
+      </li>
+      <li>
+        <a class="flex p-4" routerLink="label/green" routerLinkActive="active"
+          >Green</a
+        >
+      </li>
+      <li>
+        <a class="flex p-4" routerLink="label/blue" routerLinkActive="active"
+          >Blue</a
+        >
+      </li>
+    </ul>
+  </div>
+  <div class="app-main-content overflow-auto h-full w-full">
+    <router-outlet></router-outlet>
+  </div>
+</div>

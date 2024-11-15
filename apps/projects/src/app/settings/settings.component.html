@@ -1,0 +1,70 @@
+<renwu-page
+  title="{{ 'projects.settings' | transloco }}"
+  [breadcrumbs]="[
+    { title: 'projects.projects' | transloco, url: '../../' },
+    { title: (currentProject | async).key, url: '../' }
+  ]"
+>
+  <form [formGroup]="settingsForm">
+    <label class="form-label">
+      <rw-text-input
+        formControlName="title"
+        [prompt]="'projects.project-title' | transloco"
+      ></rw-text-input>
+    </label>
+    <label class="form-label">
+      <rw-text-input
+        formControlName="key"
+        [prompt]="'projects.project-key' | transloco"
+        [live]="true"
+        [uppercase]="true"
+      ></rw-text-input>
+    </label>
+
+    <div formGroupName="settings">
+      <label class="form-label">
+        <rw-select
+          formControlName="workflow"
+          modelName="Workflow"
+          [prompt]="'projects.project-workflow' | transloco"
+        ></rw-select>
+      </label>
+      <label class="form-label">
+        <rw-select
+          formControlName="external_user_scope"
+          modelName="ExternalUserScope"
+          [prompt]="
+            'projects.project-external-user-task-visibility' | transloco
+          "
+        ></rw-select>
+      </label>
+      <label class="form-label">
+        <rw-checkbox
+          formControlName="auto_scheduling"
+          [label]="'projects.auto-schedule-project' | transloco"
+        ></rw-checkbox
+      ></label>
+      <!-- <label class="form-label">
+        <rw-time-picker
+          formControlName="min_autolog_time"
+          [prompt]="'projects.minimum-time-for-auto-time-logging' | transloco"
+        ></rw-time-picker
+      ></label> -->
+    </div>
+    <label class="form-label">
+      <rw-checkbox
+        formControlName="archived"
+        [label]="'projects.archived' | transloco"
+      ></rw-checkbox
+    ></label>
+  </form>
+  <rw-button
+    action
+    (clicked)="save()"
+    [disabled]="(settingsForm.statusChanges | async) !== 'VALID'"
+    >{{ 'projects.save' | transloco }}</rw-button
+  >
+  <rw-button action (clicked)="remove()" [isAttention]="true">{{
+    'projects.delete' | transloco
+  }}</rw-button>
+</renwu-page>

@@ -1,0 +1,56 @@
+<renwu-page
+  title="{{ (currentProject | async).title }} ({{
+  (currentProject | async).key
+  }})"
+  [breadcrumbs]="[{ title: 'projects.projects' | transloco, url: '../../' }]"
+  >
+  <div class="">
+    <div
+      class="text-xl font-extralight mb-4 cursor-pointer"
+      [routerLink]="['../milestone']"
+      >
+      {{ 'projects.milestones' | transloco }}
+    </div>
+    @if ((milestones | async)?.length === 0) {
+      <div>
+        {{ 'projects.no-milestones' | transloco }}
+      </div>
+    }
+    <div class="flex flex-row mb-4 overflow-auto">
+      @for (m of milestones | async; track m) {
+        <div
+          class="w-40 mr-5 flex flex-col flex-shrink-0 pb-4 cursor-pointer"
+          [routerLink]="['..', 'milestone', m.id]"
+          >
+          {{ m.title }}
+          <rw-range
+            [max]="m.childs_estimated_total"
+            [ngModel]="m.childs_estimated_resolved"
+            [disabled]="true"
+            [filled]="true"
+          ></rw-range>
+          <div>
+            {{
+            'projects.%resolved%-from-%total%'
+            | transloco
+            : {
+            resolved: m.childs_resolved,
+            total: m.childs_total
+          }
+          }}
+        </div>
+        <div [ngClass]="{ 'text-warn': m.isDue }">
+          {{ m.date | rwDate: 'PPP' }}
+        </div>
+        <div class="opacity-50">
+          {{ m.date_calc | rwDate: 'PPP' }}
+        </div>
+      </div>
+    }
+  </div>
+  <div class="text-xl font-extralight mb-4">
+    {{ 'projects.tasks' | transloco }}
+  </div>
+  <renwu-projects-backlog></renwu-projects-backlog>
+</div>
+</renwu-page>
