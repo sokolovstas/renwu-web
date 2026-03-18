@@ -20,14 +20,9 @@ import {
   ActivatedRoute,
   NavigationEnd,
   Router,
-  RouterLink,
 } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
-  RwButtonComponent,
-  RwCheckboxComponent,
-  RwDropDownComponent,
-  RwIconComponent,
   RwTextInputComponent,
 } from '@renwu/components';
 import {
@@ -52,14 +47,9 @@ import { RwMessageService } from '../message.service';
   standalone: true,
   imports: [
     RwTextInputComponent,
-    RwDropDownComponent,
     FormsModule,
-    RwCheckboxComponent,
-    RwButtonComponent,
-    RwIconComponent,
     DestinationComponent,
     AsyncPipe,
-    RouterLink,
     NgClass,
     TranslocoPipe
 ],

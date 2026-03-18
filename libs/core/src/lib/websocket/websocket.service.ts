@@ -1,5 +1,4 @@
 import { Inject, Injectable, inject } from '@angular/core';
-import '@angular/localize/init';
 import { TranslocoService } from '@jsverse/transloco';
 import { RwToastService } from '@renwu/components';
 import { RxWebsocketSubject } from '@renwu/utils';

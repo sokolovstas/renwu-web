@@ -1,3 +1,5 @@
+@use 'sass:math' as math;
+
 // Put this file to /styles for override
 $black: var(--black);
 $white: var(--white);
@@ -18,7 +20,7 @@ $global-weight-bolder: 600 !default;
 
 $global-lineheight: 1.5;
 $global-fontsize: 15px;
-$global-textheight: floor($global-lineheight * $global-fontsize);
+$global-textheight: math.floor($global-lineheight * $global-fontsize);
 
 /////////////////////////////////////
 //// Colors

@@ -13,7 +13,7 @@
         "outputPath": "dist/apps/documents",
         "index": "apps/documents/src/index.html",
         "browser": "apps/documents/src/main.ts",
-        "polyfills": ["zone.js", "es-module-shims"],
+        "polyfills": ["zone.js", "es-module-shims", "@angular/localize/init"],
         "tsConfig": "apps/documents/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": ["apps/documents/src/assets"],

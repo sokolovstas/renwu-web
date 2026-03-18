@@ -17,7 +17,6 @@ import { ParentProgressTooltipComponent } from './parent-progress-tooltip/parent
   standalone: true,
   imports: [
     RwTooltipDirective,
-    ParentProgressTooltipComponent,
     RwDurationToStringPipe
 ],
   templateUrl: './status-bar.component.html',

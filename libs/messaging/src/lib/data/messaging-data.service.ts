@@ -30,6 +30,12 @@ import {
 export type DataObject = Record<string, unknown> | Array<unknown> | unknown;
 export type ParamsObject = { [param: string]: string | ReadonlyArray<string> };
 
+// Provided at runtime via `@angular/localize/init` in app `polyfills`.
+declare const $localize: (
+  strings: TemplateStringsArray,
+  ...expressions: unknown[]
+) => string;
+
 @Injectable({
   providedIn: 'root',
 })

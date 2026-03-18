@@ -16,6 +16,12 @@ import { ResponseOk } from './common.model';
 import { DataObject, ParamsObject } from './data.service';
 import { Instance } from './site.model';
 
+// Provided at runtime via `@angular/localize/init` in app `polyfills`.
+declare const $localize: (
+  strings: TemplateStringsArray,
+  ...expressions: unknown[]
+) => string;
+
 @Injectable({
   providedIn: 'root',
 })

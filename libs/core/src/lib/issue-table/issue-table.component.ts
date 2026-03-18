@@ -8,7 +8,6 @@ import {
   ViewEncapsulation,
   inject,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
@@ -28,7 +27,6 @@ import { IssueStatusComponent } from '../issue/fields/status/status.component';
 import { IssueTypeComponent } from '../issue/fields/type/type.component';
 import { Issue } from '../issue/issue.model';
 import { ListOptions } from '../search/sort.model';
-import { RwFormatUserPipe } from '../user/format-user-pipe/format-user.pipe';
 import { HeaderColumnComponent } from './header-column/header-column.component';
 import { ListExporterComponent } from './list-exporter/list-exporter.component';
 
@@ -36,7 +34,6 @@ import { ListExporterComponent } from './list-exporter/list-exporter.component';
   selector: 'renwu-issue-table',
   standalone: true,
   imports: [
-    RouterLink,
     HeaderColumnComponent,
     RwSortTableRowDirective,
     RwSortTableDirective,
@@ -52,7 +49,7 @@ import { ListExporterComponent } from './list-exporter/list-exporter.component';
     RwButtonComponent,
     AvatarComponent,
     TranslocoPipe,
-    RwFormatUserPipe
+    
 ],
   templateUrl: './issue-table.component.html',
   styleUrl: './issue-table.component.scss',

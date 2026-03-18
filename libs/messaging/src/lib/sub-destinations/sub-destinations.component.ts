@@ -5,7 +5,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +16,6 @@ import {
   ViewEncapsulation,
   inject,
 } from '@angular/core';
-import { RwIconComponent } from '@renwu/components';
 import { AvatarComponent, MessageCounterComponent } from '@renwu/core';
 import { MessageDestination } from '../message-destination';
 
@@ -24,10 +23,8 @@ import { MessageDestination } from '../message-destination';
   selector: 'renwu-messaging-sub-destinations',
   standalone: true,
   imports: [
-    RwIconComponent,
     MessageCounterComponent,
     AvatarComponent,
-    NgClass,
     AsyncPipe
 ],
   templateUrl: './sub-destinations.component.html',

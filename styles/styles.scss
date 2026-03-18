@@ -105,15 +105,15 @@ $message-edit-color: #fdcf37;
   --always-white: #{$always-white};
   --always-black: #{$always-black};
 
-  --gray-100: #{mix($white, $black, 96%)};
-  --gray-200: #{mix($white, $black, 92%)};
-  --gray-300: #{mix($white, $black, 80%)};
-  --gray-400: #{mix($white, $black, 70%)};
-  --gray-500: #{mix($white, $black, 50%)};
-  --gray-600: #{mix($white, $black, 30%)};
-  --gray-700: #{mix($white, $black, 20%)};
-  --gray-800: #{mix($white, $black, 10%)};
-  --gray-900: #{mix($white, $black, 0%)};
+  --gray-100: #{color.mix($white, $black, 96%)};
+  --gray-200: #{color.mix($white, $black, 92%)};
+  --gray-300: #{color.mix($white, $black, 80%)};
+  --gray-400: #{color.mix($white, $black, 70%)};
+  --gray-500: #{color.mix($white, $black, 50%)};
+  --gray-600: #{color.mix($white, $black, 30%)};
+  --gray-700: #{color.mix($white, $black, 20%)};
+  --gray-800: #{color.mix($white, $black, 10%)};
+  --gray-900: #{color.mix($white, $black, 0%)};
 
   --dark-100: #{color.scale($white, $lightness: -3%)};
   --dark-200: #{color.scale($white, $lightness: -6%)};
@@ -128,8 +128,8 @@ $message-edit-color: #fdcf37;
   --accent-color: #{$accent-color};
   --accent-primary-color: #{$accent-primary-color};
   --accent-secondary-color: #{$accent-primary-color};
-  --accent-darker-color: #{mix($black, $accent-color, 20%)};
-  --accent-lighter-color: #{mix($white, $accent-color, 75%)};
+  --accent-darker-color: #{color.mix($black, $accent-color, 20%)};
+  --accent-lighter-color: #{color.mix($white, $accent-color, 75%)};
   --info-color: #{$info-color};
   --success-color: #{$success-color};
   --warn-color: #{$warn-color};
@@ -164,13 +164,13 @@ $message-edit-color: #fdcf37;
   --rw-placeholder-background: #{rgba($black, 0.05)};
   --rw-avatar-online: #{color.scale($success-color, $lightness: -10%)};
 
-  --rw-button-attention: #{mix($error-color, $always-black, 70%)};
-  --rw-button-attention-hover: #{mix($error-color, $always-black, 80%)};
+  --rw-button-attention: #{color.mix($error-color, $always-black, 70%)};
+  --rw-button-attention-hover: #{color.mix($error-color, $always-black, 80%)};
 
-  --message-item-marked: #{mix($info-color, $white, 30%)};
+  --message-item-marked: #{color.mix($info-color, $white, 30%)};
   --message-item-edit: rgb(170 236 69 / 25%);
-  --message-item-delete: #{mix($error-color, $white, 30%)};
-  --message-item-selected: #{mix($warn-color, $white, 30%)};
+  --message-item-delete: #{color.mix($error-color, $white, 30%)};
+  --message-item-selected: #{color.mix($warn-color, $white, 30%)};
 
   --messages-unread-color: #db6668;
   --messages-online-color: #44d889;
@@ -203,17 +203,17 @@ html.light {
   --sidebar-bg-active: #{color.scale($white, $lightness: -9%)};
   --sidebar-text-active: #{rgba($black, 1)};
 
-  --accent-900: #{mix($white, $accent-color, 30%)};
-  --accent-800: #{mix($white, $accent-color, 35%)};
-  --accent-700: #{mix($white, $accent-color, 40%)};
-  --accent-600: #{mix($white, $accent-color, 45%)};
-  --accent-500: #{mix($white, $accent-color, 50%)};
-  --accent-400: #{mix($white, $accent-color, 55%)};
-  --accent-300: #{mix($white, $accent-color, 60%)};
-  --accent-200: #{mix($white, $accent-color, 65%)};
-  --accent-100: #{mix($white, $accent-color, 70%)};
-  --accent-50: #{mix($white, $accent-color, 75%)};
-  --accent-25: #{mix($white, $accent-color, 80%)};
+  --accent-900: #{color.mix($white, $accent-color, 30%)};
+  --accent-800: #{color.mix($white, $accent-color, 35%)};
+  --accent-700: #{color.mix($white, $accent-color, 40%)};
+  --accent-600: #{color.mix($white, $accent-color, 45%)};
+  --accent-500: #{color.mix($white, $accent-color, 50%)};
+  --accent-400: #{color.mix($white, $accent-color, 55%)};
+  --accent-300: #{color.mix($white, $accent-color, 60%)};
+  --accent-200: #{color.mix($white, $accent-color, 65%)};
+  --accent-100: #{color.mix($white, $accent-color, 70%)};
+  --accent-50: #{color.mix($white, $accent-color, 75%)};
+  --accent-25: #{color.mix($white, $accent-color, 80%)};
 
   @include applyTheme($black, $white, $black, $white);
 }
@@ -236,17 +236,17 @@ html.dark {
   --sidebar-bg-active: #{color.scale($white, $lightness: -9%)};
   --sidebar-text-active: #{rgba($black, 1)};
 
-  --accent-900: #{mix($white, $accent-color, 30%)};
-  --accent-800: #{mix($white, $accent-color, 35%)};
-  --accent-700: #{mix($white, $accent-color, 40%)};
-  --accent-600: #{mix($white, $accent-color, 45%)};
-  --accent-500: #{mix($white, $accent-color, 50%)};
-  --accent-400: #{mix($white, $accent-color, 55%)};
-  --accent-300: #{mix($white, $accent-color, 60%)};
-  --accent-200: #{mix($white, $accent-color, 65%)};
-  --accent-100: #{mix($white, $accent-color, 70%)};
-  --accent-50: #{mix($white, $accent-color, 75%)};
-  --accent-25: #{mix($white, $accent-color, 80%)};
+  --accent-900: #{color.mix($white, $accent-color, 30%)};
+  --accent-800: #{color.mix($white, $accent-color, 35%)};
+  --accent-700: #{color.mix($white, $accent-color, 40%)};
+  --accent-600: #{color.mix($white, $accent-color, 45%)};
+  --accent-500: #{color.mix($white, $accent-color, 50%)};
+  --accent-400: #{color.mix($white, $accent-color, 55%)};
+  --accent-300: #{color.mix($white, $accent-color, 60%)};
+  --accent-200: #{color.mix($white, $accent-color, 65%)};
+  --accent-100: #{color.mix($white, $accent-color, 70%)};
+  --accent-50: #{color.mix($white, $accent-color, 75%)};
+  --accent-25: #{color.mix($white, $accent-color, 80%)};
 
   @include applyTheme($black, $white, $white, $black);
 }

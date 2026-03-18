@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common';
+// Note: keep imports minimal; this file is standalone and NG8113 reports unused entries.
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -16,12 +16,10 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
   RwCheckboxComponent,
   RwDropDownComponent,
-  RwDropDownDirective,
   RwIconComponent,
 } from '@renwu/components';
 import { OQLParseListener } from '../search/oql/OQLParseListener';
@@ -41,14 +39,11 @@ import {
   selector: 'renwu-query-builder',
   standalone: true,
   imports: [
-    RwDropDownDirective,
     RwDropDownComponent,
     RwButtonComponent,
     FormsModule,
     RwIconComponent,
     RwCheckboxComponent,
-    NgTemplateOutlet,
-    TranslocoPipe,
   ],
   templateUrl: './query-builder.component.html',
   styleUrl: './query-builder.component.scss',

@@ -1,6 +1,5 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RwTooltipDirective } from '@renwu/components';
 import { AvatarComponent } from '../../../avatar/avatar.component';
 import { User, UserStatic } from '../../../user/user.model';
 import { Issue } from '../../issue.model';
@@ -8,7 +7,7 @@ import { Issue } from '../../issue.model';
 @Component({
   selector: 'renwu-issue-assignees',
   standalone: true,
-  imports: [RwTooltipDirective, AvatarComponent],
+  imports: [AvatarComponent],
   templateUrl: './assignees.component.html',
   styleUrl: './assignees.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,7 +14,6 @@ import {
   RwIconComponent,
   RwTextInputComponent,
   RwTextWithTooltipComponent,
-  RwTooltipDirective,
 } from '@renwu/components';
 import { ListOptions, SortFields } from '../../search/sort.model';
 
@@ -25,7 +24,6 @@ import { ListOptions, SortFields } from '../../search/sort.model';
     RwIconComponent,
     RwTextInputComponent,
     FormsModule,
-    RwTooltipDirective,
     RwTextWithTooltipComponent
 ],
   templateUrl: './header-column.component.html',
