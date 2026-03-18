@@ -59,7 +59,7 @@
           "target": "todos:esbuild:production"
         },
         "development": {
-          "target": "todos:serve-original:development",
+          "target": "todos:esbuild:development",
           "dev": true
         }
       },
@@ -73,6 +73,18 @@
         "dev": true,
         "port": 4209
       }
+    },
+    "serve-original": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "todos:esbuild:production"
+        },
+        "development": {
+          "buildTarget": "todos:esbuild:development"
+        }
+      },
+      "defaultConfiguration": "development"
     },
     "extract-i18n": {
       "command": "npm run i18n:extract -- --project apps/todos"

@@ -59,7 +59,7 @@
           "target": "messenger:esbuild:production"
         },
         "development": {
-          "target": "messenger:serve-original:development",
+          "target": "messenger:esbuild:development",
           "dev": true
         }
       },
@@ -73,6 +73,18 @@
         "dev": true,
         "port": 4208
       }
+    },
+    "serve-original": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "messenger:esbuild:production"
+        },
+        "development": {
+          "buildTarget": "messenger:esbuild:development"
+        }
+      },
+      "defaultConfiguration": "development"
     },
     "extract-i18n": {
       "command": "npm run i18n:extract -- --project apps/messenger"

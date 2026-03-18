@@ -59,7 +59,7 @@
           "target": "dashboard:esbuild:production"
         },
         "development": {
-          "target": "dashboard:serve-original:development",
+          "target": "dashboard:esbuild:development",
           "dev": true
         }
       },
@@ -73,6 +73,18 @@
         "dev": true,
         "port": 4210
       }
+    },
+    "serve-original": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "dashboard:esbuild:production"
+        },
+        "development": {
+          "buildTarget": "dashboard:esbuild:development"
+        }
+      },
+      "defaultConfiguration": "development"
     },
     "extract-i18n": {
       "command": "npm run i18n:extract -- --project apps/dashboard"

@@ -59,7 +59,7 @@
           "target": "documents:esbuild:production"
         },
         "development": {
-          "target": "documents:serve-original:development",
+          "target": "documents:esbuild:development",
           "dev": true
         }
       },
@@ -73,6 +73,18 @@
         "dev": true,
         "port": 4201
       }
+    },
+    "serve-original": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "documents:esbuild:production"
+        },
+        "development": {
+          "buildTarget": "documents:esbuild:development"
+        }
+      },
+      "defaultConfiguration": "development"
     },
     "extract-i18n": {
       "command": "npm run i18n:extract -- --project apps/documents"

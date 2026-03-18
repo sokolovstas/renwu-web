@@ -12,6 +12,7 @@
   "private": true,
   "devDependencies": {
     "@angular-architects/native-federation": "^21.1.1",
+    "@angular/build": "21.1.5",
     "@angular-devkit/build-angular": "21.1.5",
     "@angular-devkit/core": "21.1.5",
     "@angular-devkit/schematics": "21.1.5",

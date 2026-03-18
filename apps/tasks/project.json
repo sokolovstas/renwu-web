@@ -59,7 +59,7 @@
           "target": "tasks:esbuild:production"
         },
         "development": {
-          "target": "tasks:serve-original:development",
+          "target": "tasks:esbuild:development",
           "dev": true
         }
       },
@@ -73,6 +73,18 @@
         "dev": true,
         "port": 4204
       }
+    },
+    "serve-original": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "tasks:esbuild:production"
+        },
+        "development": {
+          "buildTarget": "tasks:esbuild:development"
+        }
+      },
+      "defaultConfiguration": "development"
     },
     "extract-i18n": {
       "command": "npm run i18n:extract -- --project apps/tasks"
