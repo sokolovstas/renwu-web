@@ -18,7 +18,8 @@
         "inlineStyleLanguage": "scss",
         "assets": ["apps/projects/src/assets"],
         "styles": ["apps/projects/src/styles.scss"],
-        "scripts": []
+        "scripts": [],
+        "allowedCommonJsDependencies": ["duration-fns"]
       },
       "configurations": {
         "production": {

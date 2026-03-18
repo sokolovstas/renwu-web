@@ -27,6 +27,7 @@
         ],
         "styles": ["apps/app/src/styles.scss"],
         "scripts": [],
+        "allowedCommonJsDependencies": ["duration-fns"],
         "serviceWorker": "apps/app/ngsw-config.json"
       },
       "configurations": {
