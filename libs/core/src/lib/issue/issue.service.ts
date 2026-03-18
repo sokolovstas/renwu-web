@@ -30,7 +30,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { JSONUtils } from '@renwu/utils';
 import { ContainerD } from '../container/container.model';
 import { RwContainerService } from '../container/container.service';

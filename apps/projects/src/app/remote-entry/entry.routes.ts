@@ -4,7 +4,7 @@ import {
   Route,
   createUrlTreeFromSnapshot,
 } from '@angular/router';
-import { InlineLoader, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { RwContainerService } from '@renwu/core';
 import { firstValueFrom } from 'rxjs';
 import { ActivityComponent } from '../activity/activity.component';

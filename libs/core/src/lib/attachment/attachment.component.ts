@@ -16,7 +16,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RwDatePipe, RwToastService } from '@renwu/components';
 
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { fromEvent } from 'rxjs';
 import { RwDataService } from '../data/data.service';
 import { FileUpload, FileWithName } from '../data/upload';

@@ -4,7 +4,7 @@ import {
   Route,
   createUrlTreeFromSnapshot,
 } from '@angular/router';
-import { InlineLoader, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { RwDataService } from '@renwu/core';
 import { firstValueFrom } from 'rxjs';
 import { ListComponent } from '../list/list.component';

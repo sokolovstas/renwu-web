@@ -22,7 +22,7 @@ import {
   Router,
   RouterLink,
 } from '@angular/router';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
   RwCheckboxComponent,

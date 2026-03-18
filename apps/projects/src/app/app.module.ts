@@ -8,7 +8,7 @@ import {
   TranslocoModule,
   provideTransloco,
   translocoConfig,
-} from '@ngneat/transloco';
+} from '@jsverse/transloco';
 import {
   RwAlertComponent,
   RwModalContainerDirective,

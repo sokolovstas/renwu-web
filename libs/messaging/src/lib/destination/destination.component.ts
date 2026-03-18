@@ -19,7 +19,7 @@ import {
 import { MessageDestination } from '../message-destination';
 import { RwMessageService } from '../message.service';
 
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Subject } from 'rxjs';
 import { DestinationType } from '../data/messages.model';
 

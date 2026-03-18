@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { InlineLoader, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { DetailComponent } from '../detail/detail.component';
 
 const createInlineLoader = (languages: Array<string>): InlineLoader => {

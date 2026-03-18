@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { Inject, Injectable, inject } from '@angular/core';
 // import { captureException } from '@sentry/browser';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { RwToastService } from '@renwu/components';
 import { JSONUtils } from '@renwu/utils';
 import { EMPTY, Observable, Observer, Subject, throwError } from 'rxjs';

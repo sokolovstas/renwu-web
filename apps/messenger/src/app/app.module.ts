@@ -9,7 +9,7 @@ import {
   TranslocoModule,
   provideTransloco,
   translocoConfig,
-} from '@ngneat/transloco';
+} from '@jsverse/transloco';
 import { provideRenwuCore } from '@renwu/core';
 import { provideRenwuMessaging, provideRenwuWebPush } from '@renwu/messaging';
 import { environment } from '../../../../environments/environment';

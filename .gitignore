@@ -47,5 +47,6 @@ Thumbs.db
 /playwright/.cache/
 
 .nx/cache
+.nx/workspace-data
 
 crowdin.yml

@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RwTextAreaComponent } from '@renwu/components';
 import { RwIssueService } from '@renwu/core';
 

@@ -1,6 +1,6 @@
 import { ElementRef, Injectable, inject } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { IconName } from '@renwu/components';
 import { Issue, RwPolicyService } from '@renwu/core';
 import { JSONUtils } from '@renwu/utils';

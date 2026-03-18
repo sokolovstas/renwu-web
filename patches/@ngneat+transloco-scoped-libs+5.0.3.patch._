@@ -1,7 +1,7 @@
-diff --git a/node_modules/@ngneat/transloco-scoped-libs/src/index.js b/node_modules/@ngneat/transloco-scoped-libs/src/index.js
+diff --git a/node_modules/@jsverse/transloco-scoped-libs/src/index.js b/node_modules/@jsverse/transloco-scoped-libs/src/index.js
 index 5fc3d55..333113c 100755
---- a/node_modules/@ngneat/transloco-scoped-libs/src/index.js
-+++ b/node_modules/@ngneat/transloco-scoped-libs/src/index.js
+--- a/node_modules/@jsverse/transloco-scoped-libs/src/index.js
++++ b/node_modules/@jsverse/transloco-scoped-libs/src/index.js
 @@ -8,12 +8,13 @@ const transloco_scoped_libs_1 = tslib_1.__importDefault(require("./lib/transloco
  const optionDefinitions = [
      { name: 'watch', alias: 'w', type: Boolean, defaultValue: false },

@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { InlineLoader, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { BoardComponent } from '../board/board.component';
 import { MainComponent } from '../main/main.component';
 

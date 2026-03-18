@@ -6,7 +6,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RenwuPageWithSidebarComponent,
   RenwuSidebarService,

@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
 } from '@angular/core';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent } from '@renwu/app-ui';
 import { IssueHistoryItemComponent } from '@renwu/core';
 import {

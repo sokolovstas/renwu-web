@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { InlineLoader, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarsComponent } from '../calendars/calendars.component';
 import { DictionaryComponent } from '../dictionary/dictionary.component';

@@ -2,7 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, ViewChild, inject } from '@angular/core';
 
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslocoPipe, TranslocoService } from '@ngneat/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   RwButtonComponent,
   RwCheckboxComponent,

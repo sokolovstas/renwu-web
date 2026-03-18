@@ -19,7 +19,7 @@ import {
 } from '@angular/animations';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuSidebarService, RenwuTourAnchorDirective } from '@renwu/app-ui';
 import { RwDropDownComponent, RwIconComponent } from '@renwu/components';
 import {

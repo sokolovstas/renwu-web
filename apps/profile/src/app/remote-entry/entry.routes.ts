@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
-import { InlineLoader, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { MainComponent } from '../main/main.component';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { SettingsComponent } from '../settings/settings.component';

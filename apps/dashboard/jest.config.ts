@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayname: 'dashboard',
-  preset: '../../../jest.preset.js',
+  displayName: 'dashboard',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {},
   coverageDirectory: '../../../coverage/apps/dashboard',

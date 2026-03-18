@@ -1,6 +1,6 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { RwToastService } from '@renwu/components';
 import { RwDataService, RwUserService, StateService, User } from '@renwu/core';
 import { filterFalsy } from '@renwu/utils';

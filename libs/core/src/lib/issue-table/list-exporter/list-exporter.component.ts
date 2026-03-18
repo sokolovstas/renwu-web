@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 
 
 import { FormsModule } from '@angular/forms';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
   RwModalBodyDirective,

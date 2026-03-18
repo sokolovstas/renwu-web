@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayname: 'messenger',
-  preset: '../../../jest.preset.js',
+  displayName: 'messenger',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {},
   coverageDirectory: '../../../coverage/apps/messenger',

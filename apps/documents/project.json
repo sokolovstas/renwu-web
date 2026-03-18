@@ -4,14 +4,15 @@
   "projectType": "application",
   "sourceRoot": "apps/documents/src",
   "prefix": "renwu-documents",
+  "tags": [],
   "targets": {
     "esbuild": {
-      "executor": "@angular-devkit/build-angular:browser-esbuild",
+      "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/documents",
         "index": "apps/documents/src/index.html",
-        "main": "apps/documents/src/main.ts",
+        "browser": "apps/documents/src/main.ts",
         "polyfills": ["zone.js", "es-module-shims"],
         "tsConfig": "apps/documents/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
@@ -58,7 +59,7 @@
           "target": "documents:esbuild:production"
         },
         "development": {
-          "target": "documents:esbuild:development",
+          "target": "documents:serve-original:development",
           "dev": true
         }
       },
@@ -67,7 +68,7 @@
     "serve": {
       "executor": "@angular-architects/native-federation:build",
       "options": {
-        "target": "documents:esbuild:development",
+        "target": "documents:serve-original:development",
         "rebuildDelay": 0,
         "dev": true,
         "port": 4201
@@ -93,7 +94,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/documents/jest.config.ts"
+        "jestConfig": "apps/documents/jest.config.ts",
+        "tsConfig": "apps/documents/tsconfig.spec.json"
       }
     },
     "e2e": {
@@ -103,6 +105,5 @@
         "config": "apps/documents/playwright.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

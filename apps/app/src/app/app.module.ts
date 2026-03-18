@@ -23,7 +23,7 @@ import {
   translocoConfig,
   TranslocoLoader,
   TranslocoModule,
-} from '@ngneat/transloco';
+} from '@jsverse/transloco';
 import {
   RwAlertComponent,
   RwAlertService,

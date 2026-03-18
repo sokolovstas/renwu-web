@@ -8,7 +8,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { RwToastService } from '@renwu/components';
 
 @Directive({

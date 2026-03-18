@@ -5,7 +5,7 @@ import {
   Component,
   Input,
 } from '@angular/core';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RwIconComponent, RwTooltipDirective } from '@renwu/components';
 import { getUnixTime } from 'date-fns';
 import { RwContainerService } from '../../../container/container.service';

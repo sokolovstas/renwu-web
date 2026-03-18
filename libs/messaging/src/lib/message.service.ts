@@ -19,7 +19,7 @@ import {
   switchMap,
 } from 'rxjs/operators';
 
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { formatISO } from 'date-fns';
 import {
   Destination,

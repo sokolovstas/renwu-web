@@ -25,7 +25,7 @@ import {
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import { Placement } from '@floating-ui/dom';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Subject, firstValueFrom } from 'rxjs';
 import { RwButtonComponent } from '../button/button.component';
 import { RwDropDownComponent } from '../dropdown/dropdown.component';

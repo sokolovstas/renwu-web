@@ -13,7 +13,7 @@ import {
   FormsModule,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RwButtonComponent } from '../button/button.component';
 import { RwTextInputComponent } from '../text-input/text-input.component';
 

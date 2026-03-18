@@ -1,11 +1,11 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RwButtonComponent } from '@renwu/components';
 
 @Component({
   selector: 'renwu-tour-hint',
   standalone: true,
-  imports: [CommonModule, RwButtonComponent],
+  imports: [RwButtonComponent],
   templateUrl: './tour-hint.component.html',
   styleUrl: './tour-hint.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

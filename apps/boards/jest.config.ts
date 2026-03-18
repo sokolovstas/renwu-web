@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayname: 'boards',
-  preset: '../../../jest.preset.js',
+  displayName: 'boards',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {},
   coverageDirectory: '../../../coverage/apps/boards',

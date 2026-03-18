@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { RwIconComponent } from '@renwu/components';
 
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Attachment } from '../issue/issue.model';
 
 interface PreparedAttachment extends Attachment {

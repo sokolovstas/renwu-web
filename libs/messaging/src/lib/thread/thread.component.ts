@@ -16,7 +16,7 @@ import {
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RwButtonComponent, RwIconComponent } from '@renwu/components';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

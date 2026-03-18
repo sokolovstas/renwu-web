@@ -1,3 +1,3 @@
-import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { TRANSLOCO_SCOPE } from '@jsverse/transloco';
 
 [{ provide: TRANSLOCO_SCOPE, useValue: 'renwu' }];

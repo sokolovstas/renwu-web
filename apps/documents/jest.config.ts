@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayname: 'documents',
-  preset: '../../../jest.preset.js',
+  displayName: 'documents',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {},
   coverageDirectory: '../../../coverage/apps/documents',

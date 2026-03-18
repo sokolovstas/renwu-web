@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TranslocoPipe } from '@ngneat/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageWithSidebarComponent } from './page-with-sidebar.component';
 
 describe('RenwuPageWithSidebarComponent', () => {

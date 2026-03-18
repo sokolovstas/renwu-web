@@ -6,7 +6,7 @@ import {
   TranslocoLoader,
   provideTransloco,
   translocoConfig,
-} from '@ngneat/transloco';
+} from '@jsverse/transloco';
 import { provideRenwuBoards } from '@renwu/board';
 import { provideRenwuCore } from '@renwu/core';
 import { environment } from '../../../../environments/environment';

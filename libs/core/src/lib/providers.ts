@@ -33,7 +33,7 @@ import { UserStatus, UserType } from './user/user.model';
 import { RwUserService } from './user/user.service';
 import { RwWebsocketService } from './websocket/websocket.service';
 
-import { TranslocoService } from '@ngneat/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { SelectModelLabel } from './select/label';
 
 export function initSelectorModels(): Record<string, () => ISelectModel<any>> {
