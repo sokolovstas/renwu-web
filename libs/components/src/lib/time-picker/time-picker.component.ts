@@ -142,7 +142,7 @@ export class RwTimePickerComponent
 
   private onChangeCallback: (_: number) => void = noop;
 
-  @HostListener('focusin', ['$event'])
+  @HostListener('focusin')
   onFocus(): void {
     this.focusTimeout = globalThis.setTimeout(() => {
       this.openEdit(true);

@@ -71,9 +71,9 @@ export class CustomErrorHandler extends ErrorHandler {
 }
 
 @NgModule({
-  declarations: [AppComponent],
   imports: [
     BrowserModule,
+    AppComponent,
     AvatarComponent,
     SidebarComponent,
     RwAlertComponent,
@@ -117,7 +117,6 @@ export class CustomErrorHandler extends ErrorHandler {
     provideAnimations(),
     provideHttpClient(),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {
   update = inject(CheckForUpdateService);

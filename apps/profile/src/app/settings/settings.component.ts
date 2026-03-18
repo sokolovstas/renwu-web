@@ -98,6 +98,5 @@ export class SettingsComponent {
   async saveUser() {
     firstValueFrom(this.userService.saveUser(this.userForm.value as any));
     this.transloco.setActiveLang(this.userForm.value.settings.profile.language);
-    this.transloco.ngOnDestroy();
   }
 }

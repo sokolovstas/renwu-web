@@ -429,7 +429,7 @@ export class RwIssueService implements OnDestroy {
                   ),
                   this.transloco.translate('core.make-all-todo'),
                 )
-                .pipe(map(() => null));
+                .pipe(map((): null => null));
             }
           }
         }

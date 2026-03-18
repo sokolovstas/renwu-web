@@ -17,7 +17,7 @@ const isAuth: CanActivateFn = async () => {
   const dataService = inject(RwDataService);
   const coreSettings = inject(RW_CORE_SETTINGS);
   const user = await firstValueFrom(dataService.getCurrentUser()).catch(
-    () => null,
+    (): null => null,
   );
   if (!user?.user?.id) {
     window.location.href = coreSettings.siteLoginUrl;

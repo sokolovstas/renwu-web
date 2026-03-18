@@ -165,7 +165,7 @@ export class RwTextAreaComponent implements OnInit, ControlValueAccessor {
     // this.focusSource = focusSource();
   }
 
-  @HostListener('focus', ['$event'])
+  @HostListener('focus')
   onFocus() {
     this.switchPopup(true);
   }

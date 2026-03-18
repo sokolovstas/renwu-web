@@ -73,7 +73,7 @@ export class RenwuTourService {
     this.tour.initialize(
       await fetch(new URL(settings.path, settings.relative).toString())
         .then((v) => v.json())
-        .catch(() => []),
+        .catch((): IStepOption[] => []),
       settings.stepSettings,
     );
     setTimeout(() => {

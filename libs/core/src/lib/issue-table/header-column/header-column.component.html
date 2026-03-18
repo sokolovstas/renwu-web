@@ -5,8 +5,8 @@
 @if (filterable) {
   <rw-text-input
     class="header-filter"
-    [class.active]="!!listOptions?.textFilter[key]"
-    [(ngModel)]="listOptions?.textFilter[key]"
+    [class.active]="!!listOptions.textFilter[key]"
+    [(ngModel)]="listOptions.textFilter[key]"
     [live]="true"
     [liveDebounce]="350"
     (ngModelChange)="changeFilter()"

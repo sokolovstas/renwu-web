@@ -5,6 +5,7 @@ import {
   inject,
   ViewChild,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { RenwuSidebarService, RenwuTourService } from '@renwu/app-ui';
 import {
@@ -15,9 +16,29 @@ import {
 import { RwLoaderService, RwTitleService, StateService } from '@renwu/core';
 import { filter, map } from 'rxjs';
 import { CheckForUpdateService } from './sw-check.service';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import {
+  RouterOutlet,
+} from '@angular/router';
+import {
+  RwAlertComponent,
+  RwModalContainerDirective,
+  RwToastContainerComponent,
+  RwTooltipContainerComponent,
+} from '@renwu/components';
 
 @Component({
   selector: 'renwu-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    SidebarComponent,
+    RwAlertComponent,
+    RwModalContainerDirective,
+    RwToastContainerComponent,
+    RwTooltipContainerComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

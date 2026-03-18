@@ -205,7 +205,7 @@ export class RwTextInputComponent
     }
   }
 
-  @HostListener('focusin', ['$event'])
+  @HostListener('focusin')
   onFocus(): void {
     this.switchPopup(true);
   }

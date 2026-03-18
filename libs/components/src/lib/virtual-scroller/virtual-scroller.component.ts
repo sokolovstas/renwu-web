@@ -1069,8 +1069,10 @@ export class RwVirtualScrollerComponent
 
   protected getScrollElement(): HTMLElement {
     return this.parentScroll instanceof Window
-      ? document.scrollingElement || document.documentElement || document.body
-      : this.parentScroll || this.element.nativeElement;
+      ? (document.scrollingElement ||
+          document.documentElement ||
+          document.body) as HTMLElement
+      : (this.parentScroll || this.element.nativeElement) as HTMLElement;
   }
 
   protected addScrollEventHandlers(): void {

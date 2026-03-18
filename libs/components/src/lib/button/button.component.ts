@@ -92,7 +92,7 @@ export class RwButtonComponent {
     }
   }
 
-  @HostListener('mouseleave', ['$event'])
+  @HostListener('mouseleave')
   onmouseleave(): void {
     this.clickCount = 0;
   }

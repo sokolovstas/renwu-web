@@ -1,7 +1,5 @@
-import { HttpClientModule } from '@angular/common/http';
 import { Injectable, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import {
   TranslocoLoader,
@@ -27,15 +25,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
   }
 }
 @NgModule({
-  declarations: [AppComponent],
   imports: [
-    RwAlertComponent,
-    RwModalContainerDirective,
-    RwToastContainerComponent,
-    RwTooltipContainerComponent,
-    BrowserAnimationsModule,
-    HttpClientModule,
     BrowserModule,
+    AppComponent,
     TranslocoModule,
     RouterModule.forRoot(
       [
@@ -64,6 +56,5 @@ export class TranslocoHttpLoader implements TranslocoLoader {
       loader: TranslocoHttpLoader,
     }),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

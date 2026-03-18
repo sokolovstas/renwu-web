@@ -1,4 +1,3 @@
-import { HttpClientModule } from '@angular/common/http';
 import { Injectable, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
@@ -20,9 +19,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
   }
 }
 @NgModule({
-  declarations: [AppComponent],
   imports: [
-    HttpClientModule,
     BrowserModule,
     TranslocoModule,
     RouterModule.forRoot(
@@ -52,6 +49,5 @@ export class TranslocoHttpLoader implements TranslocoLoader {
       loader: TranslocoHttpLoader,
     }),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

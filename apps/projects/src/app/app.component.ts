@@ -1,8 +1,26 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RwAlertService, RwModalService } from '@renwu/components';
+import { RouterOutlet } from '@angular/router';
+import {
+  RwAlertComponent,
+  RwAlertService,
+  RwModalContainerDirective,
+  RwModalService,
+  RwToastContainerComponent,
+  RwTooltipContainerComponent,
+} from '@renwu/components';
 
 @Component({
   selector: 'renwu-projects',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RwAlertComponent,
+    RwModalContainerDirective,
+    RwToastContainerComponent,
+    RwTooltipContainerComponent,
+  ],
   template: `<router-outlet></router-outlet>
     <div
       class="rw-modal-container"
