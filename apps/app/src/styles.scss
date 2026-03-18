@@ -1,5 +1,5 @@
-@import '../../../styles/styles.scss';
-@import 'styles/nprogess';
+@use '../../../styles/styles.scss' as *;
+@use 'styles/nprogess' as *;
 
 .preloader {
   position: fixed;

@@ -1,8 +1,9 @@
 @use '../libs/core/src/styles/variables.scss' as *;
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-@import './icons/style';
+@use 'sass:color' as color;
+@use './icons/style.scss' as *;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 $side-width: 95vw;
 
@@ -114,15 +115,15 @@ $message-edit-color: #fdcf37;
   --gray-800: #{mix($white, $black, 10%)};
   --gray-900: #{mix($white, $black, 0%)};
 
-  --dark-100: #{darken($white, 3)};
-  --dark-200: #{darken($white, 6)};
-  --dark-300: #{darken($white, 9)};
-  --dark-400: #{darken($white, 12)};
-  --dark-500: #{darken($white, 15)};
-  --dark-600: #{darken($white, 18)};
-  --dark-700: #{darken($white, 21)};
-  --dark-800: #{darken($white, 24)};
-  --dark-900: #{darken($white, 27)};
+  --dark-100: #{color.scale($white, $lightness: -3%)};
+  --dark-200: #{color.scale($white, $lightness: -6%)};
+  --dark-300: #{color.scale($white, $lightness: -9%)};
+  --dark-400: #{color.scale($white, $lightness: -12%)};
+  --dark-500: #{color.scale($white, $lightness: -15%)};
+  --dark-600: #{color.scale($white, $lightness: -18%)};
+  --dark-700: #{color.scale($white, $lightness: -21%)};
+  --dark-800: #{color.scale($white, $lightness: -24%)};
+  --dark-900: #{color.scale($white, $lightness: -27%)};
 
   --accent-color: #{$accent-color};
   --accent-primary-color: #{$accent-primary-color};
@@ -138,16 +139,16 @@ $message-edit-color: #fdcf37;
   --online-color: #{$online-color};
   --pulse-color: #{$pulse-color};
 
-  --toast-info-background-color: #{lighten($info-color, 30)};
-  --toast-info-color: #{darken($info-color, 20)};
-  --toast-success-background-color: #{lighten($success-color, 40)};
-  --toast-success-color: #{darken($success-color, 20)};
-  --toast-warn-background-color: #{lighten($warn-color, 30)};
-  --toast-warn-color: #{darken($warn-color, 20)};
-  --toast-error-background-color: #{lighten($error-color, 30)};
-  --toast-error-color: #{darken($error-color, 20)};
+  --toast-info-background-color: #{color.scale($info-color, $lightness: 30%)};
+  --toast-info-color: #{color.scale($info-color, $lightness: -20%)};
+  --toast-success-background-color: #{color.scale($success-color, $lightness: 40%)};
+  --toast-success-color: #{color.scale($success-color, $lightness: -20%)};
+  --toast-warn-background-color: #{color.scale($warn-color, $lightness: 30%)};
+  --toast-warn-color: #{color.scale($warn-color, $lightness: -20%)};
+  --toast-error-background-color: #{color.scale($error-color, $lightness: 30%)};
+  --toast-error-color: #{color.scale($error-color, $lightness: -20%)};
 
-  --switch-color: #{darken($accent-primary-color, 20)};
+  --switch-color: #{color.scale($accent-primary-color, $lightness: -20%)};
 
   --rw-control-border-color-invalid: #a00;
   --rw-control-border-hover-color-invalid: #f00;
@@ -161,7 +162,7 @@ $message-edit-color: #fdcf37;
   --rw-modal-overlay-background: #{rgba(18, 22, 25, 0.8)};
 
   --rw-placeholder-background: #{rgba($black, 0.05)};
-  --rw-avatar-online: #{darken($success-color, 10)};
+  --rw-avatar-online: #{color.scale($success-color, $lightness: -10%)};
 
   --rw-button-attention: #{mix($error-color, $always-black, 70%)};
   --rw-button-attention-hover: #{mix($error-color, $always-black, 80%)};
@@ -195,11 +196,11 @@ html.light {
   background-color: var(--white) !important;
   color: var(--black) !important;
 
-  --sidebar-bg: #{darken($white, 9)};
+  --sidebar-bg: #{color.scale($white, $lightness: -9%)};
   --sidebar-text: #{rgba($black, 1)};
-  --sidebar-bg-hover: #{darken($white, 9)};
+  --sidebar-bg-hover: #{color.scale($white, $lightness: -9%)};
   --sidebar-text-hover: #{rgba($black, 1)};
-  --sidebar-bg-active: #{darken($white, 9)};
+  --sidebar-bg-active: #{color.scale($white, $lightness: -9%)};
   --sidebar-text-active: #{rgba($black, 1)};
 
   --accent-900: #{mix($white, $accent-color, 30%)};
@@ -228,11 +229,11 @@ html.dark {
   background-color: var(--white) !important;
   color: var(--black) !important;
 
-  --sidebar-bg: #{darken($white, 9)};
+  --sidebar-bg: #{color.scale($white, $lightness: -9%)};
   --sidebar-text: #{rgba($black, 1)};
-  --sidebar-bg-hover: #{darken($white, 9)};
+  --sidebar-bg-hover: #{color.scale($white, $lightness: -9%)};
   --sidebar-text-hover: #{rgba($black, 1)};
-  --sidebar-bg-active: #{darken($white, 9)};
+  --sidebar-bg-active: #{color.scale($white, $lightness: -9%)};
   --sidebar-text-active: #{rgba($black, 1)};
 
   --accent-900: #{mix($white, $accent-color, 30%)};
