@@ -27,40 +27,43 @@
       </div>
     }
     <div class="changes">
-      @if (value.type === 'issue_favorite') {
-        <div class="change">
-          <div><span>Add to favorites</span></div>
-        </div>
-      }
-      @if (value.type === 'issue_unfavorite') {
-        <div class="change">
-          <div><span>Remove from favorites</span></div>
-        </div>
-      }
-      @if (value.type === 'issue_create') {
-        <div class="change">
-          <div>
-            <span>Create <span class="field-name">task</span></span>
+      @switch (value.type) {
+        @case ('issue_favorite') {
+          <div class="change">
+            <div><span>Add to favorites</span></div>
           </div>
-        </div>
-      }
-      @if (value.type === 'issue_delete') {
-        <div class="change">
-          <div>
-            <span>Delete <span class="field-name">task</span></span>
+        }
+        @case ('issue_unfavorite') {
+          <div class="change">
+            <div><span>Remove from favorites</span></div>
           </div>
-        </div>
-      }
-      @if (
-        value.type === undefined ||
-        value.type === 'issue_update' ||
-        value.type === 'issue_timelog' ||
-        (value.type === 'issue_transition' &&
-        value.fields_changes &&
-        value.fields_changes.length > 0)
-        ) {
-        @for (field of value.fields_changes; track field) {
-          @if (field.field_name === 'status') {
+        }
+        @case ('issue_create') {
+          <div class="change">
+            <div>
+              <span>Create <span class="field-name">task</span></span>
+            </div>
+          </div>
+        }
+        @case ('issue_delete') {
+          <div class="change">
+            <div>
+              <span>Delete <span class="field-name">task</span></span>
+            </div>
+          </div>
+        }
+        @default {
+          @if (
+            value.type === undefined ||
+            value.type === 'issue_update' ||
+            value.type === 'issue_timelog' ||
+            (value.type === 'issue_transition' &&
+              value.fields_changes &&
+              value.fields_changes.length > 0)
+          ) {
+            @for (field of value.fields_changes; track field) {
+              @switch (field.field_name) {
+                @case ('status') {
             <div class="change">
               <div>Set <span class="field-name">status</span> to</div>
               <!-- &nbsp;<issue-status [value]="value.fields_changes[0].old_value"></issue-status>&nbsp;
@@ -71,7 +74,7 @@
               >&nbsp;
             </div>
           }
-          @if (field.field_name === 'estimated_time') {
+                @case ('estimated_time') {
             <div class="change">
               <div>Set <span class="field-name">estimated time</span> to</div>
               <!-- &nbsp;<div>"{{field.old_value.duration/1000000 | rwDurationToString}}"</div>&nbsp;
@@ -83,7 +86,7 @@
               </div>
             </div>
           }
-          @if (field.field_name === 'completion') {
+                @case ('completion') {
             <div class="change">
               <div>Set <span class="field-name">completion</span> to</div>
               <!-- &nbsp;<div>"{{field.old_value.duration/1000000 | rwDurationToString}}"</div>&nbsp;
@@ -93,7 +96,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'type') {
+                @case ('type') {
             <div class="change">
               <div>Set <span class="field-name">type</span> to</div>
               <!-- &nbsp;<issue-type [value]="field.old_value"></issue-type>&nbsp;
@@ -105,7 +108,7 @@
               >&nbsp;
             </div>
           }
-          @if (field.field_name === 'priority') {
+                @case ('priority') {
             <div class="change">
               <div>Set <span class="field-name">priority</span> to</div>
               <!-- &nbsp;<issue-priority [value]="field.old_value"></issue-priority>&nbsp;
@@ -117,7 +120,7 @@
               >&nbsp;
             </div>
           }
-          @if (field.field_name === 'labels') {
+                @case ('labels') {
             @if (getAdded(field); as added) {
               <div class="change">
                 <div>Add <span class="field-name">labels</span></div>
@@ -133,7 +136,7 @@
               </div>
             }
           }
-          @if (field.field_name === 'affected_versions') {
+                @case ('affected_versions') {
             @if (getAdded(field, idField, 'title'); as added) {
               <div
                 class="change"
@@ -153,7 +156,7 @@
               </div>
             }
           }
-          @if (field.field_name === 'skill') {
+                @case ('skill') {
             <div class="change">
               <div>Set <span class="field-name">skill</span> to</div>
               <!-- &nbsp;<div>"{{field.old_value}}"</div>&nbsp;
@@ -163,7 +166,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'assignes') {
+                @case ('assignes') {
             <div class="change">
               <div>Set <span class="field-name">assignee</span> to</div>
               <!-- &nbsp;<div>"{{field.old_value[0] | rwFormatUser}}"</div>&nbsp;
@@ -173,7 +176,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'container') {
+                @case ('container') {
             <div class="change">
               <div>Move to <span class="field-name">project</span></div>
               &nbsp;
@@ -181,7 +184,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'date_start') {
+                @case ('date_start') {
             <div class="change">
               <div>Change <span class="field-name">date start</span> to</div>
               &nbsp;
@@ -191,7 +194,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'date_end') {
+                @case ('date_end') {
             <div class="change">
               <div>Change <span class="field-name">date end</span> to</div>
               &nbsp;
@@ -201,7 +204,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'time_logged') {
+                @case ('time_logged') {
             <div class="change">
               <div>Change <span class="field-name">time logged</span> to</div>
               &nbsp;
@@ -211,7 +214,7 @@
               &nbsp;
             </div>
           }
-          @if (field.field_name === 'milestones') {
+                @case ('milestones') {
             @if (getAdded(field, idField, 'title'); as added) {
               <div
                 class="change"
@@ -231,7 +234,7 @@
               </div>
             }
           }
-          @if (field.field_name === 'title') {
+                @case ('title') {
             <div class="change">
               <div>Change <span class="field-name">title</span></div>
               : &nbsp;
@@ -241,7 +244,7 @@
               ></div>
             </div>
           }
-          @if (field.field_name === 'description') {
+                @case ('description') {
             <div class="change">
               <div>Change <span class="field-name">description</span></div>
               : &nbsp;
@@ -251,7 +254,7 @@
               ></div>
             </div>
           }
-          @if (field.field_name === 'watchers') {
+                @case ('watchers') {
             {{ getAdded(field, idField, 'username') }}
             @if (getAdded(field, idField, 'username'); as added) {
               <div
@@ -272,7 +275,7 @@
               </div>
             }
           }
-          @if (field.field_name === 'todos') {
+                @case ('todos') {
             @if (getToDoDiff(field); as diff) {
               @if (diff.added) {
                 <div class="change">
@@ -314,7 +317,7 @@
               }
             }
           }
-          @if (field.field_name === 'attachments') {
+                @case ('attachments') {
             <ng-container class="change">
               @if (getAdded(field, idField, 'file_name'); as added) {
                 <div
@@ -336,7 +339,7 @@
               }
             </ng-container>
           }
-          @if (field.field_name === 'auto_scheduling') {
+                @case ('auto_scheduling') {
             @if (field.new_value) {
               <div class="change">
                 <div>Set <span class="field-name">scheduling type</span></div>
@@ -352,7 +355,7 @@
               </div>
             }
           }
-          @if (field.field_name === 'time_logs') {
+                @case ('time_logs') {
             @if (getTimeLogsDiff(field); as diff) {
               @if (diff.added) {
                 <div class="change">
@@ -391,7 +394,7 @@
               }
             }
           }
-          @if (field.field_name === 'links') {
+                @case ('links') {
             @if (getLinksDiff(field); as diff) {
               @if (diff.next.added) {
                 <div class="change">
@@ -508,6 +511,10 @@
                     >
                   </renwu-issue-href>
                 </div>
+              }
+            }
+          }
+                @default {}
               }
             }
           }

@@ -4,6 +4,12 @@
 
 Связано с: [MIGRATION-ANGULAR-21.md](./MIGRATION-ANGULAR-21.md).
 
+## Журнал
+
+| Дата | Что сделано |
+|------|-------------|
+| 2026-03-21 | `history-item`: `@switch (value.type)` + `@switch (field.field_name)` с `@default`; `dashboard`: вынесен `TranslocoHttpLoader` в `transloco-http-loader.ts`, удалён неиспользуемый `app.module.ts`; `MentionsListComponent`: убран `super(elementRef, cd)` после перехода базового класса на `inject()`. |
+
 ---
 
 ## Как вести процесс
@@ -55,7 +61,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 | Файл | Комментарий | Готово |
 |------|-------------|--------|
 | `libs/components/src/lib/calendar/calendar.component.html` | Уже используется `@switch (currentState)` | [x] |
-| `libs/core/src/lib/issue/history-item/history-item.component.html` | Много `@if (value.type === …)` и `@if (field.field_name === …)` — кандидат на один или два `@switch` + `@default` | [ ] |
+| `libs/core/src/lib/issue/history-item/history-item.component.html` | `@switch (value.type)` и `@switch (field.field_name)` + пустой `@default` для неизвестных полей | [x] |
 | `libs/messaging/src/lib/item/item.component.html` | Ветки по `message.type` разнесены по разметке; `@switch` — по желанию, после ревью | [ ] |
 
 ### 1.4 `@defer` и `@let`
@@ -223,7 +229,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 |------------|-----------------|----------------|-----------|--------|
 | `app` | `apps/app/src/app/app.module.ts` | `apps/app/src/bootstrap.ts` | `apps/app/src/main.ts` | [ ] |
 | `boards` | `apps/boards/src/app/app.module.ts` | `apps/boards/src/bootstrap.ts` | `apps/boards/src/main.ts` | [ ] |
-| `dashboard` | `apps/dashboard/src/app/app.module.ts` | `apps/dashboard/src/bootstrap.ts` | `apps/dashboard/src/main.ts` | [ ] |
+| `dashboard` | *(удалён; loader в `apps/dashboard/src/app/transloco-http-loader.ts`)* | `apps/dashboard/src/bootstrap.ts` | `apps/dashboard/src/main.ts` | [x] |
 | `documents` | `apps/documents/src/app/app.module.ts` | `apps/documents/src/bootstrap.ts` | `apps/documents/src/main.ts` | [ ] |
 | `messenger` | `apps/messenger/src/app/app.module.ts` | `apps/messenger/src/bootstrap.ts` | `apps/messenger/src/main.ts` | [ ] |
 | `profile` | `apps/profile/src/app/app.module.ts` | `apps/profile/src/bootstrap.ts` | `apps/profile/src/main.ts` | [ ] |
@@ -249,8 +255,9 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 ## 3. Следующий шаг (рекомендация)
 
-1. Закрыть **§1.2** (`dropdown`, `select`) или зафиксировать в таблице решение «оставляем как есть до …».
-2. Взять **§1.3** — `history-item` как максимальный выигрыш читаемости от `@switch`.
-3. По одному приложению из **§2.2** — при любом изменении `app.module.ts` убрать дубли с `bootstrap.ts` и отметить прогресс чекбоксом.
+1. **§1.2** — `dropdown` / `select`: замена `*ngTemplateOutlet` или явная запись в таблице «отложено до …».
+2. **§1.3** — опционально `libs/messaging/.../item.component.html` (ветки `message.type`).
+3. **§2.2** — следующий кандидат как у `dashboard`: приложение, где `AppModule` не импортируется нигде, а из модуля тянут только loader/helper — вынести в `.ts` и удалить модуль.
+4. **`mentions.module.ts`** — по отдельному плану.
 
 После крупного изменения пересоберите инвентарь §1.6 командой из блока «Как вести процесс» (или повторите `find` из истории коммита этого файла).
