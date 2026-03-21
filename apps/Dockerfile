@@ -13,5 +13,6 @@ COPY settings /app/modules/settings
 COPY messenger /app/modules/messenger
 COPY todos /app/modules/todos
 COPY dashboard /app/modules/dashboard
+COPY timeline /app/modules/timeline
 
 ENTRYPOINT rm -rf /www/app/*; cp -r /app/* /www/app/

@@ -8,5 +8,6 @@
   "profile": "/app/modules/profile/remoteEntry.json",
   "messenger": "/app/modules/messenger/remoteEntry.json",
   "todos": "/app/modules/todos/remoteEntry.json",
-  "dashboard": "/app/modules/dashboard/remoteEntry.json"
+  "dashboard": "/app/modules/dashboard/remoteEntry.json",
+  "timeline": "/app/modules/timeline/remoteEntry.json"
 }

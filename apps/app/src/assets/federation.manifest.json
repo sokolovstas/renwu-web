@@ -8,5 +8,6 @@
   "profile": "http://localhost:4207/remoteEntry.json",
   "messenger": "http://localhost:4208/remoteEntry.json",
   "todos": "http://localhost:4209/remoteEntry.json",
-  "dashboard": "http://localhost:4210/remoteEntry.json"
+  "dashboard": "http://localhost:4210/remoteEntry.json",
+  "timeline": "http://localhost:4211/remoteEntry.json"
 }
