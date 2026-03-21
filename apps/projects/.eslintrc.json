@@ -38,9 +38,7 @@
     {
       "files": ["*.html"],
       "extends": ["plugin:@nx/angular-template"],
-      "rules": {
-        "@angular-eslint/template/prefer-control-flow": "off"
-      }
+      "rules": {}
     },
     {
       "files": ["e2e/**/*.{ts,js,tsx,jsx}"],

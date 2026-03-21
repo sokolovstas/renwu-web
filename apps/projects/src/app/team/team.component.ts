@@ -1,4 +1,4 @@
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -22,7 +22,6 @@ import { ProjectService } from '../project.service';
   selector: 'renwu-projects-team',
   standalone: true,
   imports: [
-    NgFor,
     AsyncPipe,
     RenwuPageComponent,
     AvatarComponent,

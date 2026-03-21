@@ -66,14 +66,16 @@
             <hr class="border-gray-200 border-b-2" />
           }
           <!-- <a class="px-4 py-2" (click)="logout()">{{ 'logout' | transloco }}</a> -->
-          <!-- <a
-            class="px-4 py-2"
-            *ngIf="policyService.canEditTenantSettings() | async"
-            (click)="sidebarService.setSection({})"
-            [routerLink]="[{ outlets: { section: ['settings'] } }]"
-
-            >{{ 'admin-settings' | transloco }}</a
-            > -->
+          <!--
+          @if (policyService.canEditTenantSettings() | async) {
+            <a
+              class="px-4 py-2"
+              (click)="sidebarService.setSection({})"
+              [routerLink]="[{ outlets: { section: ['settings'] } }]"
+              >{{ 'admin-settings' | transloco }}</a
+            >
+          }
+          -->
           @for (
             section of sidebarService.profileSections | async;
             track section

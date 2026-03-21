@@ -49,8 +49,9 @@
     </div>
     <!-- <div class="recent-colors-title"><span>Recent colors</span>:</div>
     <div class="color-items-line">
-      <div class="color-item" *ngFor="let color of recentLine" [style.background-color]="color.getHex()">
-      </div>
+      @for (color of recentLine; track color) {
+        <div class="color-item" [style.background-color]="color.getHex()"></div>
+      }
     </div> -->
   </ng-template>
 </rw-dropdown>

@@ -1,4 +1,6 @@
-<!-- <div *ngIf="autoassignee" rwTooltip="Auto assigned">❉&nbsp;</div> -->
+<!-- @if (autoassignee) {
+  <div rwTooltip="Auto assigned">❉&nbsp;</div>
+} -->
 @if (!assignee) {
   <div>{{ label }}</div>
 }

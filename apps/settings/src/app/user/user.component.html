@@ -101,16 +101,17 @@
         <div class="form-supporting-text">Is admin</div>
         <rw-checkbox formControlName="is_admin"></rw-checkbox>
       </label>
-      <!-- <label class="form-label">
-      <div class="form-supporting-text">work_hours</div>
-      <div class="item" *ngFor="let item of workHours; let i = index">
-        <span class="label">{{ i }}</span>
-        <rw-checkbox
-          formControlName="is_admin"
-          >
-        </rw-checkbox>
-      </div>
-    </label> -->
+      <!-- work_hours UI (disabled):
+      <label class="form-label">
+        <div class="form-supporting-text">work_hours</div>
+        @for (item of workHours; track $index) {
+          <div class="item">
+            <span class="label">{{ $index }}</span>
+            <rw-checkbox formControlName="is_admin"></rw-checkbox>
+          </div>
+        }
+      </label>
+      -->
   </form>
   @if ((editedUser | async)?.status === UserStatus.DELETED) {
     <rw-button
