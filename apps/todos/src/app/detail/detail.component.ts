@@ -1,4 +1,4 @@
-import { AsyncPipe, NgStyle } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
@@ -22,8 +22,7 @@ import { IssueStatusComponent } from '@renwu/core';
     IssueStatusComponent,
     RwIconComponent,
     RwButtonComponent,
-    NgStyle
-],
+  ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

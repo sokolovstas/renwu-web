@@ -1,4 +1,4 @@
-import { AsyncPipe, NgStyle } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -77,7 +77,6 @@ import { TodoComponent } from '../todo/todo.component';
     MessageThreadComponent,
     MessageSubDestinationsComponent,
     MessageInputComponent,
-    NgStyle,
     RwFormatUserPipe,
     TranslocoPipe,
     SectionWrapperComponent,
