@@ -29,7 +29,7 @@
       ]
     },
     {
-      "files": ["**/bootstrap.ts", "**/app.module.ts"],
+      "files": ["**/bootstrap.ts"],
       "rules": {
         "@nx/enforce-module-boundaries": "off"
       }

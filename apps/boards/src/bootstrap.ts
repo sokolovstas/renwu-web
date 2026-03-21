@@ -11,7 +11,7 @@ import { provideRenwuBoards } from '@renwu/board';
 import { provideRenwuCore } from '@renwu/core';
 import { environment } from '../../../environments/environment';
 import { AppComponent } from './app/app.component';
-import { TranslocoHttpLoader } from './app/app.module';
+import { TranslocoHttpLoader } from './app/transloco-http-loader';
 
 bootstrapApplication(AppComponent, {
   providers: [

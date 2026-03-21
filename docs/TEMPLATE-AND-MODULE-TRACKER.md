@@ -9,6 +9,7 @@
 | Дата | Что сделано |
 |------|-------------|
 | 2026-03-21 | `history-item`: `@switch (value.type)` + `@switch (field.field_name)` с `@default`; `dashboard`: вынесен `TranslocoHttpLoader` в `transloco-http-loader.ts`, удалён неиспользуемый `app.module.ts`; `MentionsListComponent`: убран `super(elementRef, cd)` после перехода базового класса на `inject()`. |
+| 2026-03-21 | **§2 NgModule:** во всех shell-приложениях удалён неиспользуемый `app.module.ts`. Федеративные приложения: `transloco-http-loader.ts` + импорт из `bootstrap.ts`. Shell `app`: плюс `custom-error-handler.ts`, `shell-app-initializers.ts` (логика бывшего конструктора `AppModule` после `bootstrapApplication`). `timeline`: мёртвый `app.module.ts` удалён (bootstrap без transloco, как и раньше). |
 
 ---
 
@@ -39,7 +40,8 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 ### NgModule / `AppModule` / bootstrap
 
 - **Сделано:** все перечисленные приложения стартуют через `bootstrapApplication` в `bootstrap.ts`; `main.ts` подключает federation и динамический импорт `bootstrap`.
-- **Дальше:** **без массового удаления** `AppModule`. Политика: **новые** компоненты / директивы / пайпы — **standalone** (см. `nx.json`, ESLint `prefer-standalone`). Существующий `app.module.ts` **упрощаем только при касании** файла: убрать дубли с `bootstrap.ts`, вынести оставшиеся куски (например `TranslocoHttpLoader`) в отдельные файлы, не раздувать модуль новыми `declarations`.
+- **Сделано (shell apps):** файлов `app.module.ts` в приложениях больше нет; загрузчик переводов — `transloco-http-loader.ts`, shell `app` — см. §2.1.
+- **Дальше:** **новые** компоненты / директивы / пайпы — **standalone** (см. `nx.json`, ESLint `prefer-standalone`). Оставшиеся **`NgModule` в библиотеках** (например `mentions.module.ts`) — отдельные задачи, не раздувать их новыми `declarations`.
 
 ---
 
@@ -219,26 +221,27 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 |------|------|
 | `apps/<name>/src/main.ts` | `initFederation()` → динамический `import('./bootstrap')` |
 | `apps/<name>/src/bootstrap.ts` | `bootstrapApplication(AppComponent, { providers: [...] })` |
-| `apps/<name>/src/app/app.module.ts` | Остаточный `NgModule` (часто дублирует импорты/роутер с bootstrap или держит `TranslocoHttpLoader` и т.п.) — **упрощать при касании** |
+| `apps/<name>/src/app/transloco-http-loader.ts` | `TranslocoHttpLoader` для federated apps (вместо бывшего `app.module.ts`) |
+| `apps/app/src/app/*.ts` | Shell: `transloco-http-loader`, `custom-error-handler`, `shell-app-initializers` |
 
 ### 2.2 Чеклист приложений (`AppModule` + входы)
 
 Отметьте `[x]`, когда для приложения **нет смысла держать тяжёлый** `AppModule` (или он сведён к минимуму / удалён), без регрессий.
 
-| Приложение | `app.module.ts` | `bootstrap.ts` | `main.ts` | Готово |
-|------------|-----------------|----------------|-----------|--------|
-| `app` | `apps/app/src/app/app.module.ts` | `apps/app/src/bootstrap.ts` | `apps/app/src/main.ts` | [ ] |
-| `boards` | `apps/boards/src/app/app.module.ts` | `apps/boards/src/bootstrap.ts` | `apps/boards/src/main.ts` | [ ] |
-| `dashboard` | *(удалён; loader в `apps/dashboard/src/app/transloco-http-loader.ts`)* | `apps/dashboard/src/bootstrap.ts` | `apps/dashboard/src/main.ts` | [x] |
-| `documents` | `apps/documents/src/app/app.module.ts` | `apps/documents/src/bootstrap.ts` | `apps/documents/src/main.ts` | [ ] |
-| `messenger` | `apps/messenger/src/app/app.module.ts` | `apps/messenger/src/bootstrap.ts` | `apps/messenger/src/main.ts` | [ ] |
-| `profile` | `apps/profile/src/app/app.module.ts` | `apps/profile/src/bootstrap.ts` | `apps/profile/src/main.ts` | [ ] |
-| `projects` | `apps/projects/src/app/app.module.ts` | `apps/projects/src/bootstrap.ts` | `apps/projects/src/main.ts` | [ ] |
-| `settings` | `apps/settings/src/app/app.module.ts` | `apps/settings/src/bootstrap.ts` | `apps/settings/src/main.ts` | [ ] |
-| `task` | `apps/task/src/app/app.module.ts` | `apps/task/src/bootstrap.ts` | `apps/task/src/main.ts` | [ ] |
-| `tasks` | `apps/tasks/src/app/app.module.ts` | `apps/tasks/src/bootstrap.ts` | `apps/tasks/src/main.ts` | [ ] |
-| `timeline` | `apps/timeline/src/app/app.module.ts` | `apps/timeline/src/bootstrap.ts` | `apps/timeline/src/main.ts` | [ ] |
-| `todos` | `apps/todos/src/app/app.module.ts` | `apps/todos/src/bootstrap.ts` | `apps/todos/src/main.ts` | [ ] |
+| Приложение | Вместо `AppModule` | `bootstrap.ts` | `main.ts` | Готово |
+|------------|--------------------|----------------|-----------|--------|
+| `app` | `transloco-http-loader.ts`, `custom-error-handler.ts`, `shell-app-initializers.ts` | `apps/app/src/bootstrap.ts` | `apps/app/src/main.ts` | [x] |
+| `boards` | `transloco-http-loader.ts` | `apps/boards/src/bootstrap.ts` | `apps/boards/src/main.ts` | [x] |
+| `dashboard` | `transloco-http-loader.ts` | `apps/dashboard/src/bootstrap.ts` | `apps/dashboard/src/main.ts` | [x] |
+| `documents` | `transloco-http-loader.ts` | `apps/documents/src/bootstrap.ts` | `apps/documents/src/main.ts` | [x] |
+| `messenger` | `transloco-http-loader.ts` | `apps/messenger/src/bootstrap.ts` | `apps/messenger/src/main.ts` | [x] |
+| `profile` | `transloco-http-loader.ts` | `apps/profile/src/bootstrap.ts` | `apps/profile/src/main.ts` | [x] |
+| `projects` | `transloco-http-loader.ts` | `apps/projects/src/bootstrap.ts` | `apps/projects/src/main.ts` | [x] |
+| `settings` | `transloco-http-loader.ts` | `apps/settings/src/bootstrap.ts` | `apps/settings/src/main.ts` | [x] |
+| `task` | `transloco-http-loader.ts` | `apps/task/src/bootstrap.ts` | `apps/task/src/main.ts` | [x] |
+| `tasks` | `transloco-http-loader.ts` | `apps/tasks/src/bootstrap.ts` | `apps/tasks/src/main.ts` | [x] |
+| `timeline` | *(отдельного loader нет; удалён только мёртвый `app.module.ts`)* | `apps/timeline/src/bootstrap.ts` | `apps/timeline/src/main.ts` | [x] |
+| `todos` | `transloco-http-loader.ts` | `apps/todos/src/bootstrap.ts` | `apps/todos/src/main.ts` | [x] |
 
 ### 2.3 Библиотеки с `NgModule`
 
@@ -257,7 +260,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 1. **§1.2** — `dropdown` / `select`: замена `*ngTemplateOutlet` или явная запись в таблице «отложено до …».
 2. **§1.3** — опционально `libs/messaging/.../item.component.html` (ветки `message.type`).
-3. **§2.2** — следующий кандидат как у `dashboard`: приложение, где `AppModule` не импортируется нигде, а из модуля тянут только loader/helper — вынести в `.ts` и удалить модуль.
+3. **§2.2** — для всех shell-приложений `app.module.ts` убран; дальше только **§2.3** (`mentions.module.ts`) при рефакторинге mentions.
 4. **`mentions.module.ts`** — по отдельному плану.
 
 После крупного изменения пересоберите инвентарь §1.6 командой из блока «Как вести процесс» (или повторите `find` из истории коммита этого файла).

@@ -11,7 +11,7 @@ import { provideRenwuCore } from '@renwu/core';
 import { provideRenwuMessaging } from '@renwu/messaging';
 import { environment } from '../../../environments/environment';
 import { AppComponent } from './app/app.component';
-import { TranslocoHttpLoader } from './app/app.module';
+import { TranslocoHttpLoader } from './app/transloco-http-loader';
 import { provideUiTour } from 'ngx-ui-tour-console';
 
 bootstrapApplication(AppComponent, {

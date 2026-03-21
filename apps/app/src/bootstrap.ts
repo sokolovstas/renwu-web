@@ -16,8 +16,10 @@ import { provideRenwuMessaging, provideRenwuWebPush } from '@renwu/messaging';
 // eslint-disable-next-line @nx/enforce-module-boundaries -- workspace env at repo root
 import { environment } from '../../../environments/environment';
 import { CustomRouteReuseStrategy } from './app/app-route-reuse';
-import { CustomErrorHandler, TranslocoHttpLoader } from './app/app.module';
 import { AppComponent } from './app/app.component';
+import { CustomErrorHandler } from './app/custom-error-handler';
+import { runShellAppInitializers } from './app/shell-app-initializers';
+import { TranslocoHttpLoader } from './app/transloco-http-loader';
 import { appRoutes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
@@ -54,4 +56,8 @@ bootstrapApplication(AppComponent, {
       registrationStrategy: 'registerWhenStable:5000',
     }),
   ],
-}).catch((err) => console.error(err));
+})
+  .then((appRef) => {
+    runShellAppInitializers(appRef.injector);
+  })
+  .catch((err) => console.error(err));
