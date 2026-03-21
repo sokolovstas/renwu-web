@@ -1,6 +1,5 @@
 import { Injectable, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import {
@@ -44,7 +43,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     }),
   ],
   providers: [
-    provideAnimations(),
     provideRenwuCore(environment),
     provideRenwuMessaging(),
     provideRenwuWebPush(),

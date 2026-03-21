@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ErrorHandler, isDevMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   NoPreloading,
   provideRouter,
@@ -10,21 +9,13 @@ import {
   withRouterConfig,
 } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
-import {
-  provideTransloco,
-  translocoConfig,
-} from '@jsverse/transloco';
+import { provideTransloco, translocoConfig } from '@jsverse/transloco';
+import { provideUiTour } from 'ngx-ui-tour-console';
 import { provideRenwuCore, StateService } from '@renwu/core';
-import {
-  provideRenwuMessaging,
-  provideRenwuWebPush,
-} from '@renwu/messaging';
+import { provideRenwuMessaging, provideRenwuWebPush } from '@renwu/messaging';
 import { environment } from '../../../environments/environment';
 import { CustomRouteReuseStrategy } from './app/app-route-reuse';
-import {
-  CustomErrorHandler,
-  TranslocoHttpLoader,
-} from './app/app.module';
+import { CustomErrorHandler, TranslocoHttpLoader } from './app/app.module';
 import { AppComponent } from './app/app.component';
 import { appRoutes } from './app/app.routes';
 
@@ -48,6 +39,7 @@ bootstrapApplication(AppComponent, {
       loader: TranslocoHttpLoader,
     }),
     provideRenwuCore(environment),
+    provideUiTour(),
     provideRenwuMessaging(),
     provideRenwuWebPush(),
     provideRouter(
@@ -55,7 +47,6 @@ bootstrapApplication(AppComponent, {
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
       withPreloading(NoPreloading),
     ),
-    provideAnimations(),
     provideHttpClient(),
     provideServiceWorker('./sw-master.js', {
       enabled: true,

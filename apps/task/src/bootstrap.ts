@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
@@ -17,7 +16,6 @@ import { TranslocoHttpLoader } from './app/app.module';
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
-    provideAnimations(),
     provideRenwuCore(environment),
     provideRenwuMessaging(),
     provideTransloco({

@@ -1,6 +1,5 @@
 import { Injectable, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import {
   TranslocoLoader,
@@ -40,7 +39,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
   providers: [
     provideRenwuCore(environment),
     provideRenwuMessaging(),
-    provideAnimations(),
     provideTransloco({
       config: translocoConfig({
         availableLangs: ['en', 'ru', 'zh'],

@@ -48,10 +48,16 @@ export class RwWebsocketService {
       this.subject.complete();
     }
 
-    this.token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('renwu-auth'))
-      ?.split('=')[1];
+    this.token = localStorage.getItem('renwu_auth') || ''
+
+    if(this.token === '') {
+      this.token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('renwu-auth'))
+        ?.split('=')[1];
+    }
+
+
 
     this.subject = new RxWebsocketSubject(
       `${this.settings.wsServerUrl}?renwu-token=${this.token}`,

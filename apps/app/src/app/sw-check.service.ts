@@ -4,7 +4,7 @@ import { RwAlertService } from '@renwu/components';
 import { RenwuWepPushService } from '@renwu/messaging';
 import { interval } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CheckForUpdateService {
   webPushService = inject(RenwuWepPushService);
   constructor(

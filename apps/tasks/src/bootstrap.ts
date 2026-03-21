@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
@@ -13,11 +12,12 @@ import { provideRenwuMessaging } from '@renwu/messaging';
 import { environment } from '../../../environments/environment';
 import { AppComponent } from './app/app.component';
 import { TranslocoHttpLoader } from './app/app.module';
+import { provideUiTour } from 'ngx-ui-tour-console';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
-    provideAnimations(),
+    provideUiTour(),
     provideRenwuCore(environment),
     provideRenwuMessaging(),
     provideTransloco({

@@ -1,4 +1,4 @@
-import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import {
   ErrorHandler,
   inject,
@@ -8,7 +8,6 @@ import {
   NgModule,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 
 import {
   NoPreloading,
@@ -89,7 +88,6 @@ export class CustomErrorHandler extends ErrorHandler {
       enabled: true,
       registrationStrategy: 'registerWhenStable:5000',
     }),
-    HttpClientModule,
   ],
   providers: [
     CheckForUpdateService,
@@ -114,7 +112,6 @@ export class CustomErrorHandler extends ErrorHandler {
     provideRenwuMessaging(),
     provideRenwuWebPush(),
     provideRouter(appRoutes),
-    provideAnimations(),
     provideHttpClient(),
   ],
 })
