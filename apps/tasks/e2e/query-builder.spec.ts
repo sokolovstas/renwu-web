@@ -10,7 +10,7 @@ test('change text query', async ({ page }) => {
   expect(await page.locator('.hints-container .hint').count()).toBeGreaterThan(
     0,
   );
-  await page.keyboard.type('tat'), { delay: 100 };
+  await page.keyboard.type('tat', { delay: 100 });
   await page.locator('.hints-container .hint').first().waitFor();
   expect(await page.locator('.hints-container .hint').count()).toBe(2);
   await page.keyboard.press('Enter', { delay: 100 });

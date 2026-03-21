@@ -202,12 +202,16 @@ export class CommonMessageDestination implements IMessageDestination {
     }
 
     messagesArray.forEach((message, index) => {
-      index > 0
-        ? message.updatePrev(messagesArray[index - 1])
-        : message.updatePrev(undefined);
-      index < messagesArray.length
-        ? message.updateNext(messagesArray[index + 1])
-        : message.updateNext(undefined);
+      if (index > 0) {
+        message.updatePrev(messagesArray[index - 1]);
+      } else {
+        message.updatePrev(undefined);
+      }
+      if (index < messagesArray.length - 1) {
+        message.updateNext(messagesArray[index + 1]);
+      } else {
+        message.updateNext(undefined);
+      }
     });
 
     let pinnedMessagesArray = Array.from(this.pinnedMessagesMap.values()).sort(
@@ -219,9 +223,11 @@ export class CommonMessageDestination implements IMessageDestination {
     }
 
     pinnedMessagesArray.forEach((message, index) => {
-      index > 1
-        ? message.updatePrev(pinnedMessagesArray[index - 1])
-        : message.updatePrev(undefined);
+      if (index > 1) {
+        message.updatePrev(pinnedMessagesArray[index - 1]);
+      } else {
+        message.updatePrev(undefined);
+      }
     });
 
     this.pinnedMessages.next(pinnedMessagesArray);

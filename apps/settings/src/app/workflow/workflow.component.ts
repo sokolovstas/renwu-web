@@ -148,7 +148,6 @@ export class WorkflowComponent implements AfterViewInit {
             }|${t.to.id}(${t.to.label})\n`;
           });
           graphDefinition += `style ${value.step.id} stroke:${value.step.color},color:${value.step.color},stroke-width:2px\n`;
-          value.step;
         });
         graphDefinition += `linkStyle default stroke: white\n`;
 
@@ -183,7 +182,6 @@ export class WorkflowComponent implements AfterViewInit {
         value.tos.forEach((t) => {
           acc.push({ label: t.label, step: value.step, to: t.to });
         });
-        value.step;
         return acc;
       },
       [] as WorkflowTransition[],

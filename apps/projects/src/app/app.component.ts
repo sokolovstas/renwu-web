@@ -11,7 +11,7 @@ import {
 } from '@renwu/components';
 
 @Component({
-  selector: 'renwu-projects',
+  selector: 'renwu-projects-root',
   standalone: true,
   imports: [
     AsyncPipe,

@@ -16,7 +16,7 @@ import { TranslocoHttpLoader } from './app/app.module';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient(),=
+    provideHttpClient(),
     provideRenwuCore(environment),
     provideRenwuMessaging(),
     provideRenwuWebPush(),

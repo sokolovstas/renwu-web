@@ -136,7 +136,7 @@ export class RwSortTableDirective implements OnInit, OnDestroy, AfterViewInit {
   }
   ngOnDestroy(): void {
     this.sortTableService.unregisterCollection(this.rwSortTable);
-    this.resizeObserver.disconnect;
+    this.resizeObserver.disconnect();
   }
   setSort(oldIndex: number, newIndex: number): void {
     if (this.sortTableCollection) {

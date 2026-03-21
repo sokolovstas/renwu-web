@@ -1,3 +1,5 @@
 import { TRANSLOCO_SCOPE } from '@jsverse/transloco';
 
-[{ provide: TRANSLOCO_SCOPE, useValue: 'core' }];
+export const CORE_TRANSLOCO_SCOPE_PROVIDERS = [
+  { provide: TRANSLOCO_SCOPE, useValue: 'core' },
+];

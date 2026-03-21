@@ -1,3 +1,5 @@
 import { TRANSLOCO_SCOPE } from '@jsverse/transloco';
 
-[{ provide: TRANSLOCO_SCOPE, useValue: 'components' }];
+export const COMPONENTS_TRANSLOCO_SCOPE_PROVIDERS = [
+  { provide: TRANSLOCO_SCOPE, useValue: 'components' },
+];

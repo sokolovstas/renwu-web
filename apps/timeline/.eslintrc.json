@@ -9,7 +9,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "renwu-boards",
+            "prefix": "renwu-timeline",
             "style": "camelCase"
           }
         ],
@@ -17,7 +17,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "renwu-boards",
+            "prefix": "renwu-timeline",
             "style": "kebab-case"
           }
         ],

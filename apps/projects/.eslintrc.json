@@ -21,7 +21,8 @@
             "style": "kebab-case"
           }
         ],
-        "@angular-eslint/prefer-standalone": "off"
+        "@angular-eslint/prefer-standalone": "off",
+        "@angular-eslint/prefer-inject": "off"
       },
       "extends": [
         "plugin:@nx/angular",
@@ -29,13 +30,23 @@
       ]
     },
     {
+      "files": ["**/bootstrap.ts", "**/app.module.ts"],
+      "rules": {
+        "@nx/enforce-module-boundaries": "off"
+      }
+    },
+    {
       "files": ["*.html"],
       "extends": ["plugin:@nx/angular-template"],
-      "rules": {}
+      "rules": {
+        "@angular-eslint/template/prefer-control-flow": "off"
+      }
     },
     {
       "files": ["e2e/**/*.{ts,js,tsx,jsx}"],
-      "rules": {}
+      "rules": {
+        "@nx/enforce-module-boundaries": "off"
+      }
     }
   ]
 }

@@ -1,6 +1,12 @@
 {
   "extends": ["../../.eslintrc.json"],
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": [
+    "!**/*",
+    "src/lib/search/oql/OQLLexer.ts",
+    "src/lib/search/oql/OQLParser.ts",
+    "src/lib/search/oql/OQLListener.ts",
+    "src/lib/search/oql/OQLParseListener.ts"
+  ],
   "overrides": [
     {
       "files": ["*.ts"],
@@ -21,7 +27,8 @@
             "style": "kebab-case"
           }
         ],
-        "@angular-eslint/prefer-standalone": "off"
+        "@angular-eslint/prefer-standalone": "off",
+        "@angular-eslint/prefer-inject": "off"
       },
       "extends": [
         "plugin:@nx/angular",
@@ -29,9 +36,32 @@
       ]
     },
     {
+      "files": ["**/bootstrap.ts", "**/app.module.ts"],
+      "rules": {
+        "@nx/enforce-module-boundaries": "off"
+      }
+    },
+    {
       "files": ["*.html"],
       "extends": ["plugin:@nx/angular-template"],
       "rules": {}
+    },
+    {
+      "files": ["src/lib/markdown/markdown.service.ts"],
+      "rules": {
+        "no-useless-escape": "off",
+        "no-empty": "off"
+      }
+    },
+    {
+      "files": [
+        "src/lib/select/dictionary-id.ts",
+        "src/lib/select/format.service.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-empty-object-type": "off",
+        "@typescript-eslint/no-unsafe-function-type": "off"
+      }
     }
   ]
 }

@@ -21,7 +21,7 @@ export class TourHintComponent {
   next: string;
 
   @Input()
-  step: number = 0;
+  step = 0;
 
   @Input()
   onNext: () => void;
@@ -33,5 +33,5 @@ export class TourHintComponent {
   onEnd: () => void;
 
   @Input()
-  totalSteps: number = 0;
+  totalSteps = 0;
 }
