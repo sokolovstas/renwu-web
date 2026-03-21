@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { GroupComponent } from './board/group/group.component';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
@@ -12,8 +13,9 @@ describe('GroupComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, CoreModule, RouterTestingModule],
+      imports: [SharedModule, CoreModule],
       declarations: [GroupComponent],
+      providers: [provideRouter([]), provideLocationMocks()],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

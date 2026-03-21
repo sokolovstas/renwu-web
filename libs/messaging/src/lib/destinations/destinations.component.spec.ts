@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { OzModule } from 'oz';
 import { CoreModule } from './core/core.module';
 import { MessageModule } from './message/message.module';
@@ -13,9 +14,9 @@ describe('DestinationsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [CoreModule, OzModule, MessageModule, RouterTestingModule],
+      imports: [CoreModule, OzModule, MessageModule],
       declarations: [DestinationsComponent],
-      providers: [],
+      providers: [provideRouter([]), provideLocationMocks()],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

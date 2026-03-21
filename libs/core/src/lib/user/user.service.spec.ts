@@ -1,13 +1,17 @@
 import { inject, TestBed } from '@angular/core/testing';
 
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { RwUserService } from '../user/user.service';
 
 describe('RwUserService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
-      providers: [RwUserService],
+      providers: [
+        RwUserService,
+        provideRouter([]),
+        provideLocationMocks(),
+      ],
     });
   });
 

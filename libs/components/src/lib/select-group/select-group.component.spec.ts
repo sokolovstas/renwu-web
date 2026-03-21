@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { CoreModule } from './core/core.module';
 import { SelectGroupComponent } from './shared/select-group/select-group.component';
 
@@ -11,9 +12,9 @@ describe('SelectGroupComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RwModule, CoreModule, RouterTestingModule],
+      imports: [RwModule, CoreModule],
       declarations: [SelectGroupComponent],
-      providers: [],
+      providers: [provideRouter([]), provideLocationMocks()],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

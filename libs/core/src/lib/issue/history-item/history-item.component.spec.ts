@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { OzModule } from 'oz';
 import { CoreModule } from './core/core.module';
 import { NewsItemComponent } from './shared/news-item/news-item.component';
@@ -13,8 +14,9 @@ describe('NewsItemComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [CoreModule, OzModule, RouterTestingModule],
+      imports: [CoreModule, OzModule],
       declarations: [NewsItemComponent, FormatUserPipe],
+      providers: [provideRouter([]), provideLocationMocks()],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

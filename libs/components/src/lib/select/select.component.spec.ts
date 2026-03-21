@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { SelectComponent } from './select.component';
 
 describe('SelectComponent', () => {
@@ -10,9 +11,9 @@ describe('SelectComponent', () => {
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      imports: [RwModule, RouterTestingModule],
+      imports: [RwModule],
       declarations: [SelectComponent],
-      providers: [],
+      providers: [provideRouter([]), provideLocationMocks()],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

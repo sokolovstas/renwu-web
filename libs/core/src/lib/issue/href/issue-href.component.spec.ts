@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideLocationMocks } from '@angular/common/testing';
+import { provideRouter } from '@angular/router';
 import { CoreModule } from './core/core.module';
 import { IssueService } from './issue/issue.service';
 import { IssueHrefComponent } from './shared/issue-href/issue-href.component';
@@ -11,9 +12,9 @@ describe('HrefComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RwModule, CoreModule, RouterTestingModule],
+      imports: [RwModule, CoreModule],
       declarations: [IssueHrefComponent],
-      providers: [IssueService],
+      providers: [IssueService, provideRouter([]), provideLocationMocks()],
     }).compileComponents();
   }));
 
