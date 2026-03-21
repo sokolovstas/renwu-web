@@ -9,7 +9,9 @@
     </div>
   </div>
 }
-@if (message && (message.type === MessageType.REGULAR || !message.type)) {
+@if (message) {
+  @switch (message.type ?? MessageType.REGULAR) {
+    @case (MessageType.REGULAR) {
   <div
     [@newMessage]="!!message"
     class="renwu-messaging-item__message-wrapper"
@@ -239,13 +241,9 @@
     </div>
   }
 </div>
-}
-
-@if (
-  message &&
-  message.type === MessageType.PULSE &&
-  (message.newsData || message.text)
-  ) {
+    }
+    @case (MessageType.PULSE) {
+      @if (message.newsData || message.text) {
   <div
     [@newMessage]="!!message"
     class="renwu-messaging-item__pulse"
@@ -282,6 +280,10 @@
     {{ message.datetime | rwDate: settingsService.user.relativeDateFormat }}
   </div>
 </div>
+      }
+    }
+    @default {}
+  }
 }
 
 @if (message && message.subMembers && !textOnly && !threadStarter) {

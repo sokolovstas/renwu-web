@@ -2,7 +2,6 @@
  * Public API Surface of rw-mentions
  */
 export * from './lib/mentions-config';
-// export * from './lib/mentions.module';
 export {
   RwMentionsModuleConfig,
   RW_MENTIONS_MODULE_CONFIG,

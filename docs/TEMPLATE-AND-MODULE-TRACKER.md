@@ -10,6 +10,7 @@
 |------|-------------|
 | 2026-03-21 | `history-item`: `@switch (value.type)` + `@switch (field.field_name)` с `@default`; `dashboard`: вынесен `TranslocoHttpLoader` в `transloco-http-loader.ts`, удалён неиспользуемый `app.module.ts`; `MentionsListComponent`: убран `super(elementRef, cd)` после перехода базового класса на `inject()`. |
 | 2026-03-21 | **§2 NgModule:** во всех shell-приложениях удалён неиспользуемый `app.module.ts`. Федеративные приложения: `transloco-http-loader.ts` + импорт из `bootstrap.ts`. Shell `app`: плюс `custom-error-handler.ts`, `shell-app-initializers.ts` (логика бывшего конструктора `AppModule` после `bootstrapApplication`). `timeline`: мёртвый `app.module.ts` удалён (bootstrap без transloco, как и раньше). |
+| 2026-03-21 | **§2.3 / §1.3:** удалён закомментированный `libs/mentions/.../mentions.module.ts`; `messaging/item`: `@switch (message.type ?? MessageType.REGULAR)` для веток REGULAR / PULSE. **§1.2** (`*ngTemplateOutlet` в `dropdown` / `select`): осознанно **отложено** — нативной замены в control flow нет; трогать только вместе с редизайном или e2e. |
 
 ---
 
@@ -41,7 +42,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 - **Сделано:** все перечисленные приложения стартуют через `bootstrapApplication` в `bootstrap.ts`; `main.ts` подключает federation и динамический импорт `bootstrap`.
 - **Сделано (shell apps):** файлов `app.module.ts` в приложениях больше нет; загрузчик переводов — `transloco-http-loader.ts`, shell `app` — см. §2.1.
-- **Дальше:** **новые** компоненты / директивы / пайпы — **standalone** (см. `nx.json`, ESLint `prefer-standalone`). Оставшиеся **`NgModule` в библиотеках** (например `mentions.module.ts`) — отдельные задачи, не раздувать их новыми `declarations`.
+- **Дальше:** **новые** компоненты / директивы / пайпы — **standalone** (см. `nx.json`, ESLint `prefer-standalone`). Новые **`NgModule`** в библиотеках не заводить без необходимости.
 
 ---
 
@@ -55,8 +56,8 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 | Файл | Комментарий | Готово |
 |------|-------------|--------|
-| `libs/components/src/lib/dropdown/dropdown.component.html` | Один outlet; оценить замену на паттерн с `@defer` / проекцией / оставить с обоснованием | [ ] |
-| `libs/components/src/lib/select/select.component.html` | Несколько outlet + `context`; высокий риск регрессий — отдельная задача и тесты вручную | [ ] |
+| `libs/components/src/lib/dropdown/dropdown.component.html` | **Отложено:** `*ngTemplateOutlet` остаётся до отдельной задачи (нет прямого аналога в `@if`/`@for`; высокий риск регрессий). | [ ] |
+| `libs/components/src/lib/select/select.component.html` | **Отложено:** то же + несколько outlet и `context`. | [ ] |
 
 ### 1.3 `@switch` / уплотнение ветвлений
 
@@ -64,7 +65,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 |------|-------------|--------|
 | `libs/components/src/lib/calendar/calendar.component.html` | Уже используется `@switch (currentState)` | [x] |
 | `libs/core/src/lib/issue/history-item/history-item.component.html` | `@switch (value.type)` и `@switch (field.field_name)` + пустой `@default` для неизвестных полей | [x] |
-| `libs/messaging/src/lib/item/item.component.html` | Ветки по `message.type` разнесены по разметке; `@switch` — по желанию, после ревью | [ ] |
+| `libs/messaging/src/lib/item/item.component.html` | `@switch (message.type ?? MessageType.REGULAR)` — `@case` REGULAR (бывший `!type`) и PULSE | [x] |
 
 ### 1.4 `@defer` и `@let`
 
@@ -247,7 +248,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 | Файл | Комментарий | Готово |
 |------|-------------|--------|
-| `libs/mentions/src/lib/mentions.module.ts` | Модуль библиотеки; вынос на standalone — **отдельная задача** при рефакторинге mentions | [ ] |
+| `libs/mentions/src/lib/mentions.module.ts` | Файл удалён (весь код был закомментирован; API уже standalone: `MentionsDirective`, `BaseMentionsList*`). | [x] |
 
 ### 2.4 Политика-напоминание (новый код)
 
@@ -258,9 +259,8 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 ## 3. Следующий шаг (рекомендация)
 
-1. **§1.2** — `dropdown` / `select`: замена `*ngTemplateOutlet` или явная запись в таблице «отложено до …».
-2. **§1.3** — опционально `libs/messaging/.../item.component.html` (ветки `message.type`).
-3. **§2.2** — для всех shell-приложений `app.module.ts` убран; дальше только **§2.3** (`mentions.module.ts`) при рефакторинге mentions.
-4. **`mentions.module.ts`** — по отдельному плану.
+1. **§1.2** — по необходимости: `dropdown` / `select` и `*ngTemplateOutlet` (см. пометку «отложено» в таблице).
+2. **§1.4** — точечно `@defer` / `@let` на тяжёлых UI-блоках.
+3. **§2** — для перечисленных приложений и mentions хвостов по NgModule нет; новые модули не плодить.
 
 После крупного изменения пересоберите инвентарь §1.6 командой из блока «Как вести процесс» (или повторите `find` из истории коммита этого файла).
