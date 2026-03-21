@@ -21,7 +21,7 @@
             "style": "kebab-case"
           }
         ],
-        "@angular-eslint/prefer-standalone": "off"
+        "@angular-eslint/prefer-standalone": "error"
       },
       "extends": [
         "plugin:@nx/angular",

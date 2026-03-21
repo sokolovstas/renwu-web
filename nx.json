@@ -44,24 +44,30 @@
       "style": "scss",
       "linter": "eslint",
       "unitTestRunner": "jest",
-      "e2eTestRunner": "none"
+      "e2eTestRunner": "none",
+      "standalone": true
     },
     "@nx/angular:library": {
       "linter": "eslint",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "standalone": true
     },
     "@nx/angular:component": {
       "style": "scss",
-      "type": "component"
+      "type": "component",
+      "standalone": true
     },
     "@schematics/angular:component": {
-      "type": "component"
+      "type": "component",
+      "standalone": true
     },
     "@nx/angular:directive": {
-      "type": "directive"
+      "type": "directive",
+      "standalone": true
     },
     "@schematics/angular:directive": {
-      "type": "directive"
+      "type": "directive",
+      "standalone": true
     },
     "@nx/angular:service": {
       "type": "service"
@@ -94,10 +100,12 @@
       "typeSeparator": "."
     },
     "@nx/angular:pipe": {
-      "typeSeparator": "."
+      "typeSeparator": ".",
+      "standalone": true
     },
     "@schematics/angular:pipe": {
-      "typeSeparator": "."
+      "typeSeparator": ".",
+      "standalone": true
     },
     "@nx/angular:resolver": {
       "typeSeparator": "."
