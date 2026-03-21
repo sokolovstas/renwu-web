@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -22,7 +22,6 @@ import { ProjectService } from '../project.service';
     RouterLink,
     TranslocoPipe,
     RwDatePipe,
-    NgClass,
   ],
   templateUrl: './summary.component.html',
   styleUrl: './summary.component.scss',

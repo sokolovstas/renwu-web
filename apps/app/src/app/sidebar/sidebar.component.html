@@ -13,9 +13,9 @@
         [renwuTourAnchor]="'sidebar-' + (section.tour || section.path)"
         class="main-sidebar__section-button items-center flex flex-col px-1 md:px-5 py-1.5 cursor-pointer group relative w-full md:w-auto"
         (click)="sidebarService.setSection(section)"
-        [ngClass]="{
-          active: (sidebarService.currentSection | async)?.path === section.path
-        }"
+        [class.active]="
+          (sidebarService.currentSection | async)?.path === section.path
+        "
       >
         <rw-icon
           class="text-lg px-5 py-1.5 mb-1 rounded-full"

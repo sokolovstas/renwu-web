@@ -17,7 +17,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuSidebarService, RenwuTourAnchorDirective } from '@renwu/app-ui';
@@ -40,7 +40,6 @@ import { RwMessageService } from '@renwu/messaging';
     RwDropDownComponent,
     MessageCounterComponent,
     AvatarComponent,
-    NgClass,
     AsyncPipe,
     RouterLink,
     TranslocoPipe,

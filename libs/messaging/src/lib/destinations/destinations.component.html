@@ -23,9 +23,7 @@
       <li>
         <renwu-messaging-destination
           [destination]="item"
-          [ngClass]="{
-          active: (activeRoute | async)?.includes(item.id)
-          }"
+          [class.active]="(activeRoute | async)?.includes(item.id)"
           (click)="selectDestination(item)"
         ></renwu-messaging-destination>
       </li>
@@ -43,9 +41,7 @@
       <li>
         <renwu-messaging-destination
           [destination]="item"
-          [ngClass]="{
-          active: (activeRoute | async)?.includes(item.id)
-          }"
+          [class.active]="(activeRoute | async)?.includes(item.id)"
           (click)="selectDestination(item)"
         ></renwu-messaging-destination>
       </li>
@@ -64,9 +60,7 @@
       @for (item of userDestinations; track item) {
         <li>
           <renwu-messaging-destination
-            [ngClass]="{
-            active: (activeRoute | async)?.includes(item.id)
-            }"
+            [class.active]="(activeRoute | async)?.includes(item.id)"
             (click)="selectDestination(item)"
             [destination]="item"
             [isUser]="true"
@@ -96,9 +90,7 @@
     <li>
       <renwu-messaging-destination
         class=""
-        [ngClass]="{
-        active: (activeRoute | async)?.includes('fav')
-        }"
+        [class.active]="(activeRoute | async)?.includes('fav')"
         (click)="selectDestination(favDestination)"
         [destination]="favDestination"
       ></renwu-messaging-destination>

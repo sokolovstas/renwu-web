@@ -39,7 +39,7 @@
           }
           }}
         </div>
-        <div [ngClass]="{ 'text-warn': m.isDue }">
+        <div [class.text-warn]="m.isDue">
           {{ m.date | rwDate: 'PPP' }}
         </div>
         <div class="opacity-50">

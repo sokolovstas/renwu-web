@@ -1,7 +1,7 @@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, map, merge, Observable, of, Subject, switchMap } from 'rxjs';
 
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -50,7 +50,6 @@ import { RwMessageService } from '../message.service';
     FormsModule,
     DestinationComponent,
     AsyncPipe,
-    NgClass,
     TranslocoPipe
 ],
   templateUrl: './destinations.component.html',
