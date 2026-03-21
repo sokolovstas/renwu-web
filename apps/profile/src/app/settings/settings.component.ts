@@ -49,6 +49,8 @@ import { UserService } from '../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
+  private checkUser = inject(CheckUserValidator);
+
   workHours = { 0: false, 1: false, 2: false, 3: false };
   userService = inject(UserService);
   stateService = inject(StateService);
@@ -94,7 +96,6 @@ export class SettingsComponent {
       asyncValidators: [this.checkUser.validate.bind(this.checkUser)],
     },
   );
-  constructor(private checkUser: CheckUserValidator) {}
   async saveUser() {
     firstValueFrom(this.userService.saveUser(this.userForm.value as any));
     this.transloco.setActiveLang(this.userForm.value.settings.profile.language);

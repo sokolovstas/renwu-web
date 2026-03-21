@@ -1,11 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  HostBinding,
-  Input,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Directive, ElementRef, HostBinding, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { RwSortTableDirective } from './sort-table.directive';
 import { RwSortTableService } from './sort-table.service';
 
@@ -14,6 +7,10 @@ import { RwSortTableService } from './sort-table.service';
   standalone: true,
 })
 export class RwSortTableColumnHeadDirective implements OnInit, OnDestroy {
+  el = inject(ElementRef);
+  private sortTableService = inject(RwSortTableService);
+  private sortTable = inject(RwSortTableDirective);
+
   @HostBinding('class.rw-sorttablecolumnhead')
   classbind = true;
 
@@ -33,12 +30,6 @@ export class RwSortTableColumnHeadDirective implements OnInit, OnDestroy {
   prevScreenX = 0;
   moveGlobal: () => void;
   upGlobal: () => void;
-
-  constructor(
-    public el: ElementRef,
-    private sortTableService: RwSortTableService,
-    private sortTable: RwSortTableDirective,
-  ) {}
 
   ngOnInit(): void {
     this.sortTableService.registerColumnHead(this.columnId, this);

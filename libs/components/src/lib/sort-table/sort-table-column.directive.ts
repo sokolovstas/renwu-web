@@ -1,11 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  HostBinding,
-  Input,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Directive, ElementRef, HostBinding, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { RwSortTableRowDirective } from './sort-table-row.directive';
 import { RwSortTableDirective } from './sort-table.directive';
 import { RwSortTableService } from './sort-table.service';
@@ -15,6 +8,11 @@ import { RwSortTableService } from './sort-table.service';
   standalone: true,
 })
 export class RwSortTableColumnDirective implements OnInit, OnDestroy {
+  private sortTableService = inject(RwSortTableService);
+  private sortTable = inject(RwSortTableDirective);
+  private sortTableRow = inject(RwSortTableRowDirective);
+  el = inject(ElementRef);
+
   @HostBinding('class.rw-sorttablecolumn')
   classbind = true;
 
@@ -31,13 +29,6 @@ export class RwSortTableColumnDirective implements OnInit, OnDestroy {
   get columnId(): string {
     return this.sortTable.rwSortTable + ':' + this.rwSortTableColumn;
   }
-
-  constructor(
-    private sortTableService: RwSortTableService,
-    private sortTable: RwSortTableDirective,
-    private sortTableRow: RwSortTableRowDirective,
-    public el: ElementRef,
-  ) {}
 
   ngOnInit(): void {
     this.sortTableService.registerColumn(this.columnId, this);

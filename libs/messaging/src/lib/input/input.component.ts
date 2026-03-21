@@ -55,6 +55,13 @@ import { RwMessageService } from '../message.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class MessageInputComponent implements OnInit {
+  private el = inject(ElementRef);
+  stateService = inject(StateService);
+  settingsService = inject(RwSettingsService);
+  userService = inject(RwUserService);
+  protected messageService = inject(RwMessageService);
+  private cd = inject(ChangeDetectorRef);
+
   destroy = inject(DestroyRef);
   transloco = inject(TranslocoService);
   destinationChange = new Subject<void>();
@@ -120,14 +127,7 @@ export class MessageInputComponent implements OnInit {
     }
   }
 
-  constructor(
-    private el: ElementRef,
-    public stateService: StateService,
-    public settingsService: RwSettingsService,
-    public userService: RwUserService,
-    protected messageService: RwMessageService,
-    private cd: ChangeDetectorRef, // mentionProviderService: RwMentionsProviderService
-  ) {
+  constructor() {
     this.transloco.translate('messaging.write-a-message');
     // this.stateService.messagingOpened
     //   .pipe(takeUntilDestroyed(this.destroy))

@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostBinding,
-  Input,
-  Output,
-  forwardRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, Output, forwardRef, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -42,6 +33,8 @@ const noop = (): void => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwPagerComponent implements ControlValueAccessor {
+  private cd = inject(ChangeDetectorRef);
+
   private _rowsNumber = 0;
 
   private _pageSize = 20;
@@ -108,8 +101,6 @@ export class RwPagerComponent implements ControlValueAccessor {
   private onTouchedCallback: () => void = noop;
 
   private onChangeCallback: (_: number) => void = noop;
-
-  constructor(private cd: ChangeDetectorRef) {}
 
   registerOnChange(fn: (_: number) => void): void {
     this.onChangeCallback = fn;

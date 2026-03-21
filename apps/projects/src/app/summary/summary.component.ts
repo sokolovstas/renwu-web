@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -28,6 +28,9 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryComponent {
+  private containerService = inject(RwContainerService);
+  private projectService = inject(ProjectService);
+
   currentProject = this.projectService.currentProject;
   milestones = this.projectService.currentProject.pipe(
     switchMap((container) =>
@@ -43,8 +46,4 @@ export class SummaryComponent {
         })),
     ),
   );
-  constructor(
-    private containerService: RwContainerService,
-    private projectService: ProjectService,
-  ) {}
 }

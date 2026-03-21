@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { AlertButton, AlertInstance, RwAlertService } from './alert.service';
 
 import {
@@ -75,18 +68,16 @@ import { RwTextInputComponent } from '../text-input/text-input.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwAlertComponent implements OnInit, OnDestroy {
+  alertService = inject(RwAlertService);
+  private shortcutService = inject(RwShortcutService);
+  private cd = inject(ChangeDetectorRef);
+
   shortcutESC: ShortcutObservable;
 
   shortcutEnter: ShortcutObservable;
 
   @Input()
   alert: AlertInstance;
-
-  constructor(
-    public alertService: RwAlertService,
-    private shortcutService: RwShortcutService,
-    private cd: ChangeDetectorRef,
-  ) {}
   ngOnInit(): void {
     this.shortcutESC = this.shortcutService.subscribe('Escape', () => {
       for (let i = 0; i < this.alert.buttons.length; ++i) {

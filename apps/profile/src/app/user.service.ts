@@ -8,16 +8,16 @@ import { BehaviorSubject, switchMap, tap } from 'rxjs';
 
 @Injectable()
 export class UserService {
+  private dataService = inject(RwDataService);
+  private userService = inject(RwUserService);
+  private toastService = inject(RwToastService);
+  private stateService = inject(StateService);
+
   destroy = inject(DestroyRef);
   currentUserKey = new BehaviorSubject<string>('');
   currentUser = new BehaviorSubject<User>(null);
   transloco = inject(TranslocoService);
-  constructor(
-    private dataService: RwDataService,
-    private userService: RwUserService,
-    private toastService: RwToastService,
-    private stateService: StateService,
-  ) {
+  constructor() {
     this.currentUserKey
       .pipe(
         filterFalsy(),

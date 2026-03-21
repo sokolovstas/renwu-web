@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  forwardRef,
-  HostBinding,
-  HostListener,
-  Input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, HostBinding, HostListener, Input, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { parseBoolean } from '@renwu/utils';
 import { RwIconComponent } from '../icon/icon.component';
@@ -31,6 +23,8 @@ const noop = (): void => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwCheckboxComponent implements ControlValueAccessor {
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   @HostBinding('class.required')
   required: boolean;
@@ -60,8 +54,6 @@ export class RwCheckboxComponent implements ControlValueAccessor {
       this.onClickCheckbox(event);
     }
   }
-
-  constructor(private cd: ChangeDetectorRef) {}
 
   writeValue(value: string | number | boolean): void {
     this.value = parseBoolean(value);

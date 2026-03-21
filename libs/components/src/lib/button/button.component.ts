@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostBinding,
-  HostListener,
-  Input,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, HostListener, Input, Output, inject } from '@angular/core';
 import { IconSize, RwIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/list';
 
@@ -27,6 +18,8 @@ export type RwButtonType =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwButtonComponent {
+  private cd = inject(ChangeDetectorRef);
+
   clickCount = 0;
 
   @Input()
@@ -96,8 +89,6 @@ export class RwButtonComponent {
   onmouseleave(): void {
     this.clickCount = 0;
   }
-
-  constructor(private cd: ChangeDetectorRef) {}
 
   onClickButton(): void {
     if (!this.disabled && !this.inProgress) {

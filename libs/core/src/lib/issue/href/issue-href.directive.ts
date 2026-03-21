@@ -16,6 +16,9 @@ import { RwToastService } from '@renwu/components';
   standalone: true,
 })
 export class IssueHrefDirective {
+  private toastService = inject(RwToastService);
+  private router = inject(Router);
+
   transloco = inject(TranslocoService);
 
   @Input()
@@ -38,11 +41,6 @@ export class IssueHrefDirective {
   href: string;
 
   key: string;
-
-  constructor(
-    private toastService: RwToastService,
-    private router: Router,
-  ) {}
 
   @HostListener('click', ['$event']) onClick(event: MouseEvent): void {
     if (!this.href) {

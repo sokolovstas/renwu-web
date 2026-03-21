@@ -40,6 +40,11 @@ import { DestinationType } from '../data/messages.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DestinationComponent {
+  messageService = inject(RwMessageService);
+  userService = inject(RwUserService);
+  router = inject(Router);
+  private cd = inject(ChangeDetectorRef);
+
   destroy = inject(DestroyRef);
   update: Subject<boolean> = new Subject<boolean>();
   DestinationType = DestinationType;
@@ -66,13 +71,6 @@ export class DestinationComponent {
   displayTooltip: boolean;
   widthTooltip: number;
   itemActive: boolean;
-
-  constructor(
-    public messageService: RwMessageService,
-    public userService: RwUserService,
-    public router: Router,
-    private cd: ChangeDetectorRef,
-  ) {}
 
   markForCheck() {
     this.cd.markForCheck();

@@ -1,13 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  Output,
-  Type,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, Type, ViewChild, inject } from '@angular/core';
 import { getCaretCoordinates } from './caret-coords';
 import {
   getContentEditableCaretCoords,
@@ -42,6 +33,9 @@ import { BaseMentionsListItemComponent } from './mentions-list-item.component';
     `,
 })
 export class BaseMentionsListComponent<T> implements MentionsList<T> {
+  protected element = inject(ElementRef);
+  protected cd = inject(ChangeDetectorRef);
+
   @Output()
   itemClick = new EventEmitter<T>();
   @Output()
@@ -71,10 +65,6 @@ export class BaseMentionsListComponent<T> implements MentionsList<T> {
 
   protected coords: { top: number; left: number } = { top: 0, left: 0 };
   protected offset = 0;
-  constructor(
-    protected element: ElementRef,
-    protected cd: ChangeDetectorRef,
-  ) {}
 
   up(): void {
     this.activeIndex--;

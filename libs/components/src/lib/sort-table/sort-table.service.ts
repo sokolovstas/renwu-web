@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { RwSortTableColumnHeadDirective } from './sort-table-column-head.directive';
 import { RwSortTableColumnDirective } from './sort-table-column.directive';
 import { RwSortTableDragColumnDirective } from './sort-table-drag-column.directive';
@@ -8,6 +8,8 @@ import { RwSortTableSettingsService } from './sort-table.settings.service';
 
 @Injectable()
 export class RwSortTableService {
+  private settingsService = inject(RwSortTableSettingsService);
+
   currentDrag: RwSortTableRowDirective | RwSortTableDragColumnDirective;
   collections: Record<string, RwSortTableDirective> = {};
   collectionRows: Record<string, RwSortTableRowDirective[]> = {};
@@ -17,8 +19,6 @@ export class RwSortTableService {
     [key: string]: RwSortTableColumnHeadDirective;
   } = {};
   collectionColumns: { [key: string]: RwSortTableColumnDirective[] } = {};
-
-  constructor(private settingsService: RwSortTableSettingsService) {}
 
   // Register new collection from SortTableDirective
   registerCollection(name: string, table: RwSortTableDirective): void {

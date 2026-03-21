@@ -1,17 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  forwardRef,
-  HostBinding,
-  HostListener,
-  Inject,
-  Input,
-  OnDestroy,
-  OnInit,
-  Optional,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, HostBinding, HostListener, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -59,6 +46,9 @@ const noop = () => {
 export class RwTimePickerComponent
   implements OnInit, OnDestroy, ControlValueAccessor
 {
+  private shortcutService = inject(RwShortcutService);
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   @HostBinding('class.required')
   required: boolean;
@@ -149,13 +139,9 @@ export class RwTimePickerComponent
     }, 50);
   }
 
-  constructor(
-    private shortcutService: RwShortcutService,
-    private cd: ChangeDetectorRef,
-    @Optional()
-    @Inject(RW_TIME_PICKER_HELPER_ICON)
-    timePickerHelperIcon: IconName,
-  ) {
+  constructor() {
+    const timePickerHelperIcon = inject<IconName>(RW_TIME_PICKER_HELPER_ICON, { optional: true });
+
     this.editOpened = false;
     this.helpers = [
       1 * 60 * 60,

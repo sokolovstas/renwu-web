@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { RwToastService } from '@renwu/components';
 import { Observable, of, tap } from 'rxjs';
 import { SystemSettings } from '../data/common.model';
@@ -12,15 +12,13 @@ import { UserSettingsServer } from './settings.model';
   providedIn: 'root',
 })
 export class RwSettingsService {
+  private dataService = inject(RwDataService);
+  private toastService = inject(RwToastService);
+
   settings: SystemSettings;
   user: UserSettings = new UserSettings(this);
   notifications: NotificationsSettings = new NotificationsSettings(this);
   userID: string;
-
-  constructor(
-    private dataService: RwDataService,
-    private toastService: RwToastService,
-  ) {}
   init(userID: string) {
     this.userID = userID;
     this.user = UserSettings.load(this);

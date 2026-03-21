@@ -1,14 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  HostBinding,
-  HostListener,
-  Input,
-  ViewChild,
-  forwardRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, HostListener, Input, ViewChild, forwardRef, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -44,6 +35,8 @@ const noop = (): void => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwColorPickerComponent implements ControlValueAccessor {
+  private cd = inject(ChangeDetectorRef);
+
   @ViewChild('dropdown', { static: true })
   dropdown: RwDropDownComponent;
 
@@ -72,7 +65,7 @@ export class RwColorPickerComponent implements ControlValueAccessor {
     this.switchPopup(false);
   }
 
-  constructor(private cd: ChangeDetectorRef) {
+  constructor() {
     this.opened = false;
     this.color = new Color('#000000');
 

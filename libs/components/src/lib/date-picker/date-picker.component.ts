@@ -1,22 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  forwardRef,
-  HostBinding,
-  HostListener,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Optional,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -74,6 +57,11 @@ const noop = (): void => {
 export class RwDatePickerComponent
   implements OnInit, OnChanges, ControlValueAccessor
 {
+  protected el = inject(ElementRef);
+  private cd = inject(ChangeDetectorRef);
+  private dateTimeShowFormat = inject(RW_SHOW_DATE_FORMAT, { optional: true });
+  private dateShowFormat = inject(RW_SHOW_DATE_TIME_FORMAT, { optional: true });
+
   @Input()
   @HostBinding('class.required')
   required: boolean;
@@ -194,16 +182,7 @@ export class RwDatePickerComponent
     return this._labelEnd;
   }
 
-  constructor(
-    protected el: ElementRef,
-    private cd: ChangeDetectorRef,
-    @Optional()
-    @Inject(RW_SHOW_DATE_FORMAT)
-    private dateTimeShowFormat: string,
-    @Optional()
-    @Inject(RW_SHOW_DATE_TIME_FORMAT)
-    private dateShowFormat: string,
-  ) {
+  constructor() {
     this.opened = false;
     this.dateTimeShowFormat = this.dateTimeShowFormat || 'P p';
     this.dateShowFormat = this.dateShowFormat || 'P';

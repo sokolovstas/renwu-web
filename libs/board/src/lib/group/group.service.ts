@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Issue,
   Milestone,
@@ -21,16 +21,14 @@ import {
 
 @Injectable()
 export class RwGroupService {
+  private containerService = inject(RwContainerService);
+  private dataService = inject(RwDataService);
+
   dictionaries: Map<
     DictKeys,
     (Status | Priority | Type | Milestone | string)[]
   >;
   groupMap = new Map<string, BoardGroup>();
-
-  constructor(
-    private containerService: RwContainerService,
-    private dataService: RwDataService,
-  ) {}
   loadDictionaries(
     containerId: string,
   ): Observable<[Milestone[], string[], string[]]> {

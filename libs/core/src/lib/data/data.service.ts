@@ -4,7 +4,7 @@ import {
   HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
-import { Inject, Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 // import { captureException } from '@sentry/browser';
 import { TranslocoService } from '@jsverse/transloco';
 import { RwToastService } from '@renwu/components';
@@ -80,6 +80,11 @@ export type ParamsObject = { [param: string]: string | ReadonlyArray<string> };
   providedIn: 'root',
 })
 export class RwDataService {
+  private http = inject(HttpClient);
+  private toastService = inject(RwToastService);
+  private loaderService = inject(RwLoaderService);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   transloco = inject(TranslocoService);
 
   headers: { [name: string]: string | string[] };
@@ -92,13 +97,7 @@ export class RwDataService {
   issuesByIdBuffer: Subject<string>;
   issuesByIdBufferResult: Subject<Issue[]>;
 
-  constructor(
-    private http: HttpClient,
-    private toastService: RwToastService,
-    private loaderService: RwLoaderService,
-    @Inject(RW_CORE_SETTINGS)
-    private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.headers = {
       'Content-Type': 'application/json',
     };

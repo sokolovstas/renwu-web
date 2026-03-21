@@ -1,15 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import {
   addDays,
   addMonths,
@@ -65,6 +55,8 @@ type RwCalendarViewState = 'month' | 'months' | 'years';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwCalendarComponent implements OnInit, OnChanges {
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   hideOverflow: boolean;
 
@@ -107,8 +99,6 @@ export class RwCalendarComponent implements OnInit, OnChanges {
   currentMonth: number;
   currentYear: number;
   currentEra: string;
-
-  constructor(private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     const now = new Date();

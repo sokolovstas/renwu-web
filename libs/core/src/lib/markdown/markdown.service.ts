@@ -1,9 +1,4 @@
-import {
-  ComponentFactoryResolver,
-  ComponentRef,
-  Injectable,
-  Injector,
-} from '@angular/core';
+import { ComponentFactoryResolver, ComponentRef, Injectable, Injector, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { RwModalService } from '@renwu/components';
 import MarkdownIt from 'markdown-it';
@@ -18,18 +13,18 @@ import MentionPlugin from './markdown_mention.plugin';
   providedIn: 'root',
 })
 export class RwMarkdownService {
+  private router = inject(Router);
+  private dataService = inject(RwDataService);
+  private modalService = inject(RwModalService);
+  private userService = inject(RwUserService);
+  private componentFactoryResolver = inject(ComponentFactoryResolver);
+  private injector = inject(Injector);
+
   linkToComponent: Map<any, any[]> = new Map();
   linkToElement: Map<any, any[]> = new Map();
   markdown: any;
   mdPlugin: MentionPlugin;
-  constructor(
-    private router: Router,
-    private dataService: RwDataService,
-    private modalService: RwModalService,
-    private userService: RwUserService,
-    private componentFactoryResolver: ComponentFactoryResolver,
-    private injector: Injector,
-  ) {
+  constructor() {
     this.markdown = new MarkdownIt({
       linkify: true,
       breaks: true,

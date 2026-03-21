@@ -1,14 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  Directive,
-  ElementRef,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewEncapsulation, inject } from '@angular/core';
 import { RwModalService } from '../modal.service';
 
 import {
@@ -99,6 +89,11 @@ import {
   ],
 })
 export class RwModalComponent implements OnInit, OnDestroy {
+  modalService = inject(RwModalService);
+  private shortcutService = inject(RwShortcutService);
+  private cd = inject(ChangeDetectorRef);
+  private el = inject(ElementRef);
+
   set state(value: string) {
     this.__state = value;
     this.cd.detectChanges();
@@ -114,12 +109,7 @@ export class RwModalComponent implements OnInit, OnDestroy {
   @Output()
   closed = new EventEmitter<boolean>();
 
-  constructor(
-    public modalService: RwModalService,
-    private shortcutService: RwShortcutService,
-    private cd: ChangeDetectorRef,
-    private el: ElementRef,
-  ) {
+  constructor() {
     this.shortcut = this.shortcutService.subscribe('Escape', () => {
       this.close();
     });

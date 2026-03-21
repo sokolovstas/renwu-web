@@ -4,24 +4,7 @@
  *
  * Copyright (c) 2017 Dan MacFarlane
  */
-import {
-  ComponentFactoryResolver,
-  ComponentRef,
-  DestroyRef,
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostBinding,
-  HostListener,
-  Inject,
-  Input,
-  OnChanges,
-  Optional,
-  Output,
-  SimpleChanges,
-  ViewContainerRef,
-  inject,
-} from '@angular/core';
+import { ComponentFactoryResolver, ComponentRef, DestroyRef, Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnChanges, Output, SimpleChanges, ViewContainerRef, inject } from '@angular/core';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import {
   getCaretPosition,
@@ -58,6 +41,11 @@ type ExtendedKeyboardEvent = Partial<KeyboardEvent> & {
   selector: '[rwMentions]',
 })
 export class MentionsDirective implements OnChanges {
+  private config = inject<RwMentionsModuleConfig>(RW_MENTIONS_MODULE_CONFIG, { optional: true });
+  private _element = inject(ElementRef);
+  private _componentResolver = inject(ComponentFactoryResolver);
+  private _viewContainerRef = inject(ViewContainerRef);
+
   destroy = inject(DestroyRef);
 
   @Input('rwMentions')
@@ -90,15 +78,6 @@ export class MentionsDirective implements OnChanges {
   private searching = false;
   private iframe?: HTMLIFrameElement; // optional
   private lastKeyCode?: number;
-
-  constructor(
-    @Optional()
-    @Inject(RW_MENTIONS_MODULE_CONFIG)
-    private config: RwMentionsModuleConfig,
-    private _element: ElementRef,
-    private _componentResolver: ComponentFactoryResolver,
-    private _viewContainerRef: ViewContainerRef,
-  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['mentionConfig']) {

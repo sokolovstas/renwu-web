@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -46,6 +46,9 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent {
+  private projectService = inject(ProjectService);
+  private modalService = inject(RwModalService);
+
   showArchived = new BehaviorSubject<boolean>(false);
   containers = combineLatest([
     this.showArchived,
@@ -55,11 +58,6 @@ export class ListComponent {
       showArchived ? projects : projects.filter((p) => !p.archived),
     ),
   );
-
-  constructor(
-    private projectService: ProjectService,
-    private modalService: RwModalService,
-  ) {}
   addProject() {
     const addModal = this.modalService.add(AddProjectComponent);
     addModal.added

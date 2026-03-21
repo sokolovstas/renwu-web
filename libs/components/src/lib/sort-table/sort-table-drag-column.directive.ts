@@ -1,13 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostBinding,
-  Input,
-  OnDestroy,
-  Output,
-  Renderer2,
-} from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Output, Renderer2, inject } from '@angular/core';
 import {
   RwSortTableDirective,
   SortCompletedEvent,
@@ -21,6 +12,11 @@ import { RwSortTableService } from './sort-table.service';
   standalone: true,
 })
 export class RwSortTableDragColumnDirective implements OnDestroy {
+  private el = inject(ElementRef);
+  private sortTableService = inject(RwSortTableService);
+  private sortTable = inject(RwSortTableDirective);
+  private renderer = inject(Renderer2);
+
   @HostBinding('class.rw-sorttablecolumn')
   classbind = true;
 
@@ -41,13 +37,6 @@ export class RwSortTableDragColumnDirective implements OnDestroy {
   _index: number;
   moveHandlerSort: () => void;
   moveHandlerDrag: () => void;
-
-  constructor(
-    private el: ElementRef,
-    private sortTableService: RwSortTableService,
-    private sortTable: RwSortTableDirective,
-    private renderer: Renderer2,
-  ) {}
 
   @Input('rwSortTableDragColumn')
   set index(value: number) {

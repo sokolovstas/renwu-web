@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { switchTap } from '@renwu/utils';
 import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -14,6 +14,10 @@ import { RwWebsocketService } from '../websocket/websocket.service';
   providedIn: 'root',
 })
 export class RwUserService {
+  private dataService = inject(RwDataService);
+  private websocketService = inject(RwWebsocketService);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   tenant = '';
   currentUser = new BehaviorSubject<User>(null);
   currentUserValue: User = null;
@@ -24,11 +28,7 @@ export class RwUserService {
   todos = new BehaviorSubject<IssueTodo[]>([]);
   avatarsMap = new Map<string, string>();
   opened: boolean;
-  constructor(
-    private dataService: RwDataService,
-    private websocketService: RwWebsocketService,
-    @Inject(RW_CORE_SETTINGS) private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.websocketService.user.subscribe((event) => {
       if (event.type !== 'user_settings_update') {
         this.getUsers();

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Mentions } from '@renwu/mentions';
 import { of } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
@@ -14,39 +14,12 @@ import { MentionUserComponent } from './mention-items/mention-user.component';
   providedIn: 'root',
 })
 export class RwMentionsProviderService {
+  private containerService = inject(RwContainerService);
+  private userService = inject(RwUserService);
+  private dataService = inject(RwDataService);
+
   // emojies = new Array<Emoji>();
   visible: boolean;
-
-  constructor(
-    private containerService: RwContainerService,
-    private userService: RwUserService,
-    private dataService: RwDataService,
-  ) {
-    // this.emojies = [];
-    // const categories = [
-    //   'People',
-    //   'Nature',
-    //   'Foods',
-    //   'Activity',
-    //   'Places',
-    //   'Objects',
-    //   'Symbols',
-    //   'Flags',
-    // ];
-    // type keys = keyof typeof emojies_categories;
-    // for (const cat of categories) {
-    //   for (const emoji of emojies_categories[cat as keys]) {
-    //     const emojiIcon: Emoji = {
-    //       name: emoji.name,
-    //       type: 'emoji',
-    //       search: emoji.search,
-    //       code: ':' + emoji.name + ':',
-    //       icon: `<i class="em em-${emoji.name}"></i>`,
-    //     };
-    //     this.emojies.push(emojiIcon);
-    //   }
-    // }
-  }
   getUser(): Mentions<User> {
     return {
       triggerChars: ['@'],

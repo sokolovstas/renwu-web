@@ -1,21 +1,5 @@
 /* eslint-disable */
-import {
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  ElementRef,
-  EventEmitter,
-  Inject,
-  Input,
-  NgZone,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Output,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, Output, Renderer2, ViewChild, inject } from '@angular/core';
 
 import { isPlatformServer } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
@@ -185,6 +169,11 @@ export interface IViewport extends IPageInfo {
 export class RwVirtualScrollerComponent
   implements OnInit, OnChanges, OnDestroy
 {
+  protected readonly element = inject(ElementRef);
+  protected readonly renderer = inject(Renderer2);
+  protected readonly zone = inject(NgZone);
+  protected changeDetectorRef = inject(ChangeDetectorRef);
+
   protected checkScrollElementResizedTimer: number;
   protected _checkResizeInterval: number;
   protected _items: any[] = [];
@@ -690,16 +679,10 @@ export class RwVirtualScrollerComponent
 
   protected isAngularUniversalSSR: boolean;
 
-  constructor(
-    protected readonly element: ElementRef,
-    protected readonly renderer: Renderer2,
-    protected readonly zone: NgZone,
-    protected changeDetectorRef: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) platformId: Object,
-    @Optional()
-    @Inject('virtual-scroller-default-options')
-    options: RwVirtualScrollerDefaultOptions,
-  ) {
+  constructor() {
+    const platformId = inject<Object>(PLATFORM_ID);
+    const options = inject<RwVirtualScrollerDefaultOptions>('virtual-scroller-default-options' as any, { optional: true });
+
     this.isAngularUniversalSSR = isPlatformServer(platformId);
 
     this.checkResizeInterval = options.checkResizeInterval;

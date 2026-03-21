@@ -23,6 +23,9 @@ import { RwUserService } from '../user/user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarComponent implements OnInit, OnDestroy {
+  userService = inject(RwUserService);
+  private cd = inject(ChangeDetectorRef);
+
   destroy = inject(DestroyRef);
 
   @Input()
@@ -73,11 +76,6 @@ export class AvatarComponent implements OnInit, OnDestroy {
   name: string;
 
   textColor = 'var(--always-black)';
-
-  constructor(
-    public userService: RwUserService,
-    private cd: ChangeDetectorRef,
-  ) {}
 
   ngOnInit(): void {
     this.userService.userList

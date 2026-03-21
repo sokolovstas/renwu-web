@@ -1,10 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  HostBinding,
-  HostListener,
-  Input,
-} from '@angular/core';
+import { Directive, ElementRef, HostBinding, HostListener, Input, inject } from '@angular/core';
 import { RwSortTableDragColumnDirective } from './sort-table-drag-column.directive';
 import { RwSortTableDirective } from './sort-table.directive';
 import { RwSortTableService } from './sort-table.service';
@@ -14,6 +8,11 @@ import { RwSortTableService } from './sort-table.service';
   standalone: true,
 })
 export class RwSortTableDragColumnHandlerDirective {
+  private el = inject(ElementRef);
+  private sortTableService = inject(RwSortTableService);
+  private sortTableDragColumn = inject(RwSortTableDragColumnDirective);
+  private sortTable = inject(RwSortTableDirective);
+
   @HostBinding('class.rw-sorttablecolumnhandler')
   classbind = true;
 
@@ -21,13 +20,6 @@ export class RwSortTableDragColumnHandlerDirective {
 
   @Input()
   canSort = true;
-
-  constructor(
-    private el: ElementRef,
-    private sortTableService: RwSortTableService,
-    private sortTableDragColumn: RwSortTableDragColumnDirective,
-    private sortTable: RwSortTableDirective,
-  ) {}
   @HostListener('mousedown', ['$event.which']) onMouseDown(
     which: number,
   ): void {

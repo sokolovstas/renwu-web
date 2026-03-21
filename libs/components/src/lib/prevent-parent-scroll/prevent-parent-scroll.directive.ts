@@ -1,17 +1,17 @@
-import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, Input, OnDestroy, OnInit, inject } from '@angular/core';
 
 @Directive({
   selector: '[rwPreventParentScroll]',
   standalone: true,
 })
 export class RwPreventParentScrollDirective implements OnInit, OnDestroy {
+  private element = inject(ElementRef);
+
   @Input()
   scrollDisabled = false;
 
   private mouseWheelEventHandler = (event: WheelEvent) =>
     this.onMouseWheel(event);
-
-  constructor(private element: ElementRef) {}
 
   ngOnInit(): void {
     (this.element.nativeElement as HTMLElement).addEventListener(

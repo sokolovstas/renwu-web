@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import {
   Issue,
   ListOptionsFilters,
@@ -10,9 +10,10 @@ import { isAfter, isBefore, isSameDay, isValid } from 'date-fns';
 
 @Pipe({ name: 'renwuSortList', pure: true, standalone: true })
 export class SortListPipe<T extends Issue> implements PipeTransform {
+  private containerService = inject(RwContainerService);
+
   direction = 'up';
   nullPosition = 'down';
-  constructor(private containerService: RwContainerService) {}
   getDirectionSort(val: number): number {
     if (this.direction === 'up') {
       return val;

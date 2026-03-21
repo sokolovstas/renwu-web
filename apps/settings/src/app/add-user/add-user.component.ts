@@ -1,15 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output, ViewChild, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -57,6 +47,13 @@ import { JSONUtils } from '@renwu/utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddUserComponent implements AfterViewInit, OnDestroy {
+  private userService = inject(RwUserService);
+  private toastService = inject(RwToastService);
+  private cd = inject(ChangeDetectorRef);
+  private checkUser = inject(CheckUserValidator);
+  private modalService = inject(RwModalService);
+  private settingsService = inject(RwSettingsService);
+
   @Input()
   set user(value: User) {
     if (value.id) {
@@ -104,15 +101,6 @@ export class AddUserComponent implements AfterViewInit, OnDestroy {
   @ViewChild('username', { static: false })
   usernameTextinput: RwTextInputComponent;
   @ViewChild('email', { static: false }) emailTextinput: RwTextInputComponent;
-
-  constructor(
-    private userService: RwUserService,
-    private toastService: RwToastService,
-    private cd: ChangeDetectorRef,
-    private checkUser: CheckUserValidator,
-    private modalService: RwModalService,
-    private settingsService: RwSettingsService,
-  ) {}
 
   ngAfterViewInit() {
     const focusElement = this.usernameTextinput || this.emailTextinput;

@@ -1,13 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  Type,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, Type, inject } from '@angular/core';
 import { RwDurationToStringPipe, RwTooltipDirective } from '@renwu/components';
 import { Issue, IssueChilds } from '../issue/issue.model';
 import { ParentProgressTooltipComponent } from './parent-progress-tooltip/parent-progress-tooltip.component';
@@ -24,6 +16,8 @@ import { ParentProgressTooltipComponent } from './parent-progress-tooltip/parent
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IssuesStatusBarComponent {
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   set childs(childs: IssueChilds) {
     if (!childs) {
@@ -73,7 +67,7 @@ export class IssuesStatusBarComponent {
 
   tooltipParents: Type<void> = ParentProgressTooltipComponent;
 
-  constructor(private cd: ChangeDetectorRef) {
+  constructor() {
     this.progress.issueTotal = 0;
     this.progress.issueResolved = 0;
     this.progress.estimatedTotal = 0;

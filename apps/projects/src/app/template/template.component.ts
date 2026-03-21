@@ -40,6 +40,8 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TemplateComponent implements OnInit {
+  private projectService = inject(ProjectService);
+
   destroy = inject(DestroyRef);
   currentProject = this.projectService.currentProject;
   taskForm = new FormGroup({
@@ -48,7 +50,6 @@ export class TemplateComponent implements OnInit {
     status: new FormControl<Status>(null),
     estimated_time: new FormControl(4 * 60 * 60),
   });
-  constructor(private projectService: ProjectService) {}
   ngOnInit(): void {
     this.projectService.currentProject
       .pipe(takeUntilDestroyed(this.destroy))

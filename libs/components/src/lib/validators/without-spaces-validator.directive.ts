@@ -1,4 +1,4 @@
-import { Attribute, Directive, forwardRef } from '@angular/core';
+import { Directive, forwardRef, HostAttributeToken, inject } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS, Validator } from '@angular/forms';
 
 @Directive({
@@ -14,9 +14,8 @@ import { AbstractControl, NG_VALIDATORS, Validator } from '@angular/forms';
   standalone: true,
 })
 export class RwWithOutSpacesValidatorDirective implements Validator {
-  constructor(
-    @Attribute('validateWithOutSpaces') public validateWithOutSpaces: string,
-  ) {}
+  validateWithOutSpaces = inject(new HostAttributeToken('validateWithOutSpaces'), { optional: true });
+
 
   validate(c: AbstractControl): { [key: string]: boolean } {
     // self value

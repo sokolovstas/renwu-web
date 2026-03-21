@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, Output } from '@angular/core';
+import { EventEmitter, Injectable, Output, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { RwWebsocketService } from '../websocket/websocket.service';
 
@@ -25,6 +25,8 @@ export class Loader {
   providedIn: 'root',
 })
 export class RwLoaderService {
+  private websocketService = inject(RwWebsocketService);
+
   @Output()
   loadingProgress = new EventEmitter<number>();
 
@@ -41,7 +43,7 @@ export class RwLoaderService {
 
   loaders: Loader[] = [];
 
-  constructor(private websocketService: RwWebsocketService) {
+  constructor() {
     this.websocketService.workbot.subscribe((event) => {
       if (event.type === 'start') {
         this.setWorkbot(true);

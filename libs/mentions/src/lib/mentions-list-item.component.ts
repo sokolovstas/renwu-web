@@ -1,15 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  Type,
-  ViewChild,
-  ViewContainerRef,
-} from '@angular/core';
+import { AfterViewInit, Component, ComponentFactoryResolver, ComponentRef, Input, OnChanges, SimpleChanges, Type, ViewChild, ViewContainerRef, inject } from '@angular/core';
 import { MentionsListItem } from './mentions-config';
 
 @Component({
@@ -25,6 +14,8 @@ import { MentionsListItem } from './mentions-config';
 export class BaseMentionsListItemComponent<T>
   implements AfterViewInit, OnChanges
 {
+  private componentResolver = inject(ComponentFactoryResolver);
+
   @Input()
   labelKey = 'label';
 
@@ -41,8 +32,6 @@ export class BaseMentionsListItemComponent<T>
   itemComponent: Type<MentionsListItem<T>>;
 
   componentRef: ComponentRef<MentionsListItem<T>>;
-
-  constructor(private componentResolver: ComponentFactoryResolver) {}
 
   ngAfterViewInit(): void {
     if (this.itemComponent) {

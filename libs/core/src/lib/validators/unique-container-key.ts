@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidator,
@@ -9,7 +9,8 @@ import { RwDataService } from '../data/data.service';
 
 @Injectable({ providedIn: 'root' })
 export class UniqueContainerKeyValidator implements AsyncValidator {
-  constructor(private dataService: RwDataService) {}
+  private dataService = inject(RwDataService);
+
 
   validate(control: AbstractControl): Observable<ValidationErrors | null> {
     const id = control.get('id');

@@ -1,10 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwIconComponent, RwTooltipDirective } from '@renwu/components';
 import { getUnixTime } from 'date-fns';
@@ -20,6 +15,9 @@ import { Issue } from '../../issue.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconWarningComponent {
+  private containerService = inject(RwContainerService);
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   set issue(value: Issue) {
     this._issue = value;
@@ -47,11 +45,6 @@ export class IconWarningComponent {
   flagCanDragManual: boolean;
   flagOffset: boolean;
   flagNoAssignee: boolean;
-
-  constructor(
-    private containerService: RwContainerService,
-    private cd: ChangeDetectorRef,
-  ) {}
   updateFlags() {
     const flagNotPosted =
       !this.issue.date_start && !this.issue.date_start_calc && !this.isGroup;

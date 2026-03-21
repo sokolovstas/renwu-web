@@ -1,4 +1,4 @@
-import { inject, Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { RwToastService } from '@renwu/components';
 import {
   Attachment,
@@ -49,6 +49,12 @@ import { MessageItem } from './message-item';
   providedIn: 'root',
 })
 export class RwMessageService {
+  userService = inject(RwUserService);
+  messagingDataService = inject(RwMessagingDataService);
+  dataService = inject(RwDataService);
+  toastService = inject(RwToastService);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   transloco = inject(TranslocoService);
 
   token = '';
@@ -81,13 +87,7 @@ export class RwMessageService {
   events: Subject<MessageEvent>;
   markreadBuffer: Subject<MessageItem>;
 
-  constructor(
-    public userService: RwUserService,
-    public messagingDataService: RwMessagingDataService,
-    public dataService: RwDataService,
-    public toastService: RwToastService,
-    @Inject(RW_CORE_SETTINGS) private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.events = new Subject();
     this.unreadCount = new BehaviorSubject(0);
     this.pulseCount = new BehaviorSubject(0);

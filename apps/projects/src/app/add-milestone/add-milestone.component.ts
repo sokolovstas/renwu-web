@@ -49,6 +49,8 @@ import { ContainerD, Milestone, RwDataService } from '@renwu/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddMilestoneComponent implements OnDestroy {
+  private modalService = inject(RwModalService);
+
   @Output()
   closed = new EventEmitter<void>();
   @Output()
@@ -77,8 +79,6 @@ export class AddMilestoneComponent implements OnDestroy {
   set milestone(value: Milestone) {
     this.milestoneForm.patchValue(value);
   }
-
-  constructor(private modalService: RwModalService) {}
 
   ngOnDestroy() {
     this.closed.next();

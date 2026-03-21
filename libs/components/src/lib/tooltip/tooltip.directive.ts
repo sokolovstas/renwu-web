@@ -1,11 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  HostListener,
-  Input,
-  OnDestroy,
-  Type,
-} from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnDestroy, Type, inject } from '@angular/core';
 import { Placement } from '@floating-ui/dom';
 import { RwTooltipService, Tooltip } from './tooltip.service';
 import { RwTooltipComponent } from './tooltip/tooltip.component';
@@ -15,6 +8,9 @@ import { RwTooltipComponent } from './tooltip/tooltip.component';
   standalone: true,
 })
 export class RwTooltipDirective implements OnDestroy {
+  private tooltipService = inject(RwTooltipService);
+  private el = inject(ElementRef);
+
   showTimeout = -1;
   floatingCleanup: () => void;
 
@@ -81,11 +77,6 @@ export class RwTooltipDirective implements OnDestroy {
 
   @Input()
   tooltipDataField = 'data';
-
-  constructor(
-    private tooltipService: RwTooltipService,
-    private el: ElementRef,
-  ) {}
 
   @HostListener('mouseenter') onMouseEnter(): void {
     if (!this.tooltipType && (!this.rwTooltip || !this.rwTooltip.trim())) {

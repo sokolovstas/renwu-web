@@ -50,6 +50,10 @@ const noop = () => {
 export class RwTextInputComponent
   implements OnInit, OnDestroy, ControlValueAccessor
 {
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private cd = inject(ChangeDetectorRef);
+
   destroy = inject(DestroyRef);
 
   @HostBinding('class.focus')
@@ -209,12 +213,6 @@ export class RwTextInputComponent
   onFocus(): void {
     this.switchPopup(true);
   }
-
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-    private cd: ChangeDetectorRef,
-  ) {}
 
   writeValue(value: string): void {
     this.value = value;

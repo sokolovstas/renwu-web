@@ -1,17 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  ElementRef,
-  EventEmitter,
-  HostBinding,
-  Input,
-  OnDestroy,
-  Output,
-  Renderer2,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Output, Renderer2, TemplateRef, inject } from '@angular/core';
 
 import {
   animate,
@@ -59,6 +46,10 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwDropDownComponent implements OnDestroy {
+  el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private cd = inject(ChangeDetectorRef);
+
   @ContentChild('dropdownContent', { static: true })
   dropdownContent: TemplateRef<unknown>;
 
@@ -185,12 +176,6 @@ export class RwDropDownComponent implements OnDestroy {
   leaveActiveHandlerByClickActiveElement: () => void;
 
   parent: HTMLElement;
-
-  constructor(
-    public el: ElementRef,
-    private renderer: Renderer2,
-    private cd: ChangeDetectorRef,
-  ) {}
 
   setListeners(): void {
     if (this.openHandler) {

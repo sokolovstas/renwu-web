@@ -1,11 +1,4 @@
-import {
-  ContentChild,
-  Directive,
-  HostBinding,
-  Input,
-  OnInit,
-  ViewContainerRef,
-} from '@angular/core';
+import { ContentChild, Directive, HostBinding, Input, OnInit, ViewContainerRef, inject } from '@angular/core';
 import { RwModalService } from './modal.service';
 
 @Directive({
@@ -13,6 +6,8 @@ import { RwModalService } from './modal.service';
   standalone: true,
 })
 export class RwModalContainerDirective implements OnInit {
+  modalService = inject(RwModalService);
+
   @HostBinding('class.rw-modalcontainer')
   classbind = true;
 
@@ -26,8 +21,6 @@ export class RwModalContainerDirective implements OnInit {
 
   @Input()
   rwModalContainer: string;
-
-  constructor(public modalService: RwModalService) {}
 
   ngOnInit(): void {
     this.modalService.registerContainer(

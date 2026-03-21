@@ -1,15 +1,5 @@
 
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  forwardRef,
-  HostBinding,
-  Input,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, HostBinding, Input, ViewChild, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -36,6 +26,8 @@ const noop = () => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwSwitchComponent implements AfterViewInit, ControlValueAccessor {
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   @HostBinding('class.required')
   required: boolean;
@@ -67,8 +59,6 @@ export class RwSwitchComponent implements AfterViewInit, ControlValueAccessor {
   private onTouchedCallback: () => void = noop;
 
   private onChangeCallback: (_: boolean) => void = noop;
-
-  constructor(private cd: ChangeDetectorRef) {}
 
   ngAfterViewInit(): void {
     const checkedWidth = (

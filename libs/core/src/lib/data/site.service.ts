@@ -4,7 +4,7 @@ import {
   HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 // import { captureException } from '@sentry/browser';
 import { RwToastService } from '@renwu/components';
 import { JSONUtils } from '@renwu/utils';
@@ -26,17 +26,15 @@ declare const $localize: (
   providedIn: 'root',
 })
 export class RwSiteDataService {
+  private http = inject(HttpClient);
+  private toastService = inject(RwToastService);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   headers: { [name: string]: string | string[] };
 
   unauthHandler: (err: HttpErrorResponse) => void;
 
-  constructor(
-    private http: HttpClient,
-    private toastService: RwToastService,
-    // private loaderService: RwLoaderService,
-    @Inject(RW_CORE_SETTINGS)
-    private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.headers = {
       'Content-Type': 'application/json',
     };

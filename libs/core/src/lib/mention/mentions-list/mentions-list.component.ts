@@ -1,9 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwDropDownComponent } from '@renwu/components';
 import {
@@ -22,7 +17,10 @@ export class MentionsListComponent<T> extends BaseMentionsListComponent<T> {
   @ViewChild('dropdown', { static: false })
   dropdown: RwDropDownComponent;
 
-  constructor(elementRef: ElementRef, cd: ChangeDetectorRef) {
+  constructor() {
+    const elementRef = inject(ElementRef);
+    const cd = inject(ChangeDetectorRef);
+
     super(elementRef, cd);
   }
 

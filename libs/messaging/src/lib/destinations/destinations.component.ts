@@ -58,6 +58,17 @@ import { RwMessageService } from '../message.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class DestinationsComponent implements OnInit {
+  private dataService = inject(RwDataService);
+  stateService = inject(StateService);
+  userService = inject(RwUserService);
+  messageService = inject(RwMessageService);
+  policyService = inject(RwPolicyService);
+  private cd = inject(ChangeDetectorRef);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private containerService = inject(RwContainerService);
+  settingsService = inject(RwSettingsService);
+
   searchValue = '';
 
   userDestinations: MessageDestination[];
@@ -91,18 +102,7 @@ export class DestinationsComponent implements OnInit {
     suppressScrollY: false,
   };
 
-  constructor(
-    private dataService: RwDataService,
-    public stateService: StateService,
-    public userService: RwUserService,
-    public messageService: RwMessageService,
-    public policyService: RwPolicyService,
-    private cd: ChangeDetectorRef,
-    private router: Router,
-    private route: ActivatedRoute,
-    private containerService: RwContainerService,
-    public settingsService: RwSettingsService,
-  ) {
+  constructor() {
     this.favDestination = this.messageService.favDestination;
     this.quickSearchTaskDestinations =
       this.updateDisplayDestinationsQuickSearch.pipe(

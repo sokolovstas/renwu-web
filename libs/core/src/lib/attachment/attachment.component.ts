@@ -1,18 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  DestroyRef,
-  EventEmitter,
-  HostListener,
-  Inject,
-  Input,
-  OnInit,
-  Output,
-  Renderer2,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, HostListener, Input, OnInit, Output, Renderer2, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RwDatePipe, RwToastService } from '@renwu/components';
 
@@ -31,6 +18,12 @@ import { RW_CORE_SETTINGS, RwCoreSettings } from '../settings-token';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttachmentComponent implements OnInit {
+  private dataService = inject(RwDataService);
+  private toastService = inject(RwToastService);
+  private renderer = inject(Renderer2);
+  private cd = inject(ChangeDetectorRef);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   destroy = inject(DestroyRef);
 
   flagFileDrop = false;
@@ -67,13 +60,7 @@ export class AttachmentComponent implements OnInit {
   IMAGE_MIME_REGEX = new RegExp('^image/(p?jpe?g|gif|png|bmp)$', 'i');
   dragLeaveTimeout: number;
 
-  constructor(
-    private dataService: RwDataService,
-    private toastService: RwToastService,
-    private renderer: Renderer2,
-    private cd: ChangeDetectorRef,
-    @Inject(RW_CORE_SETTINGS) private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.num = Math.round(Math.random() * 100000);
   }
   ngOnInit(): void {

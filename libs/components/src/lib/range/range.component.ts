@@ -1,17 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  forwardRef,
-  HostBinding,
-  Input,
-  OnInit,
-  Output,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, Input, OnInit, Output, Renderer2, ViewChild, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -35,6 +22,10 @@ const noop = (): void => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwRangeComponent implements OnInit, ControlValueAccessor {
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private cd = inject(ChangeDetectorRef);
+
   onTouchedCallback: () => void = noop;
 
   onChangeCallback: (_: number) => void = noop;
@@ -117,12 +108,6 @@ export class RwRangeComponent implements OnInit, ControlValueAccessor {
   registerOnTouched(fn: () => void): void {
     this.onTouchedCallback = fn;
   }
-
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-    private cd: ChangeDetectorRef,
-  ) {}
 
   ngOnInit(): void {
     this.onModelChanged

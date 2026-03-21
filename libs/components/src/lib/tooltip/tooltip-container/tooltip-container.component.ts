@@ -1,9 +1,4 @@
-import {
-  Component,
-  HostBinding,
-  ViewChild,
-  ViewContainerRef,
-} from '@angular/core';
+import { Component, HostBinding, ViewChild, ViewContainerRef, inject } from '@angular/core';
 import { RwTooltipService } from '../tooltip.service';
 
 @Component({
@@ -13,6 +8,8 @@ import { RwTooltipService } from '../tooltip.service';
   styleUrl: './tooltip-container.component.scss',
 })
 export class RwTooltipContainerComponent {
+  tooltipService = inject(RwTooltipService);
+
   @ViewChild('container', { read: ViewContainerRef, static: true })
   target: ViewContainerRef;
 
@@ -21,7 +18,7 @@ export class RwTooltipContainerComponent {
 
   title: string;
 
-  constructor(public tooltipService: RwTooltipService) {
+  constructor() {
     this.tooltipService.registerContainer(this);
   }
 }

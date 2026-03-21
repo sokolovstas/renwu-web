@@ -1,4 +1,4 @@
-import { Inject, Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { RwToastService } from '@renwu/components';
 import { RxWebsocketSubject } from '@renwu/utils';
@@ -20,6 +20,9 @@ import {
   providedIn: 'root',
 })
 export class RwWebsocketService {
+  private toastService = inject(RwToastService);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   transloco = inject(TranslocoService);
 
   token = '';
@@ -36,10 +39,7 @@ export class RwWebsocketService {
   workbot: Subject<WorkbotEvent> = new Subject<WorkbotEvent>();
   user: Subject<UserEvent> = new Subject<UserEvent>();
 
-  constructor(
-    private toastService: RwToastService,
-    @Inject(RW_CORE_SETTINGS) private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.viewPath = '';
     this.viewIDs = new Map<ViewType, Set<string>>();
   }

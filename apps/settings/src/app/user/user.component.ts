@@ -61,6 +61,8 @@ import { firstValueFrom, map, shareReplay, switchMap, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
+  private checkUser = inject(CheckUserValidator);
+
   UserStatus = UserStatus;
   workHours = { 0: false, 1: false, 2: false, 3: false };
   userService = inject(RwUserService);
@@ -111,7 +113,7 @@ export class UserComponent {
     shareReplay({ bufferSize: 1, refCount: false }),
   );
 
-  constructor(private checkUser: CheckUserValidator) {
+  constructor() {
     inject(ActivatedRoute)
       .paramMap.pipe(
         map((p) => p.get('id')),

@@ -15,17 +15,17 @@ import { BehaviorSubject, map, of, switchMap, take, tap } from 'rxjs';
 
 @Injectable()
 export class ProjectService {
+  private dataService = inject(RwDataService);
+  private containerService = inject(RwContainerService);
+  private toastService = inject(RwToastService);
+  private alertService = inject(RwAlertService);
+
   destroy = inject(DestroyRef);
   transloco = inject(TranslocoService);
   currentProjectKey = new BehaviorSubject<string>('');
   currentProject = new BehaviorSubject<Container>(null);
   projects = this.containerService.containers;
-  constructor(
-    private dataService: RwDataService,
-    private containerService: RwContainerService,
-    private toastService: RwToastService,
-    private alertService: RwAlertService,
-  ) {
+  constructor() {
     this.currentProjectKey
       .pipe(
         switchMap((k) => this.containerService.getContainerByKey(k)),

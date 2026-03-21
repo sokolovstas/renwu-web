@@ -1,9 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent } from '@renwu/app-ui';
 import { IssueHistoryItemComponent } from '@renwu/core';
@@ -29,6 +25,10 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivityComponent {
+  private messageService = inject(RwMessageService);
+  private projectService = inject(ProjectService);
+  private cd = inject(ChangeDetectorRef);
+
   currentProject = this.projectService.currentProject;
   history = this.projectService.currentProject.pipe(
     switchMap((c) => {
@@ -52,12 +52,6 @@ export class ActivityComponent {
   destination: MessageDestination;
 
   loading: boolean;
-
-  constructor(
-    private messageService: RwMessageService,
-    private projectService: ProjectService,
-    private cd: ChangeDetectorRef,
-  ) {}
   loadMore() {
     this.loading = true;
     this.cd.markForCheck();

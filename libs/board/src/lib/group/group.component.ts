@@ -1,16 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostBinding,
-  Input,
-  Output,
-  QueryList,
-  ViewChildren,
-  ViewEncapsulation,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, Output, QueryList, ViewChildren, ViewEncapsulation, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
@@ -41,6 +30,9 @@ import { RwGroupService } from './group.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class BoardGroupComponent {
+  private cd = inject(ChangeDetectorRef);
+  private settingsService = inject(RwSettingsService);
+
   @Input()
   set group(value: BoardGroup) {
     if (!value) {
@@ -209,11 +201,6 @@ export class BoardGroupComponent {
     suppressScrollX: false,
     suppressScrollY: false,
   };
-
-  constructor(
-    private cd: ChangeDetectorRef,
-    private settingsService: RwSettingsService,
-  ) {}
 
   markForCheck() {
     this.cd.markForCheck();

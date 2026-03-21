@@ -1,0 +1,14 @@
+diff --git a/node_modules/@angular/core/schematics/bundles/inject-migration.cjs b/node_modules/@angular/core/schematics/bundles/inject-migration.cjs
+index 1068c69..1fc11c5 100755
+--- a/node_modules/@angular/core/schematics/bundles/inject-migration.cjs
++++ b/node_modules/@angular/core/schematics/bundles/inject-migration.cjs
+@@ -1344,7 +1344,8 @@ function runInjectMigration(tree, tsconfigPath, basePath, pathToMigrate, schemat
+         .filter((sourceFile) => sourceFile.fileName.startsWith(pathToMigrate) &&
+         compiler_host.canMigrateFile(basePath, sourceFile, program));
+     if (sourceFiles.length === 0) {
+-        throw new schematics.SchematicsException(`Could not find any files to migrate under the path ${pathToMigrate}. Cannot run the inject migration.`);
++        // Nx monorepos: multiple tsconfigs; skip configs that do not include pathToMigrate (upstream throws on first empty match).
++        return;
+     }
+     for (const sourceFile of sourceFiles) {
+         const changes = migrateFile(sourceFile, schematicOptions);

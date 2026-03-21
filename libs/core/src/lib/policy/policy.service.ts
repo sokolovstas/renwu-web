@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { RwSelectComponent, RwToastService } from '@renwu/components';
 import { JSONUtils } from '@renwu/utils';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
@@ -102,6 +102,10 @@ export interface AccessCheckList {
   providedIn: 'root',
 })
 export class RwPolicyService {
+  private userService = inject(RwUserService);
+  private dataService = inject(RwDataService);
+  private toastService = inject(RwToastService);
+
   mapPolicyJSON: { [x: string]: AccessLevel } & { id?: string };
   mapPolicySubjects: Map<string, Subject<boolean>>;
   teamName: string;
@@ -111,11 +115,7 @@ export class RwPolicyService {
     [key: string]: { s: Subject<boolean>; p: Partial<PolicyAsk> };
   };
 
-  constructor(
-    private userService: RwUserService,
-    private dataService: RwDataService,
-    private toastService: RwToastService,
-  ) {
+  constructor() {
     this.mapPolicySubjects = new Map();
 
     this.observerMap = {};

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { isBefore, parseJSON } from 'date-fns';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { debounceTime, map, tap } from 'rxjs/operators';
@@ -20,6 +20,9 @@ import { Milestone } from './milestone.model';
   providedIn: 'root',
 })
 export class RwContainerService {
+  private dataService = inject(RwDataService);
+  private websocketService = inject(RwWebsocketService);
+
   containers = new BehaviorSubject<Container[]>([]);
   containersIDMap = new BehaviorSubject<Map<string, Container>>(
     new Map<string, Container>(),
@@ -34,10 +37,7 @@ export class RwContainerService {
   resolutionMap = new Map<string, Resolution>();
   workflowsMap = new Map<string, Workflow>();
 
-  constructor(
-    private dataService: RwDataService,
-    private websocketService: RwWebsocketService,
-  ) {
+  constructor() {
     this.websocketService.container
       .pipe(debounceTime(500))
       .subscribe((event) => {

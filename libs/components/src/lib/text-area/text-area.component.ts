@@ -77,6 +77,10 @@ export const mySchema = new Schema({
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwTextAreaComponent implements OnInit, ControlValueAccessor {
+  el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   @HostBinding('class.required')
   required: boolean;
@@ -156,14 +160,6 @@ export class RwTextAreaComponent implements OnInit, ControlValueAccessor {
   onModelChanged = new Subject<string | number>();
 
   @ViewChild('textarea', { static: true }) textarea: ElementRef;
-
-  constructor(
-    public el: ElementRef,
-    private renderer: Renderer2,
-    private cd: ChangeDetectorRef,
-  ) {
-    // this.focusSource = focusSource();
-  }
 
   @HostListener('focus')
   onFocus() {

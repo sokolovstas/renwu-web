@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RwWebsocketService } from '../websocket/websocket.service';
 
@@ -6,10 +6,10 @@ import { RwWebsocketService } from '../websocket/websocket.service';
   providedIn: 'root',
 })
 export class RwTitleService {
-  constructor(
-    private title: Title,
-    private websocketService: RwWebsocketService,
-  ) {
+  private title = inject(Title);
+  private websocketService = inject(RwWebsocketService);
+
+  constructor() {
     this.websocketService.clearView();
     this.websocketService.pushView('RENWU');
     this.websocketService.sendView();

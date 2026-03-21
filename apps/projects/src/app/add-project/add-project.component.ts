@@ -1,11 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  OnDestroy,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, Output, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -52,6 +46,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddProjectComponent implements OnDestroy {
+  private uniqueContainerKey = inject(UniqueContainerKeyValidator);
+  private modalService = inject(RwModalService);
+
   @Output()
   closed = new EventEmitter<void>();
   @Output()
@@ -83,11 +80,6 @@ export class AddProjectComponent implements OnDestroy {
       ],
     },
   );
-
-  constructor(
-    private uniqueContainerKey: UniqueContainerKeyValidator,
-    private modalService: RwModalService,
-  ) {}
 
   ngOnDestroy() {
     this.closed.next();

@@ -51,6 +51,11 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent implements OnInit {
+  private projectService = inject(ProjectService);
+  private containerKeyValidator = inject(UniqueContainerKeyValidator);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   destroy = inject(DestroyRef);
   currentProject = this.projectService.currentProject;
   settingsForm = new FormGroup(
@@ -79,12 +84,6 @@ export class SettingsComponent implements OnInit {
       ],
     },
   );
-  constructor(
-    private projectService: ProjectService,
-    private containerKeyValidator: UniqueContainerKeyValidator,
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {}
   ngOnInit() {
     this.projectService.currentProject
       .pipe(takeUntilDestroyed(this.destroy))

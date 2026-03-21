@@ -1,21 +1,7 @@
 import scrollmonitor, { ScrollMonitorContainer, Watcher } from 'scrollmonitor';
 
 
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  HostBinding,
-  Input,
-  OnDestroy,
-  Output,
-  QueryList,
-  ViewChildren,
-  ViewEncapsulation,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Output, QueryList, ViewChildren, ViewEncapsulation, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwButtonComponent, RwIconComponent } from '@renwu/components';
 import { Subject } from 'rxjs';
@@ -42,6 +28,8 @@ import { MessageItem } from '../message-item';
   encapsulation: ViewEncapsulation.None,
 })
 export class MessageThreadComponent implements AfterViewInit, OnDestroy {
+  private cd = inject(ChangeDetectorRef);
+
   DestinationType = DestinationType;
 
   destroy: Subject<boolean> = new Subject<boolean>();
@@ -111,8 +99,6 @@ export class MessageThreadComponent implements AfterViewInit, OnDestroy {
   scrollMonitorPrevWatcher: Watcher;
 
   action: string;
-
-  constructor(private cd: ChangeDetectorRef) {}
   ngOnDestroy() {
     this.removeScrollWatchers();
   }

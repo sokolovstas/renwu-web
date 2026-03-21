@@ -121,6 +121,14 @@ import { RwMessageService } from '../message.service';
   ],
 })
 export class MessageItemComponent implements OnDestroy {
+  private el = inject(ElementRef);
+  private alertService = inject(RwAlertService);
+  private toastService = inject(RwToastService);
+  messageService = inject(RwMessageService);
+  private stateService = inject(StateService);
+  private sanitizer = inject(DomSanitizer);
+  private cd = inject(ChangeDetectorRef);
+
   protected settingsService = inject(RwSettingsService);
   destroy = inject(DestroyRef);
   MessageType = MessageType;
@@ -184,16 +192,6 @@ export class MessageItemComponent implements OnDestroy {
   readSubscribe: Subscription;
 
   currentUserId = inject(RwUserService).getId();
-
-  constructor(
-    private el: ElementRef,
-    private alertService: RwAlertService,
-    private toastService: RwToastService,
-    public messageService: RwMessageService,
-    private stateService: StateService,
-    private sanitizer: DomSanitizer,
-    private cd: ChangeDetectorRef,
-  ) {}
   // ngOnInit() {
   //   // this.state = 'in';
   // }

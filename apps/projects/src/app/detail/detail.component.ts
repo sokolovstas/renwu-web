@@ -29,10 +29,10 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DetailComponent {
+  private projectService = inject(ProjectService);
+
   project = this.projectService.currentProject;
   sidebarService = inject(RenwuSidebarService);
-
-  constructor(private projectService: ProjectService) {}
 
   sidebarClick() {
     this.sidebarService.scrollToMain();

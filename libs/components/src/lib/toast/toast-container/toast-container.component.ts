@@ -1,5 +1,5 @@
 
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { RwToastService } from '../toast.service';
 import { RwToastComponent, ToastData } from '../toast/toast.component';
 
@@ -12,7 +12,8 @@ import { RwToastComponent, ToastData } from '../toast/toast.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class RwToastContainerComponent {
-  constructor(public toastService: RwToastService) {}
+  toastService = inject(RwToastService);
+
 
   clickToast(toast: ToastData): void {
     if (toast.onClick) {

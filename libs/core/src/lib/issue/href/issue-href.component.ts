@@ -1,15 +1,5 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwTooltipDirective } from '@renwu/components';
 
@@ -22,6 +12,9 @@ import { RwTooltipDirective } from '@renwu/components';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IssueHrefComponent implements OnInit {
+  private el = inject(ElementRef);
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   title: string;
   @Input()
@@ -62,11 +55,6 @@ export class IssueHrefComponent implements OnInit {
   ) {
     this.onDblclick(eventMouse);
   }
-
-  constructor(
-    private el: ElementRef,
-    private cd: ChangeDetectorRef, // private toastService: RwToastService, // private issueService: RwIssueService
-  ) {}
   ngOnInit() {
     // if (this.issue && this.issue.id) {
     //   this.issue.id = this.issue.id;

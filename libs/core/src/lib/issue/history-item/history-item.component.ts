@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import {
   RwDatePipe,
   RwDurationToStringPipe,
@@ -39,6 +39,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IssueHistoryItemComponent {
+  settingsService = inject(RwSettingsService);
+
   // FIXME
   @Input()
   value: IssueChangeEvent | PulseIssueChangeEvent;
@@ -55,8 +57,6 @@ export class IssueHistoryItemComponent {
 
   @Input()
   showAuthor = true;
-
-  constructor(public settingsService: RwSettingsService) {}
 
   getDescendantProp(obj: Record<string, unknown>, desc: string): unknown {
     const arr = desc.split('.');

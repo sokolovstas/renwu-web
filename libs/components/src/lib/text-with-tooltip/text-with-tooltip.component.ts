@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  Input,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Input, ViewChild, inject } from '@angular/core';
 import { Placement } from '@floating-ui/dom';
 import { RwTooltipDirective } from '../tooltip/tooltip.directive';
 
@@ -19,6 +11,8 @@ import { RwTooltipDirective } from '../tooltip/tooltip.directive';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwTextWithTooltipComponent {
+  private cd = inject(ChangeDetectorRef);
+
   @Input()
   label: string;
 
@@ -44,6 +38,4 @@ export class RwTextWithTooltipComponent {
     );
     this.cd.detectChanges();
   }
-
-  constructor(private cd: ChangeDetectorRef) {}
 }

@@ -3,7 +3,7 @@ import {
   HttpErrorResponse,
   HttpHeaders,
 } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 // import { captureException } from '@sentry/browser';
 import { RwToastService } from '@renwu/components';
 import {
@@ -40,6 +40,11 @@ declare const $localize: (
   providedIn: 'root',
 })
 export class RwMessagingDataService {
+  private http = inject(HttpClient);
+  private toastService = inject(RwToastService);
+  private loaderService = inject(RwLoaderService);
+  private settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
+
   headers: { [name: string]: string | string[] };
 
   unauthHandler: (err: HttpErrorResponse) => void;
@@ -50,13 +55,7 @@ export class RwMessagingDataService {
   issuesByIdBuffer: Subject<string>;
   issuesByIdBufferResult: Subject<Issue[]>;
 
-  constructor(
-    private http: HttpClient,
-    private toastService: RwToastService,
-    private loaderService: RwLoaderService,
-    @Inject(RW_CORE_SETTINGS)
-    private settings: RwCoreSettings,
-  ) {
+  constructor() {
     this.headers = {
       'Content-Type': 'application/json',
     };

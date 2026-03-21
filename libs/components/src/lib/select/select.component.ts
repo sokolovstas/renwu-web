@@ -1,24 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  ElementRef,
-  EnvironmentInjector,
-  EventEmitter,
-  HostBinding,
-  HostListener,
-  Inject,
-  Input,
-  OnDestroy,
-  Optional,
-  Output,
-  TemplateRef,
-  ViewChild,
-  ViewEncapsulation,
-  forwardRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, EnvironmentInjector, EventEmitter, HostBinding, HostListener, Input, OnDestroy, Output, TemplateRef, ViewChild, ViewEncapsulation, forwardRef, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -69,6 +50,11 @@ const noop = (): void => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwSelectComponent implements OnDestroy, ControlValueAccessor {
+  private injector = inject(EnvironmentInjector);
+  protected el = inject(ElementRef);
+  private models = inject<Record<string, () => ISelectModel<unknown>>>(RW_SELECT_MODELS);
+  private cd = inject(ChangeDetectorRef);
+
   private onTouchedCallback: () => void = noop;
 
   private onChangeCallback: (_: unknown) => void = noop;
@@ -218,19 +204,10 @@ export class RwSelectComponent implements OnDestroy, ControlValueAccessor {
     }
   }
 
-  constructor(
-    private injector: EnvironmentInjector,
-    protected el: ElementRef,
-    @Optional()
-    @Inject(RW_SELECT_ICON_DOWN)
-    selectIconDown: IconName,
-    @Optional()
-    @Inject(RW_SELECT_ICON_UP)
-    selectIconUp: IconName,
-    @Inject(RW_SELECT_MODELS)
-    private models: Record<string, () => ISelectModel<unknown>>,
-    private cd: ChangeDetectorRef,
-  ) {
+  constructor() {
+    const selectIconDown = inject<IconName>(RW_SELECT_ICON_DOWN, { optional: true });
+    const selectIconUp = inject<IconName>(RW_SELECT_ICON_UP, { optional: true });
+
     this.thisContext = { select: this };
     this.iconClosed = selectIconDown || 'keyboard_arrow_down';
     this.iconOpened = selectIconUp || 'keyboard_arrow_up';

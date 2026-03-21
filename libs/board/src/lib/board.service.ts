@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   BoardGroupsConfigServer,
   RwDataService,
@@ -11,13 +11,13 @@ import { BoardGroupsConfig } from './board.model';
   providedIn: 'root',
 })
 export class RwBoardService {
+  private settingsService = inject(RwSettingsService);
+  private dataService = inject(RwDataService);
+
   boards = new BehaviorSubject<BoardGroupsConfig[]>([]);
   // favBoards = new BehaviorSubject<BoardGroupsConfig[]>([]);
 
-  constructor(
-    private settingsService: RwSettingsService,
-    private dataService: RwDataService,
-  ) {
+  constructor() {
     return;
   }
 

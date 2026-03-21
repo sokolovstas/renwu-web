@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent } from '@renwu/app-ui';
@@ -36,6 +36,9 @@ import { ProjectService } from '../project.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamComponent {
+  private projectService = inject(ProjectService);
+  private userService = inject(RwUserService);
+
   currentProject = this.projectService.currentProject;
   internalTeam = this.currentProject.pipe(
     map((c) => c.team.filter((t) => !this.userService.getIsExternal(t.user))),
@@ -49,10 +52,7 @@ export class TeamComponent {
   externalModelUser = new SelectModelUser();
   adminModelUser = new SelectModelUser();
   managerModelUser = new SelectModelUser();
-  constructor(
-    private projectService: ProjectService,
-    private userService: RwUserService,
-  ) {
+  constructor() {
     this.internalModelUser.filterFunction = (u: User) =>
       u.type === UserType.INTERNAL &&
       this.currentProject
