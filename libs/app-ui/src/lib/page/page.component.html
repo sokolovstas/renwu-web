@@ -1,8 +1,7 @@
 <div
   class="flex flex-col w-full h-full"
-  [ngClass]="{
-  'overflow-auto md:overflow-hidden': !fixedHeader
-  }"
+  [class.overflow-auto]="!fixedHeader"
+  [class.md:overflow-hidden]="!fixedHeader"
   >
   <div
     class="w-full flex flex-col pb-4 border-b-2 border-gray-200 z-10 px-4 md:px-6"
@@ -45,17 +44,20 @@
 
   <div
     class="flex flex-col h-full w-full"
-    [ngClass]="{
-    'pt-2 md:pt-4 px-4 md:px-6': !noPadding,
-    'overflow-auto': fixedHeader,
-    'overflow-visible md:overflow-auto': !fixedHeader
-    }"
+    [class.pt-2]="!noPadding"
+    [class.md:pt-4]="!noPadding"
+    [class.px-4]="!noPadding"
+    [class.md:px-6]="!noPadding"
+    [class.overflow-auto]="fixedHeader"
+    [class.overflow-visible]="!fixedHeader"
+    [class.md:overflow-auto]="!fixedHeader"
     >
     <ng-content></ng-content>
   </div>
   <div
     class="flex flex-row justify-end hide-empty py-4 gap-4"
-    [ngClass]="{ 'px-4 md:px-6': !noPadding }"
+    [class.px-4]="!noPadding"
+    [class.md:px-6]="!noPadding"
     >
     <ng-content select="[action]"></ng-content>
   </div>

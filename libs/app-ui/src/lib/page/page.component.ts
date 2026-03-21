@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,7 +12,7 @@ import { RenwuSidebarService } from '../sidebar.service';
 @Component({
   selector: 'renwu-page',
   standalone: true,
-  imports: [RouterLink, RwIconComponent, NgClass],
+  imports: [RouterLink, RwIconComponent],
   templateUrl: './page.component.html',
   styleUrl: './page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

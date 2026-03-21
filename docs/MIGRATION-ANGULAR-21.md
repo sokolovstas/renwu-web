@@ -8,7 +8,7 @@
 |-----|----------|--------|
 | 1.1 | Удалить неиспользуемый `NgStyle` из компонентов (шаблоны уже на `[style.*]`) | ✅ |
 | 1.2 | `NgClass` → `[class.*]`: shell приложений (`apps/app`, `apps/projects`) | ✅ |
-| 1.3 | `NgClass` → `[class.*]`: `RenwuPageComponent` (Tailwind-классы с `:` через `[class['…']]`) | ⬜ |
+| 1.3 | `NgClass` → `[class.*]`: `RenwuPageComponent` (Tailwind `md:…` — привязки вида `[class.md:px-6]`) | ✅ |
 | 1.4 | `NgClass` → `[class.*]`: sidebar, messaging destinations, projects summary | ⬜ |
 | 1.5 | Заменить `CommonModule` на точечный `AsyncPipe` там, где остался только async в шаблоне | ⬜ |
 
