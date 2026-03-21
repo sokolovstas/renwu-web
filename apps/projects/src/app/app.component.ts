@@ -25,9 +25,7 @@ import {
     <div
       class="rw-modal-container"
       rwModalContainer
-      [ngClass]="{
-        'hidden-important': (modalService.opened | async) === false
-      }"
+      [class.hidden-important]="(modalService.opened | async) === false"
     >
       <div #modalContainer></div>
     </div>

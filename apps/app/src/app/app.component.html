@@ -30,7 +30,7 @@
       <renwu-sidebar class="app-sidebar z-10"></renwu-sidebar>
       <div
         class="app-main-view flex flex-grow-1"
-        [ngClass]="{ 'app-main-view-full': (mainRouteExist | async) === false }"
+        [class.app-main-view-full]="(mainRouteExist | async) === false"
         >
         <router-outlet></router-outlet>
       </div>
@@ -45,7 +45,7 @@
     <div
       class="rw-modal-container"
       rwModalContainer
-      [ngClass]="{ 'hidden-important': (modalService.opened | async) === false }"
+      [class.hidden-important]="(modalService.opened | async) === false"
       >
       <div #modalContainer></div>
     </div>
