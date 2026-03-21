@@ -1,4 +1,4 @@
-import { ApplicationRef, Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { RwAlertService } from '@renwu/components';
 import { RenwuWepPushService } from '@renwu/messaging';
@@ -7,11 +7,10 @@ import { interval } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class CheckForUpdateService {
   webPushService = inject(RenwuWepPushService);
-  constructor(
-    appRef: ApplicationRef,
-    private updates: SwUpdate,
-    private alertService: RwAlertService,
-  ) {
+  private updates = inject(SwUpdate);
+  private alertService = inject(RwAlertService);
+
+  constructor() {
     // Allow the app to stabilize first, before starting
     // polling for updates with `interval()`.
     // const appIsStable$ = appRef.isStable.pipe(

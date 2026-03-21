@@ -11,8 +11,9 @@ import {
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideTransloco, translocoConfig } from '@jsverse/transloco';
 import { provideUiTour } from 'ngx-ui-tour-console';
-import { provideRenwuCore, StateService } from '@renwu/core';
+import { provideRenwuCore } from '@renwu/core';
 import { provideRenwuMessaging, provideRenwuWebPush } from '@renwu/messaging';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- workspace env at repo root
 import { environment } from '../../../environments/environment';
 import { CustomRouteReuseStrategy } from './app/app-route-reuse';
 import { CustomErrorHandler, TranslocoHttpLoader } from './app/app.module';

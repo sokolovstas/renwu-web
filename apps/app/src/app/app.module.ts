@@ -39,6 +39,7 @@ import {
 } from '@renwu/messaging';
 import { filterFalsy } from '@renwu/utils';
 import { takeUntil } from 'rxjs';
+// eslint-disable-next-line @nx/enforce-module-boundaries -- workspace env at repo root
 import { environment } from '../../../../environments/environment';
 import { CustomRouteReuseStrategy } from './app-route-reuse';
 import { AppComponent } from './app.component';
@@ -55,7 +56,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 
 @Injectable()
 export class CustomErrorHandler extends ErrorHandler {
-  constructor(private injector: Injector) {
+  private injector = inject(Injector);
+
+  constructor() {
     super();
   }
   get router(): Router {

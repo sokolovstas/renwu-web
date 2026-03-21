@@ -1,5 +1,5 @@
 {
-  "extends": ["plugin:playwright/recommended", "../../../.eslintrc.json"],
+  "extends": ["plugin:playwright/recommended", "../../.eslintrc.json"],
   "ignorePatterns": ["!**/*"],
   "overrides": [
     {
@@ -35,7 +35,9 @@
     },
     {
       "files": ["e2e/**/*.{ts,js,tsx,jsx}"],
-      "rules": {}
+      "rules": {
+        "@nx/enforce-module-boundaries": "off"
+      }
     }
   ]
 }
