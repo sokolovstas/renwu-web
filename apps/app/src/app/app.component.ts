@@ -5,7 +5,7 @@ import {
   inject,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { RenwuSidebarService, RenwuTourService } from '@renwu/app-ui';
 import {
@@ -31,7 +31,7 @@ import {
   selector: 'renwu-root',
   standalone: true,
   imports: [
-    CommonModule,
+    AsyncPipe,
     RouterOutlet,
     SidebarComponent,
     RwAlertComponent,

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {
@@ -14,7 +14,7 @@ import {
   selector: 'renwu-projects',
   standalone: true,
   imports: [
-    CommonModule,
+    AsyncPipe,
     RouterOutlet,
     RwAlertComponent,
     RwModalContainerDirective,
