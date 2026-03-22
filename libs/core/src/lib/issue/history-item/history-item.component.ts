@@ -305,6 +305,50 @@ export class IssueHistoryItemComponent {
     resultDiff.parent = this.getOneLinkTypeDiff(changes, 'parent');
     return resultDiff;
   }
+
+  /** Flat list for template `@for` instead of six copy-pasted `renwu-issue-href` blocks. */
+  linkChangeRows(field: FieldChangesLinks): LinkChangeRow[] {
+    const diff = this.getLinksDiff(field);
+    const rows: LinkChangeRow[] = [];
+    const push = (
+      isAdd: boolean,
+      linkKindLabel: string,
+      issue: IssueLink | undefined,
+    ) => {
+      if (issue) {
+        rows.push({
+          isAdd,
+          linkKindLabel,
+          issue,
+          trackId: `${isAdd}:${linkKindLabel}:${issue.key}`,
+        });
+      }
+    };
+    push(true, 'next link', diff.next?.added);
+    push(false, 'next link', diff.next?.removed);
+    push(true, 'previous link', diff.prev?.added);
+    push(false, 'previous link', diff.prev?.removed);
+    push(true, 'related link', diff.related?.added);
+    push(false, 'related link', diff.related?.removed);
+    push(true, 'parent link', diff.parent?.added);
+    push(false, 'parent link', diff.parent?.removed);
+    return rows;
+  }
+
+  hasRenderableFieldChanges(): boolean {
+    const v = this.value;
+    if (!v?.fields_changes?.length) {
+      return false;
+    }
+    const t = v.type;
+    return (
+      t === undefined ||
+      t === 'issue_update' ||
+      t === 'issue_timelog' ||
+      t === 'issue_transition'
+    );
+  }
+
   canDisplay(): boolean {
     if (!this.value) {
       return false;
@@ -362,4 +406,11 @@ export interface LinksDiff {
   parent: AddedRemoveLinkChanges;
   prev: AddedRemoveLinkChanges;
   related: AddedRemoveLinkChanges;
+}
+
+export interface LinkChangeRow {
+  isAdd: boolean;
+  linkKindLabel: string;
+  issue: IssueLink;
+  trackId: string;
 }

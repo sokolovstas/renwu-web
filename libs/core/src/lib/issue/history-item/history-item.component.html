@@ -53,15 +53,8 @@
           </div>
         }
         @default {
-          @if (
-            value.type === undefined ||
-            value.type === 'issue_update' ||
-            value.type === 'issue_timelog' ||
-            (value.type === 'issue_transition' &&
-              value.fields_changes &&
-              value.fields_changes.length > 0)
-          ) {
-            @for (field of value.fields_changes; track field) {
+          @if (hasRenderableFieldChanges()) {
+            @for (field of value.fields_changes; track $index) {
               @switch (field.field_name) {
                 @case ('status') {
             <div class="change">
@@ -255,7 +248,6 @@
             </div>
           }
                 @case ('watchers') {
-            {{ getAdded(field, idField, 'username') }}
             @if (getAdded(field, idField, 'username'); as added) {
               <div
                 class="change"
@@ -340,19 +332,21 @@
             </ng-container>
           }
                 @case ('auto_scheduling') {
-            @if (field.new_value) {
-              <div class="change">
-                <div>Set <span class="field-name">scheduling type</span></div>
-                :&nbsp;
-                <div class="field-value">AUTO</div>
-              </div>
-            }
-            @if (!field.new_value) {
-              <div class="change">
-                <div>Set <span class="field-name">scheduling type</span></div>
-                :&nbsp;
-                <div class="field-value">MANUAL</div>
-              </div>
+            @switch (!!field.new_value) {
+              @case (true) {
+                <div class="change">
+                  <div>Set <span class="field-name">scheduling type</span></div>
+                  :&nbsp;
+                  <div class="field-value">AUTO</div>
+                </div>
+              }
+              @default {
+                <div class="change">
+                  <div>Set <span class="field-name">scheduling type</span></div>
+                  :&nbsp;
+                  <div class="field-value">MANUAL</div>
+                </div>
+              }
             }
           }
                 @case ('time_logs') {
@@ -395,123 +389,25 @@
             }
           }
                 @case ('links') {
-            @if (getLinksDiff(field); as diff) {
-              @if (diff.next.added) {
-                <div class="change">
-                  <div>Add <span class="field-name">next link</span> with</div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.next.added"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.next.added.key"
-                    [title]="diff.next.added.title"
-                    >
-                  </renwu-issue-href>
+            @for (row of linkChangeRows(field); track row.trackId) {
+              <div class="change">
+                <div>
+                  @if (row.isAdd) {
+                    Add <span class="field-name">{{ row.linkKindLabel }}</span> with
+                  } @else {
+                    Remove <span class="field-name">{{ row.linkKindLabel }}</span> with
+                  }
                 </div>
-              }
-              @if (diff.next.removed) {
-                <div class="change">
-                  <div>Remove <span class="field-name">next link</span> with</div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.next.removed"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.next.removed.key"
-                    [title]="diff.next.removed.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
-              @if (diff.prev.added) {
-                <div class="change">
-                  <div>Add <span class="field-name">previous link</span> with</div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.prev.added"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.prev.added.key"
-                    [title]="diff.prev.added.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
-              @if (diff.prev.removed) {
-                <div class="change">
-                  <div>
-                    Remove <span class="field-name">previous link</span> with
-                  </div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.prev.removed"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.prev.removed.key"
-                    [title]="diff.prev.removed.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
-              @if (diff.related.added) {
-                <div class="change">
-                  <div>Add <span class="field-name">related link</span> with</div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.related.added"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.related.added.key"
-                    [title]="diff.related.added.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
-              @if (diff.related.removed) {
-                <div class="change">
-                  <div>
-                    Remove <span class="field-name">related link</span> with
-                  </div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.related.removed"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.related.removed.key"
-                    [title]="diff.related.removed.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
-              @if (diff.parent.added) {
-                <div class="change">
-                  <div>Add <span class="field-name">parent link</span> with</div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.parent.added"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.parent.added.key"
-                    [title]="diff.parent.added.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
-              @if (diff.parent.removed) {
-                <div class="change">
-                  <div>Remove <span class="field-name">parent link</span> with</div>
-                  &nbsp;
-                  <renwu-issue-href
-                    [issue]="diff.parent.removed"
-                    [linkButton]="true"
-                    [copyOnDoubleClick]="true"
-                    [key]="diff.parent.removed.key"
-                    [title]="diff.parent.removed.title"
-                    >
-                  </renwu-issue-href>
-                </div>
-              }
+                &nbsp;
+                <renwu-issue-href
+                  [issue]="row.issue"
+                  [linkButton]="true"
+                  [copyOnDoubleClick]="true"
+                  [key]="row.issue.key"
+                  [title]="row.issue.title"
+                >
+                </renwu-issue-href>
+              </div>
             }
           }
                 @default {}
