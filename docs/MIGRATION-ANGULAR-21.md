@@ -31,5 +31,5 @@
 ## Дальше (вне текущих коммитов)
 
 - Миграция `@angular/animations` → CSS / `animate.enter` / `animate.leave` ([руководство](https://angular.dev/guide/animations/migration)).
-- Опционально: standalone для оставшихся `AppModule`, control flow, signal `input()` / `output()`, схемы из [Migrations](https://angular.dev/reference/migrations).
-- Актуальный чеклист по шаблонам (`*ngTemplateOutlet`, `@switch`, инвентарь `.html`) и по `AppModule` / bootstrap: [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md).
+- Опционально: signal `input()` / `output()`, схемы из [Migrations](https://angular.dev/reference/migrations).
+- **Шаблоны и bootstrap (активный контур):** очередь в [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) закрыта (§1.1–§1.4, §2); `apps/old/` в миграцию шаблонов не входит — под переписывание.

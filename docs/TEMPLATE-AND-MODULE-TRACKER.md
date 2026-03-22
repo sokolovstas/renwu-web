@@ -11,6 +11,8 @@
 | 2026-03-21 | `history-item`: `@switch (value.type)` + `@switch (field.field_name)` с `@default`; `dashboard`: вынесен `TranslocoHttpLoader` в `transloco-http-loader.ts`, удалён неиспользуемый `app.module.ts`; `MentionsListComponent`: убран `super(elementRef, cd)` после перехода базового класса на `inject()`. |
 | 2026-03-21 | **§2 NgModule:** во всех shell-приложениях удалён неиспользуемый `app.module.ts`. Федеративные приложения: `transloco-http-loader.ts` + импорт из `bootstrap.ts`. Shell `app`: плюс `custom-error-handler.ts`, `shell-app-initializers.ts` (логика бывшего конструктора `AppModule` после `bootstrapApplication`). `timeline`: мёртвый `app.module.ts` удалён (bootstrap без transloco, как и раньше). |
 | 2026-03-21 | **§2.3 / §1.3:** удалён закомментированный `libs/mentions/.../mentions.module.ts`; `messaging/item`: `@switch (message.type ?? MessageType.REGULAR)` для веток REGULAR / PULSE. **§1.2** (`*ngTemplateOutlet` в `dropdown` / `select`): осознанно **отложено** — нативной замены в control flow нет; трогать только вместе с редизайном или e2e. |
+| 2026-03-21 | **§1.2:** `dropdown` / `select` — микросинтаксис `*ngTemplateOutlet` заменён на `[ngTemplateOutlet]` и при необходимости `[ngTemplateOutletContext]`; в активных `.html` `*ngTemplateOutlet` не остаётся. **§1.4:** `select.component.html` — `@let` для `selected` / `emptyItem` в дефолтном шаблоне строки; `@defer (when opened)` только вокруг `.rw-select-options` (поиск и `#input` снаружи — стабильный `ViewChild` и `focusOnInput`); плейсхолдер `.rw-select-defer-placeholder` в `select.component.scss`. |
+| 2026-03-21 | **Закрытие очереди шаблонов:** §1.4 без открытых чекбоксов — дальнейший `@defer`/`@let` только по отдельным задачам. **§1.7** зафиксирован как **вне объёма**: `apps/old/` не мигрируем (под переписывание). Инвентарь §1.6 пересчитан: **116** `.html` в активном контуре. |
 
 ---
 
@@ -36,7 +38,10 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 ### Шаблоны
 
 - **Сделано:** в активном контуре нет `*ngIf` / `*ngFor` / `*ngSwitch*`; используется встроенный control flow (`@if`, `@for`), где уже мигрировали.
-- **Дальше:** точечно — `*ngTemplateOutlet`, крупные цепочки `@if` → `@switch`, при необходимости `@defer` / `@let` (без обязательной «миграции всех 116 файлов»).
+- **Сделано (§1.2):** в `dropdown` / `select` outlet’ы через `[ngTemplateOutlet]` / context, без `*ngTemplateOutlet` в `.html` активного контура.
+- **Сделано (§1.4, старт):** в `rw-select` — `@let` и `@defer` на списке опций (см. журнал).
+- **Вне объёма:** `apps/old/` (§1.7) — не мигрируем шаблоны; каталог под переписывание, вне основного контура Nx.
+- **Дальше (по желанию):** крупные цепочки `@if` → `@switch`, точечно `@defer` / `@let` на других тяжёлых блоках (без обязательной «миграции всех 116 файлов»).
 
 ### NgModule / `AppModule` / bootstrap
 
@@ -56,8 +61,8 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 | Файл | Комментарий | Готово |
 |------|-------------|--------|
-| `libs/components/src/lib/dropdown/dropdown.component.html` | **Отложено:** `*ngTemplateOutlet` остаётся до отдельной задачи (нет прямого аналога в `@if`/`@for`; высокий риск регрессий). | [ ] |
-| `libs/components/src/lib/select/select.component.html` | **Отложено:** то же + несколько outlet и `context`. | [ ] |
+| `libs/components/src/lib/dropdown/dropdown.component.html` | `[ngTemplateOutlet]="dropdownContent"` вместо `*ngTemplateOutlet`. | [x] |
+| `libs/components/src/lib/select/select.component.html` | Все outlet’ы: `[ngTemplateOutlet]` + `[ngTemplateOutletContext]="thisContext"` где нужно. | [x] |
 
 ### 1.3 `@switch` / уплотнение ветвлений
 
@@ -69,7 +74,9 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 ### 1.4 `@defer` и `@let`
 
-- [ ] В репозитории пока нет `@defer` / `@let` в `.html`. Кандидаты подбирать по **тяжёлым** или **редко открываемым** блокам (модалки, второстепенные панели), с проверкой под native federation / бандлинг.
+- [x] **`libs/components/src/lib/select/select.component.html`:** `@let` для потоков `selected` / `emptyItem` в дефолтном шаблоне выбранного элемента; `@defer (when opened)` только вокруг `.rw-select-options` (поле поиска и `#input` вне `@defer`, чтобы не ломать фокус и `ViewChild`). Плейсхолдер: класс `.rw-select-defer-placeholder` в `select.component.scss`.
+
+Очередь по §1.4 **исчерпана** для текущего контура: дальнейшее добавление `@defer` / `@let` — только по отдельным задачам (модалки, панели и т.п.), с проверкой под federation и lifecycle DOM.
 
 ### 1.5 Крупные шаблоны (приоритет ревью, не обязательная миграция)
 
@@ -210,7 +217,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 ### 1.7 Архив `apps/old/`
 
-Каталог со старыми шаблонами **вне основного контура** линта/сборки Nx. Миграция — только если сознательно возвращаете код в продукт.
+**Не делаем:** старое приложение вынесено под переписывание; шаблоны и control flow здесь **намеренно не мигрируем**. Каталог **вне основного контура** линта/сборки Nx. Возврат в продукт — отдельный проект, не пункт этого трекера.
 
 ---
 
@@ -259,8 +266,8 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 ## 3. Следующий шаг (рекомендация)
 
-1. **§1.2** — по необходимости: `dropdown` / `select` и `*ngTemplateOutlet` (см. пометку «отложено» в таблице).
-2. **§1.4** — точечно `@defer` / `@let` на тяжёлых UI-блоках.
-3. **§2** — для перечисленных приложений и mentions хвостов по NgModule нет; новые модули не плодить.
+1. **Шаблоны (активный контур):** очередь §1.1–§1.4 закрыта; улучшения — точечно при рефакторинге (§1.5 / §1.6 как ориентир по размеру файлов).
+2. **`apps/old/` (§1.7):** не трогать в рамках этого трекера — переписывание отдельно.
+3. **§2** — новый код: standalone, без новых `NgModule` без нужды.
 
-После крупного изменения пересоберите инвентарь §1.6 командой из блока «Как вести процесс» (или повторите `find` из истории коммита этого файла).
+После крупного изменения пересоберите инвентарь §1.6 (`find` по дереву без `node_modules`, `dist`, `.nx`, `apps/old`, `styles`).

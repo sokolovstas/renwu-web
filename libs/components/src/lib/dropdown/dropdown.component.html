@@ -10,5 +10,5 @@
   class="dropdownContainer {{ finalPlacement }} "
   [@opacityAnim]="state"
   >
-  <ng-container *ngTemplateOutlet="dropdownContent"> </ng-container>
+  <ng-container [ngTemplateOutlet]="dropdownContent"></ng-container>
 </div>

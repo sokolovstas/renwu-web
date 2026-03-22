@@ -1,5 +1,7 @@
 <ng-template #selectedItemActionsDefault> </ng-template>
 <ng-template #selectedItemTemplateDefault>
+  @let selected = model.selected | async;
+  @let emptyItem = model.emptyItem | async;
   <div
     [tabindex]="-1"
     class="rw-select-prompt"
@@ -24,25 +26,24 @@
     <div
       class="rw-select-labels {{ manyLayout }}"
       [class.empty]="
-      !((model.selected | async)[0] || (model.emptyItem | async))
+      !(selected?.[0] || emptyItem)
       "
       [class.active]="opened"
       [class.disabled]="disabled"
       >
-      @if (
-        !(model.selected | async)[0] && (model.emptyItem | async)) {
-        @if (model.emptyItem | async) {
+      @if (!selected?.[0] && emptyItem) {
+        @if (emptyItem) {
           <div
             class="rw-select-label {{ manyLayout }}"
             >
             <div
               class="rw-select-text"
-              [innerHTML]="(model.emptyItem | async).label"
+              [innerHTML]="emptyItem.label"
             ></div></div
             >
           }
         } @else {
-          @for (item of model.selected | async; track item; let i = $index) {
+          @for (item of selected ?? []; track item; let i = $index) {
             <div
               class="rw-select-label {{ manyLayout }}"
               [class.many]="model.many && opened"
@@ -68,10 +69,8 @@
       </div>
 
       <ng-container
-        *ngTemplateOutlet="
-        selectedItemActions || selectedItemActionsDefault;
-        context: thisContext
-        "
+        [ngTemplateOutlet]="selectedItemActions || selectedItemActionsDefault"
+        [ngTemplateOutletContext]="thisContext"
       ></ng-container>
     </div>
     <rw-icon
@@ -85,10 +84,8 @@
 
   <div class="rw-select-value-holder" #valueElement>
     <ng-container
-      *ngTemplateOutlet="
-      selectedItemTemplate || selectedItemTemplateDefault;
-      context: thisContext
-      "
+      [ngTemplateOutlet]="selectedItemTemplate || selectedItemTemplateDefault"
+      [ngTemplateOutletContext]="thisContext"
     ></ng-container>
   </div>
   <rw-dropdown
@@ -106,10 +103,8 @@
     <ng-template #dropdownContent>
       <div class="rw-select-resizer">
         <ng-container
-          *ngTemplateOutlet="
-          selectedItemTemplate || selectedItemTemplateDefault;
-          context: thisContext
-          "
+          [ngTemplateOutlet]="selectedItemTemplate || selectedItemTemplateDefault"
+          [ngTemplateOutletContext]="thisContext"
         ></ng-container>
       </div>
       <div class="rw-select-search" ozPreventParentScroll>
@@ -130,55 +125,61 @@
           (keydown)="onSearchKeyDown($event)"
           />
       </div>
-      <div
-        class="rw-select-options"
-        (scroll)="onPopupScroll($event)"
-        ozPreventParentScroll
-        >
-        @if (firstItemTemplate) {
-          <div
-            class="rw-select-option"
-            [class.cursor]="selectedIndex === -1"
-            (mouseover)="setIndex(-1)"
-            >
-            <ng-container
-              *ngTemplateOutlet="firstItemTemplate; context: thisContext"
-            ></ng-container>
-          </div>
-        }
-        @for (item of model.list | async; track item; let i = $index) {
-          <div
-            class="rw-select-option"
-            [class.active]="model.isSelected(item)"
-            [class.cursor]="selectedIndex === i"
-            (mouseover)="setIndex(i)"
-            >
-            <div class="rw-select-zone-click" (click)="onSelect(i)"></div>
-            <div [innerHTML]="item.label"></div>
-          </div>
-        }
-        @if (lastItemTemplate) {
-          <div class="rw-select-option">
-            <ng-container
-              *ngTemplateOutlet="lastItemTemplate; context: thisContext"
-            ></ng-container>
-          </div>
-        }
-        @if (model.loading | async) {
-          <div class="spinner">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
-          </div>
-        }
-        @if ((model.haveNext | async) && (model.loading | async) === false) {
-          <div
-            class="rw-select-option rw-select-load-more"
-            (click)="onLoadMore()"
-            >
-            <span>{{ 'components.load-more' | transloco }}</span> ...
-          </div>
-        }
-      </div>
+      @defer (when opened) {
+        <div
+          class="rw-select-options"
+          (scroll)="onPopupScroll($event)"
+          ozPreventParentScroll
+          >
+          @if (firstItemTemplate) {
+            <div
+              class="rw-select-option"
+              [class.cursor]="selectedIndex === -1"
+              (mouseover)="setIndex(-1)"
+              >
+              <ng-container
+                [ngTemplateOutlet]="firstItemTemplate"
+                [ngTemplateOutletContext]="thisContext"
+              ></ng-container>
+            </div>
+          }
+          @for (item of model.list | async; track item; let i = $index) {
+            <div
+              class="rw-select-option"
+              [class.active]="model.isSelected(item)"
+              [class.cursor]="selectedIndex === i"
+              (mouseover)="setIndex(i)"
+              >
+              <div class="rw-select-zone-click" (click)="onSelect(i)"></div>
+              <div [innerHTML]="item.label"></div>
+            </div>
+          }
+          @if (lastItemTemplate) {
+            <div class="rw-select-option">
+              <ng-container
+                [ngTemplateOutlet]="lastItemTemplate"
+                [ngTemplateOutletContext]="thisContext"
+              ></ng-container>
+            </div>
+          }
+          @if (model.loading | async) {
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
+          }
+          @if ((model.haveNext | async) && (model.loading | async) === false) {
+            <div
+              class="rw-select-option rw-select-load-more"
+              (click)="onLoadMore()"
+              >
+              <span>{{ 'components.load-more' | transloco }}</span> ...
+            </div>
+          }
+        </div>
+      } @placeholder {
+        <div class="rw-select-defer-placeholder"></div>
+      }
     </ng-template>
   </rw-dropdown>
