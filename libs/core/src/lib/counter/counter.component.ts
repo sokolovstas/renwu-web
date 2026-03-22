@@ -1,16 +1,8 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  HostBinding,
   Input,
   Output,
 } from '@angular/core';
@@ -24,25 +16,6 @@ import { BehaviorSubject } from 'rxjs';
   templateUrl: './counter.component.html',
   styleUrl: './counter.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('transition', [
-      state(
-        'void',
-        style({
-          transform: 'scale(0)',
-        }),
-      ),
-      state(
-        '*',
-        style({
-          opacity: '1',
-          transform: 'scale(1)',
-        }),
-      ),
-      transition('* => void', animate('200ms ease')),
-      transition('void => *', animate('200ms ease')),
-    ]),
-  ],
 })
 export class MessageCounterComponent {
   @Input()
@@ -51,8 +24,9 @@ export class MessageCounterComponent {
     unreadCount?: BehaviorSubject<number>;
   };
 
-  @HostBinding('@transition')
-  transition = 'SHOW';
+  /** When true, skip enter/leave animations (e.g. sub-destination row with animations disabled). */
+  @Input()
+  skipBadgeAnimation = false;
 
   @Input()
   showOne = false;

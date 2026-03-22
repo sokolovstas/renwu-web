@@ -1,12 +1,10 @@
 <div
   class="rw-modal-background {{ state }}"
-  [@backgroundState]="state"
   (click)="close()"
 ></div>
 <div
   class="rw-modal-wrapper {{ state }}"
-  [@state]="state"
-  [hidden]="state !== 'show'"
+  [attr.inert]="state === 'show' ? null : ''"
 >
   <div class="rw-modal-title-bar">
     <div class="rw-modal-title">

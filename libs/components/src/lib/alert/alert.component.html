@@ -1,11 +1,11 @@
 <div
   class="alert-background"
-  [@backgroundState]="alert.state"
+  [class.rw-alert-visible]="alert.state === 'show'"
   (click)="closeAlertByClick()"
 ></div>
 <div
   class="alert-container"
-  [@state]="alert.state"
+  [class.rw-alert-visible]="alert.state === 'show'"
   [class.attention]="alert.isAttention"
   [style.maxWidth.px]="alert.width"
   >

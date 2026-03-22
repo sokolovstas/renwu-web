@@ -1,12 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Output, Renderer2, TemplateRef, inject } from '@angular/core';
 
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { NgTemplateOutlet } from '@angular/common';
 import { JSONUtils } from '@renwu/utils';
 
@@ -24,25 +17,6 @@ import {
   imports: [NgTemplateOutlet],
   templateUrl: './dropdown.component.html',
   styleUrl: './dropdown.component.scss',
-  animations: [
-    trigger('opacityAnim', [
-      state(
-        'show',
-        style({
-          opacity: 1,
-        }),
-      ),
-      state(
-        'void',
-        style({
-          opacity: 0,
-        }),
-      ),
-
-      transition('void => show', animate('150ms ease-out')),
-      transition('show => void', animate('150ms ease-out')),
-    ]),
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwDropDownComponent implements OnDestroy {

@@ -1,20 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MessageCounterComponent } from './message/counter/counter.component';
+import { MessageCounterComponent } from './counter.component';
 
 describe('MessageCounterComponent', () => {
   let component: MessageCounterComponent;
   let fixture: ComponentFixture<MessageCounterComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule],
-      declarations: [MessageCounterComponent],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MessageCounterComponent],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MessageCounterComponent);

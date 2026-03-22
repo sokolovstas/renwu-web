@@ -1,1 +1,7 @@
-<span #container [innerHtml]="text"></span>
+<span
+  #container
+  class="rw-tooltip-inner"
+  animate.enter="rw-tooltip-enter"
+  animate.leave="rw-tooltip-leave"
+  [innerHTML]="text"
+></span>

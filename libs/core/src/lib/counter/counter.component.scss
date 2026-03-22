@@ -54,3 +54,30 @@
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+@keyframes rw-counter-enter {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.rw-counter-enter {
+  animation: rw-counter-enter 200ms ease;
+}
+
+.rw-counter-enter-skip {
+  animation: none;
+}
+
+.rw-counter-leave {
+  transform: scale(0);
+  transition: transform 200ms ease;
+}
+
+.rw-counter-leave-skip {
+  transition: none;
+}

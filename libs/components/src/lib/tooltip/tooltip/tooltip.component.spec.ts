@@ -1,21 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TooltipComponent } from './tooltip.component';
+import { RwTooltipComponent } from './tooltip.component';
 
-describe('TooltipComponent', () => {
-  let component: TooltipComponent;
-  let fixture: ComponentFixture<TooltipComponent>;
+describe('RwTooltipComponent', () => {
+  let component: RwTooltipComponent;
+  let fixture: ComponentFixture<RwTooltipComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      imports: [BrowserAnimationsModule],
-      declarations: [TooltipComponent],
+      imports: [RwTooltipComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TooltipComponent);
+    fixture = TestBed.createComponent(RwTooltipComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

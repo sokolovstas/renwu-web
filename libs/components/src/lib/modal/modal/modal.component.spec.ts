@@ -1,20 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ShortcutServiceStub } from '../../../../test/shortcut-service-stub';
-import { ShortcutService } from '../../../shortcut/shortcut.service';
+import { ShortcutServiceStub } from '../../../test/shortcut-service-stub';
+import { RwShortcutService } from '../../shortcut/shortcut.service';
 import { RwModalService } from '../modal.service';
-import { ModalComponent } from './modal.component';
+import { RwModalComponent } from './modal.component';
 
-describe('ModalComponent', () => {
-  let component: ModalComponent;
-  let fixture: ComponentFixture<ModalComponent>;
+describe('RwModalComponent', () => {
+  let component: RwModalComponent;
+  let fixture: ComponentFixture<RwModalComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      imports: [BrowserAnimationsModule],
-      declarations: [ModalComponent],
+      imports: [RwModalComponent],
       providers: [
         {
           provide: RwModalService,
@@ -28,7 +26,7 @@ describe('ModalComponent', () => {
           },
         },
         {
-          provide: ShortcutService,
+          provide: RwShortcutService,
           useClass: ShortcutServiceStub,
         },
       ],
@@ -37,7 +35,7 @@ describe('ModalComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModalComponent);
+    fixture = TestBed.createComponent(RwModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

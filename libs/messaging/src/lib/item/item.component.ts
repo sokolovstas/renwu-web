@@ -1,10 +1,3 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -68,57 +61,6 @@ import { RwMessageService } from '../message.service';
   styleUrl: './item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  animations: [
-    trigger('readedTransition', [
-      state(
-        'void',
-        style({
-          opacity: '0',
-        }),
-      ),
-      state(
-        '*',
-        style({
-          opacity: '0.5',
-        }),
-      ),
-      transition('* => void', animate('3000ms ease')),
-    ]),
-    trigger('setCheck', [
-      state(
-        'void',
-        style({
-          opacity: '0',
-          transform: 'scale(2)',
-        }),
-      ),
-      state(
-        '*',
-        style({
-          opacity: '1',
-          transform: 'scale(1)',
-        }),
-      ),
-      transition('* => void', animate('500ms ease')),
-      transition('void => *', animate('500ms ease')),
-    ]),
-    trigger('newMessage', [
-      state(
-        'void',
-        style({
-          opacity: '0',
-        }),
-      ),
-      state(
-        '*',
-        style({
-          opacity: '1',
-        }),
-      ),
-      transition('* => void', animate('200ms ease')),
-      transition('void => *', animate('200ms ease')),
-    ]),
-  ],
 })
 export class MessageItemComponent implements OnDestroy {
   private el = inject(ElementRef);

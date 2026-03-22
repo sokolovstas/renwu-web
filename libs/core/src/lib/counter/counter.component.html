@@ -1,7 +1,8 @@
 @if (!showOne) {
   @if (destination?.unreadCount | async) {
     <div
-      [@transition]="'SHOW'"
+      [animate.enter]="skipBadgeAnimation ? 'rw-counter-enter-skip' : 'rw-counter-enter'"
+      [animate.leave]="skipBadgeAnimation ? 'rw-counter-leave-skip' : 'rw-counter-leave'"
       class="unread-count"
       (click.stop)="unreadClick.next()"
       [class.both]="destination.pulseCount | async"
@@ -13,7 +14,8 @@
   }
   @if (destination?.pulseCount | async) {
     <div
-      [@transition]="'SHOW'"
+      [animate.enter]="skipBadgeAnimation ? 'rw-counter-enter-skip' : 'rw-counter-enter'"
+      [animate.leave]="skipBadgeAnimation ? 'rw-counter-leave-skip' : 'rw-counter-leave'"
       class="pulse-count"
       (click.stop)="pulseClick.next()"
       [class.both]="destination.unreadCount | async"
@@ -27,7 +29,8 @@
 @if (showOne) {
   @if (destination?.unreadCount | async) {
     <div
-      [@transition]="'SHOW'"
+      [animate.enter]="skipBadgeAnimation ? 'rw-counter-enter-skip' : 'rw-counter-enter'"
+      [animate.leave]="skipBadgeAnimation ? 'rw-counter-leave-skip' : 'rw-counter-leave'"
       (click.stop)="unreadClick.next()"
       class="unread-count"
       [class.allow-mark]="allowMark"
@@ -41,7 +44,8 @@
     (destination?.unreadCount | async) === 0
     ) {
     <div
-      [@transition]="'SHOW'"
+      [animate.enter]="skipBadgeAnimation ? 'rw-counter-enter-skip' : 'rw-counter-enter'"
+      [animate.leave]="skipBadgeAnimation ? 'rw-counter-leave-skip' : 'rw-counter-leave'"
       (click.stop)="pulseClick.next()"
       class="pulse-count"
       [class.allow-mark]="allowMark"

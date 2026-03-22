@@ -25,11 +25,13 @@
 | Шаг | Описание | Статус |
 |-----|----------|--------|
 | 3.1 | Заменить `RouterTestingModule` на `provideRouter` + `provideLocationMocks` в unit-тестах | ✅ |
+| 3.2 | Legacy `@angular/animations` (триггеры в компонентах) → CSS transitions / keyframes + `animate.enter` / `animate.leave` ([руководство](https://angular.dev/guide/animations/migration)) | ✅ |
 
 Детали 3.1: во всех затронутых `*.spec.ts` удалён `RouterTestingModule`; в `TestBed` добавлены `provideRouter(...)` (пустой конфиг или те же маршруты, что были в `withRoutes`) и `provideLocationMocks()` из `@angular/common/testing`.
 
+Детали 3.2: из кода приложения и библиотек убраны `trigger` / `[@…]`; пакет `@angular/animations` удалён из зависимостей. В `apps/federation.config.js` в `skip` добавлены `@angular/platform-browser/animations` и `…/animations/async`, чтобы Native Federation не бандлил вторичные entry points, которые тянут `@angular/animations/browser`.
+
 ## Дальше (вне текущих коммитов)
 
-- Миграция `@angular/animations` → CSS / `animate.enter` / `animate.leave` ([руководство](https://angular.dev/guide/animations/migration)).
 - Опционально: signal `input()` / `output()`, схемы из [Migrations](https://angular.dev/reference/migrations).
 - **Шаблоны и bootstrap (активный контур):** очередь в [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) закрыта (§1.1–§1.4, §2); `apps/old/` в миграцию шаблонов не входит — под переписывание.

@@ -1,27 +1,24 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ShortcutServiceStub } from '../../test/shortcut-service-stub';
-import { ShortcutService } from '../shortcut/shortcut.service';
-import { AlertComponent } from './alert.component';
+import { RwShortcutService } from '../shortcut/shortcut.service';
+import { RwAlertComponent } from './alert.component';
 import { AlertInstance, RwAlertService } from './alert.service';
 
-describe('AlertComponent', () => {
-  let component: AlertComponent;
-  let fixture: ComponentFixture<AlertComponent>;
+describe('RwAlertComponent', () => {
+  let component: RwAlertComponent;
+  let fixture: ComponentFixture<RwAlertComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      imports: [FormsModule, NoopAnimationsModule],
-      declarations: [AlertComponent],
+      imports: [RwAlertComponent],
       providers: [
         {
           provide: RwAlertService,
           useClass: class {},
         },
         {
-          provide: ShortcutService,
+          provide: RwShortcutService,
           useClass: ShortcutServiceStub,
         },
       ],
@@ -30,7 +27,7 @@ describe('AlertComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AlertComponent);
+    fixture = TestBed.createComponent(RwAlertComponent);
     component = fixture.componentInstance;
     component.alert = {} as AlertInstance;
     fixture.detectChanges();

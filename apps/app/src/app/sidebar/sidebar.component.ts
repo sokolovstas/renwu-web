@@ -10,13 +10,6 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -47,26 +40,6 @@ import { RwMessageService } from '@renwu/messaging';
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
-  animations: [
-    trigger('visible', [
-      state(
-        '*',
-        style({
-          opacity: 1,
-          transform: 'scale(1)',
-        }),
-      ),
-      state(
-        'void',
-        style({
-          opacity: 0,
-          transform: 'scale(0.95)',
-        }),
-      ),
-      transition('* => void', animate('250ms ease')),
-      transition('void => *', animate('250ms ease')),
-    ]),
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent implements OnInit {

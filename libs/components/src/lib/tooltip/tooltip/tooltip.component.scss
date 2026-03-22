@@ -20,3 +20,31 @@
   background-color: transparent;
   padding: 0;
 }
+
+.rw-tooltip-inner {
+  display: inline-block;
+}
+
+@keyframes rw-tooltip-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rw-tooltip-enter {
+  animation: rw-tooltip-enter 150ms linear;
+}
+
+.rw-tooltip-leave {
+  opacity: 0;
+  transform: translateY(0) scale(0.95);
+  transition:
+    opacity 150ms linear,
+    transform 150ms linear;
+}

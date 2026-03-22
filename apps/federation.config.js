@@ -24,6 +24,9 @@ function withNativeFederationCommon(config) {
       ...config.shared,
     },
     skip: [
+      // Optional Angular subpaths that import @angular/animations (we use CSS + animate.enter/leave only).
+      '@angular/platform-browser/animations',
+      '@angular/platform-browser/animations/async',
       '@renwu/board',
       '@renwu/todos',
       '@renwu/documents',

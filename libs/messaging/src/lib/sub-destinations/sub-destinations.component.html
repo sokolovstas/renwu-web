@@ -5,8 +5,6 @@
     class="renwu-messaging-sub-destinations__wrapper"
     >
     <div
-      [@.disabled]="true"
-      [@show]="true"
       class="renwu-messaging-sub-destinations__destination"
       [class.selected]="destination === subDestination"
       (click)="onSelectDestination(destination)"
@@ -15,11 +13,13 @@
       <renwu-message-counter
         class="renwu-messaging-sub-destinations__counter"
         [destination]="destination"
+        [skipBadgeAnimation]="true"
       ></renwu-message-counter>
     </div>
     @for (sb of destination?.subDestinations | async; track sb; let i = $index) {
       <div
-        [@show]="true"
+        animate.enter="rw-subdest-enter"
+        animate.leave="rw-subdest-leave"
         class="renwu-messaging-sub-destinations__destination"
         [class.selected]="sb === subDestination"
         (click)="onSelectDestination(sb)"

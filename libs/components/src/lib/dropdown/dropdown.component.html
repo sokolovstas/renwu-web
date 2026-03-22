@@ -1,14 +1,14 @@
 @if (displayBackground) {
   <div
     class="background"
-    [@opacityAnim]="state"
+    [class.rw-dropdown-opacity-visible]="state === 'show'"
     (click)="closeDropdown()"
   ></div>
 }
 <div
   #dropdownContainer
   class="dropdownContainer {{ finalPlacement }} "
-  [@opacityAnim]="state"
+  [class.rw-dropdown-opacity-visible]="state === 'show'"
   >
   <ng-container [ngTemplateOutlet]="dropdownContent"></ng-container>
 </div>

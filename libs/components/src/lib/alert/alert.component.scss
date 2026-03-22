@@ -27,6 +27,17 @@
     top: 0;
     z-index: 1;
     display: block;
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+  }
+
+  &-background.rw-alert-visible {
+    opacity: 1;
+    transition-delay: 0ms;
+  }
+
+  &-background:not(.rw-alert-visible) {
+    transition-delay: 100ms;
   }
 
   &-container {
@@ -41,6 +52,21 @@
     border-radius: 28px;
     z-index: 2;
     box-shadow: $modal-wrapper-box-shadow;
+    opacity: 0;
+    transform: translateY(0) scale(0.95);
+    transition:
+      opacity 200ms ease-out,
+      transform 200ms ease-out;
+
+    &.rw-alert-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition-delay: 100ms;
+    }
+
+    &:not(.rw-alert-visible) {
+      transition-delay: 0ms;
+    }
 
     &-title {
       word-break: break-word;

@@ -16,7 +16,26 @@ rw-modal {
   right: 0;
   top: 0;
   bottom: 0;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+
+  &.create,
+  &.show {
+    opacity: 1;
+  }
+
+  &.close {
+    opacity: 0;
+    transition-delay: 75ms;
+  }
 }
+
+@starting-style {
+  .rw-modal-background.create {
+    opacity: 0;
+  }
+}
+
 .rw-modal-wrapper {
   position: relative;
   display: flex;
@@ -31,6 +50,29 @@ rw-modal {
   height: auto;
   background-color: $rw-modal-background;
   overflow: hidden;
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+
+  &.create {
+    opacity: 0;
+    transform: translateY(0) scale(0.95);
+    transition-delay: 0ms;
+    pointer-events: none;
+  }
+
+  &.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition-delay: 75ms;
+  }
+
+  &.close {
+    opacity: 0;
+    transform: translateY(0) scale(0.95);
+    transition-delay: 0ms;
+    pointer-events: none;
+  }
 }
 
 .rw-modal-title {

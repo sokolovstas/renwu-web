@@ -1,13 +1,6 @@
 import { ChangeDetectorRef, Component, Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewEncapsulation, inject } from '@angular/core';
 import { RwModalService } from '../modal.service';
 
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { RwButtonComponent } from '../../button/button.component';
 import {
   RwShortcutService,
@@ -21,72 +14,6 @@ import {
   templateUrl: './modal.component.html',
   styleUrl: './modal.component.scss',
   encapsulation: ViewEncapsulation.None,
-  animations: [
-    trigger('state', [
-      state(
-        'void',
-        style({
-          opacity: 0,
-          transform: 'translateY(0) scale(0.95)',
-        }),
-      ),
-      state(
-        'create',
-        style({
-          opacity: 0,
-          transform: 'translateY(0) scale(0.95)',
-        }),
-      ),
-      state(
-        'show',
-        style({
-          opacity: 1,
-          transform: 'translateY(0) scale(1)',
-        }),
-      ),
-      state(
-        'close',
-        style({
-          opacity: 0,
-          transform: 'translateY(0) scale(0.95)',
-        }),
-      ),
-      transition('void => create', animate('0ms')),
-      transition('void => show', animate('150ms 75ms ease-out')),
-      transition('create => show', animate('150ms 75ms ease-out')),
-      transition('show => close', animate('150ms ease-out')),
-    ]),
-    trigger('backgroundState', [
-      state(
-        'void',
-        style({
-          opacity: 0,
-        }),
-      ),
-      state(
-        'create',
-        style({
-          opacity: 1,
-        }),
-      ),
-      state(
-        'show',
-        style({
-          opacity: 1,
-        }),
-      ),
-      state(
-        'close',
-        style({
-          opacity: 0,
-        }),
-      ),
-      transition('void => create', animate('150ms ease-out')),
-      transition('void => show', animate('150ms ease-out')),
-      transition('create => show', animate('0ms')),
-      transition('show => close', animate('150ms 75ms ease-out')),
-    ]),
-  ],
 })
 export class RwModalComponent implements OnInit, OnDestroy {
   modalService = inject(RwModalService);

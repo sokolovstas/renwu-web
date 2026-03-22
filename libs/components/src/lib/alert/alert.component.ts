@@ -1,14 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { AlertButton, AlertInstance, RwAlertService } from './alert.service';
 
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
-
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwButtonComponent } from '../button/button.component';
@@ -29,42 +21,6 @@ import { RwTextInputComponent } from '../text-input/text-input.component';
 ],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.scss',
-  animations: [
-    trigger('state', [
-      state(
-        'void',
-        style({
-          opacity: 0,
-          transform: 'translateY(0) scale(0.95)',
-        }),
-      ),
-      state(
-        'show',
-        style({
-          opacity: 1,
-          transform: 'translateY(0) scale(1)',
-        }),
-      ),
-      transition('void => show', animate('200ms 100ms ease-out')),
-      transition('show => void', animate('200ms ease-out')),
-    ]),
-    trigger('backgroundState', [
-      state(
-        'void',
-        style({
-          opacity: 0,
-        }),
-      ),
-      state(
-        'show',
-        style({
-          opacity: 1,
-        }),
-      ),
-      transition('void => show', animate('200ms ease-out')),
-      transition('show => void', animate('200ms 100ms ease-out')),
-    ]),
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RwAlertComponent implements OnInit, OnDestroy {

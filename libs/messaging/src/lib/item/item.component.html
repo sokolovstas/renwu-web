@@ -1,7 +1,7 @@
 @if (message && message.new | async) {
   <div
     class="renwu-messaging-item__new-messages"
-    [@readedTransition]="'ok'"
+    animate.leave="rw-readed-leave"
     >
     <div class="renwu-messaging-item__new-messages__line"></div>
     <div class="renwu-messaging-item__new-messages__text">
@@ -156,13 +156,17 @@
         }
         <div class="renwu-messaging-item__message-wrapper__reads">
           @if (message.read?.length > 0) {
-            <rw-icon
-              [@setCheck]="true"
-              icon="check"
-              size="small"
-              class="renwu-messaging-item__message-wrapper__read-icon"
+            <span
+              class="renwu-messaging-item__message-wrapper__read-icon-wrap"
+              animate.enter="rw-read-check-enter"
+              animate.leave="rw-read-check-leave"
               >
-            </rw-icon>
+              <rw-icon
+                icon="check"
+                size="small"
+                class="renwu-messaging-item__message-wrapper__read-icon"
+              ></rw-icon>
+            </span>
           }
           @if (message.read?.length > 1) {
             <div
@@ -245,7 +249,8 @@
     @case (MessageType.PULSE) {
       @if (message.newsData || message.text) {
   <div
-    [@newMessage]="!!message"
+    animate.enter="rw-new-message-enter"
+    animate.leave="rw-new-message-leave"
     class="renwu-messaging-item__pulse"
     >
     <rw-icon class="renwu-messaging-item__pulse__icon" icon="pulse" size="large">
