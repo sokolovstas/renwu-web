@@ -1,4 +1,6 @@
 @if (issueService.issue | async) {
+  @let isNew = issueService.newIssue | async;
+  @let isFavorite = issueService.favorite | async;
   <div class="w-full h-full overflow-x-hidden">
     <form
       [formGroup]="issueService.issueForm"
@@ -10,10 +12,10 @@
         <div class="flex flex-row w-full items-center">
           <span
             class="text-2xl whitespace-nowrap"
-            [class.mb-2]="issueService.newIssue | async"
+            [class.mb-2]="isNew"
             [style.color]="issueService.issueForm.value.status?.color"
             >{{
-            (issueService.newIssue | async)
+            isNew
             ? ('task.add_new_task' | transloco)
             : issueService.issueForm.value.key
             }}</span
@@ -33,21 +35,21 @@
                 }
               </div>
               <div class="gap-2 flex flex-row">
-                @if ((issueService.favorite | async) === false) {
+                @if (isFavorite === false) {
                   <rw-button
                     typeButton="icon"
                     (clicked)="addToFav()"
                     iconClass="favorite-0"
                   ></rw-button>
                 }
-                @if (issueService.favorite | async) {
+                @if (isFavorite) {
                   <rw-button
                     typeButton="icon"
                     (clicked)="removeFromFav()"
                     iconClass="favorite-1"
                   ></rw-button>
                 }
-                @if ((issueService.newIssue | async) === false) {
+                @if (isNew === false) {
                   <rw-button
                     typeButton="icon"
                     (clicked)="remove()"
@@ -61,12 +63,12 @@
                 ></rw-button>
               </div>
             </div>
-            @if ((issueService.newIssue | async) === false) {
+            @if (isNew === false) {
               <rw-text-input
                 #title
                 [required]="true"
                 class="w-full"
-                [live]="issueService.newIssue | async"
+                [live]="isNew"
                 [borderless]="true"
                 [multiline]="true"
                 formControlName="title"
@@ -75,13 +77,13 @@
           </div>
           <div class="flex flex-col w-full h-full overflow-y-auto relative">
             <div class="grid grid-cols-2 gap-2 p-2 w-full">
-              @if (issueService.newIssue | async) {
+              @if (isNew) {
                 <rw-text-input
                   #title
                   [required]="true"
                   class="col-span-2"
                   prompt="{{ 'task.title' | transloco }}"
-                  [live]="issueService.newIssue | async"
+                  [live]="isNew"
                   formControlName="title"
                 ></rw-text-input>
               }
@@ -112,21 +114,23 @@
                 formControlName="priority"
                 [prompt]="'task.priority' | transloco"
               ></rw-select>
-              @if ((issueService.newIssue | async) === false) {
-                <rw-select
-                  class=""
-                  [model]="transitionSelectModel"
-                  formControlName="status"
-                  [prompt]="'task.status' | transloco"
-                ></rw-select>
-              }
-              @if (issueService.newIssue | async) {
-                <rw-select
-                  class=""
-                  modelName="Status"
-                  formControlName="status"
-                  [prompt]="'task.status' | transloco"
-                ></rw-select>
+              @switch (isNew) {
+                @case (false) {
+                  <rw-select
+                    class=""
+                    [model]="transitionSelectModel"
+                    formControlName="status"
+                    [prompt]="'task.status' | transloco"
+                  ></rw-select>
+                }
+                @case (true) {
+                  <rw-select
+                    class=""
+                    modelName="Status"
+                    formControlName="status"
+                    [prompt]="'task.status' | transloco"
+                  ></rw-select>
+                }
               }
               <rw-select
                 class=""
@@ -177,42 +181,44 @@
                 }
               </div>
             </div>
-            @if ((issueService.newIssue | async) === false) {
-              <div class="mt-4 mx-4 font-extralight text-2xl mb-2">
-                {{ 'task.comments' | transloco }}
-              </div>
-              <renwu-messaging-thread
-                [destination]="thread | async"
-                [noScroll]="true"
+            @switch (isNew) {
+              @case (false) {
+                <div class="mt-4 mx-4 font-extralight text-2xl mb-2">
+                  {{ 'task.comments' | transloco }}
+                </div>
+                <renwu-messaging-thread
+                  [destination]="thread | async"
+                  [noScroll]="true"
                 >
-              </renwu-messaging-thread>
-              <renwu-messaging-input
-                class="pb-2"
-                [destination]="thread | async"
-              ></renwu-messaging-input>
-            }
-            @if (issueService.newIssue | async) {
-              <div
-                class="flex justify-center w-full mb-6 md:mb-4 mt-8"
+                </renwu-messaging-thread>
+                <renwu-messaging-input
+                  class="pb-2"
+                  [destination]="thread | async"
+                ></renwu-messaging-input>
+              }
+              @case (true) {
+                <div
+                  class="flex justify-center w-full mb-6 md:mb-4 mt-8"
                 >
-                <rw-button
-                  class="mr-4"
-                  [disabled]="
-                  (issueService.issueForm.statusChanges | async) !== 'VALID'
-                  "
-                  (clicked)="create(false)"
-                  >{{ 'task.create' | transloco }}</rw-button
+                  <rw-button
+                    class="mr-4"
+                    [disabled]="
+                      (issueService.issueForm.statusChanges | async) !== 'VALID'
+                    "
+                    (clicked)="create(false)"
+                    >{{ 'task.create' | transloco }}</rw-button
                   >
                   <rw-button
                     class=""
                     (clicked)="create(true)"
                     [disabled]="
-                    (issueService.issueForm.statusChanges | async) !== 'VALID'
+                      (issueService.issueForm.statusChanges | async) !== 'VALID'
                     "
                     >{{ 'task.create-and-add-another' | transloco }}</rw-button
-                    >
-                  </div>
-                }
+                  >
+                </div>
+              }
+            }
               </div>
             </form>
           </div>

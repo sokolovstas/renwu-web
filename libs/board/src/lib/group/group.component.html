@@ -49,11 +49,7 @@
           issue) {
           <a
             >
-            @if (
-              config.view.id === 'cards-v' ||
-              config.view.id === 'cards-h' ||
-              config.view.id === 'cards-hw'
-              ) {
+            @if (isCardLayoutView(config.view.id)) {
               <renwu-boards-card
                 [issue]="issue"
                 [type]="config.type.id"

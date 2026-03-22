@@ -46,8 +46,6 @@
         </div>
         @if (range) {
           <div class="separator"></div>
-        }
-        @if (range) {
           <div class="date-time-wrapper">
             <rw-text-input [(ngModel)]="labelEnd"></rw-text-input>
             <rw-calendar
@@ -65,8 +63,6 @@
         }
         @if (range && helpers) {
           <div class="separator"></div>
-        }
-        @if (range && helpers) {
           <div class="helpers-buttons">
             <div class="helpers">
               <div class="helper-column">
@@ -76,32 +72,26 @@
                     (clicked)="setRelative('-3h', 'now')"
                     [disabled]="!!minDate || !!maxDate"
                     >{{ 'components.last-3-hours' | transloco }}</rw-button
-                    >
-                  }
-                  @if (showTime) {
-                    <rw-button
-                      typeButton="link"
-                      (clicked)="setRelative('-6h', 'now')"
-                      [disabled]="!!minDate || !!maxDate"
-                      >{{ 'components.last-6-hours' | transloco }}</rw-button
-                      >
-                    }
-                    @if (showTime) {
-                      <rw-button
-                        typeButton="link"
-                        (clicked)="setRelative('-12h', 'now')"
-                        [disabled]="!!minDate || !!maxDate"
-                        >{{ 'components.last-12-hours' | transloco }}</rw-button
-                        >
-                      }
-                      @if (showTime) {
-                        <rw-button
-                          typeButton="link"
-                          (clicked)="setRelative('-24h', 'now')"
-                          [disabled]="!!minDate || !!maxDate"
-                          >{{ 'components.last-24-hours' | transloco }}</rw-button
-                          >
-                        }
+                  >
+                  <rw-button
+                    typeButton="link"
+                    (clicked)="setRelative('-6h', 'now')"
+                    [disabled]="!!minDate || !!maxDate"
+                    >{{ 'components.last-6-hours' | transloco }}</rw-button
+                  >
+                  <rw-button
+                    typeButton="link"
+                    (clicked)="setRelative('-12h', 'now')"
+                    [disabled]="!!minDate || !!maxDate"
+                    >{{ 'components.last-12-hours' | transloco }}</rw-button
+                  >
+                  <rw-button
+                    typeButton="link"
+                    (clicked)="setRelative('-24h', 'now')"
+                    [disabled]="!!minDate || !!maxDate"
+                    >{{ 'components.last-24-hours' | transloco }}</rw-button
+                  >
+                }
                         <rw-button
                           typeButton="link"
                           (clicked)="setRelative('-2d', 'now')"

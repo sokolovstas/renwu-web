@@ -14,6 +14,7 @@
 | 2026-03-21 | **§1.2:** `dropdown` / `select` — микросинтаксис `*ngTemplateOutlet` заменён на `[ngTemplateOutlet]` и при необходимости `[ngTemplateOutletContext]`; в активных `.html` `*ngTemplateOutlet` не остаётся. **§1.4:** `select.component.html` — `@let` для `selected` / `emptyItem` в дефолтном шаблоне строки; `@defer (when opened)` только вокруг `.rw-select-options` (поиск и `#input` снаружи — стабильный `ViewChild` и `focusOnInput`); плейсхолдер `.rw-select-defer-placeholder` в `select.component.scss`. |
 | 2026-03-21 | **Закрытие очереди шаблонов:** §1.4 без открытых чекбоксов — дальнейший `@defer`/`@let` только по отдельным задачам. **§1.7** зафиксирован как **вне объёма**: `apps/old/` не мигрируем (под переписывание). Инвентарь §1.6 пересчитан: **116** `.html` в активном контуре. |
 | 2026-03-21 | **§1.5 → §1.3:** `settings/user.component.html` — действия под формой: `@switch (user.status)` (`DELETED` / `@default`), в `@default` кнопка приглашения только при `PENDING`; используется `user` из внешнего `@if`, без повторных подписок на `editedUser`. |
+| 2026-03-21 | **§1.5 (пакет):** `dictionary`: `@let dictName` + `@switch (dictName)` для ветки `'status'` (шапка таблицы, строки, подсказки). `task/detail`: `@let isNew` / `isFavorite`, `@switch (isNew)` для статуса, комментариев и кнопок создания. `date-picker`: один `@if` вместо дублей для `range`, `range && helpers`, четыре кнопки «часы» в одном `@if (showTime)`. `board/group`: `isCardLayoutView()` вместо тройного сравнения `config.view.id` в шаблоне. |
 
 ---
 
@@ -73,6 +74,10 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 | `libs/core/src/lib/issue/history-item/history-item.component.html` | `@switch (value.type)` и `@switch (field.field_name)` + пустой `@default` для неизвестных полей | [x] |
 | `libs/messaging/src/lib/item/item.component.html` | `@switch (message.type ?? MessageType.REGULAR)` — `@case` REGULAR (бывший `!type`) и PULSE | [x] |
 | `apps/settings/src/app/user/user.component.html` | `@switch (user.status)`: `@case` DELETED (restore), `@default` (delete + `@if` PENDING для invite) | [x] |
+| `apps/settings/src/app/dictionary/dictionary.component.html` | `@let dictName`; `@switch (dictName)` / `@case ('status')` вместо трёх однотипных `@if` по имени словаря | [x] |
+| `apps/task/src/app/detail/detail.component.html` | `@let isNew`, `isFavorite`; `@switch (isNew)` для выбора статуса и блока комментариев / «Создать» | [x] |
+| `libs/components/src/lib/date-picker/date-picker.component.html` | Один `@if` на `range` и на `range && helpers` вместо пар дублей; кнопки «последние N часов» в одном `@if (showTime)` | [x] |
+| `libs/board/src/lib/group/group.component.html` | `isCardLayoutView(viewId)` в TS вместо тройного сравнения в шаблоне | [x] |
 
 ### 1.4 `@defer` и `@let`
 
@@ -88,13 +93,13 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 |----------------|------|
 | ~518 | `libs/core/src/lib/issue/history-item/history-item.component.html` |
 | ~355 | `libs/messaging/src/lib/item/item.component.html` |
-| ~219 | `apps/task/src/app/detail/detail.component.html` |
-| ~210 | `libs/components/src/lib/date-picker/date-picker.component.html` |
+| ~225 | `apps/task/src/app/detail/detail.component.html` *(§1.3: `@let` + `@switch` по `isNew`)* |
+| ~200 | `libs/components/src/lib/date-picker/date-picker.component.html` *(уплотнены дубли `@if` для `range` / helpers / `showTime`)* |
 | ~184 | `libs/components/src/lib/select/select.component.html` |
 | ~158 | `apps/settings/src/app/user/user.component.html` *(§1.3: `@switch` по `user.status` для кнопок)* |
-| ~146 | `apps/settings/src/app/dictionary/dictionary.component.html` |
+| ~153 | `apps/settings/src/app/dictionary/dictionary.component.html` *(§1.3: `@let` + `@switch` для `'status'`)* |
 | ~145 | `libs/core/src/lib/issue-table/issue-table.component.html` |
-| ~128 | `libs/board/src/lib/group/group.component.html` |
+| ~124 | `libs/board/src/lib/group/group.component.html` *(`isCardLayoutView` в TS вместо тройного `===` в шаблоне)* |
 
 ### 1.6 Полный инвентарь `.html` (116 файлов, активный контур)
 

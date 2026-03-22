@@ -221,4 +221,12 @@ export class BoardGroupComponent {
     this.cd.markForCheck();
     this.settingsService.user.settings.open_index_group = openIndexGroup;
   }
+
+  isCardLayoutView(viewId: string | undefined): boolean {
+    return (
+      viewId === 'cards-v' ||
+      viewId === 'cards-h' ||
+      viewId === 'cards-hw'
+    );
+  }
 }
