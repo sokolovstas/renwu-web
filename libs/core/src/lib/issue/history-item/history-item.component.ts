@@ -1,5 +1,11 @@
-
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  inject,
+  input,
+} from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwDatePipe,
   RwDurationToStringPipe,
@@ -21,6 +27,8 @@ import {
   TimeLogsValue,
 } from '../issue.model';
 
+export type LinkKindKey = 'next' | 'prev' | 'related' | 'parent';
+
 @Component({
   selector: 'renwu-issue-history-item',
   standalone: true,
@@ -32,8 +40,9 @@ import {
     IssueTypeComponent,
     RwFormatUserPipe,
     RwDurationToStringPipe,
-    RwDatePipe
-],
+    RwDatePipe,
+    TranslocoPipe,
+  ],
   templateUrl: './history-item.component.html',
   styleUrl: './history-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,14 +50,12 @@ import {
 export class IssueHistoryItemComponent {
   settingsService = inject(RwSettingsService);
 
-  // FIXME
-  @Input()
-  value: IssueChangeEvent | PulseIssueChangeEvent;
+  readonly value = input.required<IssueChangeEvent | PulseIssueChangeEvent>();
 
   @Input()
   showSource = true;
 
-  // FIXME: TEMP WORKAROUND to use json and native mongo objects
+  /** Field id key when comparing list changes (`id` vs Mongo `_id`). */
   @Input()
   idField = 'id';
 
@@ -312,31 +319,31 @@ export class IssueHistoryItemComponent {
     const rows: LinkChangeRow[] = [];
     const push = (
       isAdd: boolean,
-      linkKindLabel: string,
-      issue: IssueLink | undefined,
+      linkKindKey: LinkKindKey,
+      issue: Pick<IssueLink, 'key' | 'title'> | undefined,
     ) => {
       if (issue) {
         rows.push({
           isAdd,
-          linkKindLabel,
+          linkKindKey,
           issue,
-          trackId: `${isAdd}:${linkKindLabel}:${issue.key}`,
+          trackId: `${isAdd}:${linkKindKey}:${issue.key}`,
         });
       }
     };
-    push(true, 'next link', diff.next?.added);
-    push(false, 'next link', diff.next?.removed);
-    push(true, 'previous link', diff.prev?.added);
-    push(false, 'previous link', diff.prev?.removed);
-    push(true, 'related link', diff.related?.added);
-    push(false, 'related link', diff.related?.removed);
-    push(true, 'parent link', diff.parent?.added);
-    push(false, 'parent link', diff.parent?.removed);
+    push(true, 'next', diff.next?.added);
+    push(false, 'next', diff.next?.removed);
+    push(true, 'prev', diff.prev?.added);
+    push(false, 'prev', diff.prev?.removed);
+    push(true, 'related', diff.related?.added);
+    push(false, 'related', diff.related?.removed);
+    push(true, 'parent', diff.parent?.added);
+    push(false, 'parent', diff.parent?.removed);
     return rows;
   }
 
   hasRenderableFieldChanges(): boolean {
-    const v = this.value;
+    const v = this.value();
     if (!v?.fields_changes?.length) {
       return false;
     }
@@ -350,32 +357,33 @@ export class IssueHistoryItemComponent {
   }
 
   canDisplay(): boolean {
-    if (!this.value) {
+    const v = this.value();
+    if (!v) {
       return false;
     }
     if (
-      this.value.type === 'issue_favorite' ||
-      this.value.type === 'issue_unfavorite' ||
-      this.value.type === 'issue_create' ||
-      this.value.type === 'issue_delete'
+      v.type === 'issue_favorite' ||
+      v.type === 'issue_unfavorite' ||
+      v.type === 'issue_create' ||
+      v.type === 'issue_delete'
     ) {
       return true;
     }
     if (
-      (this.value.type === undefined ||
-        this.value.type === 'issue_update' ||
-        this.value.type === 'issue_timelog' ||
-        this.value.type === 'issue_transition') &&
-      this.value.fields_changes &&
-      this.value.fields_changes.length > 0
+      (v.type === undefined ||
+        v.type === 'issue_update' ||
+        v.type === 'issue_timelog' ||
+        v.type === 'issue_transition') &&
+      v.fields_changes &&
+      v.fields_changes.length > 0
     ) {
       return true;
     }
     if (
-      (this.value.type === 'issue_update' ||
-        this.value.type === 'issue_timelog' ||
-        this.value.type === 'issue_transition') &&
-      !this.value.fields_changes
+      (v.type === 'issue_update' ||
+        v.type === 'issue_timelog' ||
+        v.type === 'issue_transition') &&
+      !v.fields_changes
     ) {
       return true;
     }
@@ -410,7 +418,7 @@ export interface LinksDiff {
 
 export interface LinkChangeRow {
   isAdd: boolean;
-  linkKindLabel: string;
-  issue: IssueLink;
+  linkKindKey: LinkKindKey;
+  issue: Pick<IssueLink, 'key' | 'title'>;
   trackId: string;
 }

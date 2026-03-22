@@ -3,413 +3,603 @@
     @if (showAuthor || showTime) {
       <div class="author-time-source">
         <div class="author-source">
-          @if (value.source_id && value.source && showSource) {
+          @if (value().source_id && value().source && showSource) {
             <renwu-issue-href
               class="source"
-              [issue]="value.source"
+              [issue]="value().source"
               [linkButton]="true"
               [copyOnDoubleClick]="true"
-              [key]="value.source.key"
-              [title]="value.source.title"
-              >
+              [key]="value().source.key"
+              [title]="value().source.title"
+            >
             </renwu-issue-href>
           }
-          {{ value.author | rwFormatUser }}
+          {{ value().author | rwFormatUser }}
         </div>
         @if (showTime) {
           <div
             class="time"
-            [rwTooltip]="value.date | rwDate: 'PPP pp'"
-            >
-            {{ value.date | rwDate: settingsService.user.relativeDateFormat }}
+            [rwTooltip]="value().date | rwDate: 'PPP pp'"
+          >
+            {{ value().date | rwDate: settingsService.user.relativeDateFormat }}
           </div>
         }
       </div>
     }
     <div class="changes">
-      @switch (value.type) {
+      @switch (value().type) {
         @case ('issue_favorite') {
           <div class="change">
-            <div><span>Add to favorites</span></div>
+            <div>
+              <span>{{ 'core.history-item-add-to-favorites' | transloco }}</span>
+            </div>
           </div>
         }
         @case ('issue_unfavorite') {
           <div class="change">
-            <div><span>Remove from favorites</span></div>
+            <div>
+              <span>{{ 'core.history-item-remove-from-favorites' | transloco }}</span>
+            </div>
           </div>
         }
         @case ('issue_create') {
           <div class="change">
             <div>
-              <span>Create <span class="field-name">task</span></span>
+              <span
+                >{{ 'core.history-item-create' | transloco }}
+                <span class="field-name">{{
+                  'core.history-item-field-task' | transloco
+                }}</span></span
+              >
             </div>
           </div>
         }
         @case ('issue_delete') {
           <div class="change">
             <div>
-              <span>Delete <span class="field-name">task</span></span>
+              <span
+                >{{ 'core.history-item-delete' | transloco }}
+                <span class="field-name">{{
+                  'core.history-item-field-task' | transloco
+                }}</span></span
+              >
             </div>
           </div>
         }
         @default {
           @if (hasRenderableFieldChanges()) {
-            @for (field of value.fields_changes; track $index) {
+            @for (field of value().fields_changes; track $index) {
               @switch (field.field_name) {
                 @case ('status') {
-            <div class="change">
-              <div>Set <span class="field-name">status</span> to</div>
-              <!-- &nbsp;<issue-status [value]="value.fields_changes[0].old_value"></issue-status>&nbsp;
-              <div>to</div> -->
-              &nbsp;&nbsp;<renwu-issue-status
-              [value]="field.new_value"
-              ></renwu-issue-status
-              >&nbsp;
-            </div>
-          }
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-status' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;&nbsp;<renwu-issue-status
+                      [value]="field.new_value"
+                    ></renwu-issue-status
+                    >&nbsp;
+                  </div>
+                }
                 @case ('estimated_time') {
-            <div class="change">
-              <div>Set <span class="field-name">estimated time</span> to</div>
-              <!-- &nbsp;<div>"{{field.old_value.duration/1000000 | rwDurationToString}}"</div>&nbsp;
-              <div>to</div> -->
-              <div class="field-value">
-                &nbsp;{{
-                field.new_value.duration / 1000 | rwDurationToString
-                }}&nbsp;
-              </div>
-            </div>
-          }
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-estimated-time' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    <div class="field-value">
+                      &nbsp;{{
+                        field.new_value.duration / 1000 | rwDurationToString
+                      }}&nbsp;
+                    </div>
+                  </div>
+                }
                 @case ('completion') {
-            <div class="change">
-              <div>Set <span class="field-name">completion</span> to</div>
-              <!-- &nbsp;<div>"{{field.old_value.duration/1000000 | rwDurationToString}}"</div>&nbsp;
-              <div>to</div> -->
-              &nbsp;
-              <div class="field-value">{{ field.new_value }}%</div>
-              &nbsp;
-            </div>
-          }
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-completion' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;
+                    <div class="field-value">{{ field.new_value }}%</div>
+                    &nbsp;
+                  </div>
+                }
                 @case ('type') {
-            <div class="change">
-              <div>Set <span class="field-name">type</span> to</div>
-              <!-- &nbsp;<issue-type [value]="field.old_value"></issue-type>&nbsp;
-              <div>to</div> -->
-              &nbsp;<renwu-issue-type
-              [withLabel]="true"
-              [value]="field.new_value"
-              ></renwu-issue-type
-              >&nbsp;
-            </div>
-          }
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-type' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;<renwu-issue-type
+                      [withLabel]="true"
+                      [value]="field.new_value"
+                    ></renwu-issue-type
+                    >&nbsp;
+                  </div>
+                }
                 @case ('priority') {
-            <div class="change">
-              <div>Set <span class="field-name">priority</span> to</div>
-              <!-- &nbsp;<issue-priority [value]="field.old_value"></issue-priority>&nbsp;
-              <div>to</div> -->
-              &nbsp;<renwu-issue-priority
-              [withLabel]="true"
-              [value]="field.new_value"
-              ></renwu-issue-priority
-              >&nbsp;
-            </div>
-          }
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-priority' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;<renwu-issue-priority
+                      [withLabel]="true"
+                      [value]="field.new_value"
+                    ></renwu-issue-priority
+                    >&nbsp;
+                  </div>
+                }
                 @case ('labels') {
-            @if (getAdded(field); as added) {
-              <div class="change">
-                <div>Add <span class="field-name">labels</span></div>
-                :&nbsp;
-                <div class="field-value">{{ added }}</div>
-              </div>
-            }
-            @if (getRemoved(field); as removed) {
-              <div class="change">
-                <div>Remove <span class="field-name">labels</span></div>
-                :&nbsp;
-                <div class="field-value">{{ removed }}</div>
-              </div>
-            }
-          }
-                @case ('affected_versions') {
-            @if (getAdded(field, idField, 'title'); as added) {
-              <div
-                class="change"
-                >
-                <div>Add <span class="field-name">affected version</span></div>
-                :&nbsp;
-                <div class="field-value">{{ added }}</div>
-              </div>
-            }
-            @if (getRemoved(field, idField, 'title'); as removed) {
-              <div
-                class="change"
-                >
-                <div>Remove <span class="field-name">affected version</span></div>
-                :&nbsp;
-                <div class="field-value">{{ removed }}</div>
-              </div>
-            }
-          }
-                @case ('skill') {
-            <div class="change">
-              <div>Set <span class="field-name">skill</span> to</div>
-              <!-- &nbsp;<div>"{{field.old_value}}"</div>&nbsp;
-              <div>to</div> -->
-              &nbsp;
-              <div class="field-value">{{ field.new_value || '---' }}</div>
-              &nbsp;
-            </div>
-          }
-                @case ('assignes') {
-            <div class="change">
-              <div>Set <span class="field-name">assignee</span> to</div>
-              <!-- &nbsp;<div>"{{field.old_value[0] | rwFormatUser}}"</div>&nbsp;
-              <div>to</div> -->
-              &nbsp;
-              <div class="field-value">{{ field.new_value[0] | rwFormatUser }}</div>
-              &nbsp;
-            </div>
-          }
-                @case ('container') {
-            <div class="change">
-              <div>Move to <span class="field-name">project</span></div>
-              &nbsp;
-              <div class="field-value">{{ field.new_value.title }}</div>
-              &nbsp;
-            </div>
-          }
-                @case ('date_start') {
-            <div class="change">
-              <div>Change <span class="field-name">date start</span> to</div>
-              &nbsp;
-              <div class="field-value">
-                {{ field.new_value.time | rwDate: 'LL' }}
-              </div>
-              &nbsp;
-            </div>
-          }
-                @case ('date_end') {
-            <div class="change">
-              <div>Change <span class="field-name">date end</span> to</div>
-              &nbsp;
-              <div class="field-value">
-                {{ field.new_value.time | rwDate: 'LL' }}
-              </div>
-              &nbsp;
-            </div>
-          }
-                @case ('time_logged') {
-            <div class="change">
-              <div>Change <span class="field-name">time logged</span> to</div>
-              &nbsp;
-              <div class="field-value">
-                {{ field.new_value.duration / 1000 | rwDurationToString }}
-              </div>
-              &nbsp;
-            </div>
-          }
-                @case ('milestones') {
-            @if (getAdded(field, idField, 'title'); as added) {
-              <div
-                class="change"
-                >
-                <div>Add <span class="field-name">milestones</span></div>
-                :&nbsp;
-                <div class="field-value">{{ added }}</div>
-              </div>
-            }
-            @if (getRemoved(field, idField, 'title'); as removed) {
-              <div
-                class="change"
-                >
-                <div>Remove <span class="field-name">milestones</span></div>
-                :&nbsp;
-                <div class="field-value">{{ removed }}</div>
-              </div>
-            }
-          }
-                @case ('title') {
-            <div class="change">
-              <div>Change <span class="field-name">title</span></div>
-              : &nbsp;
-              <div
-                class="field-value-description"
-                [innerHtml]="getDescriptionDiff(field)"
-              ></div>
-            </div>
-          }
-                @case ('description') {
-            <div class="change">
-              <div>Change <span class="field-name">description</span></div>
-              : &nbsp;
-              <div
-                class="field-value-description"
-                [innerHtml]="getDescriptionDiff(field)"
-              ></div>
-            </div>
-          }
-                @case ('watchers') {
-            @if (getAdded(field, idField, 'username'); as added) {
-              <div
-                class="change"
-                >
-                <div>Add <span class="field-name">watchers</span></div>
-                :&nbsp;
-                <div class="field-value">{{ added }}</div>
-              </div>
-            }
-            @if (getRemoved(field, idField, 'username'); as removed) {
-              <div
-                class="change"
-                >
-                <div>Remove <span class="field-name">watchers</span></div>
-                :&nbsp;
-                <div class="field-value">{{ removed }}</div>
-              </div>
-            }
-          }
-                @case ('todos') {
-            @if (getToDoDiff(field); as diff) {
-              @if (diff.added) {
-                <div class="change">
-                  <div>Add <span class="field-name">ToDo</span></div>
-                  :&nbsp;
-                  <div class="field-value">{{ diff.added }}</div>
-                </div>
-              }
-              @if (diff.removed) {
-                <div class="change">
-                  <div>Remove <span class="field-name">ToDo</span></div>
-                  :&nbsp;
-                  <div class="field-value">{{ diff.removed }}</div>
-                </div>
-              }
-              @if (diff.done) {
-                <div class="change">
-                  <div>Mark <span class="field-name">ToDo</span> as done</div>
-                  :&nbsp;
-                  <div class="field-value">{{ diff.done }}</div>
-                </div>
-              }
-              @if (diff.undone) {
-                <div class="change">
-                  <div>Mark <span class="field-name">ToDo</span> as not done</div>
-                  :&nbsp;
-                  <div class="field-value">{{ diff.undone }}</div>
-                </div>
-              }
-              @if (diff.text) {
-                <div class="change">
-                  <div>Change <span class="field-name">ToDo</span> text</div>
-                  : &nbsp;
-                  <div
-                    class="field-value-description"
-                    [innerHtml]="diff.text"
-                  ></div>
-                </div>
-              }
-            }
-          }
-                @case ('attachments') {
-            <ng-container class="change">
-              @if (getAdded(field, idField, 'file_name'); as added) {
-                <div
-                  class="change"
-                  >
-                  <div>Add <span class="field-name">attachment</span></div>
-                  :&nbsp;
-                  <div class="field-value">{{ added }}</div>
-                </div>
-              }
-              @if (getRemoved(field, idField, 'file_name'); as removed) {
-                <div
-                  class="change"
-                  >
-                  <div>Remove <span class="field-name">attachment</span></div>
-                  :&nbsp;
-                  <div class="field-value">{{ removed }}</div>
-                </div>
-              }
-            </ng-container>
-          }
-                @case ('auto_scheduling') {
-            @switch (!!field.new_value) {
-              @case (true) {
-                <div class="change">
-                  <div>Set <span class="field-name">scheduling type</span></div>
-                  :&nbsp;
-                  <div class="field-value">AUTO</div>
-                </div>
-              }
-              @default {
-                <div class="change">
-                  <div>Set <span class="field-name">scheduling type</span></div>
-                  :&nbsp;
-                  <div class="field-value">MANUAL</div>
-                </div>
-              }
-            }
-          }
-                @case ('time_logs') {
-            @if (getTimeLogsDiff(field); as diff) {
-              @if (diff.added) {
-                <div class="change">
-                  <div>
-                    Add <span class="field-name">time log</span> with duration
-                  </div>
-                  :&nbsp;
-                  <div class="field-value">
-                    {{ diff.added.value.duration / 1000 | rwDurationToString }}
-                  </div>
-                </div>
-              }
-              @if (diff.removed) {
-                <div class="change">
-                  <div>
-                    Remove <span class="field-name">time log</span> with duration
-                  </div>
-                  :&nbsp;
-                  <div class="field-value">
-                    {{ diff.removed.value.duration / 1000 | rwDurationToString }}
-                  </div>
-                </div>
-              }
-              @if (diff.changed) {
-                <div class="change">
-                  <div>
-                    Change <span class="field-name">time log from</span> ({{
-                    diff.changed.date_created.time | rwDate
-                    }}) duration to
-                  </div>
-                  :&nbsp;
-                  <div class="field-value">
-                    {{ diff.changed.value.duration / 1000 | rwDurationToString }}
-                  </div>
-                </div>
-              }
-            }
-          }
-                @case ('links') {
-            @for (row of linkChangeRows(field); track row.trackId) {
-              <div class="change">
-                <div>
-                  @if (row.isAdd) {
-                    Add <span class="field-name">{{ row.linkKindLabel }}</span> with
-                  } @else {
-                    Remove <span class="field-name">{{ row.linkKindLabel }}</span> with
+                  @if (getAdded(field); as added) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-add' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-labels' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ added }}</div>
+                    </div>
                   }
-                </div>
-                &nbsp;
-                <renwu-issue-href
-                  [issue]="row.issue"
-                  [linkButton]="true"
-                  [copyOnDoubleClick]="true"
-                  [key]="row.issue.key"
-                  [title]="row.issue.title"
-                >
-                </renwu-issue-href>
-              </div>
-            }
-          }
+                  @if (getRemoved(field); as removed) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-remove' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-labels' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ removed }}</div>
+                    </div>
+                  }
+                }
+                @case ('affected_versions') {
+                  @if (getAdded(field, idField, 'title'); as added) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-add' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-affected-version' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ added }}</div>
+                    </div>
+                  }
+                  @if (getRemoved(field, idField, 'title'); as removed) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-remove' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-affected-version' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ removed }}</div>
+                    </div>
+                  }
+                }
+                @case ('skill') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-skill' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;
+                    <div class="field-value">
+                      {{
+                        field.new_value ||
+                          ('core.history-item-empty-value' | transloco)
+                      }}
+                    </div>
+                    &nbsp;
+                  </div>
+                }
+                @case ('assignes') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-set' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-assignee' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;
+                    <div class="field-value">
+                      {{ field.new_value[0] | rwFormatUser }}
+                    </div>
+                    &nbsp;
+                  </div>
+                }
+                @case ('container') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-move-to' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-project' | transloco
+                      }}</span>
+                    </div>
+                    &nbsp;
+                    <div class="field-value">{{ field.new_value.title }}</div>
+                    &nbsp;
+                  </div>
+                }
+                @case ('date_start') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-change' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-date-start' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;
+                    <div class="field-value">
+                      {{ field.new_value.time | rwDate: 'LL' }}
+                    </div>
+                    &nbsp;
+                  </div>
+                }
+                @case ('date_end') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-change' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-date-end' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;
+                    <div class="field-value">
+                      {{ field.new_value.time | rwDate: 'LL' }}
+                    </div>
+                    &nbsp;
+                  </div>
+                }
+                @case ('time_logged') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-change' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-time-logged' | transloco
+                      }}</span>
+                      {{ 'core.history-item-to' | transloco }}
+                    </div>
+                    &nbsp;
+                    <div class="field-value">
+                      {{
+                        field.new_value.duration / 1000 | rwDurationToString
+                      }}
+                    </div>
+                    &nbsp;
+                  </div>
+                }
+                @case ('milestones') {
+                  @if (getAdded(field, idField, 'title'); as added) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-add' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-milestones' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ added }}</div>
+                    </div>
+                  }
+                  @if (getRemoved(field, idField, 'title'); as removed) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-remove' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-milestones' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ removed }}</div>
+                    </div>
+                  }
+                }
+                @case ('title') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-change' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-title' | transloco
+                      }}</span>
+                    </div>
+                    : &nbsp;
+                    <div
+                      class="field-value-description"
+                      [innerHtml]="getDescriptionDiff(field)"
+                    ></div>
+                  </div>
+                }
+                @case ('description') {
+                  <div class="change">
+                    <div>
+                      {{ 'core.history-item-change' | transloco }}
+                      <span class="field-name">{{
+                        'core.history-item-field-description' | transloco
+                      }}</span>
+                    </div>
+                    : &nbsp;
+                    <div
+                      class="field-value-description"
+                      [innerHtml]="getDescriptionDiff(field)"
+                    ></div>
+                  </div>
+                }
+                @case ('watchers') {
+                  @if (getAdded(field, idField, 'username'); as added) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-add' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-watchers' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ added }}</div>
+                    </div>
+                  }
+                  @if (getRemoved(field, idField, 'username'); as removed) {
+                    <div class="change">
+                      <div>
+                        {{ 'core.history-item-verb-remove' | transloco }}
+                        <span class="field-name">{{
+                          'core.history-item-field-watchers' | transloco
+                        }}</span>
+                      </div>
+                      :&nbsp;
+                      <div class="field-value">{{ removed }}</div>
+                    </div>
+                  }
+                }
+                @case ('todos') {
+                  @if (getToDoDiff(field); as diff) {
+                    @if (diff.added) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-verb-add' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-todo' | transloco
+                          }}</span>
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">{{ diff.added }}</div>
+                      </div>
+                    }
+                    @if (diff.removed) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-verb-remove' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-todo' | transloco
+                          }}</span>
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">{{ diff.removed }}</div>
+                      </div>
+                    }
+                    @if (diff.done) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-mark' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-todo' | transloco
+                          }}</span>
+                          {{ 'core.history-item-as-done' | transloco }}
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">{{ diff.done }}</div>
+                      </div>
+                    }
+                    @if (diff.undone) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-mark' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-todo' | transloco
+                          }}</span>
+                          {{ 'core.history-item-as-not-done' | transloco }}
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">{{ diff.undone }}</div>
+                      </div>
+                    }
+                    @if (diff.text) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-change' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-todo' | transloco
+                          }}</span>
+                          {{ 'core.history-item-todo-text-suffix' | transloco }}
+                        </div>
+                        : &nbsp;
+                        <div
+                          class="field-value-description"
+                          [innerHtml]="diff.text"
+                        ></div>
+                      </div>
+                    }
+                  }
+                }
+                @case ('attachments') {
+                  <ng-container>
+                    @if (getAdded(field, idField, 'file_name'); as added) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-verb-add' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-attachment' | transloco
+                          }}</span>
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">{{ added }}</div>
+                      </div>
+                    }
+                    @if (getRemoved(field, idField, 'file_name'); as removed) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-verb-remove' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-attachment' | transloco
+                          }}</span>
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">{{ removed }}</div>
+                      </div>
+                    }
+                  </ng-container>
+                }
+                @case ('auto_scheduling') {
+                  @switch (!!field.new_value) {
+                    @case (true) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-set' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-scheduling-type' | transloco
+                          }}</span>
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">
+                          {{ 'core.history-item-scheduling-auto' | transloco }}
+                        </div>
+                      </div>
+                    }
+                    @default {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-set' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-scheduling-type' | transloco
+                          }}</span>
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">
+                          {{ 'core.history-item-scheduling-manual' | transloco }}
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+                @case ('time_logs') {
+                  @if (getTimeLogsDiff(field); as diff) {
+                    @if (diff.added) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-verb-add' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-time-log' | transloco
+                          }}</span>
+                          {{ 'core.history-item-with-duration' | transloco }}
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">
+                          {{
+                            diff.added.value.duration / 1000
+                              | rwDurationToString
+                          }}
+                        </div>
+                      </div>
+                    }
+                    @if (diff.removed) {
+                      <div class="change">
+                        <div>
+                          {{ 'core.history-item-verb-remove' | transloco }}
+                          <span class="field-name">{{
+                            'core.history-item-field-time-log' | transloco
+                          }}</span>
+                          {{ 'core.history-item-with-duration' | transloco }}
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">
+                          {{
+                            diff.removed.value.duration / 1000
+                              | rwDurationToString
+                          }}
+                        </div>
+                      </div>
+                    }
+                    @if (diff.changed) {
+                      <div class="change">
+                        <div>
+                          {{
+                            'core.history-item-time-log-change-duration'
+                              | transloco
+                                : {
+                                    date:
+                                      (
+                                        diff.changed.date_created.time
+                                        | rwDate
+                                      ),
+                                  }
+                          }}
+                        </div>
+                        :&nbsp;
+                        <div class="field-value">
+                          {{
+                            diff.changed.value.duration / 1000
+                              | rwDurationToString
+                          }}
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+                @case ('links') {
+                  @for (row of linkChangeRows(field); track row.trackId) {
+                    <div class="change">
+                      <div>
+                        @if (row.isAdd) {
+                          {{ 'core.history-item-verb-add' | transloco }}
+                        } @else {
+                          {{ 'core.history-item-verb-remove' | transloco }}
+                        }
+                        <span class="field-name">{{
+                          ('core.history-item-link-kind-' + row.linkKindKey)
+                            | transloco
+                        }}</span>
+                        {{ 'core.history-item-suffix-with' | transloco }}
+                      </div>
+                      &nbsp;
+                      <renwu-issue-href
+                        [issue]="row.issue"
+                        [linkButton]="true"
+                        [copyOnDoubleClick]="true"
+                        [key]="row.issue.key"
+                        [title]="row.issue.title"
+                      >
+                      </renwu-issue-href>
+                    </div>
+                  }
+                }
                 @default {}
               }
             }
