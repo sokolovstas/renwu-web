@@ -13,6 +13,7 @@
 | 2026-03-21 | **§2.3 / §1.3:** удалён закомментированный `libs/mentions/.../mentions.module.ts`; `messaging/item`: `@switch (message.type ?? MessageType.REGULAR)` для веток REGULAR / PULSE. **§1.2** (`*ngTemplateOutlet` в `dropdown` / `select`): осознанно **отложено** — нативной замены в control flow нет; трогать только вместе с редизайном или e2e. |
 | 2026-03-21 | **§1.2:** `dropdown` / `select` — микросинтаксис `*ngTemplateOutlet` заменён на `[ngTemplateOutlet]` и при необходимости `[ngTemplateOutletContext]`; в активных `.html` `*ngTemplateOutlet` не остаётся. **§1.4:** `select.component.html` — `@let` для `selected` / `emptyItem` в дефолтном шаблоне строки; `@defer (when opened)` только вокруг `.rw-select-options` (поиск и `#input` снаружи — стабильный `ViewChild` и `focusOnInput`); плейсхолдер `.rw-select-defer-placeholder` в `select.component.scss`. |
 | 2026-03-21 | **Закрытие очереди шаблонов:** §1.4 без открытых чекбоксов — дальнейший `@defer`/`@let` только по отдельным задачам. **§1.7** зафиксирован как **вне объёма**: `apps/old/` не мигрируем (под переписывание). Инвентарь §1.6 пересчитан: **116** `.html` в активном контуре. |
+| 2026-03-21 | **§1.5 → §1.3:** `settings/user.component.html` — действия под формой: `@switch (user.status)` (`DELETED` / `@default`), в `@default` кнопка приглашения только при `PENDING`; используется `user` из внешнего `@if`, без повторных подписок на `editedUser`. |
 
 ---
 
@@ -71,6 +72,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 | `libs/components/src/lib/calendar/calendar.component.html` | Уже используется `@switch (currentState)` | [x] |
 | `libs/core/src/lib/issue/history-item/history-item.component.html` | `@switch (value.type)` и `@switch (field.field_name)` + пустой `@default` для неизвестных полей | [x] |
 | `libs/messaging/src/lib/item/item.component.html` | `@switch (message.type ?? MessageType.REGULAR)` — `@case` REGULAR (бывший `!type`) и PULSE | [x] |
+| `apps/settings/src/app/user/user.component.html` | `@switch (user.status)`: `@case` DELETED (restore), `@default` (delete + `@if` PENDING для invite) | [x] |
 
 ### 1.4 `@defer` и `@let`
 
@@ -89,7 +91,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 | ~219 | `apps/task/src/app/detail/detail.component.html` |
 | ~210 | `libs/components/src/lib/date-picker/date-picker.component.html` |
 | ~184 | `libs/components/src/lib/select/select.component.html` |
-| ~160 | `apps/settings/src/app/user/user.component.html` |
+| ~158 | `apps/settings/src/app/user/user.component.html` *(§1.3: `@switch` по `user.status` для кнопок)* |
 | ~146 | `apps/settings/src/app/dictionary/dictionary.component.html` |
 | ~145 | `libs/core/src/lib/issue-table/issue-table.component.html` |
 | ~128 | `libs/board/src/lib/group/group.component.html` |

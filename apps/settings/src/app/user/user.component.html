@@ -113,31 +113,29 @@
       </label>
       -->
   </form>
-  @if ((editedUser | async)?.status === UserStatus.DELETED) {
-    <rw-button
-      action
-      (clicked)="restore()"
-      >{{ 'settings.restore' | transloco }}</rw-button
-      >
+  @switch (user.status) {
+    @case (UserStatus.DELETED) {
+      <rw-button action (clicked)="restore()">{{
+        'settings.restore' | transloco
+      }}</rw-button>
     }
-    @if ((editedUser | async)?.status !== UserStatus.DELETED) {
+    @default {
       <rw-button
         action
         (clicked)="deleteUser()"
         [isAttention]="true"
         >{{ 'settings.delete' | transloco }}</rw-button
-        >
-      }
-      @if ((editedUser | async)?.status === UserStatus.PENDING) {
-        <rw-button
-          action
-          (clicked)="copyInviteLink()"
-          >{{ 'settings.invite-link' | transloco }}</rw-button
-          >
-        }
-        <rw-button action (clicked)="saveUser()">{{
-          'settings.save' | transloco
+      >
+      @if (user.status === UserStatus.PENDING) {
+        <rw-button action (clicked)="copyInviteLink()">{{
+          'settings.invite-link' | transloco
         }}</rw-button>
+      }
+    }
+  }
+  <rw-button action (clicked)="saveUser()">{{
+    'settings.save' | transloco
+  }}</rw-button>
         <!--
         work_hours: new FormControl<{ [key: string]: Record<string, never> }>({}),
         settings: new FormGroup({
