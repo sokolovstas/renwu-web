@@ -46,10 +46,11 @@
 </div>
 <rw-dropdown #hintDropdown class="hints-popup" [displayBackground]="true">
   <ng-template #dropdownContent>
+    @let multiHint = multipleSelectHint();
     <div class="hints">
       @for (hint of hints(); track i; let i = $index) {
       <div class="hint" (mousedown)="selectHint(hint)">
-        @if(multipleSelectHint()) {
+        @if (multiHint) {
         <rw-checkbox
           class="hint-option"
           [ngModel]="hint.selected"
@@ -68,7 +69,7 @@
       </div>
       }
     </div>
-    @if(multipleSelectHint()) {
+    @if (multiHint) {
     <rw-button
       class="ok-button"
       (mouseover)="hintHovered = undefined"

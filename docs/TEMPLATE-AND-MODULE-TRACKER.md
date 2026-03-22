@@ -15,6 +15,7 @@
 | 2026-03-21 | **Закрытие очереди шаблонов:** §1.4 без открытых чекбоксов — дальнейший `@defer`/`@let` только по отдельным задачам. **§1.7** зафиксирован как **вне объёма**: `apps/old/` не мигрируем (под переписывание). Инвентарь §1.6 пересчитан: **116** `.html` в активном контуре. |
 | 2026-03-21 | **§1.5 → §1.3:** `settings/user.component.html` — действия под формой: `@switch (user.status)` (`DELETED` / `@default`), в `@default` кнопка приглашения только при `PENDING`; используется `user` из внешнего `@if`, без повторных подписок на `editedUser`. |
 | 2026-03-21 | **§1.5 (пакет):** `dictionary`: `@let dictName` + `@switch (dictName)` для ветки `'status'` (шапка таблицы, строки, подсказки). `task/detail`: `@let isNew` / `isFavorite`, `@switch (isNew)` для статуса, комментариев и кнопок создания. `date-picker`: один `@if` вместо дублей для `range`, `range && helpers`, четыре кнопки «часы» в одном `@if (showTime)`. `board/group`: `isCardLayoutView()` вместо тройного сравнения `config.view.id` в шаблоне. |
+| 2026-03-21 | `query-builder.component.html`: в `#dropdownContent` — `@let multiHint = multipleSelectHint()` вместо двух вызовов сигнала в `@if`. |
 
 ---
 
@@ -78,6 +79,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 | `apps/task/src/app/detail/detail.component.html` | `@let isNew`, `isFavorite`; `@switch (isNew)` для выбора статуса и блока комментариев / «Создать» | [x] |
 | `libs/components/src/lib/date-picker/date-picker.component.html` | Один `@if` на `range` и на `range && helpers` вместо пар дублей; кнопки «последние N часов» в одном `@if (showTime)` | [x] |
 | `libs/board/src/lib/group/group.component.html` | `isCardLayoutView(viewId)` в TS вместо тройного сравнения в шаблоне | [x] |
+| `libs/core/src/lib/query-builder/query-builder.component.html` | `@let multiHint` в выпадающем шаблоне подсказок (один сигнал на два `@if`) | [x] |
 
 ### 1.4 `@defer` и `@let`
 
