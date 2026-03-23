@@ -29,9 +29,10 @@
 
 Детали 3.1: во всех затронутых `*.spec.ts` удалён `RouterTestingModule`; в `TestBed` добавлены `provideRouter(...)` (пустой конфиг или те же маршруты, что были в `withRoutes`) и `provideLocationMocks()` из `@angular/common/testing`.
 
-Детали 3.2: из кода приложения и библиотек убраны `trigger` / `[@…]`; пакет `@angular/animations` удалён из зависимостей. В `apps/federation.config.js` в `skip` добавлены `@angular/platform-browser/animations` и `…/animations/async`, чтобы Native Federation не бандлил вторичные entry points, которые тянут `@angular/animations/browser`.
+Детали 3.2: из кода приложения и библиотек убраны `trigger` / `[@…]`; анимации переведены на CSS и `animate.enter` / `animate.leave` ([миграция](https://angular.dev/guide/animations/migration)). В `apps/federation.config.js` **нет** `skip` / `skipList` для `platform-browser/animations` — это не из документации Angular, а был бы обход отсутствующего пакета. **`@angular/animations`** снова в `package.json`: у `@angular/platform-browser` он в `peerDependenciesMeta` как **optional**; Native Federation при `shareAll` подхватывает вторичные `exports` (`…/animations`, `…/animations/async`), которым нужен резолв `@angular/animations/browser`. В **исходниках приложения** пакет не импортируется.
 
-## Дальше (вне текущих коммитов)
+## Дальше (что осталось)
 
-- Опционально: signal `input()` / `output()`, схемы из [Migrations](https://angular.dev/reference/migrations).
-- **Шаблоны и bootstrap (активный контур):** очередь в [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) закрыта (§1.1–§1.4, §2); `apps/old/` в миграцию шаблонов не входит — под переписывание.
+- **Шаблоны / bootstrap:** активный контур закрыт по [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) (§1.1–§1.4, §2). Вне плана: `apps/old/` — под отдельное переписывание.
+- **Опционально по Angular:** signal `input()` / `output()` и прочие схемы из [Migrations](https://angular.dev/reference/migrations).
+- **Опционально жёсткая выкладка бандла:** снова убрать `@angular/animations` из зависимостей можно только осознанно (иначе federation снова не соберёт shared для `…/animations*`) — в гайде по миграции анимаций это про отказ от **legacy API**, а не обязательное удаление пакета из `node_modules`.

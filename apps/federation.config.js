@@ -24,10 +24,6 @@ function withNativeFederationCommon(config) {
       ...config.shared,
     },
     skip: [
-      // shareAll auto-discovers @angular/platform-browser/animations from package exports;
-      // those chunks import @angular/animations/browser — not installed after dropping @angular/animations.
-      '@angular/platform-browser/animations',
-      '@angular/platform-browser/animations/async',
       '@renwu/board',
       '@renwu/todos',
       '@renwu/documents',
