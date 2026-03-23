@@ -21,6 +21,7 @@
   padding: 0;
 }
 
+/* Enter uses keyframes only; @starting-style + same-element transition would fight the enter animation. */
 .rw-tooltip-inner {
   display: inline-block;
 }

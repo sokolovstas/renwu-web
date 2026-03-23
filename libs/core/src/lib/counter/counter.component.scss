@@ -73,11 +73,17 @@
   animation: none;
 }
 
+/* Leave: final state + transition — angular.dev/guide/animations */
 .rw-counter-leave {
+  opacity: 0;
   transform: scale(0);
-  transition: transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
 }
 
 .rw-counter-leave-skip {
+  opacity: 0;
+  transform: scale(0);
   transition: none;
 }

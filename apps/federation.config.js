@@ -24,7 +24,8 @@ function withNativeFederationCommon(config) {
       ...config.shared,
     },
     skip: [
-      // Optional Angular subpaths that import @angular/animations (we use CSS + animate.enter/leave only).
+      // shareAll auto-discovers @angular/platform-browser/animations from package exports;
+      // those chunks import @angular/animations/browser — not installed after dropping @angular/animations.
       '@angular/platform-browser/animations',
       '@angular/platform-browser/animations/async',
       '@renwu/board',
