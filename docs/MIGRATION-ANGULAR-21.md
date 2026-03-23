@@ -34,5 +34,5 @@
 ## Дальше (что осталось)
 
 - **Шаблоны / bootstrap:** активный контур закрыт по [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) (§1.1–§1.4, §2). Вне плана: `apps/old/` — под отдельное переписывание.
-- **Опционально по Angular:** signal `input()` / `output()` и прочие схемы из [Migrations](https://angular.dev/reference/migrations).
+- **Официальные CLI-миграции Angular:** полный список схем, команд и оценка для репозитория — [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (источник: [Migrations](https://angular.dev/reference/migrations)).
 - **Опционально жёсткая выкладка бандла:** снова убрать `@angular/animations` из зависимостей можно только осознанно (иначе federation снова не соберёт shared для `…/animations*`) — в гайде по миграции анимаций это про отказ от **legacy API**, а не обязательное удаление пакета из `node_modules`.
