@@ -3,10 +3,9 @@
   [breadcrumbs]="[{ title: 'tasks.filters' | transloco, showSidebar: true }]"
   >
   <div subtitle>
-    <renwu-query-builder
-      [query]="queryString()"
+    <renwu-query-builder [query]="queryString()"
       (queryChange)="updateQuery($event)"
-    ></renwu-query-builder>
+     />
     <!-- <div
     class="header -mb-1 text-sm text-gray-500 flex-row items-center flex md:hidden"
     >
@@ -28,13 +27,12 @@
     [listOptions]="listOptions()"
     (listOptionsChange)="updateListOptions($event)"
     >
-    <renwu-issue-status-bar
-      header
+    <renwu-issue-status-bar header
       class="mb-2"
       [issues]="issues"
       [groupBy]="[listOptions().group.field]"
       (itemClick)="filterByBar($event)"
-    ></renwu-issue-status-bar>
+     />
   </renwu-issue-table>
 }
 

@@ -1,4 +1,4 @@
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,9 +12,7 @@ import { RenwuPageComponent, RenwuSidebarService } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwDatePipe,
-  RwFormatArrayStringPipe,
-  RwIconComponent,
-  RwModalService,
+  RwModalService
 } from '@renwu/components';
 import {
   Issue,
@@ -45,11 +43,8 @@ import { ProjectService } from '../project.service';
   standalone: true,
   imports: [
     AsyncPipe,
-    RwIconComponent,
     RenwuPageComponent,
     RwDatePipe,
-    JsonPipe,
-    RwFormatArrayStringPipe,
     RwButtonComponent,
     RwIssueTableComponent,
     IssuesStatusBarComponent,

@@ -8,12 +8,11 @@
   <div class="text-lg">{{ 'projects.internal' | transloco }}</div>
   <div class="flex flex-row">
     @for (it of (internalTeam | async) ?? []; track it.user.id) {
-      <renwu-avatar
-        [size]="'50px'"
+      <renwu-avatar [size]="'50px'"
         class="my-2 mr-2"
         [user]="it.user"
         (click)="removeUserFrom(it.user, 'internal')"
-      ></renwu-avatar>
+       />
     }
     <rw-select
       [borderless]="true"
@@ -23,11 +22,10 @@
       <ng-template #selectedItemTemplate let-select="select">
         <div class="summary-user-add-new">
           <div class="value" (click)="select.switchPopup()">
-            <renwu-avatar
-              [size]="'50px'"
+            <renwu-avatar [size]="'50px'"
               class="my-2"
               [newUser]="true"
-            ></renwu-avatar>
+             />
           </div>
         </div>
       </ng-template>
@@ -36,12 +34,11 @@
   <div class="text-lg mt-8">{{ 'projects.external' | transloco }}</div>
   <div class="flex flex-row">
     @for (et of (externalTeam | async) ?? []; track et.user.id) {
-      <renwu-avatar
-        [size]="'50px'"
+      <renwu-avatar [size]="'50px'"
         class="my-2 mr-2"
         [user]="et.user"
         (click)="removeUserFrom(et.user, 'external')"
-      ></renwu-avatar>
+       />
     }
     <rw-select
       [borderless]="true"
@@ -51,11 +48,10 @@
       <ng-template #selectedItemTemplate let-select="select">
         <div class="summary-user-add-new">
           <div class="value" (click)="select.switchPopup()">
-            <renwu-avatar
-              [size]="'50px'"
+            <renwu-avatar [size]="'50px'"
               class="my-2"
               [newUser]="true"
-            ></renwu-avatar>
+             />
           </div>
         </div>
       </ng-template>
@@ -64,12 +60,11 @@
   <div class="text-lg mt-8">{{ 'projects.managers' | transloco }}</div>
   <div class="flex flex-row">
     @for (mg of (managers | async) ?? []; track mg.id) {
-      <renwu-avatar
-        [size]="'50px'"
+      <renwu-avatar [size]="'50px'"
         class="my-2 mr-2"
         [user]="mg"
         (click)="removeUserFrom(mg, 'managers')"
-      ></renwu-avatar>
+       />
     }
     <rw-select
       [borderless]="true"
@@ -79,11 +74,10 @@
       <ng-template #selectedItemTemplate let-select="select">
         <div class="summary-user-add-new">
           <div class="value" (click)="select.switchPopup()">
-            <renwu-avatar
-              [size]="'50px'"
+            <renwu-avatar [size]="'50px'"
               class="my-2"
               [newUser]="true"
-            ></renwu-avatar>
+             />
           </div>
         </div>
       </ng-template>
@@ -92,12 +86,11 @@
   <div class="text-lg mt-8">{{ 'projects.admin' | transloco }}</div>
   <div class="flex flex-row">
     @for (ad of (admins | async) ?? []; track ad.id) {
-      <renwu-avatar
-        [size]="'50px'"
+      <renwu-avatar [size]="'50px'"
         class="my-2 mr-2"
         [user]="ad"
         (click)="removeUserFrom(ad, 'admins')"
-      ></renwu-avatar>
+       />
     }
     <rw-select
       [borderless]="true"
@@ -107,11 +100,10 @@
       <ng-template #selectedItemTemplate let-select="select">
         <div class="summary-user-add-new">
           <div class="value" (click)="select.switchPopup()">
-            <renwu-avatar
-              [size]="'50px'"
+            <renwu-avatar [size]="'50px'"
               class="my-2"
               [newUser]="true"
-            ></renwu-avatar>
+             />
           </div>
         </div>
       </ng-template>

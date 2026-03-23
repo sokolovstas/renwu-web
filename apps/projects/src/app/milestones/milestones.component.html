@@ -5,12 +5,11 @@
   { title: (currentProject | async).key, url: '../' }
   ]"
   >
-  <rw-checkbox
-    class="flex self-end"
+  <rw-checkbox class="flex self-end"
     [ngModel]="showArchived | async"
     (ngModelChange)="showArchived.next($event)"
     [label]="'projects.show-archived-milestones' | transloco"
-  ></rw-checkbox>
+   />
   <div
     rwSortTable="milestones"
     class="flex flex-col w-full"
@@ -46,7 +45,7 @@
           rwSortTableColumn="order"
           [rwSortTableRowHandler]="i"
           >
-          <rw-icon icon="menu"></rw-icon>
+          <rw-icon icon="menu" />
         </div>
         <div
           rwSortTableColumn="name"
@@ -72,13 +71,12 @@
         {{ milestone.date_calc | rwDate: 'PP' }}
       </div>
       <div rwSortTableColumn="checkbox">
-        <rw-checkbox
-          [disabled]="true"
+        <rw-checkbox [disabled]="true"
           [ngModel]="milestone.archived"
-        ></rw-checkbox>
+         />
       </div>
       <div rwSortTableColumn="editicon">
-        <rw-icon icon="pen" (click)="edit($event, milestone)"></rw-icon>
+        <rw-icon icon="pen" (click)="edit($event, milestone)" />
       </div>
     </a>
   }

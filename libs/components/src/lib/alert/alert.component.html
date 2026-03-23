@@ -13,11 +13,10 @@
   <div class="alert-container-text" [innerHTML]="alert.text"></div>
   @if (alert.type === 'prompt') {
     <div class="alert-container-value">
-      <rw-text-input
-        [(ngModel)]="alert.defaultValue"
+      <rw-text-input [(ngModel)]="alert.defaultValue"
         name="value"
         prompt="{{ 'components.enter-value' | transloco }}"
-      ></rw-text-input>
+       />
     </div>
   }
   <div class="alert-container-buttons">

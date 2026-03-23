@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent } from '@renwu/app-ui';
 import {
@@ -50,7 +50,6 @@ import { ProjectService } from '../project.service';
     RwSortTableColumnHeadDirective,
     RwSortTableDirective,
     RwSortTableRowDirective,
-    RouterLinkActive,
     RwDatePipe,
     RwSortTableRowHandlerDirective,
     FormsModule,

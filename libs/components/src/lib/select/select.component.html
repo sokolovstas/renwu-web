@@ -1,4 +1,4 @@
-<ng-template #selectedItemActionsDefault> </ng-template>
+<ng-template #selectedItemActionsDefault />
 <ng-template #selectedItemTemplateDefault>
   @let selected = model.selected | async;
   @let emptyItem = model.emptyItem | async;
@@ -54,39 +54,33 @@
                 (model.many && opened && item) ||
                 (opened && item && model.allowNull)
                 ) {
-                <rw-button
-                  class="rw-select-clear"
+                <rw-button class="rw-select-clear"
                   typeButton="icon"
                   iconClass="close"
                   iconSize="normal"
                   (click)="onRemoveItem($event, i)"
-                  >
-                </rw-button>
+                   />
               }
             </div>
           }
         }
       </div>
 
-      <ng-container
-        [ngTemplateOutlet]="selectedItemActions || selectedItemActionsDefault"
+      <ng-container [ngTemplateOutlet]="selectedItemActions || selectedItemActionsDefault"
         [ngTemplateOutletContext]="thisContext"
-      ></ng-container>
+       />
     </div>
-    <rw-icon
-      class="rw-select-arrow"
+    <rw-icon class="rw-select-arrow"
       (click)="switchPopup(!opened)"
       [icon]="opened ? iconOpened : iconClosed"
       size="small"
-      >
-    </rw-icon>
+       />
   </ng-template>
 
   <div class="rw-select-value-holder" #valueElement>
-    <ng-container
-      [ngTemplateOutlet]="selectedItemTemplate || selectedItemTemplateDefault"
+    <ng-container [ngTemplateOutlet]="selectedItemTemplate || selectedItemTemplateDefault"
       [ngTemplateOutletContext]="thisContext"
-    ></ng-container>
+     />
   </div>
   <rw-dropdown
     #dropdown
@@ -102,10 +96,9 @@
     >
     <ng-template #dropdownContent>
       <div class="rw-select-resizer">
-        <ng-container
-          [ngTemplateOutlet]="selectedItemTemplate || selectedItemTemplateDefault"
+        <ng-container [ngTemplateOutlet]="selectedItemTemplate || selectedItemTemplateDefault"
           [ngTemplateOutletContext]="thisContext"
-        ></ng-container>
+         />
       </div>
       <div class="rw-select-search" ozPreventParentScroll>
         @if (!searchString) {
@@ -137,10 +130,9 @@
               [class.cursor]="selectedIndex === -1"
               (mouseover)="setIndex(-1)"
               >
-              <ng-container
-                [ngTemplateOutlet]="firstItemTemplate"
+              <ng-container [ngTemplateOutlet]="firstItemTemplate"
                 [ngTemplateOutletContext]="thisContext"
-              ></ng-container>
+               />
             </div>
           }
           @for (item of model.list | async; track item; let i = $index) {
@@ -156,10 +148,9 @@
           }
           @if (lastItemTemplate) {
             <div class="rw-select-option">
-              <ng-container
-                [ngTemplateOutlet]="lastItemTemplate"
+              <ng-container [ngTemplateOutlet]="lastItemTemplate"
                 [ngTemplateOutletContext]="thisContext"
-              ></ng-container>
+               />
             </div>
           }
           @if (model.loading | async) {

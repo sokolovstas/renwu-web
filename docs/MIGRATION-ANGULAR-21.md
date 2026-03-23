@@ -31,8 +31,26 @@
 
 Детали 3.2: из кода приложения и библиотек убраны `trigger` / `[@…]`; анимации переведены на CSS и `animate.enter` / `animate.leave` ([миграция](https://angular.dev/guide/animations/migration)). В `apps/federation.config.js` **нет** `skip` / `skipList` для `platform-browser/animations` — это не из документации Angular, а был бы обход отсутствующего пакета. **`@angular/animations`** снова в `package.json`: у `@angular/platform-browser` он в `peerDependenciesMeta` как **optional**; Native Federation при `shareAll` подхватывает вторичные `exports` (`…/animations`, `…/animations/async`), которым нужен резолв `@angular/animations/browser`. В **исходниках приложения** пакет не импортируется.
 
+## Фаза 4: лишние записи в `imports` у standalone (NG8113)
+
+| Шаг | Описание | Статус |
+|-----|----------|--------|
+| 4.1 | Во всех `apps/**/tsconfig.json`, `libs/**/tsconfig.json` и связанных `tsconfig.lib.prod.json` включена расширенная диагностика **[NG8113](https://angular.dev/extended-diagnostics/NG8113)** (`unusedStandaloneImports`: `error`) | ✅ |
+| 4.2 | Официальная схема `cleanup-unused-imports`: `nx generate @angular/core:cleanup-unused-imports --no-interactive` (удалено 49 неиспользуемых импортов в 22 компонентах активного контура) | ✅ |
+
+Детали 4.x: в `@angular-eslint` 21.x отдельного ESLint-правила под это нет — контроль через компилятор Angular. Повторный прогон схемы и `npm run cleanup-unused-imports` — см. [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (п. 9).
+
+## Фаза 5: самозакрывающиеся теги в шаблонах
+
+| Шаг | Описание | Статус |
+|-----|----------|--------|
+| 5.1 | ESLint **`@angular-eslint/template/prefer-self-closing-tags`** (`error`) в override для **`*.html`** во всех `apps/*/.eslintrc.json` и `libs/*/.eslintrc.json` | ✅ |
+| 5.2 | Схема **`self-closing-tags-migration`**: `nx generate @angular/core:self-closing-tags-migration --no-interactive` (292 тега в 83 файлах активного контура) | ✅ |
+
+Детали 5.x: правило на весь `*.ts` не ставили — для `e2e` и прочих файлов нет Angular template parser. Инлайн-шаблоны закрывает схема; для `.html` дальше достаточно `nx run-many -t lint --all --fix`. См. [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (п. 10).
+
 ## Дальше (что осталось)
 
-- **Шаблоны / bootstrap:** активный контур закрыт по [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) (§1.1–§1.4, §2). Вне плана: `apps/old/` — под отдельное переписывание.
+- **Шаблоны / bootstrap:** активный контур закрыт по [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) (§1.1–§1.4, §2). **`apps/old/` не трогаем** (ни шаблоны, ни standalone, ни CLI-схемы) — отдельное переписывание, вне этого плана.
 - **Официальные CLI-миграции Angular:** полный список схем, команд и оценка для репозитория — [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (источник: [Migrations](https://angular.dev/reference/migrations)).
 - **Опционально жёсткая выкладка бандла:** снова убрать `@angular/animations` из зависимостей можно только осознанно (иначе federation снова не соберёт shared для `…/animations*`) — в гайде по миграции анимаций это про отказ от **legacy API**, а не обязательное удаление пакета из `node_modules`.

@@ -17,28 +17,24 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RenwuSidebarService } from '@renwu/app-ui';
 import {
   RwButtonComponent,
-  RwIconComponent,
   RwSelectComponent,
-  RwTextAreaComponent,
   RwTextInputComponent,
   RwTimePickerComponent,
-  RwToastService,
+  RwToastService
 } from '@renwu/components';
 import {
-  IssueStatusComponent,
   RwFormatUserPipe,
   RwIssueService,
   SelectModelMilestones,
   SelectModelTransition,
   StateService,
-  WorkflowTransition,
+  WorkflowTransition
 } from '@renwu/core';
 import {
   DestinationType,
   MessageInputComponent,
-  MessageSubDestinationsComponent,
   MessageThreadComponent,
-  RwMessageService,
+  RwMessageService
 } from '@renwu/messaging';
 import {
   distinctUntilChanged,
@@ -67,21 +63,16 @@ import { TodoComponent } from '../todo/todo.component';
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    RwTextAreaComponent,
     RwTextInputComponent,
     RwTimePickerComponent,
-    IssueStatusComponent,
-    RwIconComponent,
     RwButtonComponent,
     RwSelectComponent,
     MessageThreadComponent,
-    MessageSubDestinationsComponent,
     MessageInputComponent,
     RwFormatUserPipe,
     TranslocoPipe,
     SectionWrapperComponent,
-    DescriptionComponent,
-  ],
+    ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.scss',
   // providers: [RwIssueService],

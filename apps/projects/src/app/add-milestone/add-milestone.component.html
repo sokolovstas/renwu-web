@@ -10,48 +10,42 @@
   <div rwModalBody class="w-96 min-w-30">
     <form [formGroup]="milestoneForm">
       <label class="form-label">
-        <rw-text-input
-          formControlName="title"
+        <rw-text-input formControlName="title"
           [prompt]="'projects.name' | transloco"
-        ></rw-text-input>
+         />
       </label>
       <label class="form-label">
-        <rw-select
-          modelName="Container"
+        <rw-select modelName="Container"
           formControlName="container"
           [prompt]="'projects.container' | transloco"
-        ></rw-select>
+         />
       </label>
       <label class="form-label">
-        <rw-text-input
-          formControlName="key"
+        <rw-text-input formControlName="key"
           [prompt]="'projects.key' | transloco"
           [uppercase]="true"
           [live]="true"
-        ></rw-text-input>
+         />
         <div class="form-supporting-text">
           {{ 'projects.letters-a-z' | transloco }}
         </div>
       </label>
       <label class="form-label">
-        <rw-date-picker
-          [prompt]="'projects.date' | transloco"
+        <rw-date-picker [prompt]="'projects.date' | transloco"
           formControlName="date"
-        ></rw-date-picker>
+         />
       </label>
       <label class="form-label">
-        <rw-text-area
-          formControlName="description"
+        <rw-text-area formControlName="description"
           [prompt]="'projects.description' | transloco"
-        ></rw-text-area>
+         />
       </label>
       <label class="form-label">
-        <rw-select
-          modelName="MilestoneLabel"
+        <rw-select modelName="MilestoneLabel"
           formControlName="labels"
           [tags]="true"
           [prompt]="'projects.labels' | transloco"
-        ></rw-select>
+         />
       </label>
     </form>
   </div>

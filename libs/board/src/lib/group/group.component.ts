@@ -3,8 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
-  RwIconComponent,
-  RwTooltipDirective,
+  RwIconComponent
 } from '@renwu/components';
 import { Issue, RwSettingsService } from '@renwu/core';
 import { BoardGroup, BoardGroupsConfig } from '../board.model';
@@ -16,7 +15,6 @@ import { RwGroupService } from './group.service';
   selector: 'renwu-board-group',
   standalone: true,
   imports: [
-    RwTooltipDirective,
     SortListPipe,
     RwIconComponent,
     RwButtonComponent,

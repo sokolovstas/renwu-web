@@ -11,34 +11,28 @@
     {{ prompt }}
   </div>
   <div class="input-container" [class.container-active]="editOpened">
-    <rw-text-input
-      #input
+    <rw-text-input #input
       [borderless]="true"
       [ngModel]="editOpened ? valueInput : getLabel()"
       (keydown)="onKeyDown($event)"
       (ngModelChange)="onInputChange($event)"
-      >
-    </rw-text-input>
+       />
   </div>
   @if (!disabled && !editOpened) {
-    <rw-icon
-      [tabindex]="-1"
+    <rw-icon [tabindex]="-1"
       class="popup-icon button"
       [icon]="icon"
       size="normal"
       (mousedown)="enableSelectMode($event)"
-      >
-    </rw-icon>
+       />
   }
   @if (showClear && value > 0) {
-    <rw-icon
-      [tabindex]="-1"
+    <rw-icon [tabindex]="-1"
       class="clear"
       icon="close"
       size="normal"
       (mousedown)="onClear($event)"
-      >
-    </rw-icon>
+       />
   }
 </div>
 <rw-dropdown

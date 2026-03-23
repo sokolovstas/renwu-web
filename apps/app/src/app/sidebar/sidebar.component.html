@@ -17,19 +17,17 @@
           (sidebarService.currentSection | async)?.path === section.path
         "
       >
-        <rw-icon
-          class="text-lg px-5 py-1.5 mb-1 rounded-full"
+        <rw-icon class="text-lg px-5 py-1.5 mb-1 rounded-full"
           [icon]="section.icon"
           size="inherit"
-        ></rw-icon>
+         />
         @if (section.path === 'messenger') {
-          <renwu-message-counter
-            class="absolute left-2/3 md:left-2/3 top-1"
+          <renwu-message-counter class="absolute left-2/3 md:left-2/3 top-1"
             [destination]="{
               unreadCount: messageService.unreadCount,
               pulseCount: messageService.pulseCount
             }"
-          ></renwu-message-counter>
+           />
         }
         <div class="text-xs text-center">{{ section.hint | async }}</div>
       </a>
@@ -39,13 +37,12 @@
   <ul class="hidden md:flex flex-row md:flex-col">
     <a #currentUser [renwuTourAnchor]="'sidebar-avatar'">
       <li class="items-center flex flex-col py-4 cursor-pointer text-xl">
-        <renwu-avatar
-          class="cursor-pointer"
+        <renwu-avatar class="cursor-pointer"
           [user]="userService.currentUser | async"
           [showOnline]="false"
           [showTooltip]="false"
           size="3em"
-        ></renwu-avatar>
+         />
       </li>
     </a>
     <rw-dropdown

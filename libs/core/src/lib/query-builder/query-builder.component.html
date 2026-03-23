@@ -18,12 +18,11 @@
         (keyup)="onSearchKeyUp($event)"
       />
     </div>
-    <rw-icon
-      class="icon"
+    <rw-icon class="icon"
       icon="search"
       cursor="pointer"
       (click)="onSearch()"
-    ></rw-icon>
+     />
   </div>
   @if (showHintsContainer()) {
 
@@ -51,13 +50,12 @@
       @for (hint of hints(); track i; let i = $index) {
       <div class="hint" (mousedown)="selectHint(hint)">
         @if (multiHint) {
-        <rw-checkbox
-          class="hint-option"
+        <rw-checkbox class="hint-option"
           [ngModel]="hint.selected"
           (ngModelChange)="selectHint($event)"
           (mousedown)="onCheckboxClick($event)"
           (mouseover)="hintHovered = undefined"
-        ></rw-checkbox>
+         />
         }
         <div
           class="hint-text"

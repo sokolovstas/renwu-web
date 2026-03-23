@@ -10,11 +10,10 @@
       (click)="onSelectDestination(destination)"
       >
       <div class="renwu-messaging-sub-destinations__title">Main</div>
-      <renwu-message-counter
-        class="renwu-messaging-sub-destinations__counter"
+      <renwu-message-counter class="renwu-messaging-sub-destinations__counter"
         [destination]="destination"
         [skipBadgeAnimation]="true"
-      ></renwu-message-counter>
+       />
     </div>
     @for (sb of destination?.subDestinations | async; track sb; let i = $index) {
       <div
@@ -34,18 +33,16 @@
           class="renwu-messaging-sub-destinations__avatars"
           >
           @for (id of sb.subMembers | async; track id) {
-            <renwu-avatar
-              class="renwu-messaging-sub-destinations__avatar"
+            <renwu-avatar class="renwu-messaging-sub-destinations__avatar"
               [user]="{ id: id }"
               size="20px"
-            ></renwu-avatar>
+             />
           }
         </div>
       }
-      <renwu-message-counter
-        class="renwu-messaging-sub-destinations__counter"
+      <renwu-message-counter class="renwu-messaging-sub-destinations__counter"
         [destination]="sb"
-      ></renwu-message-counter>
+       />
     </div>
   }
 </div>

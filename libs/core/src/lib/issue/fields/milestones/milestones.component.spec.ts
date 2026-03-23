@@ -4,10 +4,9 @@ import { Component } from '@angular/core';
 import { IssueMilestonesComponent } from './shared/issue-fields/milestones/milestones.component';
 
 @Component({
-  template: ` <issue-milestones
-    [value]="value"
+  template: ` <issue-milestones [value]="value"
     [parentValue]="parentValue"
-  ></issue-milestones>`,
+   />`,
 })
 class TestHostComponent {
   value: any[];

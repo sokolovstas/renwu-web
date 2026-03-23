@@ -20,34 +20,28 @@
 @if (opened) {
   <div class="rw-text-area-tool-buttons">
     @if (editButton && !opened) {
-      <rw-button
-        [tabindex]="-1"
+      <rw-button [tabindex]="-1"
         class="rw-text-area-tool-button rw-text-area-tool-button-edit"
         typeButton="icon"
         iconClass="pen"
         (clicked)="onEditButton()"
-        >
-      </rw-button>
+         />
     }
     @if ((editButton && opened) || (doneButton && opened)) {
-      <rw-button
-        [tabindex]="-1"
+      <rw-button [tabindex]="-1"
         class="rw-text-area-tool-button"
         typeButton="icon"
         iconClass="check"
         (clicked)="onDoneButton()"
-        >
-      </rw-button>
+         />
     }
     @if (editButton && opened) {
-      <rw-button
-        [tabindex]="-1"
+      <rw-button [tabindex]="-1"
         class="rw-text-area-tool-button"
         typeButton="icon"
         iconClass="close"
         (clicked)="onCancelButton()"
-        >
-      </rw-button>
+         />
     }
   </div>
 }

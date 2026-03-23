@@ -1,4 +1,4 @@
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RwDurationToStringPipe } from '@renwu/components';
 import { RwDataService } from '@renwu/core';
@@ -8,7 +8,7 @@ import { ProjectService } from '../project.service';
 @Component({
   selector: 'renwu-projects-backlog',
   standalone: true,
-  imports: [JsonPipe, AsyncPipe, RwDurationToStringPipe],
+  imports: [AsyncPipe, RwDurationToStringPipe],
   templateUrl: './backlog.component.html',
   styleUrl: './backlog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

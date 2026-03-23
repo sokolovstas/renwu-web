@@ -1,21 +1,17 @@
 <div class="head">
-  <rw-text-input
-    class="textinput"
+  <rw-text-input class="textinput"
     [(ngModel)]="this.model"
     [live]="true"
     [keepFocus]="true"
     (keydown)="onSearchKeyDown($event)"
-    >
-  </rw-text-input>
+     />
   @if (model.createNewOption) {
     <div class="add">
-      <rw-button
-        [disabled]="!this.model"
+      <rw-button [disabled]="!this.model"
         typeButton="icon"
         iconClass="add"
         (clicked)="onEnter()"
-        >
-      </rw-button>
+         />
     </div>
   }
 </div>

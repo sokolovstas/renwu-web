@@ -8,17 +8,13 @@ import {
   inject,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent, RenwuSidebarService } from '@renwu/app-ui';
-import { RwButtonComponent } from '@renwu/components';
+
 import {
   Issue,
-  IssueAssigneesComponent,
-  IssuePriorityComponent,
-  IssueStatusComponent,
   IssueTableService,
-  IssueTypeComponent,
   IssuesStatusBarComponent,
   ListOptions,
   QueryBuilderComponent,
@@ -26,7 +22,7 @@ import {
   RwIssueTableComponent,
   RwQueryBuilderService,
   RwSearchService,
-  RwWebsocketService,
+  RwWebsocketService
 } from '@renwu/core';
 import { distinctUntilChanged, map, of, shareReplay, switchMap } from 'rxjs';
 
@@ -34,15 +30,9 @@ import { distinctUntilChanged, map, of, shareReplay, switchMap } from 'rxjs';
   selector: 'renwu-tasks-list',
   standalone: true,
   imports: [
-    RwButtonComponent,
     IssuesStatusBarComponent,
     AsyncPipe,
     RenwuPageComponent,
-    IssueStatusComponent,
-    IssueAssigneesComponent,
-    IssuePriorityComponent,
-    IssueTypeComponent,
-    RouterLink,
     RwIssueTableComponent,
     QueryBuilderComponent,
     TranslocoPipe,

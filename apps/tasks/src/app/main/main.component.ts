@@ -11,7 +11,7 @@ import {
   RenwuPageWithSidebarComponent,
   RenwuSidebarService,
 } from '@renwu/app-ui';
-import { RwButtonComponent } from '@renwu/components';
+
 import { RwDataService } from '@renwu/core';
 
 @Component({
@@ -23,7 +23,6 @@ import { RwDataService } from '@renwu/core';
     RouterLinkActive,
     AsyncPipe,
     RouterOutlet,
-    RwButtonComponent,
     TranslocoPipe,
   ],
   templateUrl: './main.component.html',

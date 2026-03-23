@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common';
+
 import { ChangeDetectorRef, Component, ViewChild, inject } from '@angular/core';
 
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -11,8 +11,7 @@ import {
   RwSortTableRowDirective,
   RwSortTableRowHandlerDirective,
   RwTextAreaComponent,
-  RwTextInputComponent,
-  SortCompletedEvent,
+  SortCompletedEvent
 } from '@renwu/components';
 import { RwIssueService } from '@renwu/core';
 
@@ -24,11 +23,9 @@ import { RwIssueService } from '@renwu/core';
     TranslocoPipe,
     ReactiveFormsModule,
     FormsModule,
-    AsyncPipe,
     RwSortTableDirective,
     RwButtonComponent,
     RwCheckboxComponent,
-    RwTextInputComponent,
     RwIconComponent,
     RwTextAreaComponent,
     RwSortTableRowDirective,

@@ -36,112 +36,98 @@
               </div>
               <div class="gap-2 flex flex-row">
                 @if (isFavorite === false) {
-                  <rw-button
-                    typeButton="icon"
+                  <rw-button typeButton="icon"
                     (clicked)="addToFav()"
                     iconClass="favorite-0"
-                  ></rw-button>
+                   />
                 }
                 @if (isFavorite) {
-                  <rw-button
-                    typeButton="icon"
+                  <rw-button typeButton="icon"
                     (clicked)="removeFromFav()"
                     iconClass="favorite-1"
-                  ></rw-button>
+                   />
                 }
                 @if (isNew === false) {
-                  <rw-button
-                    typeButton="icon"
+                  <rw-button typeButton="icon"
                     (clicked)="remove()"
                     iconClass="trash"
-                  ></rw-button>
+                   />
                 }
-                <rw-button
-                  typeButton="icon"
+                <rw-button typeButton="icon"
                   (clicked)="close()"
                   iconClass="close"
-                ></rw-button>
+                 />
               </div>
             </div>
             @if (isNew === false) {
-              <rw-text-input
-                #title
+              <rw-text-input #title
                 [required]="true"
                 class="w-full"
                 [live]="isNew"
                 [borderless]="true"
                 [multiline]="true"
                 formControlName="title"
-              ></rw-text-input>
+               />
             }
           </div>
           <div class="flex flex-col w-full h-full overflow-y-auto relative">
             <div class="grid grid-cols-2 gap-2 p-2 w-full">
               @if (isNew) {
-                <rw-text-input
-                  #title
+                <rw-text-input #title
                   [required]="true"
                   class="col-span-2"
                   prompt="{{ 'task.title' | transloco }}"
                   [live]="isNew"
                   formControlName="title"
-                ></rw-text-input>
+                 />
               }
-              <rw-select
-                class=""
+              <rw-select class=""
                 [required]="true"
                 modelName="Container"
                 formControlName="container"
                 prompt="{{ 'task.container' | transloco }}"
-              ></rw-select>
-              <rw-select
-                class=""
+               />
+              <rw-select class=""
                 [model]="milestoneSelectModel"
                 formControlName="milestones"
                 [tags]="true"
                 [closeOnSelect]="false"
                 [prompt]="'task.milestones' | transloco"
-              ></rw-select>
-              <rw-select
-                class=""
+               />
+              <rw-select class=""
                 modelName="Type"
                 formControlName="type"
                 [prompt]="'task.type' | transloco"
-              ></rw-select>
-              <rw-select
-                class=""
+               />
+              <rw-select class=""
                 modelName="Priority"
                 formControlName="priority"
                 [prompt]="'task.priority' | transloco"
-              ></rw-select>
+               />
               @switch (isNew) {
                 @case (false) {
-                  <rw-select
-                    class=""
+                  <rw-select class=""
                     [model]="transitionSelectModel"
                     formControlName="status"
                     [prompt]="'task.status' | transloco"
-                  ></rw-select>
+                   />
                 }
                 @case (true) {
-                  <rw-select
-                    class=""
+                  <rw-select class=""
                     modelName="Status"
                     formControlName="status"
                     [prompt]="'task.status' | transloco"
-                  ></rw-select>
+                   />
                 }
               }
-              <rw-select
-                class=""
+              <rw-select class=""
                 modelName="Milestone"
                 formControlName="affected_versions"
                 [tags]="true"
                 [closeOnSelect]="false"
                 [prompt]="'task.affected-version' | transloco"
-              ></rw-select>
-              <rw-select
-                modelName="Assignee"
+               />
+              <rw-select modelName="Assignee"
                 formControlName="assignes"
                 manyLayout="vertical"
                 [emptyItem]="{
@@ -150,34 +136,30 @@
                 (issueService.issue | async)?.assignes_calc | rwFormatUser: true
                 }"
                 [prompt]="'task.assignee' | transloco"
-              ></rw-select>
-              <rw-time-picker
-                [required]="true"
+               />
+              <rw-time-picker [required]="true"
                 formControlName="estimated_time"
                 [prompt]="'task.estimated-time' | transloco"
-              ></rw-time-picker>
-              <rw-select
-                class=""
+               />
+              <rw-select class=""
                 modelName="Watcher"
                 formControlName="watchers"
                 manyLayout="vertical"
                 [tags]="true"
                 [closeOnSelect]="false"
                 [prompt]="'task.watchers' | transloco"
-              ></rw-select>
-              <rw-select
-                class=""
+               />
+              <rw-select class=""
                 modelName="Label"
                 formControlName="labels"
                 [tags]="true"
                 [closeOnSelect]="false"
                 [prompt]="'task.labels' | transloco"
-              ></rw-select>
+               />
               <div class="col-span-2">
                 @for (section of sections | async; track section) {
-                  <renwu-task-section-wrapper
-                    [section]="section"
-                  ></renwu-task-section-wrapper>
+                  <renwu-task-section-wrapper [section]="section"
+                   />
                 }
               </div>
             </div>
@@ -186,15 +168,12 @@
                 <div class="mt-4 mx-4 font-extralight text-2xl mb-2">
                   {{ 'task.comments' | transloco }}
                 </div>
-                <renwu-messaging-thread
-                  [destination]="thread | async"
+                <renwu-messaging-thread [destination]="thread | async"
                   [noScroll]="true"
-                >
-                </renwu-messaging-thread>
-                <renwu-messaging-input
-                  class="pb-2"
+                 />
+                <renwu-messaging-input class="pb-2"
                   [destination]="thread | async"
-                ></renwu-messaging-input>
+                 />
               }
               @case (true) {
                 <div

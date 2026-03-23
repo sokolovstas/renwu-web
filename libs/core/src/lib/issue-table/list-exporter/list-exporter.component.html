@@ -34,13 +34,12 @@
           >HTML
         </rw-button>
       </div>
-      <rw-text-input
-        [prompt]="'Template' | transloco"
+      <rw-text-input [prompt]="'Template' | transloco"
         [(ngModel)]="templates[format]"
         [multiline]="true"
         [live]="true"
         (ngModelChange)="saveCustom($event)"
-      ></rw-text-input>
+       />
       <br />
       <div class="result" [attr.contenteditable]="format !== 'list'">
         @for (item of list; track item) {

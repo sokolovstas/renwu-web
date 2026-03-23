@@ -13,9 +13,7 @@ import { RenwuPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwSelectComponent,
-  RwTextAreaComponent,
-  RwTextInputComponent,
-  RwTimePickerComponent,
+  RwTimePickerComponent
 } from '@renwu/components';
 import { Priority, Status, Type } from '@renwu/core';
 import { firstValueFrom } from 'rxjs';
@@ -28,8 +26,6 @@ import { ProjectService } from '../project.service';
     AsyncPipe,
     RenwuPageComponent,
     ReactiveFormsModule,
-    RwTextAreaComponent,
-    RwTextInputComponent,
     RwTimePickerComponent,
     RwButtonComponent,
     RwSelectComponent,

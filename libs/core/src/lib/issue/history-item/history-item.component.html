@@ -4,15 +4,13 @@
       <div class="author-time-source">
         <div class="author-source">
           @if (value().source_id && value().source && showSource) {
-            <renwu-issue-href
-              class="source"
+            <renwu-issue-href class="source"
               [issue]="value().source"
               [linkButton]="true"
               [copyOnDoubleClick]="true"
               [key]="value().source.key"
               [title]="value().source.title"
-            >
-            </renwu-issue-href>
+             />
           }
           {{ value().author | rwFormatUser }}
         </div>
@@ -79,10 +77,8 @@
                       }}</span>
                       {{ 'core.history-item-to' | transloco }}
                     </div>
-                    &nbsp;&nbsp;<renwu-issue-status
-                      [value]="field.new_value"
-                    ></renwu-issue-status
-                    >&nbsp;
+                    &nbsp;&nbsp;<renwu-issue-status [value]="field.new_value"
+                     />&nbsp;
                   </div>
                 }
                 @case ('estimated_time') {
@@ -124,11 +120,9 @@
                       }}</span>
                       {{ 'core.history-item-to' | transloco }}
                     </div>
-                    &nbsp;<renwu-issue-type
-                      [withLabel]="true"
+                    &nbsp;<renwu-issue-type [withLabel]="true"
                       [value]="field.new_value"
-                    ></renwu-issue-type
-                    >&nbsp;
+                     />&nbsp;
                   </div>
                 }
                 @case ('priority') {
@@ -140,11 +134,9 @@
                       }}</span>
                       {{ 'core.history-item-to' | transloco }}
                     </div>
-                    &nbsp;<renwu-issue-priority
-                      [withLabel]="true"
+                    &nbsp;<renwu-issue-priority [withLabel]="true"
                       [value]="field.new_value"
-                    ></renwu-issue-priority
-                    >&nbsp;
+                     />&nbsp;
                   </div>
                 }
                 @case ('labels') {
@@ -589,14 +581,12 @@
                         {{ 'core.history-item-suffix-with' | transloco }}
                       </div>
                       &nbsp;
-                      <renwu-issue-href
-                        [issue]="row.issue"
+                      <renwu-issue-href [issue]="row.issue"
                         [linkButton]="true"
                         [copyOnDoubleClick]="true"
                         [key]="row.issue.key"
                         [title]="row.issue.title"
-                      >
-                      </renwu-issue-href>
+                       />
                     </div>
                   }
                 }

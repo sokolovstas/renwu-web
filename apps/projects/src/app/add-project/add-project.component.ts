@@ -14,9 +14,8 @@ import {
   RwModalComponent,
   RwModalFooterDirective,
   RwModalService,
-  RwModalSubHeaderDirective,
   RwSelectComponent,
-  RwTextInputComponent,
+  RwTextInputComponent
 } from '@renwu/components';
 import {
   Container,
@@ -32,7 +31,6 @@ import {
     RwModalComponent,
     RwModalBodyDirective,
     RwModalFooterDirective,
-    RwModalSubHeaderDirective,
     RwModalBodyDirective,
     RwButtonComponent,
     RwTextInputComponent,

@@ -1,10 +1,8 @@
 @if (!filterable) {
-  <rw-text-with-tooltip label="{{ label }}">
-  </rw-text-with-tooltip>
+  <rw-text-with-tooltip label="{{ label }}" />
 }
 @if (filterable) {
-  <rw-text-input
-    class="header-filter"
+  <rw-text-input class="header-filter"
     [class.active]="!!listOptions.textFilter[key]"
     [(ngModel)]="listOptions.textFilter[key]"
     [live]="true"
@@ -12,15 +10,13 @@
     (ngModelChange)="changeFilter()"
     prompt="{{ label }}"
     [showClear]="true"
-    >
-  </rw-text-input>
+     />
 }
 @if (
   filterable ||
   (listOptions?.sort?.direction && listOptions?.sort?.field === key)
   ) {
-  <rw-icon
-    class="icon-sort"
+  <rw-icon class="icon-sort"
     [class.none]="
     !(listOptions?.sort?.direction && listOptions?.sort?.field === key)
     "
@@ -29,7 +25,7 @@
     [state]="
     listOptions?.sort?.field === key ? listOptions?.sort?.direction : undefined
     "
-  ></rw-icon>
+   />
 }
 @if (groupable) {
   <div

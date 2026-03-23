@@ -7,15 +7,13 @@
   >
   <div class="">
     @for (h of history | async; track h) {
-      <renwu-issue-history-item
-        class="pb-4"
+      <renwu-issue-history-item class="pb-4"
         [value]="h"
         idField="id"
         [showAuthor]="true"
         [showTime]="true"
         [showSource]="true"
-        >
-      </renwu-issue-history-item>
+         />
     }
     @if (destination?.leftBefore | async; as leftBefore) {
       <div

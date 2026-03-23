@@ -86,7 +86,7 @@ export interface IViewport extends IPageInfo {
   template: `
     <div class="total-padding" #invisiblePadding></div>
     <div class="scrollable-content" #content>
-      <ng-content></ng-content>
+      <ng-content />
     </div>
   `,
   // eslint-disable-next-line @angular-eslint/no-host-metadata-property

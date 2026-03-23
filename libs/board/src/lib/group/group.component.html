@@ -7,15 +7,13 @@
         {{ group.label }} ({{ group.reduce?.count }})
       </div>
       &nbsp;
-      <rw-icon
-        [states]="{
+      <rw-icon [states]="{
         true: 'keyboard_arrow_right',
         false: 'keyboard_arrow_down'
         }"
         (click)="collapse()"
         [state]="collapsed"
-        >
-      </rw-icon>
+         />
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       @if (group.issue) {
         <rw-button
@@ -50,10 +48,9 @@
           <a
             >
             @if (isCardLayoutView(config.view.id)) {
-              <renwu-boards-card
-                [issue]="issue"
+              <renwu-boards-card [issue]="issue"
                 [type]="config.type.id"
-              ></renwu-boards-card>
+               />
             }
           </a>
         }
@@ -77,8 +74,7 @@
       : 'sort'
       ; track
       g) {
-      <renwu-board-group
-        class="renwu-board-group__group-{{
+      <renwu-board-group class="renwu-board-group__group-{{
         group.config.view.id
         }} renwu-board-group__group-{{
         config.view.id
@@ -88,8 +84,7 @@
         [parentGroup]="group"
         [group]="g"
         [config]="config"
-        >
-      </renwu-board-group>
+         />
     }
     <div class="renwu-board-group__groups-container">
       <div
@@ -105,8 +100,7 @@
           : 'sort'
           ; track
           g) {
-          <renwu-board-group
-            class="renwu-board-group__group-{{
+          <renwu-board-group class="renwu-board-group__group-{{
             group.config.view.id
             }} renwu-board-group__group-{{ config.view.id }}"
             (check)="onIssueCheck($event)"
@@ -114,8 +108,7 @@
             [parentGroup]="group"
             [group]="g"
             [config]="config"
-            >
-          </renwu-board-group>
+             />
         }
       </div>
     </div>

@@ -1,22 +1,19 @@
-import { AsyncPipe } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageWithSidebarComponent } from '@renwu/app-ui';
-import { RwButtonComponent, RwIconComponent } from '@renwu/components';
+
 import { RW_CORE_SETTINGS } from '@renwu/core';
 
 @Component({
   selector: 'renwu-settings-settings',
   standalone: true,
   imports: [
-    RwIconComponent,
-    RwButtonComponent,
     RouterOutlet,
     RouterLink,
     RenwuPageWithSidebarComponent,
     RouterLinkActive,
-    AsyncPipe,
     TranslocoPipe,
   ],
   templateUrl: './settings.component.html',

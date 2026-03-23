@@ -8,6 +8,8 @@
 
 | Дата | Что сделано |
 |------|-------------|
+| 2026-03-23 | **Self-closing tags:** `nx generate @angular/core:self-closing-tags-migration --no-interactive` (292 тега, 83 файла); ESLint `@angular-eslint/template/prefer-self-closing-tags` на `*.html` во всех app/lib-проектах. |
+| 2026-03-23 | **Standalone / NG8113:** во всех рабочих `tsconfig` приложений и библиотек включён `unusedStandaloneImports: error`; прогон `nx generate @angular/core:cleanup-unused-imports --no-interactive` (49 импортов в 22 файлах). `apps/old/` не затрагивался. |
 | 2026-03-21 | `history-item`: `@switch (value.type)` + `@switch (field.field_name)` с `@default`; `dashboard`: вынесен `TranslocoHttpLoader` в `transloco-http-loader.ts`, удалён неиспользуемый `app.module.ts`; `MentionsListComponent`: убран `super(elementRef, cd)` после перехода базового класса на `inject()`. |
 | 2026-03-21 | **§2 NgModule:** во всех shell-приложениях удалён неиспользуемый `app.module.ts`. Федеративные приложения: `transloco-http-loader.ts` + импорт из `bootstrap.ts`. Shell `app`: плюс `custom-error-handler.ts`, `shell-app-initializers.ts` (логика бывшего конструктора `AppModule` после `bootstrapApplication`). `timeline`: мёртвый `app.module.ts` удалён (bootstrap без transloco, как и раньше). |
 | 2026-03-21 | **§2.3 / §1.3:** удалён закомментированный `libs/mentions/.../mentions.module.ts`; `messaging/item`: `@switch (message.type ?? MessageType.REGULAR)` для веток REGULAR / PULSE. **§1.2** (`*ngTemplateOutlet` в `dropdown` / `select`): осознанно **отложено** — нативной замены в control flow нет; трогать только вместе с редизайном или e2e. |
@@ -50,6 +52,7 @@ rg '\*ngTemplateOutlet' --glob '*.html' --glob '!apps/old/**'
 
 ### NgModule / `AppModule` / bootstrap
 
+- **`apps/old/`:** не трогаем — в том числе **не** гоняем на каталог официальные CLI-миграции Angular (`ng generate @angular/core:…`); см. §1.7.
 - **Сделано:** все перечисленные приложения стартуют через `bootstrapApplication` в `bootstrap.ts`; `main.ts` подключает federation и динамический импорт `bootstrap`.
 - **Сделано (shell apps):** файлов `app.module.ts` в приложениях больше нет; загрузчик переводов — `transloco-http-loader.ts`, shell `app` — см. §2.1.
 - **Дальше:** **новые** компоненты / директивы / пайпы — **standalone** (см. `nx.json`, ESLint `prefer-standalone`). Новые **`NgModule`** в библиотеках не заводить без необходимости.

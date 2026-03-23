@@ -17,7 +17,7 @@ import {
   RwSortTableDirective,
   RwSortTableRowDirective,
 } from '@renwu/components';
-import { RwFormatUserPipe } from '@renwu/core';
+
 import { BehaviorSubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import { AddProjectComponent } from '../add-project/add-project.component';
 import { ProjectService } from '../project.service';
@@ -36,7 +36,6 @@ import { ProjectService } from '../project.service';
     RwSortTableRowDirective,
     RwSortTableColumnDirective,
     RwSortTableColumnHeadDirective,
-    RwFormatUserPipe,
     RwButtonComponent,
     RenwuTourAnchorDirective,
     TranslocoPipe,

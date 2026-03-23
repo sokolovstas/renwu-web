@@ -20,8 +20,7 @@ import {
   RwButtonComponent,
   RwCheckboxComponent,
   RwSelectComponent,
-  RwTextInputComponent,
-  RwTimePickerComponent,
+  RwTextInputComponent
 } from '@renwu/components';
 import {
   Container,
@@ -42,7 +41,6 @@ import { ProjectService } from '../project.service';
     RwSelectComponent,
     RwButtonComponent,
     RwCheckboxComponent,
-    RwTimePickerComponent,
     RwTextInputComponent,
     TranslocoPipe,
   ],

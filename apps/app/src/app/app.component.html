@@ -27,18 +27,18 @@
       @if (mainRouteExist | async) {
         <div class="app-snap-right"></div>
       }
-      <renwu-sidebar class="app-sidebar z-10"></renwu-sidebar>
+      <renwu-sidebar class="app-sidebar z-10" />
       <div
         class="app-main-view flex flex-grow-1"
         [class.app-main-view-full]="(mainRouteExist | async) === false"
         >
-        <router-outlet></router-outlet>
+        <router-outlet />
       </div>
       @if (mainRouteExist | async) {
         <div
           class="app-task-view flex flex-grow-1 z-10 bg-gray-100 overflow-visible"
           >
-          <router-outlet name="section"></router-outlet>
+          <router-outlet name="section" />
         </div>
       }
     </div>
@@ -50,11 +50,10 @@
       <div #modalContainer></div>
     </div>
     @if (alertService.current) {
-      <rw-alert
-        [alert]="alertService.current"
-      ></rw-alert>
+      <rw-alert [alert]="alertService.current"
+       />
     }
-    <rw-toast-container></rw-toast-container>
-    <rw-tooltip-container></rw-tooltip-container>
+    <rw-toast-container />
+    <rw-tooltip-container />
   </div>
 }

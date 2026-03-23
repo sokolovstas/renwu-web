@@ -21,7 +21,7 @@ import {
     RwToastContainerComponent,
     RwTooltipContainerComponent,
   ],
-  template: `<router-outlet></router-outlet>
+  template: `<router-outlet />
     <div
       class="rw-modal-container"
       rwModalContainer
@@ -30,10 +30,10 @@ import {
       <div #modalContainer></div>
     </div>
     @if (alertService.current) {
-      <rw-alert [alert]="alertService.current"></rw-alert>
+      <rw-alert [alert]="alertService.current" />
     }
-    <rw-toast-container></rw-toast-container>
-    <rw-tooltip-container></rw-tooltip-container>`,
+    <rw-toast-container />
+    <rw-tooltip-container />`,
 })
 export class AppComponent {
   alertService = inject(RwAlertService);

@@ -5,8 +5,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent } from '@renwu/app-ui';
 import {
   ISelectItem,
-  RwButtonComponent,
-  RwSelectComponent,
+  RwSelectComponent
 } from '@renwu/components';
 import {
   AvatarComponent,
@@ -27,7 +26,6 @@ import { ProjectService } from '../project.service';
     AvatarComponent,
     RwSelectComponent,
     AvatarComponent,
-    RwButtonComponent,
     FormsModule,
     TranslocoPipe,
   ],

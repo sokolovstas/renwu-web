@@ -7,7 +7,7 @@ import { MentionsListItem } from './mentions-config';
   styleUrl: './mentions-list-item.component.scss',
   template: `
     <li class="mention-list-item">
-      <ng-container #itemComponentViewRef></ng-container>
+      <ng-container #itemComponentViewRef />
     </li>
   `,
 })

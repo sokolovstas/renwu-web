@@ -11,17 +11,15 @@ import {
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   RwButtonComponent,
-  RwCheckboxComponent,
   RwDatePickerComponent,
   RwModalBodyDirective,
   RwModalComponent,
   RwModalFooterDirective,
   RwModalService,
-  RwModalSubHeaderDirective,
   RwSelectComponent,
   RwTextAreaComponent,
   RwTextInputComponent,
-  RwToastService,
+  RwToastService
 } from '@renwu/components';
 import { ContainerD, Milestone, RwDataService } from '@renwu/core';
 
@@ -32,14 +30,12 @@ import { ContainerD, Milestone, RwDataService } from '@renwu/core';
     RwModalComponent,
     RwModalBodyDirective,
     RwModalFooterDirective,
-    RwModalSubHeaderDirective,
     RwModalBodyDirective,
     RwButtonComponent,
     RwTextInputComponent,
     RwSelectComponent,
     RwTextAreaComponent,
     RwDatePickerComponent,
-    RwCheckboxComponent,
     ReactiveFormsModule,
     AsyncPipe,
     TranslocoPipe

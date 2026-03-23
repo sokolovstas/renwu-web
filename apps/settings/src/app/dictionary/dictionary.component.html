@@ -60,55 +60,52 @@
                 rwSortTableColumn="order"
                 [rwSortTableRowHandler]="i"
                 >
-                <rw-icon icon="menu"></rw-icon>
+                <rw-icon icon="menu" />
               </div>
               <div rwSortTableColumn="label">
-                <rw-text-input
-                  formControlName="label"
+                <rw-text-input formControlName="label"
                   [borderless]="true"
-                ></rw-text-input>
+                 />
               </div>
               <div rwSortTableColumn="color">
-                <rw-color-picker formControlName="color"></rw-color-picker>
+                <rw-color-picker formControlName="color" />
               </div>
               <div rwSortTableColumn="symbol">
-                <rw-text-input
-                  formControlName="symbol"
+                <rw-text-input formControlName="symbol"
                   [borderless]="true"
-                ></rw-text-input>
+                 />
               </div>
               @switch (dictName) {
                 @case ('status') {
                   <div rwSortTableColumn="checkbox">
-                    <rw-checkbox formControlName="closed"></rw-checkbox>
+                    <rw-checkbox formControlName="closed" />
                   </div>
                   <div rwSortTableColumn="checkbox">
-                    <rw-checkbox formControlName="log_time"></rw-checkbox>
+                    <rw-checkbox formControlName="log_time" />
                   </div>
                   <!-- <div rwSortTableColumn="checkbox">
                 <rw-checkbox formControlName="account_time"></rw-checkbox>
               </div> -->
                   <div rwSortTableColumn="checkbox">
-                    <rw-checkbox formControlName="completed"></rw-checkbox>
+                    <rw-checkbox formControlName="completed" />
                   </div>
                   <div rwSortTableColumn="checkbox">
-                    <rw-checkbox formControlName="in_progress"></rw-checkbox>
+                    <rw-checkbox formControlName="in_progress" />
                   </div>
                   <div rwSortTableColumn="checkbox">
-                    <rw-checkbox formControlName="rebot"></rw-checkbox>
+                    <rw-checkbox formControlName="rebot" />
                   </div>
                 }
               }
             <div rwSortTableColumn="checkbox">
-              <rw-checkbox formControlName="default"></rw-checkbox>
+              <rw-checkbox formControlName="default" />
             </div>
             <div rwSortTableColumn="checkbox">
-              <rw-button
-                iconClass="trash"
+              <rw-button iconClass="trash"
                 [double]="true"
                 typeButton="icon"
                 (clicked)="removeItem(i)"
-              ></rw-button>
+               />
             </div>
           </div>
         }
@@ -144,10 +141,9 @@
 <rw-button action (clicked)="save()">{{
   'settings.save-changes' | transloco
 }}</rw-button>
-<rw-button
-  action
+<rw-button action
   iconClass="add-bold"
   typeButton="primary"
   (clicked)="addItem()"
-></rw-button>
+ />
 </renwu-page>

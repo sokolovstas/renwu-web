@@ -11,39 +11,35 @@
     <div rwModalBody class="w-96">
       <form [formGroup]="userForm">
         <label class="form-label">
-          <rw-text-input
-            #email
+          <rw-text-input #email
             formControlName="email"
             prompt="{{ 'settings.email' | transloco }}"
             [live]="true"
-          ></rw-text-input>
+           />
           <div class="form-supporting-text">
             {{ 'settings.leave-empty-to-create-dummy-user' | transloco }}
           </div>
         </label>
         <label class="form-label">
-          <rw-text-input
-            #username
+          <rw-text-input #username
             formControlName="username"
             prompt="{{ 'settings.username' | transloco }}"
             [live]="true"
-          ></rw-text-input>
+           />
           <div class="form-supporting-text">
             {{ 'settings.letters-a-z-numbers-and-underscore' | transloco }}
           </div>
         </label>
         <label class="form-label">
-          <rw-text-input
-            formControlName="full_name"
+          <rw-text-input formControlName="full_name"
             prompt="{{ 'settings.full-name' | transloco }}"
-          ></rw-text-input>
+           />
         </label>
         <label class="form-label">
-          <rw-select
-            formControlName="type"
+          <rw-select formControlName="type"
             modelName="UserType"
             prompt="{{ 'settings.select-user-type' | transloco }}"
-          ></rw-select>
+           />
           <div class="form-supporting-text">
             {{
             'settings.dummy-user-dont-have-email-but-can-work-in-projects'

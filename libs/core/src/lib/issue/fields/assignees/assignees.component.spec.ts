@@ -5,7 +5,7 @@ import { Issue } from './model/issue.model';
 import { IssueAssigneesComponent } from './shared/issue-fields/assignees/assignees.component';
 
 @Component({
-  template: ` <issue-assignees [issue]="issue"></issue-assignees>`,
+  template: ` <issue-assignees [issue]="issue" />`,
 })
 class TestHostComponent {
   issue: Issue;

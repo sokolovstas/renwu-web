@@ -10,32 +10,26 @@
   </div>
   <form [formGroup]="taskForm">
     <label class="form-label">
-      <rw-select
-        modelName="Type"
+      <rw-select modelName="Type"
         formControlName="type"
         [prompt]="'projects.type' | transloco"
-      ></rw-select>
+       />
     </label>
 
     <label class="form-label"
-      ><rw-select
-        modelName="Priority"
+      ><rw-select modelName="Priority"
         formControlName="priority"
         [prompt]="'projects.priority' | transloco"
-      ></rw-select
-    ></label>
+       /></label>
     <label class="form-label"
-      ><rw-select
-        modelName="Status"
+      ><rw-select modelName="Status"
         formControlName="status"
         [prompt]="'projects.status' | transloco"
-      ></rw-select
-    ></label>
+       /></label>
     <label class="form-label">
-      <rw-time-picker
-        formControlName="estimated_time"
+      <rw-time-picker formControlName="estimated_time"
         [prompt]="'projects.estimated-time' | transloco"
-      ></rw-time-picker>
+       />
     </label>
   </form>
   <rw-button action (clicked)="save()">{{

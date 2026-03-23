@@ -23,12 +23,11 @@
           [routerLink]="['..', 'milestone', m.id]"
           >
           {{ m.title }}
-          <rw-range
-            [max]="m.childs_estimated_total"
+          <rw-range [max]="m.childs_estimated_total"
             [ngModel]="m.childs_estimated_resolved"
             [disabled]="true"
             [filled]="true"
-          ></rw-range>
+           />
           <div>
             {{
             'projects.%resolved%-from-%total%'
@@ -51,6 +50,6 @@
   <div class="text-xl font-extralight mb-4">
     {{ 'projects.tasks' | transloco }}
   </div>
-  <renwu-projects-backlog></renwu-projects-backlog>
+  <renwu-projects-backlog />
 </div>
 </renwu-page>

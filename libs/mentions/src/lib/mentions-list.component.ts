@@ -19,15 +19,13 @@ import { BaseMentionsListItemComponent } from './mentions-list-item.component';
       [class.mention-dropdown]="dropUp"
       >
       @for (item of items; track item; let i = $index) {
-        <rw-mentions-list-item
-          [active]="activeIndex === i"
+        <rw-mentions-list-item [active]="activeIndex === i"
           [item]="item"
           [labelKey]="labelKey"
           [itemComponent]="itemComponent"
           (click)="select(item, $event)"
           (mouseenter)="activeIndex = i; activeItem = item"
-          >
-        </rw-mentions-list-item>
+           />
       }
     </ul>
     `,

@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "cleanup-unused-imports": "nx generate @angular/core:cleanup-unused-imports --no-interactive",
+    "migrate:self-closing-tags": "nx generate @angular/core:self-closing-tags-migration --no-interactive",
     "start": "nx run-many -t serve --parallel 20",
     "locales": "nx run-many -t extract-i18n; nx run-many -t extract-scoped-i18n",
     "i18n:extract": "transloco-keys-manager extract --langs src",

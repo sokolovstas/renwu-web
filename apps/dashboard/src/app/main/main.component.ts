@@ -6,10 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import {
-  Router,
-  RouterLink,
-  RouterLinkActive,
-  RouterOutlet,
+  Router
 } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
@@ -32,9 +29,6 @@ import { BehaviorSubject, combineLatest, map, shareReplay } from 'rxjs';
   selector: 'renwu-dashboard-main',
   standalone: true,
   imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     RenwuPageComponent,
     RenwuPageWithSidebarComponent,
     RwIssueTableComponent,

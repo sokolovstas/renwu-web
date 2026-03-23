@@ -19,14 +19,13 @@
       (clicked)="issueClick($event)"
       [issues]="issuesDisplay | async"
       ><div footer class="flex w-full justify-end mt-4">
-      <rw-pager
-        [currentPage]="issuesPage | async"
+      <rw-pager [currentPage]="issuesPage | async"
         [pagesCountLimit]="3"
         [pageSize]="rows"
         [rowsCount]="(issues | async)?.length"
         [showPages]="true"
         (pageChanged)="issuesPage.next($event)"
-      ></rw-pager></div
+       /></div
     ></renwu-issue-table>
   }
   @if ((recentIssues | async)?.length) {
@@ -38,14 +37,13 @@
       (clicked)="issueClick($event)"
       [issues]="recentIssuesDisplay | async"
       ><div footer class="flex w-full justify-end mt-4">
-      <rw-pager
-        [currentPage]="recentIssuesPage | async"
+      <rw-pager [currentPage]="recentIssuesPage | async"
         [pagesCountLimit]="3"
         [pageSize]="rows"
         [rowsCount]="(recentIssues | async)?.length"
         [showPages]="true"
         (pageChanged)="recentIssuesPage.next($event)"
-      ></rw-pager></div
+       /></div
     ></renwu-issue-table>
   }
   @if ((watched | async)?.length) {
@@ -57,14 +55,13 @@
       (clicked)="issueClick($event)"
       [issues]="watchedDisplay | async"
       ><div footer class="flex w-full justify-end mt-4">
-      <rw-pager
-        [currentPage]="watchedPage | async"
+      <rw-pager [currentPage]="watchedPage | async"
         [pagesCountLimit]="3"
         [pageSize]="rows"
         [rowsCount]="(watched | async)?.length"
         [showPages]="true"
         (pageChanged)="watchedPage.next($event)"
-      ></rw-pager></div
+       /></div
     ></renwu-issue-table>
   }
 </renwu-page>

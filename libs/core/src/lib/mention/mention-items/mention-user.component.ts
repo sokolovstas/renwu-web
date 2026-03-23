@@ -10,7 +10,7 @@ import { User } from '../../user/user.model';
 
 @Component({
   selector: 'renwu-mention-user',
-  template: `<renwu-avatar [user]="item"></renwu-avatar>
+  template: `<renwu-avatar [user]="item" />
     <div class="fullname">
       <div>{{ item?.full_name || item?.username }}</div>
       @if (item?.full_name) {

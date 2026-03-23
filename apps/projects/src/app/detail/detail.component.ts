@@ -7,7 +7,7 @@ import {
   RenwuSidebarService,
   RenwuTourAnchorDirective,
 } from '@renwu/app-ui';
-import { RwButtonComponent, RwIconComponent } from '@renwu/components';
+
 import { ProjectService } from '../project.service';
 
 @Component({
@@ -19,8 +19,6 @@ import { ProjectService } from '../project.service';
     RouterLinkActive,
     AsyncPipe,
     RenwuPageWithSidebarComponent,
-    RwIconComponent,
-    RwButtonComponent,
     RenwuTourAnchorDirective,
     TranslocoPipe,
   ],

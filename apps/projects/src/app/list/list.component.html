@@ -18,12 +18,11 @@
     </ul>
   </div>
   <renwu-page title="{{ 'projects.projects' | transloco }}">
-    <rw-checkbox
-      class="flex self-end"
+    <rw-checkbox class="flex self-end"
       [ngModel]="showArchived | async"
       (ngModelChange)="showArchived.next($event)"
       [label]="'projects.show-archived-projects' | transloco"
-    ></rw-checkbox>
+     />
     <div rwSortTable="users" class="flex flex-col w-full">
       <div class="flex flex-row w-full">
         <div rwSortTableColumnHead="key">{{ 'projects.key' | transloco }}</div>
@@ -48,10 +47,9 @@
             {{ container.title }}
           </div>
           <div rwSortTableColumn="checkbox">
-            <rw-checkbox
-              class="inline-block"
+            <rw-checkbox class="inline-block"
               [ngModel]="container.archived"
-            ></rw-checkbox>
+             />
           </div>
         </a>
       }

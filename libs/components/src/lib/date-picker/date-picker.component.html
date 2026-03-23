@@ -12,7 +12,7 @@
   </div>
   <span>{{ label }}</span>
 </div>
-<rw-icon class="icon" icon="keyboard_arrow_down" size="small"> </rw-icon>
+<rw-icon class="icon" icon="keyboard_arrow_down" size="small" />
 
 <rw-dropdown
   #dropdown
@@ -28,12 +28,10 @@
     <div class="dropdown-wrapper" [class.range]="range">
       <div class="picker-wrapper">
         <div class="date-time-wrapper">
-          <rw-text-input
-            [(ngModel)]="labelStart"
+          <rw-text-input [(ngModel)]="labelStart"
             [prompt]="prompt"
-          ></rw-text-input>
-          <rw-calendar
-            class="rw-date-picker-popup-calendar"
+           />
+          <rw-calendar class="rw-date-picker-popup-calendar"
             [hideOverflow]="true"
             [selectionStart]="selectionStart"
             [selectionEnd]="selectionEnd"
@@ -42,14 +40,13 @@
             [minDate]="minDate"
             [maxDate]="maxDate"
             (changed)="onCalendarChangeStart($event)"
-          ></rw-calendar>
+           />
         </div>
         @if (range) {
           <div class="separator"></div>
           <div class="date-time-wrapper">
-            <rw-text-input [(ngModel)]="labelEnd"></rw-text-input>
-            <rw-calendar
-              class="rw-date-picker-popup-calendar"
+            <rw-text-input [(ngModel)]="labelEnd" />
+            <rw-calendar class="rw-date-picker-popup-calendar"
               [hideOverflow]="true"
               [selectionStart]="selectionStart"
               [selectionEnd]="selectionEnd"
@@ -58,7 +55,7 @@
               [minDate]="minDate"
               [maxDate]="maxDate"
               (changed)="onCalendarChangeEnd($event)"
-            ></rw-calendar>
+             />
           </div>
         }
         @if (range && helpers) {

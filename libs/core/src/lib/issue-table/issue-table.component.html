@@ -3,52 +3,48 @@
   rwSortTable="issues"
   [autohideColumns]="true"
   >
-  <ng-content select="[header]"></ng-content>
+  <ng-content select="[header]" />
   <div class="renwu-issue-table__header" [rwSortTableRow]="-1">
     <!-- <div rwSortTableColumnHead="key">{{ 'core.key' | transloco }}</div> -->
     <div rwSortTableColumnHead="title">{{ 'core.title' | transloco }}</div>
-    <renwu-issue-table-header-column
-      rwSortTableColumnHead="priority"
+    <renwu-issue-table-header-column rwSortTableColumnHead="priority"
       [groupable]="groupable"
       [sortable]="sortable"
       [listOptions]="listOptions"
       (listOptionsChange)="updateListOptions($event)"
       key="priority"
       label="{{ 'core.priority' | transloco }}"
-    ></renwu-issue-table-header-column>
-    <renwu-issue-table-header-column
-      rwSortTableColumnHead="type"
+     />
+    <renwu-issue-table-header-column rwSortTableColumnHead="type"
       [groupable]="groupable"
       [sortable]="sortable"
       [listOptions]="listOptions"
       (listOptionsChange)="updateListOptions($event)"
       key="type"
       label="{{ 'core.type' | transloco }}"
-    ></renwu-issue-table-header-column>
-    <renwu-issue-table-header-column
-      rwSortTableColumnHead="resolution"
+     />
+    <renwu-issue-table-header-column rwSortTableColumnHead="resolution"
       [groupable]="groupable"
       [sortable]="sortable"
       [listOptions]="listOptions"
       (listOptionsChange)="updateListOptions($event)"
       key="resolution"
       label="{{ 'core.resolution' | transloco }}"
-    ></renwu-issue-table-header-column>
+     />
     <div rwSortTableColumnHead="estimated_time">
       {{ 'core.estimated-time' | transloco }}
     </div>
     <div rwSortTableColumnHead="completion">
       {{ 'core.completion' | transloco }}
     </div>
-    <renwu-issue-table-header-column
-      rwSortTableColumnHead="status"
+    <renwu-issue-table-header-column rwSortTableColumnHead="status"
       [groupable]="groupable"
       [sortable]="sortable"
       [listOptions]="listOptions"
       (listOptionsChange)="updateListOptions($event)"
       key="status"
       label="{{ 'core.status' | transloco }}"
-    ></renwu-issue-table-header-column>
+     />
     <div rwSortTableColumnHead="assignes">
       {{ 'core.assignes' | transloco }}
     </div>
@@ -72,7 +68,7 @@
       {{ 'core.date-last-update' | transloco }}
     </div>
   </div>
-  <ng-content select="[subheader]"></ng-content>
+  <ng-content select="[subheader]" />
   <div
     class="renwu-issue-table__body"
     [class.renwu-issue-table__body-scrollable]="fixedHeader"
@@ -86,10 +82,10 @@
         <!-- <div rwSortTableColumn="key">{{ issue.key }}</div> -->
         <div rwSortTableColumn="title">{{ issue.key }} - {{ issue.title }}</div>
         <div rwSortTableColumn="priority">
-          <renwu-issue-priority [value]="issue.priority"></renwu-issue-priority>
+          <renwu-issue-priority [value]="issue.priority" />
         </div>
         <div rwSortTableColumn="type">
-          <renwu-issue-type [value]="issue.type"></renwu-issue-type>
+          <renwu-issue-type [value]="issue.type" />
         </div>
         <div rwSortTableColumn="resolution">
           {{ issue.resolution?.label }}
@@ -99,22 +95,21 @@
         </div>
         <div rwSortTableColumn="completion">{{ issue.completion }}</div>
         <div rwSortTableColumn="status">
-          <renwu-issue-status [value]="issue.status"></renwu-issue-status>
+          <renwu-issue-status [value]="issue.status" />
         </div>
         <div rwSortTableColumn="assignes">
-          <renwu-issue-assignees [issue]="issue"></renwu-issue-assignees>
+          <renwu-issue-assignees [issue]="issue" />
         </div>
         <div rwSortTableColumn="skill">{{ issue.skill }}</div>
         <div rwSortTableColumn="milestones">
-          <renwu-issue-milestones
-            [value]="issue.milestones"
-          ></renwu-issue-milestones>
+          <renwu-issue-milestones [value]="issue.milestones"
+           />
         </div>
         <div rwSortTableColumn="affected_versions">
           {{ issue.affected_versions }}
         </div>
         <div rwSortTableColumn="reporter">
-          <renwu-avatar [user]="issue.reporter"></renwu-avatar>
+          <renwu-avatar [user]="issue.reporter" />
         </div>
         <div rwSortTableColumn="date_created">
           {{ issue.date_created | rwDate: 'P p' }}
@@ -130,7 +125,7 @@
   </div>
   <div class="flex flex-row">
     <div class="flex flex-row flex-1 basis-full">
-      <ng-content select="[footer]"></ng-content>
+      <ng-content select="[footer]" />
     </div>
 
     @if (showExport) {

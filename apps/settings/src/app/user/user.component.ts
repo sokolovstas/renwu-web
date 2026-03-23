@@ -1,4 +1,4 @@
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -51,7 +51,6 @@ import { firstValueFrom, map, shareReplay, switchMap, tap } from 'rxjs';
     RwColorPickerComponent,
     AvatarComponent,
     AsyncPipe,
-    JsonPipe,
     RenwuPageComponent,
     ReactiveFormsModule,
     TranslocoPipe,

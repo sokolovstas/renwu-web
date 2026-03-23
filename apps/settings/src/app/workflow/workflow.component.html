@@ -7,11 +7,10 @@
       [formGroup]="workflowForm"
       class="flex w-full h-full flex-col overflow-hidden"
       >
-      <rw-text-input
-        formControlName="title"
+      <rw-text-input formControlName="title"
         prompt="{{ 'settings.title' | transloco }}"
         class="mb-4"
-      ></rw-text-input>
+       />
       <div class="flex flex-row w-full h-full gap-2 overflow-hidden">
         <div class="flex-col w-full h-full gap-2 overflow-auto">
           @for (status of groupedTransitions; track status; let i = $index) {
@@ -21,10 +20,9 @@
                 class="flex flex-col items-start p-4 bg-gray-100 rounded-2xl mb-4"
                 >
                 {{ 'settings.transition-from' | transloco }}
-                <renwu-issue-status
-                  class="my-4"
+                <renwu-issue-status class="my-4"
                   [value]="status.controls.step.value"
-                ></renwu-issue-status>
+                 />
                 {{ 'settings.transition-to' | transloco }}
                 @for (to of status.controls.tos.controls; track to; let i = $index) {
                   <div>
@@ -41,23 +39,20 @@
                         >
                         <ng-template #selectedItemTemplate let-select="select">
                           <div (click)="select.switchPopup()">
-                            <renwu-issue-status
-                              [value]="to.controls.to.value"
-                            ></renwu-issue-status>
+                            <renwu-issue-status [value]="to.controls.to.value"
+                             />
                           </div>
                         </ng-template>
                       </rw-select>
-                      <rw-text-input
-                        formControlName="label"
+                      <rw-text-input formControlName="label"
                         prompt="{{ 'settings.translation-label' | transloco }}"
                         [borderless]="true"
-                      ></rw-text-input>
-                      <rw-button
-                        iconClass="trash"
+                       />
+                      <rw-button iconClass="trash"
                         [double]="true"
                         typeButton="icon"
                         (clicked)="removeStep(status, i)"
-                      ></rw-button>
+                       />
                     </div>
                   </div>
                 }

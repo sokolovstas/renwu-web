@@ -72,13 +72,11 @@
   }
 
   @if (showClear && value !== undefined && value !== '') {
-    <rw-icon
-      [tabindex]="-1"
+    <rw-icon [tabindex]="-1"
       class="rw-text-input-clear"
       icon="close"
       size="normal"
       (mousedown)="onClear($event)"
-      >
-    </rw-icon>
+       />
   }
 </div>

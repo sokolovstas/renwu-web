@@ -1,17 +1,15 @@
 @if (destination?.type !== DestinationType.FAV) {
   @if (!disableAttachments) {
-    <renwu-attachment
-      #attachments
+    <renwu-attachment #attachments
       [flagDropZone]="canReceiveFiles"
       [flagPaste]="canReceiveFiles"
       (fileUploaded)="onFileUploaded($event)"
-      >
-    </renwu-attachment>
+       />
   }
   @if (editMessage) {
     <div class="renwu-messaging-input__edit-wrapper">
       <div class="renwu-messaging-input__edit-cancel" (click)="onCancelEdit()">
-        <rw-icon icon="close"></rw-icon>
+        <rw-icon icon="close" />
       </div>
       <div class="renwu-messaging-input__edit-text">
         <div class="renwu-messaging-input__edit-title">
@@ -26,8 +24,7 @@
     [class.message-external]="isExternal && !userService.getIsExternal()"
     >
     <div class="renwu-messaging-input__input-container">
-      <rw-text-area
-        #textarea
+      <rw-text-area #textarea
         class="renwu-messaging-input__text-area"
         [live]="true"
         [disabled]="(messageService.connected | async) === false"
@@ -35,8 +32,7 @@
         [(ngModel)]="text"
         (keydown)="onKeyDown($event)"
         [prompt]="prompt | async"
-        >
-      </rw-text-area>
+         />
     </div>
     <div class="renwu-messaging-input__buttons">
       @if (displayButtonChangeType) {
@@ -62,12 +58,10 @@
         }
       }
       @if (!disableAttachments) {
-        <renwu-attachment
-          [flagButton]="true"
+        <renwu-attachment [flagButton]="true"
           classButton="renwu-messaging-input__button icon-add"
           (fileUploaded)="onFileUploaded($event)"
-          >
-        </renwu-attachment>
+           />
       }
       <!-- <rw-messaging-emoji
       class="renwu-messaging-input__button renwu-messaging-input__button-emoji"

@@ -5,29 +5,26 @@
   <div rwModalBody class="w-96">
     <form [formGroup]="projectForm">
       <label class="form-label">
-        <rw-text-input
-          [renwuTourAnchor]="'projects-add-name'"
+        <rw-text-input [renwuTourAnchor]="'projects-add-name'"
           formControlName="title"
           [prompt]="'projects.project-name' | transloco"
-        ></rw-text-input>
+         />
       </label>
       <label class="form-label">
-        <rw-text-input
-          [renwuTourAnchor]="'projects-add-key'"
+        <rw-text-input [renwuTourAnchor]="'projects-add-key'"
           formControlName="key"
           [prompt]="'projects.project-key' | transloco"
           [uppercase]="true"
           [live]="true"
-        ></rw-text-input>
+         />
       </label>
       <div formGroupName="settings">
         <label class="form-label">
-          <rw-select
-            [renwuTourAnchor]="'projects-add-scope'"
+          <rw-select [renwuTourAnchor]="'projects-add-scope'"
             formControlName="external_user_scope"
             modelName="ExternalUserScope"
             [prompt]="'projects.project-external-user-scope' | transloco"
-          ></rw-select>
+           />
         </label>
       </div>
     </form>

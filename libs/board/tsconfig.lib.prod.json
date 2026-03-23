@@ -4,5 +4,11 @@
     "declarationMap": false,
     "moduleResolution": "bundler"
   },
-  "angularCompilerOptions": {}
+  "angularCompilerOptions": {
+    "extendedDiagnostics": {
+      "checks": {
+        "unusedStandaloneImports": "error"
+      }
+    }
+  }
 }

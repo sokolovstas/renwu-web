@@ -1,5 +1,7 @@
 {
-  "extends": ["../../.eslintrc.json"],
+  "extends": [
+    "../../.eslintrc.json"
+  ],
   "ignorePatterns": [
     "!**/*",
     "src/lib/search/oql/OQLLexer.ts",
@@ -9,7 +11,9 @@
   ],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
@@ -35,18 +39,29 @@
       ]
     },
     {
-      "files": ["**/bootstrap.ts", "**/app.module.ts"],
+      "files": [
+        "**/bootstrap.ts",
+        "**/app.module.ts"
+      ],
       "rules": {
         "@nx/enforce-module-boundaries": "off"
       }
     },
     {
-      "files": ["*.html"],
-      "extends": ["plugin:@nx/angular-template"],
-      "rules": {}
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@nx/angular-template"
+      ],
+      "rules": {
+        "@angular-eslint/template/prefer-self-closing-tags": "error"
+      }
     },
     {
-      "files": ["src/lib/markdown/markdown.service.ts"],
+      "files": [
+        "src/lib/markdown/markdown.service.ts"
+      ],
       "rules": {
         "no-useless-escape": "off",
         "no-empty": "off"

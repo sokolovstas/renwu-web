@@ -1,30 +1,27 @@
 @if (rowsCount > 0 && showJumpToEnd) {
-  <rw-button
-    class="margin"
+  <rw-button class="margin"
     typeButton="link"
     iconClass="shevron-right-double"
     padding="0.6rem 1rem"
     [disabled]="currentPage === 1 || rowsCount === -1"
     (click)="onClickFirst()"
-  ></rw-button>
+   />
 }
 @if (rowsCount > 0) {
-  <rw-button
-    class="margin"
+  <rw-button class="margin"
     typeButton="link"
     iconClass="shevron-right"
     padding="0.6rem 1rem"
     [disabled]="currentPage === 1 || rowsCount === -1"
     (click)="onClickPrev()"
-  ></rw-button>
+   />
 }
 @if (rowsCount > 0 && showPageTextInput) {
-  <rw-text-input
-    [(ngModel)]="currentPage"
+  <rw-text-input [(ngModel)]="currentPage"
     type="number"
     class="margin"
     placeholder="Current page"
-  ></rw-text-input>
+   />
   <div class="margin">
     <span>{{ 'components.from' | transloco }}</span>
   </div>
@@ -48,22 +45,19 @@
     </div>
   }
   @if (rowsCount > 0) {
-    <rw-button
-      class="margin"
+    <rw-button class="margin"
       typeButton="link"
       iconClass="shevron-left"
       padding="0.6rem 1rem"
       [disabled]="currentPage === pageCount || rowsCount === -1"
       (click)="onClickNext()"
-    ></rw-button>
+     />
   }
   @if (rowsCount > 0 && showJumpToEnd) {
-    <rw-button
-      typeButton="link"
+    <rw-button typeButton="link"
       iconClass="shevron-left-double"
       padding="0.6rem 1rem"
       [disabled]="currentPage === pageCount || rowsCount === -1"
       (click)="onClickLast()"
-      >
-    </rw-button>
+       />
   }

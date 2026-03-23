@@ -7,15 +7,13 @@ import {
   RwButtonComponent,
   RwModalService,
   RwSortTableColumnDirective,
-  RwSortTableColumnHeadDirective,
   RwSortTableDirective,
-  RwSortTableRowDirective,
+  RwSortTableRowDirective
 } from '@renwu/components';
 import {
   AvatarComponent,
-  RwFormatUserPipe,
   RwUserService,
-  User,
+  User
 } from '@renwu/core';
 import { AddUserComponent } from '../add-user/add-user.component';
 
@@ -25,11 +23,9 @@ import { AddUserComponent } from '../add-user/add-user.component';
   imports: [
     RwButtonComponent,
     AsyncPipe,
-    RwFormatUserPipe,
     RwSortTableDirective,
     RwSortTableRowDirective,
     RwSortTableColumnDirective,
-    RwSortTableColumnHeadDirective,
     AvatarComponent,
     RenwuPageComponent,
     TranslocoPipe,

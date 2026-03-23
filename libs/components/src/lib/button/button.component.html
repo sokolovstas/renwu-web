@@ -14,14 +14,13 @@
   [class.attention]="isAttention"
   (click)="onClickButton()"
   >
-  <rw-icon
-    class="icon"
+  <rw-icon class="icon"
     [class.in-progress]="inProgress"
     [size]="iconSize"
     [icon]="iconClass"
-  ></rw-icon>
+   />
   <span [class.in-progress]="inProgress" #textelement
-    ><ng-content></ng-content>{{ text }}</span
+    ><ng-content />{{ text }}</span
     >
     @if (inProgress) {
       <div class="spinner">
