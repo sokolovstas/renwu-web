@@ -8,6 +8,7 @@
 
 | Дата | Что сделано |
 |------|-------------|
+| 2026-03-23 | **CommonModule → standalone:** контрольный прогон `nx generate @angular/core:common-to-standalone-migration --no-interactive` — **0** оставшихся `CommonModule`; п. 14 [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) закрыт. |
 | 2026-03-23 | **Self-closing tags:** `nx generate @angular/core:self-closing-tags-migration --no-interactive` (292 тега, 83 файла); ESLint `@angular-eslint/template/prefer-self-closing-tags` на `*.html` во всех app/lib-проектах. |
 | 2026-03-23 | **Standalone / NG8113:** во всех рабочих `tsconfig` приложений и библиотек включён `unusedStandaloneImports: error`; прогон `nx generate @angular/core:cleanup-unused-imports --no-interactive` (49 импортов в 22 файлах). `apps/old/` не затрагивался. |
 | 2026-03-21 | `history-item`: `@switch (value.type)` + `@switch (field.field_name)` с `@default`; `dashboard`: вынесен `TranslocoHttpLoader` в `transloco-http-loader.ts`, удалён неиспользуемый `app.module.ts`; `MentionsListComponent`: убран `super(elementRef, cd)` после перехода базового класса на `inject()`. |

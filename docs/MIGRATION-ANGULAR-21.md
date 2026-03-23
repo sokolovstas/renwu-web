@@ -49,6 +49,14 @@
 
 Детали 5.x: правило на весь `*.ts` не ставили — для `e2e` и прочих файлов нет Angular template parser. Инлайн-шаблоны закрывает схема; для `.html` дальше достаточно `nx run-many -t lint --all --fix`. См. [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (п. 10).
 
+## Фаза 6: `CommonModule` → точечные импорты (официальная схема)
+
+| Шаг | Описание | Статус |
+|-----|----------|--------|
+| 6.1 | Схема **`common-to-standalone-migration`**: `nx generate @angular/core:common-to-standalone-migration --no-interactive` — подтверждение отсутствия `CommonModule` в активном контуре (**0** правок) | ✅ |
+
+Детали 6.x: база уже была в фазе 1.5; схема дублирует миграцию из [доки Angular](https://angular.dev/reference/migrations/common-to-standalone). Повторный прогон — `npm run migrate:common-to-standalone`. См. [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (п. 14).
+
 ## Дальше (что осталось)
 
 - **Шаблоны / bootstrap:** активный контур закрыт по [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) (§1.1–§1.4, §2). **`apps/old/` не трогаем** (ни шаблоны, ни standalone, ни CLI-схемы) — отдельное переписывание, вне этого плана.

@@ -37,7 +37,7 @@ npx ng generate @angular/core:<имя-схемы>
 | 11 | ✅ | [NgClass → class](https://angular.dev/reference/migrations/ngclass-to-class) | `ngclass-to-class-migration` | `npx ng generate @angular/core:ngclass-to-class` | **Сделано** вручную: MIGRATION-ANGULAR-21 §1.2–1.4. Схема — поймать пропуски. |
 | 12 | ✅ | [NgStyle → style](https://angular.dev/reference/migrations/ngstyle-to-style) | `ngstyle-to-style-migration` | `npx ng generate @angular/core:ngstyle-to-style` | **Сделано** вручную: §1.1 и курс на `[style.*]`. Схема — пропуски. |
 | 13 | ✅ | [RouterTestingModule](https://angular.dev/reference/migrations/router-testing-module-migration) | `router-testing-module-migration` | `npx ng generate @angular/core:router-testing-module-migration` | **Сделано** вручную: §3.1. Схема — дожать оставшиеся `*.spec.ts`. |
-| 14 | ◐ | [CommonModule → standalone imports](https://angular.dev/reference/migrations/common-to-standalone) | `common-to-standalone-migration` | `npx ng generate @angular/core:common-to-standalone` | **Частично** вручную: §1.5 + трекер. Схема — остатки `NgIf`/`NgFor`/pipes. |
+| 14 | ✅ | [CommonModule → standalone imports](https://angular.dev/reference/migrations/common-to-standalone) | `common-to-standalone-migration` (алиас `common-to-standalone`) | `nx generate @angular/core:common-to-standalone-migration --no-interactive` | **Закрыто:** ранее §1.5 (точечный `AsyncPipe` и др.); контрольный прогон схемы — **0** оставшихся `CommonModule`. В исходниках только точечные импорты из `@angular/common` (`AsyncPipe`, `NgTemplateOutlet`, …). Повтор: `npm run migrate:common-to-standalone`. |
 
 **Вне таблицы схем** (гайд, не `ng generate`): [миграция анимаций](https://angular.dev/guide/animations/migration) — ✅ **сделано** вручную (MIGRATION-ANGULAR-21 §3.2).
 
@@ -54,7 +54,7 @@ npx ng generate @angular/core:<имя-схемы>
 3. **`control-flow-migration`** — только если ещё есть старый синтаксис и нужна автоматизация; иначе продолжать вручную по [TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md).
 4. **`route-lazy-loading-migration`** — только после явного аудита маршрутов и federation.
 
-Периодически при крупных рефакторингах: снова **`nx generate @angular/core:cleanup-unused-imports --no-interactive`** — пока NG8113 включён как `error`, сборка не пропустит новые лишние `imports`. При появлении новых инлайн-шаблонов без самозакрытия — **`npm run migrate:self-closing-tags`** (или правки только в `.html` через ESLint `--fix`).
+Периодически при крупных рефакторингах: снова **`nx generate @angular/core:cleanup-unused-imports --no-interactive`** — пока NG8113 включён как `error`, сборка не пропустит новые лишние `imports`. При появлении новых инлайн-шаблонов без самозакрытия — **`npm run migrate:self-closing-tags`** (или правки только в `.html` через ESLint `--fix`). Если кто-то снова подтянет **`CommonModule`** в standalone — **`npm run migrate:common-to-standalone`**.
 
 ---
 
