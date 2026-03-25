@@ -22,12 +22,12 @@ npx ng generate @angular/core:<имя-схемы>
 
 ## Список миграций (как в документации)
 
-**Статус (renwu):** ✅ — цель закрыта **вручную** по [MIGRATION-ANGULAR-21.md](./MIGRATION-ANGULAR-21.md) (CLI-схему не обязательно гонять) · ◐ — **частично** (остатки или только активный контур) · ⬜ — **не делали** целенаправленно (кандидат на схему или ручной дожим).
+**Статус (renwu):** ✅ — цель закрыта **вручную** по [MIGRATION-ANGULAR-21.md](./MIGRATION-ANGULAR-21.md) и [TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md) в **активном контуре** (без `apps/old/` — §1.7 трекера). ◐ — **частично** или с оговорками · ⬜ — **не делали** целенаправленно.
 
 | # | Статус | Тема (как в доке) | Схема `@angular/core` | Команда (пример) | Для renwu |
 |---|--------|-------------------|-------------------------|------------------|-----------|
-| 1 | ◐ | [Standalone](https://angular.dev/reference/migrations/standalone) | `standalone-migration` (алиас `standalone`) | `npx ng generate @angular/core:standalone-migration` | Активный контур на standalone ([TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md)); **`apps/old/` вне объёма**. Повторный прогон схемы — только с `--path` по нужным папкам, не по архиву. |
-| 2 | ◐ | [Control Flow](https://angular.dev/reference/migrations/control-flow) | `control-flow-migration` | `npx ng generate @angular/core:control-flow` | `@if` / `@for` уже есть; возможны оставшиеся `*ngIf` / `*ngFor`. Схема или вручную по трекеру, удобно с `--path`. |
+| 1 | ✅ | [Standalone](https://angular.dev/reference/migrations/standalone) | `standalone-migration` (алиас `standalone`) | `nx generate @angular/core:standalone-migration --no-interactive` *(опц. `--path`)* | **Закрыто** в активном контуре: `NgModule` нет, `bootstrapApplication` ([TEMPLATE-AND-MODULE-TRACKER §2](./TEMPLATE-AND-MODULE-TRACKER.md)). Архив **`apps/old/`** вне плана миграции и **не отменяет** этот статус. Опциональный прогон схемы с `--path` при регрессах. |
+| 2 | ✅ | [Control Flow](https://angular.dev/reference/migrations/control-flow) | `control-flow-migration` (алиас `control-flow`) | `nx generate @angular/core:control-flow-migration --no-interactive` *(опц. `--path`)* | **Закрыто** по [трекеру §1.1](./TEMPLATE-AND-MODULE-TRACKER.md#11-базовая-миграция-control-flow): в `.html` активного контура нет `*ngIf` / `*ngFor` / `*ngSwitch*`. Схема — опциональный дожим; **`apps/old/`** не трогаем. |
 | 3 | ✅ | [inject()](https://angular.dev/reference/migrations/inject-function) | `inject-migration` (алиас `inject`) | `nx generate @angular/core:inject-migration --no-interactive` *(опц. `--path=…`)* | **Проверено:** выборочные прогоны (`libs/board`, `libs/components`, `libs/core/src/lib/select`) — **0** правок; в декорированных классах уже `inject()`. ESLint **`prefer-inject`** (`warn`). Схема не трогает классы **без** Angular-декоратора (см. `filters.select.ts` — мёртвый `SelectModelFilter`, не в public API). Повтор: `npm run migrate:inject`. |
 | 4 | ⬜ | [Lazy-loaded routes](https://angular.dev/reference/migrations/route-lazy-loading) | `route-lazy-loading-migration` (алиас `route-lazy-loading`) | `npx ng generate @angular/core:route-lazy-loading-migration` | **Оценить**: `routes` / federation; перед прогоном — снимок маршрутов. |
 | 5 | ⬜ | [Signal inputs](https://angular.dev/reference/migrations/signal-inputs) | `signal-input-migration` | `npx ng generate @angular/core:signal-input-migration` | **Кандидат**: `@Input()` → `input()`. `--best-effort-mode`, `--insert-todos`, `--analysis-dir`; постепенно. |
@@ -52,8 +52,9 @@ npx ng generate @angular/core:<имя-схемы>
 Во всех пунктах: **`apps/old/` не затрагивать** (см. выше).
 
 1. **`signal-input-migration`** / **`output-migration`** / **`signal-queries-migration`** — по одной библиотеке или приложению, с тестами и ревью; опция `--insert-todos` для граничных случаев.
-2. **`control-flow-migration`** — только если ещё есть старый синтаксис и нужна автоматизация; иначе продолжать вручную по [TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md).
-3. **`route-lazy-loading-migration`** — только после явного аудита маршрутов и federation.
+2. **`route-lazy-loading-migration`** — только после явного аудита маршрутов и federation.
+
+**Control flow / standalone:** по таблице (п. 1–2) закрыты; при регрессе старого синтаксиса или `NgModule` — точечно **`nx generate`** с `--path` по [трекеру](./TEMPLATE-AND-MODULE-TRACKER.md).
 
 **inject():** для активного контура см. п. 3 таблицы (схема дала 0 правок; контроль — **`prefer-inject`** и при необходимости **`npm run migrate:inject`**).
 
