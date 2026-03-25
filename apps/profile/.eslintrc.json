@@ -28,7 +28,8 @@
             "style": "kebab-case"
           }
         ],
-        "@angular-eslint/prefer-standalone": "error"
+        "@angular-eslint/prefer-standalone": "error",
+        "@angular-eslint/prefer-inject": "warn"
       },
       "extends": [
         "plugin:@nx/angular",

@@ -57,6 +57,15 @@
 
 Детали 6.x: база уже была в фазе 1.5; схема дублирует миграцию из [доки Angular](https://angular.dev/reference/migrations/common-to-standalone). Повторный прогон — `npm run migrate:common-to-standalone`. См. [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (п. 14).
 
+## Фаза 7: `inject()` вместо конструкторного DI
+
+| Шаг | Описание | Статус |
+|-----|----------|--------|
+| 7.1 | Контрольные прогоны **`inject-migration`** (`libs/board`, `libs/components`, `libs/core/src/lib/select`) — **0** правок; в `@Component` / `@Injectable` / `@Directive` / `@Pipe` уже `inject()` | ✅ |
+| 7.2 | ESLint **`@angular-eslint/prefer-inject`**: `warn` во всех `apps/*` и `libs/*` (подсказка на регресс с параметрами конструктора) | ✅ |
+
+Детали 7.x: схема не меняет классы **без** Angular-декоратора. В репозитории остался неиспользуемый `SelectModelFilter` в `libs/core/src/lib/select/filters.select.ts` с `constructor(private dataService: …)` — вне объёма схемы; при желании удалить файл или перевести на фабрику/DI осознанно. Повторный прогон — `npm run migrate:inject` с `--path` при необходимости. См. [MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md](./MIGRATION-ANGULAR-OFFICIAL-SCHEMATICS.md) (п. 3).
+
 ## Дальше (что осталось)
 
 - **Шаблоны / bootstrap:** активный контур закрыт по [TEMPLATE-AND-MODULE-TRACKER.md](./TEMPLATE-AND-MODULE-TRACKER.md) (§1.1–§1.4, §2). **`apps/old/` не трогаем** (ни шаблоны, ни standalone, ни CLI-схемы) — отдельное переписывание, вне этого плана.

@@ -12,6 +12,8 @@ npx ng generate @angular/core:<имя-схемы>
 
 **Линтер:** в `@angular-eslint` 21.x **нет** отдельного правила «лишние записи в `imports` у standalone»; это **[NG8113 · Unused standalone imports](https://angular.dev/extended-diagnostics/NG8113)** — расширенная диагностика компилятора Angular, задаётся в **`angularCompilerOptions.extendedDiagnostics.checks.unusedStandaloneImports`** (`warning` / `error` / `suppress`).
 
+Для **`inject()`** есть **`@angular-eslint/prefer-inject`** (`warn` в `apps/*` и `libs/*`) — только для классов с `@Component` / `@Directive` / `@Injectable` / `@Pipe`; намёк на схему **`inject-migration`**, автозамены нет.
+
 Для **самозакрывающихся тегов** в шаблонах используется ESLint **`@angular-eslint/template/prefer-self-closing-tags`** (`fixable`) на **`*.html`** в каждом `apps/*/.eslintrc.json` и `libs/*/.eslintrc.json`. На весь `*.ts` подряд то же правило вешать нельзя: для `e2e/*.ts` и прочих файлов нет Angular template parser — линт падает. Инлайн-шаблоны в `.ts` закрываются официальной схемой **`self-closing-tags-migration`** (см. п. 10).
 
 **`apps/old/` не трогаем:** ни официальными схемами, ни ручными правками в рамках этих документов — архив вне продуктового контура ([TEMPLATE-AND-MODULE-TRACKER §1.7](./TEMPLATE-AND-MODULE-TRACKER.md#17-архив-appsold)). Любой CLI-прогон — только с явным `--path` по `libs/…` и рабочим `apps/…`, **без** `apps/old`.
@@ -26,7 +28,7 @@ npx ng generate @angular/core:<имя-схемы>
 |---|--------|-------------------|-------------------------|------------------|-----------|
 | 1 | ◐ | [Standalone](https://angular.dev/reference/migrations/standalone) | `standalone-migration` (алиас `standalone`) | `npx ng generate @angular/core:standalone-migration` | Активный контур на standalone ([TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md)); **`apps/old/` вне объёма**. Повторный прогон схемы — только с `--path` по нужным папкам, не по архиву. |
 | 2 | ◐ | [Control Flow](https://angular.dev/reference/migrations/control-flow) | `control-flow-migration` | `npx ng generate @angular/core:control-flow` | `@if` / `@for` уже есть; возможны оставшиеся `*ngIf` / `*ngFor`. Схема или вручную по трекеру, удобно с `--path`. |
-| 3 | ⬜ | [inject()](https://angular.dev/reference/migrations/inject-function) | `inject-migration` (алиас `inject`) | `npx ng generate @angular/core:inject-migration` | **Кандидат**: конструктор → `inject()`. Большой дифф; лучше по библиотекам (`--path=libs/...`). |
+| 3 | ✅ | [inject()](https://angular.dev/reference/migrations/inject-function) | `inject-migration` (алиас `inject`) | `nx generate @angular/core:inject-migration --no-interactive` *(опц. `--path=…`)* | **Проверено:** выборочные прогоны (`libs/board`, `libs/components`, `libs/core/src/lib/select`) — **0** правок; в декорированных классах уже `inject()`. ESLint **`prefer-inject`** (`warn`). Схема не трогает классы **без** Angular-декоратора (см. `filters.select.ts` — мёртвый `SelectModelFilter`, не в public API). Повтор: `npm run migrate:inject`. |
 | 4 | ⬜ | [Lazy-loaded routes](https://angular.dev/reference/migrations/route-lazy-loading) | `route-lazy-loading-migration` (алиас `route-lazy-loading`) | `npx ng generate @angular/core:route-lazy-loading-migration` | **Оценить**: `routes` / federation; перед прогоном — снимок маршрутов. |
 | 5 | ⬜ | [Signal inputs](https://angular.dev/reference/migrations/signal-inputs) | `signal-input-migration` | `npx ng generate @angular/core:signal-input-migration` | **Кандидат**: `@Input()` → `input()`. `--best-effort-mode`, `--insert-todos`, `--analysis-dir`; постепенно. |
 | 6 | ⬜ | [Outputs](https://angular.dev/reference/migrations/outputs) | `output-migration` | `npx ng generate @angular/core:output-migration` | **Кандидат**: `@Output()` / `EventEmitter` → `output()`. Порциями + тесты. |
@@ -50,9 +52,10 @@ npx ng generate @angular/core:<имя-схемы>
 Во всех пунктах: **`apps/old/` не затрагивать** (см. выше).
 
 1. **`signal-input-migration`** / **`output-migration`** / **`signal-queries-migration`** — по одной библиотеке или приложению, с тестами и ревью; опция `--insert-todos` для граничных случаев.
-2. **`inject-migration`** — после стабилизации signal API или параллельно по модулям.
-3. **`control-flow-migration`** — только если ещё есть старый синтаксис и нужна автоматизация; иначе продолжать вручную по [TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md).
-4. **`route-lazy-loading-migration`** — только после явного аудита маршрутов и federation.
+2. **`control-flow-migration`** — только если ещё есть старый синтаксис и нужна автоматизация; иначе продолжать вручную по [TEMPLATE-AND-MODULE-TRACKER](./TEMPLATE-AND-MODULE-TRACKER.md).
+3. **`route-lazy-loading-migration`** — только после явного аудита маршрутов и federation.
+
+**inject():** для активного контура см. п. 3 таблицы (схема дала 0 правок; контроль — **`prefer-inject`** и при необходимости **`npm run migrate:inject`**).
 
 Периодически при крупных рефакторингах: снова **`nx generate @angular/core:cleanup-unused-imports --no-interactive`** — пока NG8113 включён как `error`, сборка не пропустит новые лишние `imports`. При появлении новых инлайн-шаблонов без самозакрытия — **`npm run migrate:self-closing-tags`** (или правки только в `.html` через ESLint `--fix`). Если кто-то снова подтянет **`CommonModule`** в standalone — **`npm run migrate:common-to-standalone`**.
 
