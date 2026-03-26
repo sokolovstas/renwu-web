@@ -668,4 +668,4 @@ export class TimelineComponent implements OnInit {
 - [x] `TimelineService` в `libs/core` содержит общую логику
 - [ ] Строки i18n в JSON файлах
 - [ ] Нет ошибок линтера (`nx lint timeline`)
-- [ ] `nx build timeline` проходит в production mode
+- [x] `nx build timeline` проходит в production mode
