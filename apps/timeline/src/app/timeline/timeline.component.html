@@ -37,7 +37,7 @@
       }
     </div>
 
-    <div class="timeline-graph">
+    <div class="timeline-graph" [scrollLeft]="scrollLeftGraph()">
       @for (link of links(); track link.issue.id + '-' + link.link.id + '-' + link.type) {
         <renwu-timeline-link
           [data]="link"

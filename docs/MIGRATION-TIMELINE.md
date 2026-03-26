@@ -193,7 +193,7 @@ apps/timeline/src/app/timeline/shared/directives/
   - `apps/timeline/src/app/timeline/workload/workload-user-stat.component.*` (рендер списка workload-элементов)
   - `apps/timeline/src/app/timeline/workload/workload-user-item.component.*` (рендер одного workload-элемента)
   - `apps/timeline/src/app/timeline/graph/timeline-link.component.*` (рендер зависимости между issue в графе)
-  - `apps/timeline/src/app/timeline/timeline.component.*` (загрузка `IssueGroup[]`, `Milestone[]`, `UserWorkload`; интеграция table/graph/roadmap/workload; wiring `TimelineStateService`)
+  - `apps/timeline/src/app/timeline/timeline.component.*` (загрузка `IssueGroup[]`, `Milestone[]`, `UserWorkload`; интеграция table/graph/roadmap/workload; wiring `TimelineStateService`; reload по websocket; поддержка `query_hash`; keyboard scroll через `RwShortcutService`)
 
 ---
 

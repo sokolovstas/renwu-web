@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -15,6 +16,8 @@ import {
   IssueGroup,
   Milestone,
   RwUserService,
+  RwWebsocketService,
+  RwShortcutService,
   TimelineService as CoreTimelineService,
   User,
   UserWorkload,
@@ -29,6 +32,7 @@ import { WorkloadUserComponent } from './workload/workload-user.component';
 import { forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'renwu-timeline-timeline',
@@ -49,7 +53,10 @@ import { TimelineLinkComponent } from './graph/timeline-link.component';
 })
 export class TimelineComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(RwUserService);
+  private readonly websocketService = inject(RwWebsocketService);
+  private readonly shortcutService = inject(RwShortcutService);
   private readonly settingsService = inject(TimelineSettingsService);
   private readonly dataService = inject(TimelineDataService);
   private readonly coreTimelineService = inject(CoreTimelineService);
@@ -82,11 +89,18 @@ export class TimelineComponent {
   protected readonly loading = signal(false);
   protected readonly workload = signal<UserWorkload | null>(null);
   protected readonly links = signal<TimelineLink[]>([]);
+  protected readonly scrollLeftGraph = signal(0);
 
-  private readonly routeContainerKey = toSignal(
-    this.route.queryParamMap.pipe(map((qp) => qp.get('container_key') || '')),
-    { initialValue: '' },
+  private readonly queryParams = toSignal(
+    this.route.queryParamMap.pipe(
+      map((qp) => ({
+        containerKey: qp.get('container_key') || '',
+        queryHash: qp.get('query_hash') || '',
+      })),
+    ),
+    { initialValue: { containerKey: '', queryHash: '' } },
   );
+  private readonly reloadCounter = signal(0);
 
   constructor() {
     // Load persisted settings once the current user is available.
@@ -95,13 +109,15 @@ export class TimelineComponent {
       this.settingsService.initFromLocalStorage(userId ?? undefined);
     });
 
-    effect(() => {
+    effect((onCleanup) => {
       const grouping = this.settings().grouping || 'none';
-      const routeContainerKey = this.routeContainerKey();
+      const params = this.queryParams();
+      const routeContainerKey = params.containerKey;
+      const queryHash = params.queryHash;
       const user = this.currentUser();
+      this.reloadCounter();
       this.loading.set(true);
-
-      this.dataService
+      const sub = this.dataService
         .loadContainers()
         .pipe(
           map((containers) => {
@@ -116,7 +132,9 @@ export class TimelineComponent {
               return of({ groups: [] as IssueGroup[], milestones: [] as Milestone[] });
             }
             return forkJoin({
-              groups: this.dataService.loadIssueTree(container.id, grouping, {}),
+              groups: this.dataService.loadIssueTree(container.id, grouping, {
+                queryHash,
+              }),
               milestones: this.dataService.loadMilestones(container.id),
             });
           }),
@@ -144,12 +162,35 @@ export class TimelineComponent {
           },
           error: () => this.loading.set(false),
         });
+      onCleanup(() => sub.unsubscribe());
 
       if (user?.id) {
         this.dataService
           .loadUserWorkload(user.id, {})
           .subscribe((value) => this.workload.set(value));
       }
+    });
+
+    this.websocketService.issue
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.reloadCounter.update((v) => v + 1);
+      });
+    this.websocketService.workbot
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.reloadCounter.update((v) => v + 1);
+      });
+
+    const left = this.shortcutService.subscribe('ArrowLeft', () => {
+      this.scrollLeftGraph.update((v) => Math.max(0, v - 100));
+    });
+    const right = this.shortcutService.subscribe('ArrowRight', () => {
+      this.scrollLeftGraph.update((v) => v + 100);
+    });
+    this.destroyRef.onDestroy(() => {
+      left?.unsubscribe();
+      right?.unsubscribe();
     });
   }
 
