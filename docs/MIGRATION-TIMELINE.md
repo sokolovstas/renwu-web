@@ -170,7 +170,7 @@ apps/timeline/src/app/timeline/shared/directives/
 - `apps/timeline/src/app/timeline/services/timeline-settings.service.ts`
 - `apps/timeline/src/app/timeline/services/timeline-state.service.ts`
 - `apps/timeline/src/app/timeline/services/timeline-data.service.ts`
-- `apps/timeline/src/i18n/en.json`, `apps/timeline/src/i18n/ru.json`, `apps/timeline/src/i18n/zh.json` (добавлены ключи `timeline.loading`, `timeline.fit`, `timeline.userFallback`)
+- `apps/timeline/src/i18n/en.json`, `apps/timeline/src/i18n/ru.json`, `apps/timeline/src/i18n/zh.json` (добавлены ключи `timeline.loading`, `timeline.fit`, `timeline.userFallback`, `timeline.groupFallback`)
 - `apps/timeline/e2e/example.spec.ts` (добавлен assertion, чтобы убрать lint warning `playwright/expect-expect`)
 - `apps/timeline/src/app/timeline/shared/directives/timeline-item-drag.directive.ts`
 - `apps/timeline/src/app/timeline/shared/directives/timeline-holder.directive.ts`

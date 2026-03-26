@@ -38,7 +38,7 @@ import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
 
@@ -71,6 +71,7 @@ export class TimelineComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(RwUserService);
+  private readonly translocoService = inject(TranslocoService);
   private readonly searchService = inject(RwSearchService);
   private readonly websocketService = inject(RwWebsocketService);
   private readonly shortcutService = inject(RwShortcutService);
@@ -94,7 +95,7 @@ export class TimelineComponent {
     moment.utc().add(1, 'month'),
   );
 
-  protected readonly selectedUsers = signal<unknown[]>([]);
+  protected readonly selectedUsers = signal<User[]>([]);
   protected readonly queryString = signal('');
   protected readonly queryHash = signal('');
   protected readonly selectMilestone = signal<SelectedMilestone>(null);
@@ -331,7 +332,12 @@ export class TimelineComponent {
 
   private getGroupTitle(group: IssueGroup): string {
     const key = group.key as { title?: string; full_name?: string; name?: string } | null;
-    return key?.title || key?.full_name || key?.name || 'Group';
+    return (
+      key?.title ||
+      key?.full_name ||
+      key?.name ||
+      this.translocoService.translate('timeline.groupFallback')
+    );
   }
 
   private centerNow(): void {
