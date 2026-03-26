@@ -65,3 +65,4 @@ export * from './lib/user/user.service';
 export * from './lib/validators/invite-user';
 export * from './lib/validators/unique-container-key';
 export * from './lib/websocket/websocket.service';
+export * from './lib/shortcut/shortcut.service';
