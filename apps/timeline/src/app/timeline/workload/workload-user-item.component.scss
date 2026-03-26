@@ -1,4 +1,8 @@
 .workload-user-item {
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
 }
 

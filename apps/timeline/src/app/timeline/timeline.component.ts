@@ -16,6 +16,8 @@ import {
   Milestone,
   RwUserService,
   TimelineService as CoreTimelineService,
+  User,
+  UserWorkload,
 } from '@renwu/core';
 import { TimelineSettingsService } from './services/timeline-settings.service';
 import { TimelineTableItemComponent } from './table/timeline-table-item.component';
@@ -23,6 +25,7 @@ import { TimelineItemComponent } from './graph/timeline-item.component';
 import { IssueTreeRoot, TimelineIssue } from './models/timeline-issue.model';
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
+import { WorkloadUserComponent } from './workload/workload-user.component';
 import { forkJoin, map, of, switchMap } from 'rxjs';
 
 @Component({
@@ -38,6 +41,7 @@ import { forkJoin, map, of, switchMap } from 'rxjs';
     TimelineTableItemComponent,
     TimelineItemComponent,
     TimelineRoadmapComponent,
+    WorkloadUserComponent,
   ],
 })
 export class TimelineComponent {
@@ -72,6 +76,7 @@ export class TimelineComponent {
   });
   protected readonly roadmapItems = signal<Milestone[]>([]);
   protected readonly loading = signal(false);
+  protected readonly workload = signal<UserWorkload | null>(null);
 
   private readonly routeContainerKey = toSignal(
     this.route.queryParamMap.pipe(map((qp) => qp.get('container_key') || '')),
@@ -88,6 +93,7 @@ export class TimelineComponent {
     effect(() => {
       const grouping = this.settings().grouping || 'none';
       const routeContainerKey = this.routeContainerKey();
+      const user = this.currentUser();
       this.loading.set(true);
 
       this.dataService
@@ -126,6 +132,12 @@ export class TimelineComponent {
           },
           error: () => this.loading.set(false),
         });
+
+      if (user?.id) {
+        this.dataService
+          .loadUserWorkload(user.id, {})
+          .subscribe((value) => this.workload.set(value));
+      }
     });
   }
 
@@ -141,6 +153,10 @@ export class TimelineComponent {
 
   protected onScrollTo(item: TimelineIssue): void {
     void item;
+  }
+
+  protected currentUserValue(): User | null {
+    return this.currentUser() ?? null;
   }
 
   private toTree(groups: IssueGroup[]): TimelineIssue[] {

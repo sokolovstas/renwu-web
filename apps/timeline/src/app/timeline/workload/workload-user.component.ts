@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { User, UserWorkload } from '@renwu/core';
+import { WorkloadUserStatComponent } from './workload-user-stat.component';
 
 @Component({
   selector: 'renwu-timeline-workload-user',
@@ -6,9 +8,10 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   templateUrl: './workload-user.component.html',
   styleUrl: './workload-user.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [WorkloadUserStatComponent],
 })
 export class WorkloadUserComponent {
-  @Input() user: unknown;
-  @Input() workload: unknown;
+  @Input() user: User | null = null;
+  @Input() workload: UserWorkload | null = null;
 }
 

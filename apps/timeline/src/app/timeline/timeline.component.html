@@ -51,5 +51,14 @@
       }
     </div>
   </div>
+
+  @if (settings().showWorkforce) {
+    <div class="timeline-workload">
+      <renwu-timeline-workload-user
+        [user]="currentUserValue()"
+        [workload]="workload()"
+      />
+    </div>
+  }
 </div>
 

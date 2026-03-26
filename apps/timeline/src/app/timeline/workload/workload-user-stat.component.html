@@ -1,2 +1,6 @@
-<div class="workload-user-stat"></div>
+<div class="workload-user-stat">
+  @for (item of items; track item.week + '-' + item.total) {
+    <renwu-timeline-workload-user-item [item]="item" />
+  }
+</div>
 
