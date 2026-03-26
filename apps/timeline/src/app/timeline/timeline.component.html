@@ -1,2 +1,23 @@
-<p>timeline works!</p>
+<div class="timeline-container">
+  <renwu-timeline-scale
+    [dateStart]="dateStart()"
+    [dateEnd]="dateEnd()"
+    [isWorkload]="isWorkload()"
+    [scaleTick]="settings().scaleTick"
+    (changed)="onScaleChanged()"
+    (fitToScreen)="onFitToScreen()"
+  />
+
+  <renwu-timeline-ruler
+    [scale]="settings().scale"
+    [scaleTick]="settings().scaleTick"
+    [dateStart]="dateStart()"
+    [dateEnd]="dateEnd()"
+    [selectedUsers]="selectedUsers()"
+    [linesOnly]="linesOnly()"
+    [selectMilestone]="selectMilestone()"
+  />
+
+  <!-- Graph / table / roadmap / workload are integrated in later phases -->
+</div>
 
