@@ -7,6 +7,7 @@ import {
   Input,
   Output,
   Renderer2,
+  inject,
 } from '@angular/core';
 
 @Directive({
@@ -32,10 +33,8 @@ export class TimelineHolderDirective {
   private upGlobal: (() => void) | null = null;
   private dragTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(
-    private el: ElementRef<HTMLElement>,
-    private renderer: Renderer2,
-  ) {}
+  private el = inject<ElementRef<HTMLElement>>(ElementRef);
+  private renderer = inject(Renderer2);
 
   @HostListener('mousedown', ['$event.layerX', '$event.screenX', '$event.which'])
   onMouseDown(layerX: number, screenX: number, which: number): boolean {

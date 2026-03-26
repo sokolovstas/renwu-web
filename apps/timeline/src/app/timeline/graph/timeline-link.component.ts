@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+} from '@angular/core';
 import moment from 'moment';
 import { IssueBounds, TimelineLink } from '../models/timeline-issue.model';
 
@@ -9,7 +14,7 @@ import { IssueBounds, TimelineLink } from '../models/timeline-issue.model';
   styleUrl: './timeline-link.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimelineLinkComponent {
+export class TimelineLinkComponent implements OnChanges {
   @Input() data!: TimelineLink;
   @Input() issueBounds: IssueBounds | null = null;
   @Input() linkBounds: IssueBounds | null = null;
