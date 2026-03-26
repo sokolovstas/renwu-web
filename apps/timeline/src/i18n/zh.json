@@ -1,6 +1,8 @@
 {
   "timeline": {
-    "loading": "时间线加载中..."
+    "loading": "时间线加载中...",
+    "fit": "适配",
+    "userFallback": "用户"
   }
 }
 

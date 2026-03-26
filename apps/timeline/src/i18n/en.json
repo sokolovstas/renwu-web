@@ -1,6 +1,8 @@
 {
   "timeline": {
-    "loading": "Loading timeline..."
+    "loading": "Loading timeline...",
+    "fit": "Fit",
+    "userFallback": "User"
   }
 }
 

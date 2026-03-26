@@ -1,5 +1,7 @@
 <div class="workload-user">
-  <div class="workload-user-header">{{ user?.full_name || user?.username || 'User' }}</div>
+  <div class="workload-user-header">
+    {{ user?.full_name || user?.username || ('timeline.userFallback' | transloco) }}
+  </div>
   <renwu-timeline-workload-user-stat
     [user]="user"
     [items]="workload?.workload?.weeks || []"

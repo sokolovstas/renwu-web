@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import moment from 'moment';
 
 @Component({
@@ -7,6 +8,7 @@ import moment from 'moment';
   templateUrl: './timeline-scale.component.html',
   styleUrl: './timeline-scale.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslocoPipe],
 })
 export class TimelineScaleComponent {
   @Input() dateStart!: moment.Moment;
