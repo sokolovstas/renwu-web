@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  Container,
   Issue,
   IssueGroup,
   ListOptionsFilters,
@@ -36,6 +37,10 @@ export class TimelineDataService {
       grouping.toLowerCase(),
       filters,
     );
+  }
+
+  loadContainers(): Observable<Container[]> {
+    return this.dataService.getContainers({ archived: false });
   }
 
   loadUserWorkload(

@@ -1,4 +1,8 @@
 <div class="timeline-container">
+  @if (loading()) {
+    <div class="timeline-loading">Loading timeline...</div>
+  }
+
   <renwu-timeline-scale
     [dateStart]="dateStart()"
     [dateEnd]="dateEnd()"
@@ -17,6 +21,8 @@
     [linesOnly]="linesOnly()"
     [selectMilestone]="selectMilestone()"
   />
+
+  <renwu-timeline-roadmap [items]="roadmapItems()" />
 
   <div class="timeline-layout">
     <div class="timeline-table" [style.width.px]="settings().tableWidth">
