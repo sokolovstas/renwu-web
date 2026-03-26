@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import moment from 'moment';
 import { TimelineRulerComponent } from './ruler/timeline-ruler.component';
 import { TimelineScaleComponent } from './scale/timeline-scale.component';
@@ -31,7 +31,7 @@ import { IssueTreeRoot, TimelineIssue, TimelineLink } from './models/timeline-is
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
 import { WorkloadUserComponent } from './workload/workload-user.component';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -57,6 +57,7 @@ type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
 })
 export class TimelineComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(RwUserService);
   private readonly websocketService = inject(RwWebsocketService);
@@ -95,6 +96,8 @@ export class TimelineComponent {
   protected readonly links = signal<TimelineLink[]>([]);
   protected readonly scrollLeftGraph = signal(0);
   protected readonly scrollTopGraph = signal(0);
+  private readonly activeContainerId = signal<string | null>(null);
+  private readonly pendingReload = signal(false);
   private selectedIssueId: string | null = null;
   @ViewChild('graphScroll') private graphScroll?: ElementRef<HTMLDivElement>;
 
@@ -136,7 +139,16 @@ export class TimelineComponent {
           }),
           switchMap((container) => {
             if (!container) {
+              this.activeContainerId.set(null);
               return of({ groups: [] as IssueGroup[], milestones: [] as Milestone[] });
+            }
+            this.activeContainerId.set(container.id);
+            if (!routeContainerKey && container.key) {
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: { container_key: container.key },
+                queryParamsHandling: 'merge',
+              });
             }
             return forkJoin({
               groups: this.dataService.loadIssueTree(container.id, grouping, {
@@ -180,14 +192,26 @@ export class TimelineComponent {
     });
 
     this.websocketService.issue
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        debounceTime(1000),
+        filter((event) => {
+          const containerId = (event as { container?: string } | null)?.container;
+          const activeContainerId = this.activeContainerId();
+          return !activeContainerId || !containerId || containerId === activeContainerId;
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe(() => {
-        this.reloadCounter.update((v) => v + 1);
+        this.requestReload();
       });
     this.websocketService.workbot
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        filter((event) => (event as { type?: string } | null)?.type === 'end'),
+        debounceTime(1000),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe(() => {
-        this.reloadCounter.update((v) => v + 1);
+        this.requestReload();
       });
 
     const left = this.shortcutService.subscribe('ArrowLeft', () => {
@@ -199,6 +223,13 @@ export class TimelineComponent {
     this.destroyRef.onDestroy(() => {
       left?.unsubscribe();
       right?.unsubscribe();
+    });
+
+    effect(() => {
+      if (!this.loading() && this.pendingReload()) {
+        this.pendingReload.set(false);
+        this.reloadCounter.update((v) => v + 1);
+      }
     });
   }
 
@@ -276,6 +307,14 @@ export class TimelineComponent {
       (centerUnix - this.dateStart().unix()) / this.settings().scale -
       graphEl.clientWidth / 2;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
+  }
+
+  private requestReload(): void {
+    if (this.loading()) {
+      this.pendingReload.set(true);
+      return;
+    }
+    this.reloadCounter.update((v) => v + 1);
   }
 }
 
