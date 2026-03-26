@@ -31,6 +31,7 @@
           [item]="row"
           [depth]="0"
           [tableWidth]="settings().tableWidth"
+          (selected)="onSelected($event)"
           (scrollTo)="onScrollTo($event)"
         />
       }
@@ -46,6 +47,7 @@
           [showTitleInside]="settings().showTitleInside"
           [showTitleRight]="settings().showTitleRight"
           [selectMilestone]="selectMilestone()"
+          (selected)="onSelected($event)"
           (scrollTo)="onScrollTo($event)"
         />
       }

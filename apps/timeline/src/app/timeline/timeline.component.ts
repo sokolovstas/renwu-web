@@ -27,6 +27,7 @@ import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
 import { WorkloadUserComponent } from './workload/workload-user.component';
 import { forkJoin, map, of, switchMap } from 'rxjs';
+import { TimelineStateService } from './services/timeline-state.service';
 
 @Component({
   selector: 'renwu-timeline-timeline',
@@ -34,7 +35,7 @@ import { forkJoin, map, of, switchMap } from 'rxjs';
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [TimelineDataService, TimelineSettingsService],
+  providers: [TimelineDataService, TimelineSettingsService, TimelineStateService],
   imports: [
     TimelineScaleComponent,
     TimelineRulerComponent,
@@ -50,6 +51,7 @@ export class TimelineComponent {
   private readonly settingsService = inject(TimelineSettingsService);
   private readonly dataService = inject(TimelineDataService);
   private readonly coreTimelineService = inject(CoreTimelineService);
+  private readonly stateService = inject(TimelineStateService);
 
   private readonly currentUser = toSignal(this.userService.currentUser, {
     initialValue: this.userService.currentUserValue,
@@ -123,6 +125,7 @@ export class TimelineComponent {
               _SHOWCHILDS: true,
               childs: this.toTree(groups),
             });
+            this.stateService.recalculateIndexes(this.rootChild());
             this.roadmapItems.set(milestones || []);
             const timezone = this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
             const range = this.coreTimelineService.calcMinMaxDate(groups ?? [], timezone);
@@ -152,7 +155,13 @@ export class TimelineComponent {
   }
 
   protected onScrollTo(item: TimelineIssue): void {
-    void item;
+    if (!item?.id) return;
+    this.stateService.setSelected(item.id, true);
+  }
+
+  protected onSelected(item: TimelineIssue): void {
+    if (!item?.id) return;
+    this.stateService.setSelected(item.id, true);
   }
 
   protected currentUserValue(): User | null {

@@ -30,6 +30,7 @@ export type TimelineIssue = Omit<Issue, 'type' | 'childs'> & {
 };
 
 export interface IssueTreeRoot {
+  id?: string | null;
   type: 'root';
   childs: TimelineIssue[];
   _SHOWCHILDS: boolean;
