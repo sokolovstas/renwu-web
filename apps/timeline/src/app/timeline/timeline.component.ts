@@ -38,6 +38,7 @@ import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
 
@@ -55,6 +56,7 @@ type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
   ],
   imports: [
     QueryBuilderComponent,
+    TranslocoPipe,
     TimelineScaleComponent,
     TimelineRulerComponent,
     TimelineTableItemComponent,
