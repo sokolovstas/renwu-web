@@ -193,7 +193,7 @@ apps/timeline/src/app/timeline/shared/directives/
   - `apps/timeline/src/app/timeline/workload/workload-user-stat.component.*` (рендер списка workload-элементов)
   - `apps/timeline/src/app/timeline/workload/workload-user-item.component.*` (рендер одного workload-элемента)
   - `apps/timeline/src/app/timeline/graph/timeline-link.component.*` (рендер зависимости между issue в графе)
-  - `apps/timeline/src/app/timeline/timeline.component.*` (загрузка `IssueGroup[]`, `Milestone[]`, `UserWorkload`; интеграция table/graph/roadmap/workload; wiring `TimelineStateService`; reload по websocket; поддержка `query_hash`; keyboard scroll через `RwShortcutService`; центрирование по времени/issue и sync `scrollLeft/scrollTop` графа; debounce/filter realtime refresh + `pendingReload`; auto-sync `container_key` в URL)
+  - `apps/timeline/src/app/timeline/timeline.component.*` (загрузка `IssueGroup[]`, `Milestone[]`, `UserWorkload`; интеграция table/graph/roadmap/workload; wiring `TimelineStateService`; reload по websocket; поддержка `query_hash`; keyboard scroll через `RwShortcutService`; центрирование по времени/issue и sync `scrollLeft/scrollTop` графа; debounce/filter realtime refresh + `pendingReload`; auto-sync `container_key` в URL; интеграция `renwu-query-builder` и обновление `query_hash` при изменении query)
 
 ---
 

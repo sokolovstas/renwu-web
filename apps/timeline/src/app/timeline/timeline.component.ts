@@ -16,7 +16,10 @@ import { TimelineRulerComponent } from './ruler/timeline-ruler.component';
 import { TimelineScaleComponent } from './scale/timeline-scale.component';
 import {
   IssueGroup,
+  ListOptions,
   Milestone,
+  QueryBuilderComponent,
+  RwSearchService,
   RwUserService,
   RwWebsocketService,
   RwShortcutService,
@@ -44,8 +47,14 @@ type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [TimelineDataService, TimelineSettingsService, TimelineStateService],
+  providers: [
+    TimelineDataService,
+    TimelineSettingsService,
+    TimelineStateService,
+    RwSearchService,
+  ],
   imports: [
+    QueryBuilderComponent,
     TimelineScaleComponent,
     TimelineRulerComponent,
     TimelineTableItemComponent,
@@ -60,6 +69,7 @@ export class TimelineComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(RwUserService);
+  private readonly searchService = inject(RwSearchService);
   private readonly websocketService = inject(RwWebsocketService);
   private readonly shortcutService = inject(RwShortcutService);
   private readonly settingsService = inject(TimelineSettingsService);
@@ -83,6 +93,8 @@ export class TimelineComponent {
   );
 
   protected readonly selectedUsers = signal<unknown[]>([]);
+  protected readonly queryString = signal('');
+  protected readonly queryHash = signal('');
   protected readonly selectMilestone = signal<SelectedMilestone>(null);
   protected readonly linesOnly = signal(false);
   protected readonly rootChild = signal<IssueTreeRoot>({
@@ -123,7 +135,7 @@ export class TimelineComponent {
       const grouping = this.settings().grouping || 'none';
       const params = this.queryParams();
       const routeContainerKey = params.containerKey;
-      const queryHash = params.queryHash;
+      const queryHash = this.queryHash() || params.queryHash;
       const user = this.currentUser();
       this.reloadCounter();
       this.loading.set(true);
@@ -231,6 +243,32 @@ export class TimelineComponent {
         this.reloadCounter.update((v) => v + 1);
       }
     });
+
+    // Keep local state in sync with route and resolve query string from hash.
+    effect(() => {
+      const routeHash = this.queryParams().queryHash;
+      if (routeHash && routeHash !== this.queryHash()) {
+        this.queryHash.set(routeHash);
+        const options = new ListOptions();
+        options.hash = routeHash;
+        this.searchService.setListOptions(options);
+      }
+    });
+
+    this.searchService.listOptions
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((options) => {
+        const nextHash = options?.hash || '';
+        const nextQuery = options?.queryString || '';
+        this.queryString.set(nextQuery);
+        this.queryHash.set(nextHash);
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { query_hash: nextHash || null },
+          queryParamsHandling: 'merge',
+        });
+        this.requestReload();
+      });
   }
 
   protected onScaleChanged(): void {
@@ -273,6 +311,10 @@ export class TimelineComponent {
     if (!target) return;
     this.scrollLeftGraph.set(target.scrollLeft);
     this.scrollTopGraph.set(target.scrollTop);
+  }
+
+  protected onQueryChanged(query: string): void {
+    this.searchService.updateQuery(query || '');
   }
 
   private toTree(groups: IssueGroup[]): TimelineIssue[] {
