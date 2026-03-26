@@ -667,5 +667,5 @@ export class TimelineComponent implements OnInit {
 - [x] `RwShortcutService` создан в `libs/core` и экспортирован из `index.ts`
 - [x] `TimelineService` в `libs/core` содержит общую логику
 - [ ] Строки i18n в JSON файлах
-- [ ] Нет ошибок линтера (`nx lint timeline`)
+- [x] Нет ошибок линитера (`nx lint timeline`)
 - [x] `nx build timeline` проходит в production mode
