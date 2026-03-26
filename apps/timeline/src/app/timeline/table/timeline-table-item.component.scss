@@ -1,4 +1,22 @@
 .timeline-table-item {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  cursor: pointer;
+}
+
+.expand-btn {
+  width: 18px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 

@@ -2,3 +2,20 @@
   position: relative;
 }
 
+.bar {
+  position: relative;
+  height: 18px;
+  border: 1px solid #9ca3af;
+  background: #d1d5db;
+}
+
+.progress {
+  height: 100%;
+  background: #4b5563;
+}
+
+.drag-area {
+  position: absolute;
+  inset: 0;
+}
+

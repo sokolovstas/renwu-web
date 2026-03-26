@@ -175,5 +175,27 @@ export class TimelineSettingsService {
     this.settingsSignal.update((s) => ({ ...s, tableWidth: value }));
     this.persist();
   }
+
+  setOpenIndex(issueId: string, opened: boolean): void {
+    this.settingsSignal.update((s) => ({
+      ...s,
+      open_index: {
+        ...s.open_index,
+        [issueId]: opened,
+      },
+    }));
+    this.persist();
+  }
+
+  setOpenGroupIndex(groupId: string, opened: boolean): void {
+    this.settingsSignal.update((s) => ({
+      ...s,
+      open_index_group: {
+        ...s.open_index_group,
+        [groupId]: opened,
+      },
+    }));
+    this.persist();
+  }
 }
 

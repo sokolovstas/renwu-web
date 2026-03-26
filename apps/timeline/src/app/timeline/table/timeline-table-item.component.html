@@ -1,2 +1,33 @@
-<div class="timeline-table-item"></div>
+@if (item) {
+  <div
+    class="timeline-table-item"
+    [class.root]="isRoot()"
+    [class.group]="isGroup()"
+    [style.paddingLeft.px]="depth * 12"
+    (mouseenter)="onHover(true)"
+    (mouseleave)="onHover(false)"
+    (click)="onItemClick()"
+  >
+    @if (item.childs?.length) {
+      <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
+        {{ item._SHOWCHILDS ? '▾' : '▸' }}
+      </button>
+    }
+    <span class="title">{{ item.title || item.key || item.id }}</span>
+  </div>
+
+  @if (item._SHOWCHILDS !== false && item.childs?.length) {
+    @for (child of item.childs; track child.id || child.title) {
+      <renwu-timeline-table-item
+        [item]="child"
+        [depth]="depth + 1"
+        [tableWidth]="tableWidth"
+        [disableSelectedTimelineItem]="disableSelectedTimelineItem"
+        (selected)="selected.emit($event)"
+        (scrollTo)="scrollTo.emit($event)"
+        (expanded)="expanded.emit($event)"
+      />
+    }
+  }
+}
 

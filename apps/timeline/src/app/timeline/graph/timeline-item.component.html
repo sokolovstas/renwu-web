@@ -1,2 +1,39 @@
-<div class="timeline-item"></div>
+@if (item) {
+  <div
+    class="timeline-item"
+    [style.paddingLeft.px]="offsetForItem"
+    [style.width.px]="lineWidth"
+    (click)="onItemClick()"
+  >
+    <div class="bar" [ngStyle]="{ width: width + 'px' }">
+      <div class="progress" [style.width.px]="widthProgress"></div>
+      <div class="drag-area" renwu-timeline-itemDrag [issue]="item" (dragDelta)="onDrag($event)"></div>
+    </div>
+  </div>
+
+  @if (item._SHOWCHILDS !== false && item.childs?.length) {
+    @for (child of item.childs; track child.id || child.title) {
+      <renwu-timeline-item
+        [item]="child"
+        [scale]="scale"
+        [dateStart]="dateStart"
+        [dateEnd]="dateEnd"
+        [showTitleInside]="showTitleInside"
+        [showTitleRight]="showTitleRight"
+        [containerTop]="containerTop"
+        [selectMilestone]="selectMilestone"
+        [timelineGraphContentBound]="timelineGraphContentBound"
+        [depth]="depth + 1"
+        (selected)="selected.emit($event)"
+        (scrollTo)="scrollTo.emit($event)"
+        (dragIssueStart)="dragIssueStart.emit()"
+        (dragIssueEnd)="dragIssueEnd.emit($event)"
+        (issueLaidOut)="issueLaidOut.emit($event)"
+        (scrollRight)="scrollRight.emit()"
+        (scrollLeft)="scrollLeft.emit()"
+        (increaseWidth)="increaseWidth.emit($event)"
+      />
+    }
+  }
+}
 

@@ -184,6 +184,10 @@ apps/timeline/src/app/timeline/shared/directives/
 - `apps/timeline/src/app/timeline/workload/workload-user-stat.component.*`
 - `apps/timeline/src/app/timeline/workload/workload-user-item.component.*`
 - обновлены `apps/timeline/src/app/timeline/timeline.component.ts` и `apps/timeline/src/app/timeline/timeline.component.html` (интеграция scale+ruler в `TimelineComponent`)
+- обновлены:
+  - `apps/timeline/src/app/timeline/services/timeline-settings.service.ts` (open-index API для expand/collapse)
+  - `apps/timeline/src/app/timeline/table/timeline-table-item.component.*` (рекурсивный рендер + expand/collapse + scroll/select)
+  - `apps/timeline/src/app/timeline/graph/timeline-item.component.*` (расчёт базовой геометрии бара + drag смещения + рекурсивный рендер)
 
 ---
 
