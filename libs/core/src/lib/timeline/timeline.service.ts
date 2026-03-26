@@ -55,6 +55,11 @@ export class TimelineService {
     const MAX_DATE = 0;
     const MIN_DATE = 99999999999999;
 
+    // `moment-timezone` isn't available in this workspace build, so we currently
+    // keep calculations in UTC. The timezone argument will be used once the
+    // timezone plugin is introduced.
+    void userTimeZone;
+
     let maxDate = MAX_DATE;
     let minDate = MIN_DATE;
 
@@ -66,7 +71,9 @@ export class TimelineService {
       }
 
       for (const child of node.childs) {
-        if (child.type !== 'group') {
+        // In the migrated UI tree, synthetic "group" nodes use `type: 'group'`.
+        // Real issue nodes may use a different enum type, so compare as runtime string.
+        if (String(child.type) !== 'group') {
           if (child.id) {
             issuesMap[String(child.id)] = child as unknown as Issue;
           }
@@ -105,13 +112,13 @@ export class TimelineService {
 
     const dateStart =
       minDate === MIN_DATE
-        ? moment.utc().tz(userTimeZone)
-        : moment.unix(minDate).tz(userTimeZone);
+        ? moment.utc()
+        : moment.unix(minDate).utc();
 
     const dateEnd =
       maxDate === MAX_DATE
-        ? moment.utc().tz(userTimeZone)
-        : moment.unix(maxDate).tz(userTimeZone);
+        ? moment.utc()
+        : moment.unix(maxDate).utc();
 
     dateStart.subtract(1, 'M').startOf('M');
     dateEnd.add(1, 'M').endOf('M');
