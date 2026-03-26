@@ -17,12 +17,18 @@
 .timeline-table {
   border-right: 1px solid #e5e7eb;
   overflow: auto;
+  max-height: 640px;
 }
 
 .timeline-graph {
   flex: 1;
   padding-left: 8px;
   overflow: auto;
+  max-height: 640px;
+}
+
+.timeline-graph-content {
+  min-width: max-content;
 }
 
 .timeline-workload {

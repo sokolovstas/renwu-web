@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
+  ViewChild,
   computed,
   effect,
   inject,
@@ -92,7 +94,9 @@ export class TimelineComponent {
   protected readonly workload = signal<UserWorkload | null>(null);
   protected readonly links = signal<TimelineLink[]>([]);
   protected readonly scrollLeftGraph = signal(0);
+  protected readonly scrollTopGraph = signal(0);
   private selectedIssueId: string | null = null;
+  @ViewChild('graphScroll') private graphScroll?: ElementRef<HTMLDivElement>;
 
   private readonly queryParams = toSignal(
     this.route.queryParamMap.pipe(
@@ -161,6 +165,7 @@ export class TimelineComponent {
             );
             this.dateStart.set(range.dateStart);
             this.dateEnd.set(range.dateEnd);
+            this.centerNow();
             this.loading.set(false);
           },
           error: () => this.loading.set(false),
@@ -198,7 +203,14 @@ export class TimelineComponent {
   }
 
   protected onScaleChanged(): void {
-    // Placeholder for Phase 5+ wiring (graph recalculation etc).
+    const graphEl = this.graphScroll?.nativeElement;
+    if (!graphEl) return;
+    const centerPx = this.scrollLeftGraph() + graphEl.clientWidth / 2;
+    const centerUnix = this.dateStart().unix() + centerPx * this.settings().oldScale;
+    const nextLeft =
+      (centerUnix - this.dateStart().unix()) / this.settings().scale -
+      graphEl.clientWidth / 2;
+    this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
   }
 
   protected onFitToScreen(): void {
@@ -209,6 +221,7 @@ export class TimelineComponent {
 
   protected onScrollTo(item: TimelineIssue): void {
     this.onSelected(item);
+    this.centerAtIssue(item);
   }
 
   protected onSelected(item: TimelineIssue): void {
@@ -224,6 +237,13 @@ export class TimelineComponent {
     return this.currentUser() ?? null;
   }
 
+  protected onGraphScroll(event: Event): void {
+    const target = event.target as HTMLDivElement | null;
+    if (!target) return;
+    this.scrollLeftGraph.set(target.scrollLeft);
+    this.scrollTopGraph.set(target.scrollTop);
+  }
+
   private toTree(groups: IssueGroup[]): TimelineIssue[] {
     return (groups || []).map((g) => ({
       id: g.id,
@@ -237,6 +257,25 @@ export class TimelineComponent {
   private getGroupTitle(group: IssueGroup): string {
     const key = group.key as { title?: string; full_name?: string; name?: string } | null;
     return key?.title || key?.full_name || key?.name || 'Group';
+  }
+
+  private centerNow(): void {
+    const graphEl = this.graphScroll?.nativeElement;
+    if (!graphEl) return;
+    const nowOffset = (moment.utc().unix() - this.dateStart().unix()) / this.settings().scale;
+    this.scrollLeftGraph.set(Math.max(0, Math.floor(nowOffset - graphEl.clientWidth / 2)));
+  }
+
+  private centerAtIssue(issue: TimelineIssue): void {
+    const graphEl = this.graphScroll?.nativeElement;
+    if (!graphEl) return;
+    const baseDate = issue.date_start_calc || issue.date_start;
+    if (!baseDate) return;
+    const centerUnix = moment.utc(baseDate).unix();
+    const nextLeft =
+      (centerUnix - this.dateStart().unix()) / this.settings().scale -
+      graphEl.clientWidth / 2;
+    this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
   }
 }
 
