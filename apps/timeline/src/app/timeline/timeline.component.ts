@@ -34,6 +34,8 @@ import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
+
 @Component({
   selector: 'renwu-timeline-timeline',
   standalone: true,
@@ -78,7 +80,7 @@ export class TimelineComponent {
   );
 
   protected readonly selectedUsers = signal<unknown[]>([]);
-  protected readonly selectMilestone = signal<unknown>(null);
+  protected readonly selectMilestone = signal<SelectedMilestone>(null);
   protected readonly linesOnly = signal(false);
   protected readonly rootChild = signal<IssueTreeRoot>({
     type: 'root',
@@ -90,6 +92,7 @@ export class TimelineComponent {
   protected readonly workload = signal<UserWorkload | null>(null);
   protected readonly links = signal<TimelineLink[]>([]);
   protected readonly scrollLeftGraph = signal(0);
+  private selectedIssueId: string | null = null;
 
   private readonly queryParams = toSignal(
     this.route.queryParamMap.pipe(
@@ -205,12 +208,15 @@ export class TimelineComponent {
   }
 
   protected onScrollTo(item: TimelineIssue): void {
-    if (!item?.id) return;
-    this.stateService.setSelected(item.id, true);
+    this.onSelected(item);
   }
 
   protected onSelected(item: TimelineIssue): void {
     if (!item?.id) return;
+    if (this.selectedIssueId && this.selectedIssueId !== item.id) {
+      this.stateService.setSelected(this.selectedIssueId, false);
+    }
+    this.selectedIssueId = item.id;
     this.stateService.setSelected(item.id, true);
   }
 

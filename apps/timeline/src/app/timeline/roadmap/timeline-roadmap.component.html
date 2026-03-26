@@ -1,2 +1,12 @@
-<div class="timeline-roadmap"></div>
+<div class="timeline-roadmap">
+  @for (item of items; track item.id) {
+    <renwu-timeline-roadmap-item
+      [item]="item"
+      [dateStart]="dateStart"
+      [scale]="scale"
+      [selectedMilestoneId]="selectedMilestoneId"
+      (selectMilestone)="onSelectMilestone($event)"
+    />
+  }
+</div>
 

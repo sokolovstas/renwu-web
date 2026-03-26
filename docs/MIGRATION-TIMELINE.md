@@ -178,8 +178,8 @@ apps/timeline/src/app/timeline/shared/directives/
 - `apps/timeline/src/app/timeline/graph/timeline-item-flag.component.*`
 - `apps/timeline/src/app/timeline/graph/timeline-link.component.*`
 - `apps/timeline/src/app/timeline/table/timeline-table-item.component.*`
-- `apps/timeline/src/app/timeline/roadmap/timeline-roadmap.component.*`
-- `apps/timeline/src/app/timeline/roadmap/timeline-roadmap-item.component.*`
+  - `apps/timeline/src/app/timeline/roadmap/timeline-roadmap.component.*` (рендер roadmap через `@for`, проброс `dateStart/scale`, событие выбора milestone)
+  - `apps/timeline/src/app/timeline/roadmap/timeline-roadmap-item.component.*` (расчет `left/width/due`, визуальное выделение, toggle-select milestone)
 - `apps/timeline/src/app/timeline/workload/workload-user.component.*`
 - `apps/timeline/src/app/timeline/workload/workload-user-stat.component.*`
 - `apps/timeline/src/app/timeline/workload/workload-user-item.component.*`
