@@ -22,12 +22,13 @@ import {
 import { TimelineSettingsService } from './services/timeline-settings.service';
 import { TimelineTableItemComponent } from './table/timeline-table-item.component';
 import { TimelineItemComponent } from './graph/timeline-item.component';
-import { IssueTreeRoot, TimelineIssue } from './models/timeline-issue.model';
+import { IssueTreeRoot, TimelineIssue, TimelineLink } from './models/timeline-issue.model';
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
 import { WorkloadUserComponent } from './workload/workload-user.component';
 import { forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
+import { TimelineLinkComponent } from './graph/timeline-link.component';
 
 @Component({
   selector: 'renwu-timeline-timeline',
@@ -41,6 +42,7 @@ import { TimelineStateService } from './services/timeline-state.service';
     TimelineRulerComponent,
     TimelineTableItemComponent,
     TimelineItemComponent,
+    TimelineLinkComponent,
     TimelineRoadmapComponent,
     WorkloadUserComponent,
   ],
@@ -79,6 +81,7 @@ export class TimelineComponent {
   protected readonly roadmapItems = signal<Milestone[]>([]);
   protected readonly loading = signal(false);
   protected readonly workload = signal<UserWorkload | null>(null);
+  protected readonly links = signal<TimelineLink[]>([]);
 
   private readonly routeContainerKey = toSignal(
     this.route.queryParamMap.pipe(map((qp) => qp.get('container_key') || '')),
@@ -129,6 +132,12 @@ export class TimelineComponent {
             this.roadmapItems.set(milestones || []);
             const timezone = this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
             const range = this.coreTimelineService.calcMinMaxDate(groups ?? [], timezone);
+            this.links.set(
+              this.dataService.parseLinksFromIssues(
+                this.rootChild().childs,
+                range.issuesMap,
+              ) as unknown as TimelineLink[],
+            );
             this.dateStart.set(range.dateStart);
             this.dateEnd.set(range.dateEnd);
             this.loading.set(false);

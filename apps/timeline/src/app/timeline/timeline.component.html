@@ -38,6 +38,14 @@
     </div>
 
     <div class="timeline-graph">
+      @for (link of links(); track link.issue.id + '-' + link.link.id + '-' + link.type) {
+        <renwu-timeline-link
+          [data]="link"
+          [dateStart]="dateStart()"
+          [scale]="settings().scale"
+        />
+      }
+
       @for (row of rootChild().childs; track row.id || row.title) {
         <renwu-timeline-item
           [item]="row"

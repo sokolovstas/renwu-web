@@ -1,2 +1,8 @@
-<div class="timeline-link"></div>
+<div
+  class="timeline-link"
+  [style.marginLeft.px]="left"
+  [style.width.px]="width"
+  [class.before]="data?.type === 'before'"
+  [class.after]="data?.type === 'after'"
+></div>
 
