@@ -664,8 +664,8 @@ export class TimelineComponent implements OnInit {
 - [ ] `ChangeDetectionStrategy.OnPush` на всех компонентах
 - [ ] Нет ручного `destroy Subject` — используется `takeUntilDestroyed`
 - [ ] Шаблоны используют `@if`, `@for`, `@switch` вместо `*ngIf`, `*ngFor`, `*ngSwitch`
-- [ ] `RwShortcutService` создан в `libs/core` и экспортирован из `index.ts`
-- [ ] `TimelineService` в `libs/core` содержит общую логику
+- [x] `RwShortcutService` создан в `libs/core` и экспортирован из `index.ts`
+- [x] `TimelineService` в `libs/core` содержит общую логику
 - [ ] Строки i18n в JSON файлах
 - [ ] Нет ошибок линтера (`nx lint timeline`)
 - [ ] `nx build timeline` проходит в production mode
