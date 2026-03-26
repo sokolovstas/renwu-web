@@ -151,10 +151,39 @@ apps/timeline/src/app/timeline/
     ├── workload-user-item.component.html
     └── workload-user-item.component.scss
 
-apps/timeline/src/app/shared/directives/
+apps/timeline/src/app/timeline/shared/directives/
     ├── timeline-item-drag.directive.ts
     └── timeline-holder.directive.ts
 ```
+
+---
+## 3.1 Что уже добавлено в репозиторий (по состоянию на текущий прогресс)
+
+### `@renwu/core`
+- `libs/core/src/lib/shortcut/shortcut.service.ts` — добавлен `RwShortcutService` (обёртка над `@renwu/components`, чтобы remotes могли импортировать из `@renwu/core`)
+- `libs/core/src/lib/timeline/timeline.service.ts` — наполнена общая логика `calcMinMaxDate`, `parseLinks`, `recalculateIndexes`
+- `package.json` + `package-lock.json` — добавлен `moment` для текущей итерации
+
+### `apps/timeline`
+- `apps/timeline/src/app/timeline/models/timeline-issue.model.ts`
+- `apps/timeline/src/app/timeline/models/timeline-settings.model.ts`
+- `apps/timeline/src/app/timeline/services/timeline-settings.service.ts`
+- `apps/timeline/src/app/timeline/services/timeline-state.service.ts`
+- `apps/timeline/src/app/timeline/services/timeline-data.service.ts`
+- `apps/timeline/src/app/timeline/shared/directives/timeline-item-drag.directive.ts`
+- `apps/timeline/src/app/timeline/shared/directives/timeline-holder.directive.ts`
+- `apps/timeline/src/app/timeline/scale/timeline-scale.component.*`
+- `apps/timeline/src/app/timeline/ruler/timeline-ruler.component.*`
+- `apps/timeline/src/app/timeline/graph/timeline-item.component.*`
+- `apps/timeline/src/app/timeline/graph/timeline-item-flag.component.*`
+- `apps/timeline/src/app/timeline/graph/timeline-link.component.*`
+- `apps/timeline/src/app/timeline/table/timeline-table-item.component.*`
+- `apps/timeline/src/app/timeline/roadmap/timeline-roadmap.component.*`
+- `apps/timeline/src/app/timeline/roadmap/timeline-roadmap-item.component.*`
+- `apps/timeline/src/app/timeline/workload/workload-user.component.*`
+- `apps/timeline/src/app/timeline/workload/workload-user-stat.component.*`
+- `apps/timeline/src/app/timeline/workload/workload-user-item.component.*`
+- обновлены `apps/timeline/src/app/timeline/timeline.component.ts` и `apps/timeline/src/app/timeline/timeline.component.html` (интеграция scale+ruler в `TimelineComponent`)
 
 ---
 
