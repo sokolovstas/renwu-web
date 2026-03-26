@@ -18,6 +18,32 @@
     [selectMilestone]="selectMilestone()"
   />
 
-  <!-- Graph / table / roadmap / workload are integrated in later phases -->
+  <div class="timeline-layout">
+    <div class="timeline-table" [style.width.px]="settings().tableWidth">
+      @for (row of rootChild().childs; track row.id || row.title) {
+        <renwu-timeline-table-item
+          [item]="row"
+          [depth]="0"
+          [tableWidth]="settings().tableWidth"
+          (scrollTo)="onScrollTo($event)"
+        />
+      }
+    </div>
+
+    <div class="timeline-graph">
+      @for (row of rootChild().childs; track row.id || row.title) {
+        <renwu-timeline-item
+          [item]="row"
+          [scale]="settings().scale"
+          [dateStart]="dateStart()"
+          [dateEnd]="dateEnd()"
+          [showTitleInside]="settings().showTitleInside"
+          [showTitleRight]="settings().showTitleRight"
+          [selectMilestone]="selectMilestone()"
+          (scrollTo)="onScrollTo($event)"
+        />
+      }
+    </div>
+  </div>
 </div>
 

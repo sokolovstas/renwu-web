@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
-import { NgClass, NgStyle } from '@angular/common';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { TimelineSettingsService } from '../services/timeline-settings.service';
 
@@ -9,7 +8,7 @@ import { TimelineSettingsService } from '../services/timeline-settings.service';
   templateUrl: './timeline-table-item.component.html',
   styleUrl: './timeline-table-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, NgStyle, TimelineTableItemComponent],
+  imports: [TimelineTableItemComponent],
 })
 export class TimelineTableItemComponent {
   private settingsService = inject(TimelineSettingsService);

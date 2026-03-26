@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import moment from 'moment';
 import { NgStyle } from '@angular/common';
 import { TimelineIssue } from '../models/timeline-issue.model';
@@ -12,7 +12,7 @@ import { TimelineItemDragDirective } from '../shared/directives/timeline-item-dr
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgStyle, TimelineItemComponent, TimelineItemDragDirective],
 })
-export class TimelineItemComponent {
+export class TimelineItemComponent implements OnChanges {
   @Input() item!: TimelineIssue;
   @Input() scale!: number;
   @Input() dateStart!: moment.Moment;

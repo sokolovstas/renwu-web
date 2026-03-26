@@ -1,1 +1,21 @@
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
+.timeline-layout {
+  display: flex;
+  min-height: 320px;
+}
+
+.timeline-table {
+  border-right: 1px solid #e5e7eb;
+  overflow: auto;
+}
+
+.timeline-graph {
+  flex: 1;
+  padding-left: 8px;
+  overflow: auto;
+}
