@@ -97,6 +97,7 @@
     "projects": "renwu.projects",
     "tasks": "renwu.tasks",
     "messenger": "renwu.messenger",
+    "timeline": "renwu.timeline",
     "add-task": "renwu.add-task",
     "settings": "renwu.settings",
     "profile": "renwu.profile"

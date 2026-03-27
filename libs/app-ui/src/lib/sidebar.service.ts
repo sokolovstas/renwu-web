@@ -75,6 +75,12 @@ export class RenwuSidebarService {
       place: 'sidebar',
     },
     {
+      icon: 's-board',
+      hint: this.transloco.selectTranslate('renwu.timeline'),
+      path: 'timeline',
+      place: 'sidebar',
+    },
+    {
       icon: 'add-bold',
       tour: 'add-task',
       hint: this.transloco.selectTranslate('renwu.add-task'),
