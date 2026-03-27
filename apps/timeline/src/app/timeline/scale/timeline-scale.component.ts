@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import moment from 'moment';
 
 @Component({
   selector: 'renwu-timeline-scale',
@@ -11,8 +10,8 @@ import moment from 'moment';
   imports: [TranslocoPipe],
 })
 export class TimelineScaleComponent {
-  @Input() dateStart!: moment.Moment;
-  @Input() dateEnd!: moment.Moment;
+  @Input() dateStart!: Date;
+  @Input() dateEnd!: Date;
   @Input() isWorkload = false;
 
   @Input()

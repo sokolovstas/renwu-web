@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import moment from 'moment';
 import { Issue, IssueGroup } from '../issue/issue.model';
+import { isValid } from 'date-fns';
 
 export type TimelineLinkType = 'before' | 'after';
 
@@ -48,14 +48,36 @@ export class TimelineService {
     groups: IssueGroup[],
     userTimeZone: string,
   ): {
-    dateStart: moment.Moment;
-    dateEnd: moment.Moment;
+    dateStart: Date;
+    dateEnd: Date;
     issuesMap: Record<string, Issue>;
   } {
     const MAX_DATE = 0;
     const MIN_DATE = 99999999999999;
 
-    // `moment-timezone` isn't available in this workspace build, so we currently
+    const unixSeconds = (date: Date): number =>
+      Math.floor(date.getTime() / 1000);
+
+    const parseMomentLocal = (value: string | undefined): Date | null => {
+      if (!value) return null;
+      const d = new Date(value);
+      return isValid(d) ? d : null;
+    };
+
+    const utcStartOfPrevMonth = (date: Date): Date => {
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth();
+      return new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+    };
+
+    const utcEndOfNextMonth = (date: Date): Date => {
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth();
+      // endOf month for (month + 1) in UTC = day 0 of (month + 2)
+      return new Date(Date.UTC(year, month + 2, 0, 23, 59, 59, 999));
+    };
+
+    // The timezone plugin isn't available in this workspace build, so we currently
     // keep calculations in UTC. The timezone argument will be used once the
     // timezone plugin is introduced.
     void userTimeZone;
@@ -78,26 +100,25 @@ export class TimelineService {
             issuesMap[String(child.id)] = child as unknown as Issue;
           }
 
-          const momentStart = moment(child.date_start || child.date_start_calc);
-          const momentEnd = moment(child.date_end || child.date_end_calc);
+          const start = parseMomentLocal(child.date_start || child.date_start_calc);
+          const end = parseMomentLocal(child.date_end || child.date_end_calc);
 
-          if (momentStart.isValid() && momentStart.unix() > 0) {
-            minDate = Math.min(minDate, momentStart.unix());
+          if (start) {
+            const unix = unixSeconds(start);
+            if (unix > 0) minDate = Math.min(minDate, unix);
           }
-          if (momentEnd.isValid() && momentEnd.unix() > 0) {
-            maxDate = Math.max(maxDate, momentEnd.unix());
+          if (end) {
+            const unix = unixSeconds(end);
+            if (unix > 0) maxDate = Math.max(maxDate, unix);
           }
 
           if (child.time_logs) {
             for (const log of child.time_logs) {
               if (!log.date_created) continue;
-              const momentCreated = moment(log.date_created);
-              if (
-                momentCreated.isValid() &&
-                momentCreated.unix() > 0
-              ) {
-                minDate = Math.min(minDate, momentCreated.unix());
-              }
+              const created = parseMomentLocal(log.date_created);
+              if (!created) continue;
+              const unix = unixSeconds(created);
+              if (unix > 0) minDate = Math.min(minDate, unix);
             }
           }
         }
@@ -110,18 +131,11 @@ export class TimelineService {
       findMin({ childs: group.issues as unknown as TimelineIssueNodeLike[] });
     }
 
-    const dateStart =
-      minDate === MIN_DATE
-        ? moment.utc()
-        : moment.unix(minDate).utc();
+    const dateStartBase = minDate === MIN_DATE ? new Date() : new Date(minDate * 1000);
+    const dateEndBase = maxDate === MAX_DATE ? new Date() : new Date(maxDate * 1000);
 
-    const dateEnd =
-      maxDate === MAX_DATE
-        ? moment.utc()
-        : moment.unix(maxDate).utc();
-
-    dateStart.subtract(1, 'M').startOf('M');
-    dateEnd.add(1, 'M').endOf('M');
+    const dateStart = utcStartOfPrevMonth(dateStartBase);
+    const dateEnd = utcEndOfNextMonth(dateEndBase);
 
     return { dateStart, dateEnd, issuesMap };
   }

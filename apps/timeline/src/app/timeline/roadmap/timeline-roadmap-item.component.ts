@@ -6,8 +6,8 @@ import {
   OnChanges,
   Output,
 } from '@angular/core';
-import moment from 'moment';
 import { Milestone } from '@renwu/core';
+import { parseUtcLike, unixSeconds } from '../date-helpers';
 
 @Component({
   selector: 'renwu-timeline-roadmap-item',
@@ -18,7 +18,7 @@ import { Milestone } from '@renwu/core';
 })
 export class TimelineRoadmapItemComponent implements OnChanges {
   @Input() item!: Milestone;
-  @Input() dateStart!: moment.Moment;
+  @Input() dateStart!: Date;
   @Input() scale = 1;
   @Input() selectedMilestoneId: string | null = null;
 
@@ -38,14 +38,18 @@ export class TimelineRoadmapItemComponent implements OnChanges {
     if (!this.item || !this.dateStart || !this.scale) {
       return;
     }
-    const dateCalc = this.item.date_calc ? moment.utc(this.item.date_calc) : null;
-    const date = this.item.date ? moment.utc(this.item.date) : null;
+    const dateCalc = this.item.date_calc
+      ? parseUtcLike(this.item.date_calc)
+      : null;
+    const date = this.item.date ? parseUtcLike(this.item.date) : null;
+
+    const startUnix = unixSeconds(this.dateStart);
 
     const calcOffset = dateCalc
-      ? Math.floor((dateCalc.unix() - this.dateStart.unix()) / this.scale)
+      ? Math.floor((unixSeconds(dateCalc) - startUnix) / this.scale)
       : 0;
     const dateOffset = date
-      ? Math.floor((date.unix() - this.dateStart.unix()) / this.scale)
+      ? Math.floor((unixSeconds(date) - startUnix) / this.scale)
       : calcOffset;
 
     this.due = calcOffset > dateOffset;

@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import moment from 'moment';
 
 @Component({
   selector: 'renwu-timeline-ruler',
@@ -11,8 +10,8 @@ import moment from 'moment';
 export class TimelineRulerComponent {
   @Input() scale!: number;
   @Input() scaleTick!: unknown;
-  @Input() dateStart!: moment.Moment;
-  @Input() dateEnd!: moment.Moment;
+  @Input() dateStart!: Date;
+  @Input() dateEnd!: Date;
   @Input() selectedUsers: unknown[] = [];
   @Input() linesOnly = false;
   @Input() selectMilestone: unknown;

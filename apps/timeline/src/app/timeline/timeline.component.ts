@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import moment from 'moment';
+import { addMonthsUtc, parseUtcLike, unixSeconds } from './date-helpers';
 import { TimelineRulerComponent } from './ruler/timeline-ruler.component';
 import { TimelineScaleComponent } from './scale/timeline-scale.component';
 import {
@@ -90,10 +90,8 @@ export class TimelineComponent {
     this.settingsService.getTimeline(this.isWorkload()),
   );
 
-  protected readonly dateStart = signal<moment.Moment>(moment.utc());
-  protected readonly dateEnd = signal<moment.Moment>(
-    moment.utc().add(1, 'month'),
-  );
+  protected readonly dateStart = signal<Date>(new Date());
+  protected readonly dateEnd = signal<Date>(addMonthsUtc(new Date(), 1));
 
   protected readonly selectedUsers = signal<User[]>([]);
   protected readonly queryString = signal('');
@@ -278,17 +276,18 @@ export class TimelineComponent {
     const graphEl = this.graphScroll?.nativeElement;
     if (!graphEl) return;
     const centerPx = this.scrollLeftGraph() + graphEl.clientWidth / 2;
-    const centerUnix = this.dateStart().unix() + centerPx * this.settings().oldScale;
+    const centerUnix = unixSeconds(this.dateStart()) + centerPx * this.settings().oldScale;
     const nextLeft =
-      (centerUnix - this.dateStart().unix()) / this.settings().scale -
+      (centerUnix - unixSeconds(this.dateStart())) / this.settings().scale -
       graphEl.clientWidth / 2;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
   }
 
   protected onFitToScreen(): void {
     // Placeholder: later we will recompute dateStart/dateEnd from issues bounds.
-    this.dateStart.set(moment.utc());
-    this.dateEnd.set(moment.utc().add(1, 'month'));
+    const now = new Date();
+    this.dateStart.set(now);
+    this.dateEnd.set(addMonthsUtc(now, 1));
   }
 
   protected onScrollTo(item: TimelineIssue): void {
@@ -343,7 +342,9 @@ export class TimelineComponent {
   private centerNow(): void {
     const graphEl = this.graphScroll?.nativeElement;
     if (!graphEl) return;
-    const nowOffset = (moment.utc().unix() - this.dateStart().unix()) / this.settings().scale;
+    const nowOffset =
+      (unixSeconds(new Date()) - unixSeconds(this.dateStart())) /
+      this.settings().scale;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nowOffset - graphEl.clientWidth / 2)));
   }
 
@@ -352,9 +353,11 @@ export class TimelineComponent {
     if (!graphEl) return;
     const baseDate = issue.date_start_calc || issue.date_start;
     if (!baseDate) return;
-    const centerUnix = moment.utc(baseDate).unix();
+    const centerDate = parseUtcLike(baseDate);
+    if (!centerDate) return;
+    const centerUnix = unixSeconds(centerDate);
     const nextLeft =
-      (centerUnix - this.dateStart().unix()) / this.settings().scale -
+      (centerUnix - unixSeconds(this.dateStart())) / this.settings().scale -
       graphEl.clientWidth / 2;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
   }

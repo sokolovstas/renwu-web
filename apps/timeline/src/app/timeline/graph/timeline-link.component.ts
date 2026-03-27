@@ -4,8 +4,8 @@ import {
   Input,
   OnChanges,
 } from '@angular/core';
-import moment from 'moment';
 import { IssueBounds, TimelineLink } from '../models/timeline-issue.model';
+import { parseUtcLike, unixSeconds } from '../date-helpers';
 
 @Component({
   selector: 'renwu-timeline-link',
@@ -18,7 +18,7 @@ export class TimelineLinkComponent implements OnChanges {
   @Input() data!: TimelineLink;
   @Input() issueBounds: IssueBounds | null = null;
   @Input() linkBounds: IssueBounds | null = null;
-  @Input() dateStart!: moment.Moment;
+  @Input() dateStart!: Date;
   @Input() scale = 1;
 
   protected left = 0;
@@ -27,14 +27,17 @@ export class TimelineLinkComponent implements OnChanges {
   ngOnChanges(): void {
     if (!this.data || !this.dateStart || !this.scale) return;
 
-    const a = moment.utc(
+    const a = parseUtcLike(
       this.data.issue.date_start || this.data.issue.date_start_calc,
     );
-    const b = moment.utc(this.data.link.date_end || this.data.link.date_end_calc);
-    if (!a.isValid() || !b.isValid()) return;
+    const b = parseUtcLike(
+      this.data.link.date_end || this.data.link.date_end_calc,
+    );
+    if (!a || !b) return;
 
-    const p1 = (a.unix() - this.dateStart.unix()) / this.scale;
-    const p2 = (b.unix() - this.dateStart.unix()) / this.scale;
+    const dateStartUnix = unixSeconds(this.dateStart);
+    const p1 = (unixSeconds(a) - dateStartUnix) / this.scale;
+    const p2 = (unixSeconds(b) - dateStartUnix) / this.scale;
     this.left = Math.min(p1, p2);
     this.width = Math.abs(p2 - p1);
   }

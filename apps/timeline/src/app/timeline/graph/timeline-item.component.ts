@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import moment from 'moment';
 import { NgStyle } from '@angular/common';
 import { TimelineIssue } from '../models/timeline-issue.model';
+import { addSecondsUtc, parseUtcLike, unixSeconds } from '../date-helpers';
 import { TimelineItemDragDirective } from '../shared/directives/timeline-item-drag.directive';
 
 @Component({
@@ -15,8 +15,8 @@ import { TimelineItemDragDirective } from '../shared/directives/timeline-item-dr
 export class TimelineItemComponent implements OnChanges {
   @Input() item!: TimelineIssue;
   @Input() scale!: number;
-  @Input() dateStart!: moment.Moment;
-  @Input() dateEnd!: moment.Moment;
+  @Input() dateStart!: Date;
+  @Input() dateEnd!: Date;
   @Input() showTitleInside = false;
   @Input() showTitleRight = false;
   @Input() containerTop = 0;
@@ -52,11 +52,23 @@ export class TimelineItemComponent implements OnChanges {
       this.width = 0;
       return;
     }
-    const start = moment.utc(dateStartItem);
-    const end = moment.utc(dateEndItem);
-    this.lineWidth = (this.dateEnd.unix() - this.dateStart.unix()) / this.scale;
-    this.offsetForItem = (start.unix() - this.dateStart.unix()) / this.scale;
-    this.width = Math.max((end.unix() - start.unix()) / this.scale, 5);
+
+    const start = parseUtcLike(dateStartItem);
+    const end = parseUtcLike(dateEndItem);
+    if (!start || !end) {
+      this.width = 0;
+      return;
+    }
+
+    const startUnix = unixSeconds(start);
+    const endUnix = unixSeconds(end);
+    const dateStartUnix = unixSeconds(this.dateStart);
+    const dateEndUnix = unixSeconds(this.dateEnd);
+
+    this.lineWidth =
+      (dateEndUnix - dateStartUnix) / this.scale;
+    this.offsetForItem = (startUnix - dateStartUnix) / this.scale;
+    this.width = Math.max((endUnix - startUnix) / this.scale, 5);
     this.widthProgress = ((this.item.completion ?? 0) * this.width) / 100;
   }
 
@@ -65,14 +77,19 @@ export class TimelineItemComponent implements OnChanges {
   }
 
   protected onDrag(value: number): void {
-    const dateStart = moment
-      .utc(this.item.date_start || this.item.date_start_calc)
-      .add(-value * this.scale, 'seconds');
-    const dateEnd = moment
-      .utc(this.item.date_end || this.item.date_end_calc)
-      .add(-value * this.scale, 'seconds');
-    this.item.date_start = dateStart.toISOString();
-    this.item.date_end = dateEnd.toISOString();
+    const currentStart = parseUtcLike(
+      this.item.date_start || this.item.date_start_calc,
+    );
+    const currentEnd = parseUtcLike(
+      this.item.date_end || this.item.date_end_calc,
+    );
+    if (!currentStart || !currentEnd) return;
+
+    const nextStart = addSecondsUtc(currentStart, -value * this.scale);
+    const nextEnd = addSecondsUtc(currentEnd, -value * this.scale);
+
+    this.item.date_start = nextStart.toISOString();
+    this.item.date_end = nextEnd.toISOString();
     this.recalculate();
   }
 }

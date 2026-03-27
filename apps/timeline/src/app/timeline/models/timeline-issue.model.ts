@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Issue } from '@renwu/core';
 
 export interface IssueBounds {
@@ -34,8 +33,8 @@ export interface IssueTreeRoot {
   type: 'root';
   childs: TimelineIssue[];
   _SHOWCHILDS: boolean;
-  date_start_calc?: moment.Moment;
-  date_end_calc?: moment.Moment;
+  date_start_calc?: Date;
+  date_end_calc?: Date;
 }
 
 export type TimelineLinkType = 'before' | 'after';

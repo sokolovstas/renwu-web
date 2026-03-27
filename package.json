@@ -100,7 +100,6 @@
     "markdown-it": "^13.0.2",
     "markdown-it-emoji": "^2.0.2",
     "mermaid": "^10.6.1",
-    "moment": "^2.30.1",
     "ngx-ui-tour-console": "^16.0.0",
     "ngx-ui-tour-core": "^16.0.0",
     "prosemirror-commands": "^1.5.2",

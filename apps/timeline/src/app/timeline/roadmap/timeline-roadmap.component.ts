@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import moment from 'moment';
 import { Milestone } from '@renwu/core';
 import { TimelineRoadmapItemComponent } from './timeline-roadmap-item.component';
 
@@ -14,7 +13,7 @@ import { TimelineRoadmapItemComponent } from './timeline-roadmap-item.component'
 export class TimelineRoadmapComponent {
   @Input() items: Milestone[] = [];
 
-  @Input() dateStart!: moment.Moment;
+  @Input() dateStart!: Date;
   @Input() scale = 1;
 
   @Input() selectedMilestoneId: string | null = null;
