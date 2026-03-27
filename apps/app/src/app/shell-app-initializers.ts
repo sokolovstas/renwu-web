@@ -2,7 +2,7 @@ import { Injector } from '@angular/core';
 import { StateService } from '@renwu/core';
 import { RenwuWepPushService } from '@renwu/messaging';
 import { filterFalsy } from '@renwu/utils';
-import { takeUntil } from 'rxjs';
+import { first, take, takeUntil } from 'rxjs';
 import { CheckForUpdateService } from './sw-check.service';
 
 export function runShellAppInitializers(injector: Injector): void {
@@ -18,7 +18,7 @@ export function runShellAppInitializers(injector: Injector): void {
     }
   });
   stateService.ready
-    .pipe(takeUntil(stateService.ready.pipe(filterFalsy())))
+    .pipe(filterFalsy(), first())
     .subscribe(() => {
       const preloader = document.querySelector<HTMLDivElement>('.preloader');
       if (!preloader) {
