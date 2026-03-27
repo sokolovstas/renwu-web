@@ -127,6 +127,12 @@ export class RwSelectComponent implements OnDestroy, ControlValueAccessor {
   @HostBinding('class.borderless')
   borderless = false;
 
+  /** Tighter layout when the floating label (`prompt`) is not used. */
+  @HostBinding('class.rw-select-no-prompt')
+  get noPrompt(): boolean {
+    return !this.prompt;
+  }
+
   @Output()
   closed = new EventEmitter<void>();
 

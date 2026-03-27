@@ -3,7 +3,22 @@
     "loading": "时间线加载中...",
     "fit": "适配",
     "userFallback": "用户",
-    "groupFallback": "分组"
+    "groupFallback": "分组",
+    "eightHourDayAxis": "8 小时工作日坐标",
+    "grouping": "分组",
+    "scale": "刻度",
+    "showMilestones": "里程碑",
+    "currentTimeZone": "时区",
+    "now": "现在",
+    "switchOn": "开",
+    "switchOff": "关",
+    "groupingNone": "无",
+    "groupingType": "类型",
+    "groupingStatus": "状态",
+    "groupingAssignee": "负责人",
+    "tickFit": "适配",
+    "tickDay": "日",
+    "tickWeek": "周",
+    "tickQuarter": "季"
   }
 }
-

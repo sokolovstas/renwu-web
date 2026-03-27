@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { Milestone } from '@renwu/core';
 import { parseUtcLike, unixSeconds } from '../date-helpers';
+import { unixSecondsVirtual } from '../virtual-hours';
 
 @Component({
   selector: 'renwu-timeline-roadmap-item',
@@ -20,6 +21,7 @@ export class TimelineRoadmapItemComponent implements OnChanges {
   @Input() item!: Milestone;
   @Input() dateStart!: Date;
   @Input() scale = 1;
+  @Input() hours24InDay = true;
   @Input() selectedMilestoneId: string | null = null;
 
   @Output()
@@ -43,13 +45,16 @@ export class TimelineRoadmapItemComponent implements OnChanges {
       : null;
     const date = this.item.date ? parseUtcLike(this.item.date) : null;
 
-    const startUnix = unixSeconds(this.dateStart);
+    const h24 = this.hours24InDay;
+    const origin = unixSecondsVirtual(this.dateStart, h24, '');
 
     const calcOffset = dateCalc
-      ? Math.floor((unixSeconds(dateCalc) - startUnix) / this.scale)
+      ? Math.floor(
+          (unixSecondsVirtual(dateCalc, h24, '') - origin) / this.scale,
+        )
       : 0;
     const dateOffset = date
-      ? Math.floor((unixSeconds(date) - startUnix) / this.scale)
+      ? Math.floor((unixSecondsVirtual(date, h24, '') - origin) / this.scale)
       : calcOffset;
 
     this.due = calcOffset > dateOffset;

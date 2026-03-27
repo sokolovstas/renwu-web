@@ -4,6 +4,7 @@ import { Observable, of, tap } from 'rxjs';
 import { SystemSettings } from '../data/common.model';
 
 import { RwDataService } from '../data/data.service';
+import { RW_WORKLOAD_SETTINGS_STORAGE_PREFIX } from './settings.model';
 import { NotificationsSettings } from './settings-notification';
 import { UserSettings } from './settings-user';
 import { UserSettingsServer } from './settings.model';
@@ -31,7 +32,7 @@ export class RwSettingsService {
   }
   resetAllSettings(): Observable<any> {
     localStorage.removeItem(`renwu_timeline_settings_${this.userID}`);
-    localStorage.removeItem(`renwu_workload_settings_${this.userID}`);
+    localStorage.removeItem(`${RW_WORKLOAD_SETTINGS_STORAGE_PREFIX}${this.userID}`);
     localStorage.removeItem(`renwu_column_width_${this.userID}`);
     localStorage.removeItem(`renwu_user_settings_${this.userID}`);
     this.user = UserSettings.load(this);

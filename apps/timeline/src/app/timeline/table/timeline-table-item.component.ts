@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  inject,
+} from '@angular/core';
+import { IssueTypeComponent, IssueStatusComponent, IssueAssigneesComponent, Type, Status } from '@renwu/core';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { TimelineSettingsService } from '../services/timeline-settings.service';
 
@@ -8,14 +17,14 @@ import { TimelineSettingsService } from '../services/timeline-settings.service';
   templateUrl: './timeline-table-item.component.html',
   styleUrl: './timeline-table-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TimelineTableItemComponent],
+  imports: [TimelineTableItemComponent, IssueTypeComponent, IssueStatusComponent, IssueAssigneesComponent],
 })
 export class TimelineTableItemComponent {
   private settingsService = inject(TimelineSettingsService);
 
   @Input() item!: TimelineIssue;
   @Input() depth = 0;
-  @Input() tableWidth = 280;
+  @Input() tableWidth = 380;
   @Input() disableSelectedTimelineItem = false;
 
   @Output() selected = new EventEmitter<TimelineIssue>();
@@ -24,6 +33,16 @@ export class TimelineTableItemComponent {
 
   protected readonly isGroup = computed(() => String(this.item?.type) === 'group');
   protected readonly isRoot = computed(() => String(this.item?.type) === 'root');
+
+  get typeInfo(): Type | null {
+    const t = this.item?.type;
+    if (!t || typeof t !== 'object') return null;
+    return t as Type;
+  }
+
+  get statusInfo(): Status | null {
+    return (this.item?.status as Status) ?? null;
+  }
 
   protected onHover(inside: boolean): void {
     if (this.disableSelectedTimelineItem || !this.item?.id) return;
@@ -40,11 +59,13 @@ export class TimelineTableItemComponent {
     this.item._SHOWCHILDS = opened;
 
     if (this.isGroup()) {
-      this.settingsService.setOpenGroupIndex(this.item.id ?? this.item.title ?? 'group', opened);
+      this.settingsService.setOpenGroupIndex(
+        this.item.id ?? this.item.title ?? 'group',
+        opened,
+      );
     } else if (this.item.id) {
       this.settingsService.setOpenIndex(this.item.id, opened);
     }
     this.expanded.emit(this.item);
   }
 }
-

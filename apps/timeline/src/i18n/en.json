@@ -3,7 +3,22 @@
     "loading": "Loading timeline...",
     "fit": "Fit",
     "userFallback": "User",
-    "groupFallback": "Group"
+    "groupFallback": "Group",
+    "eightHourDayAxis": "8-hour workday axis",
+    "grouping": "Grouping",
+    "scale": "Scale",
+    "showMilestones": "Milestones",
+    "currentTimeZone": "Time zone",
+    "now": "Now",
+    "switchOn": "On",
+    "switchOff": "Off",
+    "groupingNone": "None",
+    "groupingType": "Type",
+    "groupingStatus": "Status",
+    "groupingAssignee": "Assignee",
+    "tickFit": "Fit",
+    "tickDay": "Day",
+    "tickWeek": "Week",
+    "tickQuarter": "Quarter"
   }
 }
-

@@ -8,89 +8,157 @@
     </div>
   }
 
-  @if (loading()) {
-    <div class="timeline-loading">{{ 'timeline.loading' | transloco }}</div>
-  }
 
   <renwu-timeline-scale
     [dateStart]="dateStart()"
     [dateEnd]="dateEnd()"
     [isWorkload]="isWorkload()"
-    [scaleTick]="settings().scaleTick"
+    [timezone]="timezone()"
     (changed)="onScaleChanged()"
     (fitToScreen)="onFitToScreen()"
+    (nowClicked)="onCenterNow()"
   />
 
-  <renwu-timeline-ruler
-    [scale]="settings().scale"
-    [scaleTick]="settings().scaleTick"
-    [dateStart]="dateStart()"
-    [dateEnd]="dateEnd()"
-    [selectedUsers]="selectedUsers()"
-    [linesOnly]="linesOnly()"
-    [selectMilestone]="selectMilestone()"
-  />
-
-  <renwu-timeline-roadmap
-    [items]="roadmapItems()"
-    [dateStart]="dateStart()"
-    [scale]="settings().scale"
-    [selectedMilestoneId]="selectMilestone()?.id ?? null"
-    (selectedMilestoneChange)="selectMilestone.set($event)"
-  />
+  @if (settings().showMilestones) {
+    <div class="timeline-roadmap-wrapper" #roadmapWrapper>
+      <div class="timeline-roadmap-spacer" [style.width.px]="settings().tableWidth"></div>
+      <div class="timeline-roadmap-scroll" #roadmapScroll>
+        <renwu-timeline-roadmap
+          [items]="roadmapItems()"
+          [dateStart]="dateStart()"
+          [scale]="settings().scale"
+          [hours24InDay]="hours24InDay()"
+          [selectedMilestoneId]="selectMilestone()?.id ?? null"
+          (selectedMilestoneChange)="selectMilestone.set($event)"
+        />
+      </div>
+    </div>
+  }
 
   <div class="timeline-layout">
-    <div class="timeline-table" [style.width.px]="settings().tableWidth">
-      @for (row of rootChild().childs; track row.id || row.title) {
-        <renwu-timeline-table-item
-          [item]="row"
-          [depth]="0"
-          [tableWidth]="settings().tableWidth"
-          (selected)="onSelected($event)"
-          (scrollTo)="onScrollTo($event)"
+    <div
+      class="timeline-table-resize"
+      [style.left.px]="settings().tableWidth - 1"
+      (mousedown)="onResizeDown($event)"
+    ></div>
+
+    <div class="timeline-layout-header">
+      <div
+        class="timeline-table-header"
+        [style.width.px]="settings().tableWidth"
+        [style.min-width.px]="settings().tableWidth"
+      >
+        <span class="th-col th-key">Key</span>
+        <span class="th-col th-type">T</span>
+        <span class="th-col th-title">Title</span>
+        <span class="th-col th-assignee">Assignee</span>
+        <span class="th-col th-pct">%</span>
+        <span class="th-col th-status">Status</span>
+      </div>
+      <div class="timeline-ruler-wrapper" #rulerWrapper>
+        <renwu-timeline-ruler
+          [scale]="settings().scale"
+          [scaleTick]="settings().scaleTick"
+          [dateStart]="dateStart()"
+          [dateEnd]="rulerLimit()"
+          [hours24InDay]="hours24InDay()"
         />
-      }
+      </div>
     </div>
 
-    <div
-      class="timeline-graph"
-      #graphScroll
-      [scrollLeft]="scrollLeftGraph()"
-      [scrollTop]="scrollTopGraph()"
-      (scroll)="onGraphScroll($event)"
-    >
-      <div class="timeline-graph-content">
-        @for (link of links(); track link.issue.id + '-' + link.link.id + '-' + link.type) {
-          <renwu-timeline-link
-            [data]="link"
-            [dateStart]="dateStart()"
-            [scale]="settings().scale"
-          />
-        }
-
+    <div class="timeline-layout-body">
+      <div
+        class="timeline-table"
+        #tableBody
+        [style.width.px]="settings().tableWidth"
+        [style.min-width.px]="settings().tableWidth"
+        (scroll)="onTableScroll($event)"
+      >
         @for (row of rootChild().childs; track row.id || row.title) {
-          <renwu-timeline-item
+          <renwu-timeline-table-item
             [item]="row"
-            [scale]="settings().scale"
-            [dateStart]="dateStart()"
-            [dateEnd]="dateEnd()"
-            [showTitleInside]="settings().showTitleInside"
-            [showTitleRight]="settings().showTitleRight"
-            [selectMilestone]="selectMilestone()"
+            [depth]="0"
+            [tableWidth]="settings().tableWidth"
             (selected)="onSelected($event)"
             (scrollTo)="onScrollTo($event)"
           />
         }
       </div>
+
+      <div
+        class="timeline-graph"
+        #graphScroll
+        renwu-timeline-holder
+        [scrollLeft]="scrollLeftGraph()"
+        [scrollTop]="scrollTopGraph()"
+        (scroll)="onGraphScroll($event)"
+        (dragStart)="onTimelineDragStart()"
+        (dragDelta)="onTimelineDrag($event)"
+        (dragEnd)="onTimelineDragEnd()"
+      >
+        <div class="timeline-graph-content">
+          @for (pos of gridLines(); track pos) {
+            <div class="timeline-grid-line" [style.left.px]="pos"></div>
+          }
+
+          @for (link of links(); track link.issue.id + '-' + link.link.id + '-' + link.type) {
+            <renwu-timeline-link
+              [data]="link"
+              [dateStart]="dateStart()"
+              [scale]="settings().scale"
+              [hours24InDay]="hours24InDay()"
+            />
+          }
+
+          @for (row of rootChild().childs; track row.id || row.title) {
+            <renwu-timeline-item
+              [item]="row"
+              [scale]="settings().scale"
+              [dateStart]="dateStart()"
+              [dateEnd]="rulerLimit()"
+              [hours24InDay]="hours24InDay()"
+              [showTitleInside]="settings().showTitleInside"
+              [showTitleRight]="settings().showTitleRight"
+              [selectMilestone]="selectMilestone()"
+              (selected)="onSelected($event)"
+              (scrollTo)="onScrollTo($event)"
+            />
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-layout-workload">
+      <div class="workforce-tab" (click)="onToggleWorkforce()">
+        <span class="workforce-arrow">{{ settings().showWorkforce ? '▾' : '▸' }}</span>
+        <span>Workforce</span>
+      </div>
+      @if (settings().showWorkforce) {
+        <div class="timeline-workload-content">
+          <div
+            class="timeline-workload-info"
+            [style.width.px]="settings().tableWidth"
+            [style.min-width.px]="settings().tableWidth"
+          >
+            <div class="workforce-user-row">
+              <span class="workforce-user-name">
+                {{ currentUserValue()?.full_name || currentUserValue()?.username }}
+              </span>
+            </div>
+          </div>
+          <div class="timeline-workload-bars" #workloadBars>
+          <renwu-timeline-workload-user
+            [user]="currentUserValue()"
+            [workload]="workload()"
+            [scaleTick]="settings().scaleTick"
+            [hours24InDay]="hours24InDay()"
+            [dateStart]="dateStart()"
+            [dateEnd]="rulerLimit()"
+            [scale]="settings().scale"
+          />
+          </div>
+        </div>
+      }
     </div>
   </div>
-
-  @if (settings().showWorkforce) {
-    <div class="timeline-workload">
-      <renwu-timeline-workload-user
-        [user]="currentUserValue()"
-        [workload]="workload()"
-      />
-    </div>
-  }
 </div>

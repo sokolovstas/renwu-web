@@ -1,6 +1,7 @@
-<div class="workload-user-stat">
-  @for (item of items; track item.week + '-' + item.total) {
-    <renwu-timeline-workload-user-item [item]="item" />
+<div class="workload-user-stat" [style.width.px]="totalWidth">
+  @for (bar of bars; track bar.position) {
+    <renwu-timeline-workload-user-item
+      [bar]="bar"
+    />
   }
 </div>
-

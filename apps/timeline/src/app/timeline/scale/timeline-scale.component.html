@@ -1,5 +1,63 @@
 <div class="timeline-scale">
-  <button type="button" (click)="onFit()">{{ 'timeline.fit' | transloco }}</button>
-  <div class="timeline-scale-value">{{ scaleValue }}%</div>
-</div>
+  <div class="scale-left">
+    <span class="scale-field">
+      <span class="scale-field-label">{{ 'timeline.grouping' | transloco }}:</span>
+      <rw-select
+        [model]="groupingModel"
+        [borderless]="true"
+        (changed)="onGroupingChanged($event)"
+      />
+    </span>
 
+    <rw-checkbox
+      [label]="'timeline.showMilestones' | transloco"
+      [ngModel]="settings.showMilestones"
+      (ngModelChange)="onShowMilestonesChange($event)"
+    />
+
+    <span class="scale-info">
+      {{ 'timeline.currentTimeZone' | transloco }}: {{ timezone }}
+    </span>
+
+    <span class="scale-hours">
+      <span class="scale-hours-label">{{ 'timeline.eightHourDayAxis' | transloco }}:</span>
+      <rw-switch
+        [labelChecked]="'timeline.switchOn' | transloco"
+        [labelUnchecked]="'timeline.switchOff' | transloco"
+        [ngModel]="!issueDateTimeSvc.issueDateTime.hours24InDay"
+        (ngModelChange)="onEightHourAxisChange($event)"
+      />
+    </span>
+  </div>
+
+  <div class="scale-right">
+    <span class="scale-field">
+      <span class="scale-field-label">{{ 'timeline.scale' | transloco }}:</span>
+      <rw-select
+        [model]="scaleTickModel"
+        [borderless]="true"
+        (changed)="onScaleTickChanged($event)"
+      />
+    </span>
+
+    <span class="scale-slider">
+      <rw-range
+        [min]="50"
+        [max]="200"
+        [step]="5"
+        [ngModel]="settings.scaleValue"
+        [live]="true"
+        (changed)="onSliderChange($event)"
+      />
+    </span>
+
+    <span class="scale-percent">{{ scalePercent }}%</span>
+
+    <rw-button
+      [text]="'timeline.now' | transloco"
+      typeButton="primary"
+      padding="2px 12px"
+      (clicked)="onNow()"
+    />
+  </div>
+</div>

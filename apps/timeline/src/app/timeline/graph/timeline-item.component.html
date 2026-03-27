@@ -1,15 +1,37 @@
 @if (item) {
-  <div
-    class="timeline-item"
-    [style.paddingLeft.px]="offsetForItem"
-    [style.width.px]="lineWidth"
-    (click)="onItemClick()"
-  >
-    <div class="bar" [ngStyle]="{ width: width + 'px' }">
-      <div class="progress" [style.width.px]="widthProgress"></div>
-      <div class="drag-area" renwu-timeline-itemDrag [issue]="item" (dragDelta)="onDrag($event)"></div>
+  @if (isGroup) {
+    <div class="timeline-item-group">
+      <!-- group row placeholder - no bar -->
     </div>
-  </div>
+  } @else if (width > 0) {
+    <div
+      class="timeline-item"
+      [style.width.px]="lineWidth"
+    >
+      <div
+        class="bar"
+        [class.auto-scheduled]="isAutoScheduled"
+        [style.marginLeft.px]="offsetForItem"
+        [style.width.px]="width"
+        [style.background]="barColor"
+        (click)="onItemClick()"
+      >
+        <div
+          class="progress"
+          [style.width.px]="widthProgress"
+          [style.background]="progressColor"
+        ></div>
+        @if (showTitleInside && width > 40) {
+          <span class="bar-title-inside">{{ titleLabel }}</span>
+        }
+      </div>
+      @if (showTitleRight) {
+        <span class="bar-title-right">{{ titleLabel }}</span>
+      }
+    </div>
+  } @else {
+    <div class="timeline-item-empty"></div>
+  }
 
   @if (item._SHOWCHILDS !== false && item.childs?.length) {
     @for (child of item.childs; track child.id || child.title) {
@@ -18,6 +40,7 @@
         [scale]="scale"
         [dateStart]="dateStart"
         [dateEnd]="dateEnd"
+        [hours24InDay]="hours24InDay"
         [showTitleInside]="showTitleInside"
         [showTitleRight]="showTitleRight"
         [containerTop]="containerTop"
@@ -26,8 +49,6 @@
         [depth]="depth + 1"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
-        (dragIssueStart)="dragIssueStart.emit()"
-        (dragIssueEnd)="dragIssueEnd.emit($event)"
         (issueLaidOut)="issueLaidOut.emit($event)"
         (scrollRight)="scrollRight.emit()"
         (scrollLeft)="scrollLeft.emit()"
@@ -36,4 +57,3 @@
     }
   }
 }
-

@@ -2,19 +2,22 @@
 <ng-template #selectedItemTemplateDefault>
   @let selected = model.selected | async;
   @let emptyItem = model.emptyItem | async;
-  <div
-    [tabindex]="-1"
-    class="rw-select-prompt"
-    (click)="switchPopup(!opened)"
-    [class.rw-select-prompt-active]="
-    opened || (model.selected | async)[0] || (model.emptyItem | async)
-    "
+  @if (prompt) {
+    <div
+      [tabindex]="-1"
+      class="rw-select-prompt"
+      (click)="switchPopup(!opened)"
+      [class.rw-select-prompt-active]="
+        opened || (model.selected | async)[0] || (model.emptyItem | async)
+      "
     >
-    {{ prompt }}
-  </div>
+      {{ prompt }}
+    </div>
+  }
   <div
     class="rw-select-value"
     #value
+    [class.rw-select-no-prompt]="!prompt"
     [class.center]="centred"
     [class.tags]="tags"
     [class.disabled]="disabled"

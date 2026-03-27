@@ -1,42 +1,222 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
 .timeline-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.timeline-loading {
-  font-size: 12px;
-  color: #6b7280;
+  height: 100%;
+  color: var(--black);
 }
 
 .timeline-filters {
-  border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 4px 8px;
 }
 
 .timeline-layout {
   display: flex;
-  min-height: 320px;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--gray-300);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.timeline-table-resize {
+  position: absolute;
+  width: 8px;
+  margin-left: -4px;
+  height: 100%;
+  background-color: transparent;
+  z-index: 20;
+  cursor: col-resize;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--accent-lighter-color);
+  }
+}
+
+.timeline-layout-header {
+  display: flex;
+  border-bottom: 2px solid var(--gray-300);
+  background: var(--gray-100);
+  flex-shrink: 0;
+}
+
+.timeline-table-header {
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--gray-300);
+  font-weight: 600;
+  color: var(--gray-500);
+  flex-shrink: 0;
+
+  .th-col {
+    padding: 6px 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-right: 1px solid var(--gray-200);
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .th-key {
+    width: 64px;
+    min-width: 64px;
+  }
+
+  .th-type {
+    width: 24px;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .th-title {
+    flex: 1;
+    min-width: 60px;
+  }
+
+  .th-assignee {
+    width: 120px;
+    min-width: 80px;
+  }
+
+  .th-pct {
+    width: 60px;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .th-status {
+    width: 90px;
+    min-width: 70px;
+    text-align: center;
+  }
+}
+
+.timeline-ruler-wrapper {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.timeline-layout-body {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 100px;
+  overflow: hidden;
+}
+
+.timeline-roadmap-wrapper {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.timeline-roadmap-spacer {
+  flex-shrink: 0;
+}
+
+.timeline-roadmap-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .timeline-table {
-  border-right: 1px solid #e5e7eb;
-  overflow: auto;
-  max-height: 640px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid var(--gray-300);
+  flex-shrink: 0;
+  background: var(--white);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .timeline-graph {
   flex: 1;
-  padding-left: 8px;
-  overflow: auto;
-  max-height: 640px;
+  overflow: scroll;
+  min-width: 0;
+  position: relative;
+  user-select: none;
 }
 
 .timeline-graph-content {
   min-width: max-content;
+  position: relative;
 }
 
-.timeline-workload {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 8px;
+.timeline-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--gray-200);
+  pointer-events: none;
+}
+
+.timeline-layout-workload {
+  flex-shrink: 0;
+  border-top: 1px solid var(--gray-300);
+  position: relative;
+}
+
+.workforce-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 16px;
+  font-weight: 600;
+  color: var(--black);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  user-select: none;
+  margin-left: 8px;
+  position: absolute;
+  top: -33px;
+}
+
+.timeline-workload-content {
+  display: flex;
+  background: var(--gray-100);
+}
+
+.timeline-workload-info {
+  border-right: 1px solid var(--gray-300);
+  flex-shrink: 0;
+}
+
+.workforce-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+}
+
+.workforce-user-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-workload-bars {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }

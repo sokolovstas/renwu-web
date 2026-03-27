@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { IssueBounds, TimelineLink } from '../models/timeline-issue.model';
 import { parseUtcLike, unixSeconds } from '../date-helpers';
+import { unixSecondsVirtual } from '../virtual-hours';
 
 @Component({
   selector: 'renwu-timeline-link',
@@ -19,6 +20,7 @@ export class TimelineLinkComponent implements OnChanges {
   @Input() issueBounds: IssueBounds | null = null;
   @Input() linkBounds: IssueBounds | null = null;
   @Input() dateStart!: Date;
+  @Input() hours24InDay = true;
   @Input() scale = 1;
 
   protected left = 0;
@@ -27,17 +29,14 @@ export class TimelineLinkComponent implements OnChanges {
   ngOnChanges(): void {
     if (!this.data || !this.dateStart || !this.scale) return;
 
-    const a = parseUtcLike(
-      this.data.issue.date_start || this.data.issue.date_start_calc,
-    );
-    const b = parseUtcLike(
-      this.data.link.date_end || this.data.link.date_end_calc,
-    );
+    const a = parseUtcLike(this.data.issue.date_start_calc);
+    const b = parseUtcLike(this.data.link.date_end_calc);
     if (!a || !b) return;
 
-    const dateStartUnix = unixSeconds(this.dateStart);
-    const p1 = (unixSeconds(a) - dateStartUnix) / this.scale;
-    const p2 = (unixSeconds(b) - dateStartUnix) / this.scale;
+    const h24 = this.hours24InDay;
+    const origin = unixSecondsVirtual(this.dateStart, h24, '');
+    const p1 = (unixSecondsVirtual(a, h24, 'start') - origin) / this.scale;
+    const p2 = (unixSecondsVirtual(b, h24, 'end') - origin) / this.scale;
     this.left = Math.min(p1, p2);
     this.width = Math.abs(p2 - p1);
   }

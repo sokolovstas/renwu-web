@@ -60,8 +60,17 @@ export class TimelineService {
 
     const parseMomentLocal = (value: string | undefined): Date | null => {
       if (!value) return null;
-      const d = new Date(value);
-      return isValid(d) ? d : null;
+      let d: Date;
+      const trimmed = value.trim();
+      if (/^\d+(\.\d+)?$/.test(trimmed)) {
+        const num = Number(trimmed);
+        const ms = num < 1e10 ? num * 1000 : num;
+        d = new Date(ms);
+      } else {
+        d = new Date(value);
+      }
+      if (!isValid(d) || d.getFullYear() < 1970) return null;
+      return d;
     };
 
     const utcStartOfPrevMonth = (date: Date): Date => {
@@ -100,8 +109,8 @@ export class TimelineService {
             issuesMap[String(child.id)] = child as unknown as Issue;
           }
 
-          const start = parseMomentLocal(child.date_start || child.date_start_calc);
-          const end = parseMomentLocal(child.date_end || child.date_end_calc);
+          const start = parseMomentLocal(child.date_start_calc);
+          const end = parseMomentLocal(child.date_end_calc);
 
           if (start) {
             const unix = unixSeconds(start);

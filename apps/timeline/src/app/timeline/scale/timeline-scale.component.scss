@@ -1,11 +1,63 @@
 .timeline-scale {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  background: var(--gray-100);
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.scale-left,
+.scale-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.scale-field {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.timeline-scale-value {
-  font-size: 12px;
+.scale-field-label {
+  color: var(--gray-500);
+  white-space: nowrap;
 }
 
+.scale-info {
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+.scale-hours {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.scale-hours-label {
+  color: var(--gray-500);
+}
+
+.scale-slider {
+  display: flex;
+  align-items: center;
+  width: 100px;
+
+  rw-range {
+    width: 100%;
+  }
+}
+
+.scale-percent {
+  min-width: 36px;
+  text-align: right;
+  white-space: nowrap;
+}

@@ -1,13 +1,4 @@
 .workload-user {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 6px 8px;
+  min-width: max-content;
 }
-
-.workload-user-header {
-  font-size: 12px;
-  font-weight: 600;
-}
-

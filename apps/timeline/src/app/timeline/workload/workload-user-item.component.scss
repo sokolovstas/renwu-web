@@ -1,8 +1,39 @@
-.workload-user-item {
-  position: relative;
+.workload-bar-segment {
+  position: absolute;
+  top: 2px;
+  height: 22px;
+  border-radius: 3px;
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 11px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-width: 2px;
 }
 
+.bar-empty {
+  background: var(--gray-300);
+}
+
+.bar-low {
+  background: var(--gray-300);
+}
+
+.bar-medium {
+  background: var(--gray-400);
+}
+
+.bar-high {
+  background: var(--gray-500);
+}
+
+.bar-overload {
+  background: var(--gray-600);
+}
+
+.workload-bar-label {
+  font-weight: 600;
+  color: var(--always-white);
+  white-space: nowrap;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+  padding: 0 4px;
+}

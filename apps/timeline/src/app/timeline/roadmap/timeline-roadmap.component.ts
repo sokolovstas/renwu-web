@@ -15,6 +15,7 @@ export class TimelineRoadmapComponent {
 
   @Input() dateStart!: Date;
   @Input() scale = 1;
+  @Input() hours24InDay = true;
 
   @Input() selectedMilestoneId: string | null = null;
 

@@ -13,7 +13,8 @@ function normalizeIsoLike(value: string): string {
  * Parses a string into a UTC `Date`:
  * - if timezone is missing, treat the ISO-like string as UTC by appending `Z`
  * - if timezone exists, let JS parse it normally
- * - supports numeric strings as epoch milliseconds (same as `new Date(number)`)
+ * - numeric strings: values < 1e10 are treated as epoch seconds, otherwise milliseconds
+ * - returns null for "zero" dates (year < 1970) like Go's `0001-01-01T00:00:00Z`
  */
 export function parseUtcLike(
   value: string | null | undefined,
@@ -23,22 +24,26 @@ export function parseUtcLike(
   const raw = value.trim();
   if (!raw) return null;
 
-  // Numeric strings: epoch milliseconds.
+  let d: Date;
+
   if (/^\d+(\.\d+)?$/.test(raw)) {
-    const d = new Date(Number(raw));
-    return isValid(d) ? d : null;
+    const num = Number(raw);
+    const ms = num < 1e10 ? num * 1000 : num;
+    d = new Date(ms);
+  } else {
+    const normalized = normalizeIsoLike(raw);
+    const hasZone = /Z$|[+-]\d{2}:?\d{2}$/.test(normalized);
+    const isoNoZone =
+      /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?$/.test(
+        normalized,
+      );
+
+    const candidate = !hasZone && isoNoZone ? `${normalized}Z` : normalized;
+    d = new Date(candidate);
   }
 
-  const normalized = normalizeIsoLike(raw);
-  const hasZone = /Z$|[+-]\d{2}:?\d{2}$/.test(normalized);
-  const isoNoZone =
-    /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?$/.test(
-      normalized,
-    );
-
-  const candidate = !hasZone && isoNoZone ? `${normalized}Z` : normalized;
-  const d = new Date(candidate);
-  return isValid(d) ? d : null;
+  if (!isValid(d) || d.getFullYear() < 1970) return null;
+  return d;
 }
 
 export function addSecondsUtc(date: Date, seconds: number): Date {

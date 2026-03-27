@@ -1,18 +1,30 @@
 import { provideHttpClient } from '@angular/common/http';
+import { isDevMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
   withRouterConfig,
 } from '@angular/router';
+import { provideTransloco, translocoConfig } from '@jsverse/transloco';
 import { provideRenwuCore } from '@renwu/core';
 import { environment } from '../../../environments/environment';
 import { AppComponent } from './app/app.component';
+import { TranslocoHttpLoader } from './app/transloco-http-loader';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
     provideRenwuCore(environment),
+    provideTransloco({
+      config: translocoConfig({
+        availableLangs: ['en', 'ru', 'zh'],
+        defaultLang: 'ru',
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      }),
+      loader: TranslocoHttpLoader,
+    }),
     provideRouter(
       [
         {

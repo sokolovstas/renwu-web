@@ -13,7 +13,10 @@ import {
   UserWorkloadIssues,
 } from '@renwu/core';
 
-type IssueTreeFilters = ListOptionsFilters & { group_by?: string };
+type IssueTreeFilters = ListOptionsFilters & {
+  group_by?: string;
+  query_hash?: string;
+};
 
 @Injectable()
 export class TimelineDataService {

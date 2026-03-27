@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import { JSONUtils } from '@renwu/utils';
 import { getHours } from 'date-fns';
 import { Subject } from 'rxjs';
@@ -49,4 +50,10 @@ export class IssueDateTime {
       true,
     );
   }
+}
+
+/** Shared timeline / issue axis mode (`renwu_hours24InDay` in localStorage). */
+@Injectable({ providedIn: 'root' })
+export class RwIssueDateTimeService {
+  readonly issueDateTime = new IssueDateTime();
 }

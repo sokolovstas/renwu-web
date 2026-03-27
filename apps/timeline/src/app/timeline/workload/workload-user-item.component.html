@@ -1,5 +1,8 @@
-<div class="workload-user-item">
-  <span class="period">{{ item.week || item.month || item.quarter || item.year }}</span>
-  <span class="value">{{ item.total }}</span>
+<div
+  class="workload-bar-segment"
+  [class]="barColorClass"
+  [style.left.px]="bar.position"
+  [style.width.px]="bar.width"
+>
+  <span class="workload-bar-label">{{ label }}</span>
 </div>
-

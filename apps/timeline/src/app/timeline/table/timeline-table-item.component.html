@@ -1,20 +1,49 @@
 @if (item) {
-  <div
-    class="timeline-table-item"
-    [class.root]="isRoot()"
-    [class.group]="isGroup()"
-    [style.paddingLeft.px]="depth * 12"
-    (mouseenter)="onHover(true)"
-    (mouseleave)="onHover(false)"
-    (click)="onItemClick()"
-  >
-    @if (item.childs?.length) {
-      <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
-        {{ item._SHOWCHILDS ? '▾' : '▸' }}
-      </button>
-    }
-    <span class="title">{{ item.title || item.key || item.id }}</span>
-  </div>
+  @if (isGroup()) {
+    <div
+      class="timeline-table-row group-row"
+      [style.paddingLeft.px]="depth * 12"
+      (click)="onItemClick()"
+    >
+      @if (item.childs?.length) {
+        <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
+          {{ item._SHOWCHILDS ? '▾' : '▸' }}
+        </button>
+      }
+      <span class="group-title">{{ item.title || item.key || item.id }}</span>
+    </div>
+  } @else {
+    <div
+      class="timeline-table-row issue-row"
+      (mouseenter)="onHover(true)"
+      (mouseleave)="onHover(false)"
+      (click)="onItemClick()"
+    >
+      <span class="td-col td-key">{{ item.key }}</span>
+      <span class="td-col td-type">
+        @if (typeInfo) {
+          <renwu-issue-type [value]="typeInfo" [tooltipDisabled]="true" />
+        }
+      </span>
+      <span class="td-col td-title" [title]="item.title || ''">
+        @if (item.childs?.length) {
+          <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
+            {{ item._SHOWCHILDS ? '▾' : '▸' }}
+          </button>
+        }
+        {{ item.title }}
+      </span>
+      <span class="td-col td-assignee">
+        <renwu-issue-assignees [issue]="$any(item)" />
+      </span>
+      <span class="td-col td-pct">{{ item.completion || 0 }}%</span>
+      <span class="td-col td-status">
+        @if (statusInfo) {
+          <renwu-issue-status [value]="statusInfo" />
+        }
+      </span>
+    </div>
+  }
 
   @if (item._SHOWCHILDS !== false && item.childs?.length) {
     @for (child of item.childs; track child.id || child.title) {
@@ -30,4 +59,3 @@
     }
   }
 }
-

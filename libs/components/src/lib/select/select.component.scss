@@ -21,6 +21,11 @@ rw-select.borderless {
   border-radius: initial;
 }
 
+/* Reserve top space only when the floating prompt label is shown */
+rw-select.rw-select-no-prompt:not(.borderless) {
+  padding-top: $rw-control-default-padding;
+}
+
 rw-select:hover {
   // background-color: $rw-control-border-hover-color;
   .select-arrow {
@@ -39,6 +44,11 @@ rw-select:hover {
   display: flex;
   flex-direction: row;
   position: relative;
+
+  &:has(.rw-select-value.rw-select-no-prompt) {
+    padding-top: $rw-control-default-padding * 2;
+  }
+
   .rw-select-prompt {
     margin: $rw-control-default-padding $rw-control-default-padding * 2;
     margin-top: $rw-control-default-padding * 5;
@@ -116,6 +126,10 @@ rw-select:hover {
   overflow: hidden;
   min-height: $global-lineheight * 1rem;
   gap: 2px;
+
+  .rw-select-value.rw-select-no-prompt & {
+    margin-top: 0;
+  }
 
   &.horizontal {
     flex-direction: row;

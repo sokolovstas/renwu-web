@@ -1,2 +1,26 @@
-<div class="timeline-ruler"></div>
-
+<div class="timeline-ruler" [style.width.px]="totalWidth">
+  @if (majorLabels.length) {
+    <div class="ruler-major">
+      @for (label of majorLabels; track label.position) {
+        <div
+          class="ruler-major-label"
+          [style.left.px]="label.position"
+          [style.width.px]="label.width"
+        >
+          {{ label.text }}
+        </div>
+      }
+    </div>
+  }
+  <div class="ruler-minor">
+    @for (label of minorLabels; track label.position) {
+      <div
+        class="ruler-minor-label"
+        [style.left.px]="label.position"
+        [style.width.px]="label.width"
+      >
+        <span class="ruler-minor-text">{{ label.text }}</span>
+      </div>
+    }
+  </div>
+</div>

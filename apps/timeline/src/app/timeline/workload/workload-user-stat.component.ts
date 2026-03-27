@@ -1,6 +1,16 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { UserWorkloadItem } from '@renwu/core';
-import { WorkloadUserItemComponent } from './workload-user-item.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+} from '@angular/core';
+import { TimelineTicksId, UserWorkloadItem } from '@renwu/core';
+import { unixSeconds } from '../date-helpers';
+import { unixSecondsVirtual } from '../virtual-hours';
+import {
+  WorkloadUserItemComponent,
+  WorkloadBar,
+} from './workload-user-item.component';
 
 @Component({
   selector: 'renwu-timeline-workload-user-stat',
@@ -10,9 +20,99 @@ import { WorkloadUserItemComponent } from './workload-user-item.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [WorkloadUserItemComponent],
 })
-export class WorkloadUserStatComponent {
+export class WorkloadUserStatComponent implements OnChanges {
   @Input() user: unknown;
   @Input() stat: unknown;
   @Input() items: UserWorkloadItem[] = [];
-}
+  @Input() scaleTick: TimelineTicksId = TimelineTicksId.DAY;
+  /** Aligns workload strip with timeline axis (`IssueDateTime` / virtual 8h day). */
+  @Input() hours24InDay = true;
+  @Input() dateStart!: Date;
+  @Input() dateEnd!: Date;
+  @Input() scale = 5000;
 
+  bars: WorkloadBar[] = [];
+  totalWidth = 0;
+
+  ngOnChanges(): void {
+    this.calculateBars();
+  }
+
+  private calculateBars(): void {
+    if (!this.dateStart || !this.dateEnd || !this.scale || !this.items?.length) {
+      this.bars = [];
+      return;
+    }
+
+    const h24 = this.hours24InDay;
+    const origin = unixSecondsVirtual(this.dateStart, h24, '');
+    const endAxis = unixSecondsVirtual(this.dateEnd, h24, '');
+    this.totalWidth = (endAxis - origin) / this.scale;
+
+    this.bars = this.items
+      .map((item) => this.itemToBar(item, origin, h24))
+      .filter((bar): bar is WorkloadBar => bar !== null);
+  }
+
+  private itemToBar(
+    item: UserWorkloadItem,
+    originVirtual: number,
+    h24: boolean,
+  ): WorkloadBar | null {
+    const range = this.getItemRange(item);
+    if (!range) return null;
+
+    const startDate = new Date(range.startUnix * 1000);
+    const endDate = new Date(range.endUnix * 1000);
+    const v0 = unixSecondsVirtual(startDate, h24, '');
+    const v1 = unixSecondsVirtual(endDate, h24, '');
+    const position = (v0 - originVirtual) / this.scale;
+    const width = (v1 - v0) / this.scale;
+    const capacity = item.time_to_now || 0;
+    const total = item.total || 0;
+
+    return {
+      position,
+      width: Math.max(width, 2),
+      total,
+      capacity,
+      ratio: capacity > 0 ? total / capacity : 0,
+    };
+  }
+
+  private getItemRange(item: UserWorkloadItem): { startUnix: number; endUnix: number } | null {
+    switch (this.scaleTick) {
+      case TimelineTicksId.QUARTER:
+        return this.getQuarterRange(item.year, item.quarter);
+      case TimelineTicksId.WEEK:
+        return this.getMonthRange(item.year, item.month);
+      default:
+        return this.getWeekRange(item.year, item.week);
+    }
+  }
+
+  private getWeekRange(year: number, week: number): { startUnix: number; endUnix: number } | null {
+    if (!year || !week) return null;
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const dayOfWeek = jan4.getUTCDay() || 7;
+    const isoWeek1Monday = new Date(jan4.getTime() - (dayOfWeek - 1) * 86400000);
+    const weekStart = new Date(isoWeek1Monday.getTime() + (week - 1) * 7 * 86400000);
+    const startUnix = unixSeconds(weekStart);
+    return { startUnix, endUnix: startUnix + 7 * 86400 };
+  }
+
+  private getMonthRange(year: number, month: number): { startUnix: number; endUnix: number } | null {
+    if (!year || !month) return null;
+    const start = new Date(Date.UTC(year, month - 1, 1));
+    const end = new Date(Date.UTC(year, month, 1));
+    return { startUnix: unixSeconds(start), endUnix: unixSeconds(end) };
+  }
+
+  private getQuarterRange(year: number, quarter: number): { startUnix: number; endUnix: number } | null {
+    if (!year || !quarter) return null;
+    const startMonth = (quarter - 1) * 3;
+    const start = new Date(Date.UTC(year, startMonth, 1));
+    const end = new Date(Date.UTC(year, startMonth + 3, 1));
+    return { startUnix: unixSeconds(start), endUnix: unixSeconds(end) };
+  }
+}

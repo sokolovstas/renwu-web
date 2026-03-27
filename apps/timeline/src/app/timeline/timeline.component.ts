@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  Renderer2,
   ViewChild,
   computed,
   effect,
@@ -12,6 +13,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addMonthsUtc, parseUtcLike, unixSeconds } from './date-helpers';
+import { unixSecondsVirtual } from './virtual-hours';
 import { TimelineRulerComponent } from './ruler/timeline-ruler.component';
 import { TimelineScaleComponent } from './scale/timeline-scale.component';
 import {
@@ -19,11 +21,13 @@ import {
   ListOptions,
   Milestone,
   QueryBuilderComponent,
+  RwDataService,
   RwSearchService,
   RwUserService,
   RwWebsocketService,
   RwShortcutService,
   TimelineService as CoreTimelineService,
+  RwIssueDateTimeService,
   User,
   UserWorkload,
 } from '@renwu/core';
@@ -34,11 +38,12 @@ import { IssueTreeRoot, TimelineIssue, TimelineLink } from './models/timeline-is
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
 import { WorkloadUserComponent } from './workload/workload-user.component';
+import { TimelineHolderDirective } from './shared/directives/timeline-holder.directive';
 import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 
 type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
 
@@ -56,7 +61,6 @@ type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
   ],
   imports: [
     QueryBuilderComponent,
-    TranslocoPipe,
     TimelineScaleComponent,
     TimelineRulerComponent,
     TimelineTableItemComponent,
@@ -64,6 +68,7 @@ type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
     TimelineLinkComponent,
     TimelineRoadmapComponent,
     WorkloadUserComponent,
+    TimelineHolderDirective,
   ],
 })
 export class TimelineComponent {
@@ -73,12 +78,20 @@ export class TimelineComponent {
   private readonly userService = inject(RwUserService);
   private readonly translocoService = inject(TranslocoService);
   private readonly searchService = inject(RwSearchService);
+  private readonly rwDataService = inject(RwDataService);
   private readonly websocketService = inject(RwWebsocketService);
   private readonly shortcutService = inject(RwShortcutService);
   private readonly settingsService = inject(TimelineSettingsService);
   private readonly dataService = inject(TimelineDataService);
   private readonly coreTimelineService = inject(CoreTimelineService);
   private readonly stateService = inject(TimelineStateService);
+  private readonly renderer = inject(Renderer2);
+  private readonly issueDateTimeSvc = inject(RwIssueDateTimeService);
+
+  /** `true` = linear 24h calendar axis; `false` = compressed 8h workday mapping (see `IssueDateTime`). */
+  protected readonly hours24InDay = signal(
+    this.issueDateTimeSvc.issueDateTime.hours24InDay,
+  );
 
   private readonly currentUser = toSignal(this.userService.currentUser, {
     initialValue: this.userService.currentUserValue,
@@ -86,12 +99,57 @@ export class TimelineComponent {
 
   protected readonly isWorkload = computed(() => Boolean(this.currentUser()));
 
-  protected readonly settings = computed(() =>
-    this.settingsService.getTimeline(this.isWorkload()),
-  );
+  protected readonly timezone = computed(() => {
+    return this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
+  });
+
+  protected readonly settings = computed(() => this.settingsService.getTimeline());
 
   protected readonly dateStart = signal<Date>(new Date());
   protected readonly dateEnd = signal<Date>(addMonthsUtc(new Date(), 1));
+  protected readonly rulerLimit = computed(() => {
+    const end = this.dateEnd();
+    const scale = this.settings().scale;
+    if (scale <= 2500) return addMonthsUtc(end, 6);
+    if (scale <= 16500) return addMonthsUtc(end, 12);
+    return addMonthsUtc(end, 24);
+  });
+
+  protected readonly gridLines = computed(() => {
+    const start = this.dateStart();
+    const end = this.rulerLimit();
+    const scale = this.settings().scale;
+    const h24 = this.hours24InDay();
+    if (!start || !end || !scale) return [];
+    const startU = unixSeconds(start);
+    const endU = unixSeconds(end);
+    if (endU <= startU) return [];
+    const origin = unixSecondsVirtual(start, h24, '');
+    const dayPx = 86400 / scale;
+    const lines: number[] = [];
+    if (dayPx >= 30) {
+      const cursor = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+      while (unixSeconds(cursor) < endU) {
+        lines.push((unixSecondsVirtual(cursor, h24, '') - origin) / scale);
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+      }
+    } else if (dayPx >= 3) {
+      const cursor = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+      const dow = cursor.getUTCDay();
+      cursor.setUTCDate(cursor.getUTCDate() - ((dow + 6) % 7));
+      while (unixSeconds(cursor) < endU) {
+        lines.push((unixSecondsVirtual(cursor, h24, '') - origin) / scale);
+        cursor.setUTCDate(cursor.getUTCDate() + 7);
+      }
+    } else {
+      const cursor = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1));
+      while (unixSeconds(cursor) < endU) {
+        lines.push((unixSecondsVirtual(cursor, h24, '') - origin) / scale);
+        cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+      }
+    }
+    return lines;
+  });
 
   protected readonly selectedUsers = signal<User[]>([]);
   protected readonly queryString = signal('');
@@ -112,7 +170,16 @@ export class TimelineComponent {
   private readonly activeContainerId = signal<string | null>(null);
   private readonly pendingReload = signal(false);
   private selectedIssueId: string | null = null;
+  private dragTimeline = false;
+  private scrollSource: 'graph' | 'table' | null = null;
+  private resizeTableHandle: (() => void) | null = null;
+  private resizeTableEndHandle: (() => void) | null = null;
+  private prevTableScreenX = 0;
   @ViewChild('graphScroll') private graphScroll?: ElementRef<HTMLDivElement>;
+  @ViewChild('rulerWrapper') private rulerWrapper?: ElementRef<HTMLDivElement>;
+  @ViewChild('tableBody') private tableBody?: ElementRef<HTMLDivElement>;
+  @ViewChild('workloadBars') private workloadBars?: ElementRef<HTMLDivElement>;
+  @ViewChild('roadmapScroll') private roadmapScroll?: ElementRef<HTMLDivElement>;
 
   private readonly queryParams = toSignal(
     this.route.queryParamMap.pipe(
@@ -126,6 +193,25 @@ export class TimelineComponent {
   private readonly reloadCounter = signal(0);
 
   constructor() {
+    this.issueDateTimeSvc.issueDateTime.show24HoursInDay
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((v) => this.hours24InDay.set(v));
+
+    this.route.paramMap
+      .pipe(
+        map((params) => params.get('id')),
+        filter((id): id is string => Boolean(id)),
+        switchMap((id) => this.rwDataService.getSearchQuery(id)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((query) => {
+        if (!query?.id) return;
+        const options = new ListOptions();
+        options.hash = query.id;
+        options.queryString = query.query_string;
+        this.searchService.setListOptions(options);
+      });
+
     // Load persisted settings once the current user is available.
     effect(() => {
       const userId = this.currentUser()?.id;
@@ -163,10 +249,17 @@ export class TimelineComponent {
                 queryParamsHandling: 'merge',
               });
             }
+            const query = this.queryString();
+            const treeFilters = {
+              ...(query ? { query } : {}),
+              ...(queryHash ? { query_hash: queryHash } : {}),
+            };
             return forkJoin({
-              groups: this.dataService.loadIssueTree(container.id, grouping, {
-                queryHash,
-              }),
+              groups: this.dataService.loadIssueTree(
+                container.id,
+                grouping,
+                treeFilters,
+              ),
               milestones: this.dataService.loadMilestones(container.id),
             });
           }),
@@ -245,6 +338,23 @@ export class TimelineComponent {
       }
     });
 
+    effect(() => {
+      const left = this.scrollLeftGraph();
+      const top = this.scrollTopGraph();
+      if (this.rulerWrapper?.nativeElement) {
+        this.rulerWrapper.nativeElement.scrollLeft = left;
+      }
+      if (this.tableBody?.nativeElement) {
+        this.tableBody.nativeElement.scrollTop = top;
+      }
+      if (this.workloadBars?.nativeElement) {
+        this.workloadBars.nativeElement.scrollLeft = left;
+      }
+      if (this.roadmapScroll?.nativeElement) {
+        this.roadmapScroll.nativeElement.scrollLeft = left;
+      }
+    });
+
     // Keep local state in sync with route and resolve query string from hash.
     effect(() => {
       const routeHash = this.queryParams().queryHash;
@@ -273,6 +383,7 @@ export class TimelineComponent {
   }
 
   protected onScaleChanged(): void {
+    this.hours24InDay.set(this.issueDateTimeSvc.issueDateTime.hours24InDay);
     const graphEl = this.graphScroll?.nativeElement;
     if (!graphEl) return;
     const centerPx = this.scrollLeftGraph() + graphEl.clientWidth / 2;
@@ -284,10 +395,30 @@ export class TimelineComponent {
   }
 
   protected onFitToScreen(): void {
-    // Placeholder: later we will recompute dateStart/dateEnd from issues bounds.
-    const now = new Date();
-    this.dateStart.set(now);
-    this.dateEnd.set(addMonthsUtc(now, 1));
+    const graphEl = this.graphScroll?.nativeElement;
+    if (!graphEl) return;
+    const contentWidth = graphEl.clientWidth;
+    if (!contentWidth) return;
+    const idealScale =
+      (unixSeconds(this.dateEnd()) - unixSeconds(this.dateStart())) / contentWidth;
+    const ticks = this.settingsService.ticks;
+    for (const tick of ticks) {
+      if (!tick.scale) continue;
+      if (idealScale > tick.min && idealScale <= tick.scale) {
+        let pct = Math.round((tick.scale * 50) / idealScale);
+        pct = Math.max(50, Math.min(200, pct));
+        this.settingsService.setScaleTick(tick.id);
+        this.settingsService.setScaleValue(pct);
+        this.scrollLeftGraph.set(0);
+        return;
+      }
+    }
+    const lastTick = ticks[ticks.length - 1];
+    if (lastTick) {
+      this.settingsService.setScaleTick(lastTick.id);
+      this.settingsService.setScaleValue(50);
+      this.scrollLeftGraph.set(0);
+    }
   }
 
   protected onScrollTo(item: TimelineIssue): void {
@@ -308,15 +439,93 @@ export class TimelineComponent {
     return this.currentUser() ?? null;
   }
 
+  protected onTableScroll(event: Event): void {
+    if (this.scrollSource === 'graph') return;
+    this.scrollSource = 'table';
+    const target = event.target as HTMLDivElement | null;
+    if (!target) return;
+    this.scrollTopGraph.set(target.scrollTop);
+    if (this.graphScroll?.nativeElement) {
+      this.graphScroll.nativeElement.scrollTop = target.scrollTop;
+    }
+    requestAnimationFrame(() => (this.scrollSource = null));
+  }
+
   protected onGraphScroll(event: Event): void {
+    if (this.scrollSource === 'table') return;
+    this.scrollSource = 'graph';
     const target = event.target as HTMLDivElement | null;
     if (!target) return;
     this.scrollLeftGraph.set(target.scrollLeft);
     this.scrollTopGraph.set(target.scrollTop);
+    if (this.rulerWrapper?.nativeElement) {
+      this.rulerWrapper.nativeElement.scrollLeft = target.scrollLeft;
+    }
+    if (this.tableBody?.nativeElement) {
+      this.tableBody.nativeElement.scrollTop = target.scrollTop;
+    }
+    if (this.workloadBars?.nativeElement) {
+      this.workloadBars.nativeElement.scrollLeft = target.scrollLeft;
+    }
+    if (this.roadmapScroll?.nativeElement) {
+      this.roadmapScroll.nativeElement.scrollLeft = target.scrollLeft;
+    }
+    requestAnimationFrame(() => (this.scrollSource = null));
+  }
+
+  protected onCenterNow(): void {
+    this.centerNow();
+  }
+
+  protected onToggleWorkforce(): void {
+    this.settingsService.setShowWorkforce(!this.settings().showWorkforce);
   }
 
   protected onQueryChanged(query: string): void {
     this.searchService.updateQuery(query || '');
+  }
+
+  protected onTimelineDragStart(): void {
+    this.dragTimeline = true;
+  }
+
+  protected onTimelineDrag(deltaX: number): void {
+    if (this.dragTimeline) {
+      this.scrollLeftGraph.update((v) => Math.max(0, v + deltaX));
+    }
+  }
+
+  protected onTimelineDragEnd(): void {
+    this.dragTimeline = false;
+  }
+
+  protected onResizeDown(event: MouseEvent): void {
+    event.preventDefault();
+    this.prevTableScreenX = event.screenX;
+
+    this.resizeTableHandle = this.renderer.listen(
+      'window',
+      'mousemove',
+      (e: MouseEvent) => {
+        const delta = this.prevTableScreenX - e.screenX;
+        this.prevTableScreenX = e.screenX;
+        const next = this.settings().tableWidth - delta;
+        if (next >= 200 && next <= 800) {
+          this.settingsService.setTableWidth(next);
+        }
+      },
+    );
+
+    this.resizeTableEndHandle = this.renderer.listen(
+      'window',
+      'mouseup',
+      () => {
+        this.resizeTableHandle?.();
+        this.resizeTableEndHandle?.();
+        this.resizeTableHandle = null;
+        this.resizeTableEndHandle = null;
+      },
+    );
   }
 
   private toTree(groups: IssueGroup[]): TimelineIssue[] {
@@ -335,7 +544,7 @@ export class TimelineComponent {
       key?.title ||
       key?.full_name ||
       key?.name ||
-      this.translocoService.translate('timeline.groupFallback')
+      this.translocoService.translate('groupFallback')
     );
   }
 
@@ -351,9 +560,7 @@ export class TimelineComponent {
   private centerAtIssue(issue: TimelineIssue): void {
     const graphEl = this.graphScroll?.nativeElement;
     if (!graphEl) return;
-    const baseDate = issue.date_start_calc || issue.date_start;
-    if (!baseDate) return;
-    const centerDate = parseUtcLike(baseDate);
+    const centerDate = parseUtcLike(issue.date_start_calc);
     if (!centerDate) return;
     const centerUnix = unixSeconds(centerDate);
     const nextLeft =

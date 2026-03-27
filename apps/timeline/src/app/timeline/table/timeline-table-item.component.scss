@@ -1,22 +1,101 @@
-.timeline-table-item {
-  position: relative;
+@use '../styles/timeline-variables' as *;
+
+.timeline-table-row {
   display: flex;
   align-items: center;
-  min-height: 28px;
+  height: $timeline-row-height;
+  min-height: $timeline-row-height;
+  max-height: $timeline-row-height;
   cursor: pointer;
+  border-bottom: 1px solid var(--gray-100);
+
+  &:hover {
+    background: var(--gray-100);
+  }
 }
 
-.expand-btn {
-  width: 18px;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  margin-right: 4px;
+.group-row {
+  font-weight: 600;
+  color: var(--black);
+  background: var(--gray-100);
+  gap: 4px;
+  padding: 0 4px;
 }
 
-.title {
+.group-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.issue-row {
+  color: var(--black);
+}
+
+.td-col {
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 1px solid var(--gray-100);
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.td-key {
+  width: 64px;
+  min-width: 64px;
+  font-weight: 500;
+  color: var(--gray-500);
+}
+
+.td-type {
+  width: 24px;
+  min-width: 24px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.td-title {
+  flex: 1;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.td-assignee {
+  width: 120px;
+  min-width: 80px;
+  color: var(--gray-500);
+}
+
+.td-pct {
+  width: 60px;
+  min-width: 60px;
+  text-align: center;
+  color: var(--gray-500);
+}
+
+.td-status {
+  width: 90px;
+  min-width: 70px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expand-btn {
+  width: 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--gray-500);
+  padding: 0;
+  flex-shrink: 0;
+}

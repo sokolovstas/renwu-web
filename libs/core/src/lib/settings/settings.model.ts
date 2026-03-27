@@ -72,3 +72,6 @@ export interface UserSettingsServer {
   notifications: NotificationSettingsModel;
   date_last_update?: string;
 }
+
+/** localStorage key: `${RW_WORKLOAD_SETTINGS_STORAGE_PREFIX}${userId}` — cleared in RwSettingsService.resetAllSettings. */
+export const RW_WORKLOAD_SETTINGS_STORAGE_PREFIX = 'renwu_workload_settings_';

@@ -1,11 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   ListOptionsFilters,
+  RW_WORKLOAD_SETTINGS_STORAGE_PREFIX,
   RwUserService,
   TimelineScaleTick,
   TimelineTicksId,
 } from '@renwu/core';
 import { TimelineSettings } from '../models/timeline-settings.model';
+import { TimelineWorkloadStorage } from '../models/timeline-workload-storage.model';
 
 const STORAGE_PREFIX = 'renwu_timeline_settings_';
 
@@ -39,15 +41,15 @@ export class TimelineSettingsService {
     grouping: 'none',
 
     scaleTick: TimelineTicksId.DAY,
-    scale: 5000,
-    oldScale: 5000,
-    scaleValue: 120,
+    scale: this.computeActualScale(TimelineTicksId.DAY, 100),
+    oldScale: this.computeActualScale(TimelineTicksId.DAY, 100),
+    scaleValue: 100,
 
-    tableWidth: 250,
+    tableWidth: 380,
     showMilestones: true,
-    showWorkforce: false,
+    showWorkforce: true,
     showTitleInside: true,
-    showTitleRight: false,
+    showTitleRight: true,
 
     workforceHeight: null,
 
@@ -65,17 +67,20 @@ export class TimelineSettingsService {
    * Mutably exposed "settings timeline" snapshot for the feature UI.
    * Later phases can switch to signals-aware templates if needed.
    */
-  getTimeline(isWorkload: boolean): TimelineSettings {
-    const current = this.settingsSignal();
-    if (current.showWorkforce !== isWorkload) {
-      this.settingsSignal.update((s) => ({
-        ...s,
-        showWorkforce: isWorkload,
-      }));
-    }
-
-    // Ensure the current ticks reference is stable for the UI.
+  getTimeline(): TimelineSettings {
     return this.settingsSignal();
+  }
+
+  syncWorkforceMode(isWorkload: boolean): void {
+    const current = this.settingsSignal();
+    if (current.showWorkforce === isWorkload) {
+      return;
+    }
+    this.settingsSignal.update((s) => ({
+      ...s,
+      showWorkforce: isWorkload,
+    }));
+    this.persist();
   }
 
   initFromLocalStorage(userId?: string): void {
@@ -87,28 +92,73 @@ export class TimelineSettingsService {
 
     try {
       const raw = localStorage.getItem(key);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<TimelineSettings>;
-      this.settingsSignal.update((prev) => ({
-        ...prev,
-        ...parsed,
-        // Always keep ticks aligned with our local tick set.
-        ticks: TICKS,
-        open_index: parsed.open_index ?? prev.open_index,
-        open_index_group: parsed.open_index_group ?? prev.open_index_group,
-      }));
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<TimelineSettings> & {
+          hoursPerDay?: number;
+          displayHoursPerDay?: boolean;
+        };
+        const {
+          hoursPerDay: _omitHours,
+          displayHoursPerDay: _omitDisplay,
+          ...timelineRest
+        } = parsed;
+        const scaleTick =
+          timelineRest.scaleTick ?? this.initialSettings.scaleTick;
+        const scaleValue =
+          timelineRest.scaleValue ?? this.initialSettings.scaleValue;
+        const scale = this.computeActualScale(scaleTick, scaleValue);
+        this.settingsSignal.update((prev) => ({
+          ...prev,
+          ...timelineRest,
+          ticks: TICKS,
+          scale,
+          oldScale: scale,
+          open_index: timelineRest.open_index ?? prev.open_index,
+          open_index_group: timelineRest.open_index_group ?? prev.open_index_group,
+        }));
+      }
+      this.mergeWorkloadFromLocalStorage(userId);
     } catch {
       // ignore broken localStorage
     }
   }
 
+  private mergeWorkloadFromLocalStorage(userId?: string): void {
+    const uid = userId ?? this.userService.currentUserValue?.id;
+    if (!uid) return;
+    const wkey = `${RW_WORKLOAD_SETTINGS_STORAGE_PREFIX}${uid}`;
+    try {
+      const raw = localStorage.getItem(wkey);
+      if (!raw) return;
+      const w = JSON.parse(raw) as TimelineWorkloadStorage;
+      this.settingsSignal.update((prev) => ({
+        ...prev,
+        ...(w.showWorkforce !== undefined ? { showWorkforce: w.showWorkforce } : {}),
+        ...(w.workforceHeight !== undefined ? { workforceHeight: w.workforceHeight } : {}),
+      }));
+    } catch {
+      // ignore
+    }
+  }
+
+  private pickWorkloadForStorage(s: TimelineSettings): TimelineWorkloadStorage {
+    return {
+      showWorkforce: s.showWorkforce,
+      workforceHeight: s.workforceHeight,
+    };
+  }
+
   private persist(): void {
     const key = this.storageKey();
     if (!key) return;
+    const state = this.settingsSignal();
+    const userId = key.slice(STORAGE_PREFIX.length);
+    const workloadKey = `${RW_WORKLOAD_SETTINGS_STORAGE_PREFIX}${userId}`;
     try {
+      localStorage.setItem(key, JSON.stringify(state));
       localStorage.setItem(
-        key,
-        JSON.stringify(this.settingsSignal()),
+        workloadKey,
+        JSON.stringify(this.pickWorkloadForStorage(state)),
       );
     } catch {
       // ignore storage quota / disabled storage
@@ -119,8 +169,19 @@ export class TimelineSettingsService {
     return this.settingsSignal().ticks;
   }
 
-  getScaleValue(tickId: TimelineTicksId): number {
-    return this.ticks.find((t) => t.id === tickId)?.scale ?? this.settingsSignal().scale;
+  /**
+   * Compute seconds-per-pixel from tick base scale and zoom percentage.
+   * Formula from the old codebase: `actualScale = tickBaseScale * 50 / scaleValue`
+   * where scaleValue is a percentage (50 = most zoomed out, 200 = most zoomed in).
+   */
+  private computeActualScale(tickId: TimelineTicksId, scaleValue: number): number {
+    const tick = TICKS.find((t) => t.id === tickId);
+    if (!tick || !tick.scale || !scaleValue) return 5000;
+    return Math.max(1, Math.round(tick.scale * 50 / scaleValue));
+  }
+
+  getTickBaseScale(tickId: TimelineTicksId): number {
+    return TICKS.find((t) => t.id === tickId)?.scale ?? 5000;
   }
 
   // --- Mutators (used by timeline UI) ---
@@ -131,23 +192,29 @@ export class TimelineSettingsService {
   }
 
   setScaleTick(value: TimelineTicksId): void {
-    const nextScale = this.getScaleValue(value);
-    this.settingsSignal.update((s) => ({
-      ...s,
-      oldScale: s.scale,
-      scaleTick: value,
-      scale: nextScale,
-    }));
+    this.settingsSignal.update((s) => {
+      const nextScale = this.computeActualScale(value, s.scaleValue);
+      return {
+        ...s,
+        oldScale: s.scale,
+        scaleTick: value,
+        scale: nextScale,
+      };
+    });
     this.persist();
   }
 
   setScaleValue(value: number): void {
-    this.settingsSignal.update((s) => ({
-      ...s,
-      oldScale: s.scale,
-      scaleValue: value,
-      scale: value,
-    }));
+    this.settingsSignal.update((s) => {
+      const clamped = Math.max(50, Math.min(200, value));
+      const nextScale = this.computeActualScale(s.scaleTick, clamped);
+      return {
+        ...s,
+        oldScale: s.scale,
+        scaleValue: clamped,
+        scale: nextScale,
+      };
+    });
     this.persist();
   }
 
@@ -168,6 +235,11 @@ export class TimelineSettingsService {
 
   setShowTitleRight(value: boolean): void {
     this.settingsSignal.update((s) => ({ ...s, showTitleRight: value }));
+    this.persist();
+  }
+
+  setShowWorkforce(value: boolean): void {
+    this.settingsSignal.update((s) => ({ ...s, showWorkforce: value }));
     this.persist();
   }
 

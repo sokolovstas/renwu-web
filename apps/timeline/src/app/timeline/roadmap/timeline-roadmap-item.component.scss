@@ -7,19 +7,19 @@
   margin-top: 6px;
   padding: 0 6px;
   border-radius: 8px;
-  background: #dbeafe;
-  color: #1e3a8a;
+  background: var(--accent-lighter-color);
+  color: var(--accent-secondary-color);
   cursor: pointer;
   user-select: none;
 }
 
 .timeline-roadmap-item.due {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--toast-error-background-color);
+  color: var(--toast-error-color);
 }
 
 .timeline-roadmap-item.selected {
-  box-shadow: 0 0 0 2px #2563eb inset;
+  box-shadow: 0 0 0 2px var(--accent-primary-color) inset;
 }
 
 .title {
@@ -28,4 +28,3 @@
   white-space: nowrap;
   font-size: 11px;
 }
-

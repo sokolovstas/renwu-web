@@ -3,7 +3,22 @@
     "loading": "Загрузка таймлайна...",
     "fit": "Подогнать",
     "userFallback": "Пользователь",
-    "groupFallback": "Группа"
+    "groupFallback": "Группа",
+    "eightHourDayAxis": "8 часов в день",
+    "grouping": "Группировка",
+    "scale": "Шаг",
+    "showMilestones": "Вехи",
+    "currentTimeZone": "Часовой пояс",
+    "now": "Сейчас",
+    "switchOn": "Вкл",
+    "switchOff": "Выкл",
+    "groupingNone": "Нет",
+    "groupingType": "Тип",
+    "groupingStatus": "Статус",
+    "groupingAssignee": "Исполнитель",
+    "tickFit": "По экрану",
+    "tickDay": "День",
+    "tickWeek": "Неделя",
+    "tickQuarter": "Квартал"
   }
 }
-
