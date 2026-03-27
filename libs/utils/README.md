@@ -1,35 +1,19 @@
 # utils
 
-Renwu util library. Have usefull tools
+## Назначение
+Библиотека универсальных утилит для работы с данными, датами, строками, файлами и RxJS-потоками.
 
-## Clipboard
+## Область ответственности
+- Чистые helper-функции общего назначения.
+- Переиспользуемые инструменты трансформации данных.
+- Низкоуровневые утилиты без доменной привязки.
 
-## Color
+## Что улучшить
+- Ввести политику добавления утилит (pure-first, запрет дубликатов, обязательные тесты).
+- Разделить API по подпакетам и ограничить экспорты.
+- Добавить property-based и граничные тесты для критичных helper-функций.
 
-## Dates
-
-## File
-
-## Json
-
-## mongo ObjectID
-
-## Ranges
-
-## Strings
-
-## Websocket subject
-
-## RxJS
-
-### destroy-observable.ts
-
-Use with `merge(destroyObservable(this.destroy))`
-
-### filter-falsy.ts
-
-Operator to skip falsy value in pipe
-
-### switch-tap.ts
-
-Wait until complete without value change
+## Техдолг
+- `P0`: остановить рост "свалки утилит" и удалить дубли/legacy helper-ы.
+- `P1`: усилить типизацию и гарантии корректности для часто используемых функций.
+- `P2`: проверить tree-shaking и оптимизировать публичный API библиотеки.
