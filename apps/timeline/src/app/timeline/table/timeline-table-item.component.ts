@@ -26,6 +26,8 @@ export class TimelineTableItemComponent {
   @Input() item!: TimelineIssue;
   /** DFS index among visible rows (for alternating striping with the graph column). */
   @Input() stripeIndex = 0;
+  /** When set, row with this issue id is highlighted (sync with graph hover). */
+  @Input() highlightedId: string | null = null;
   @Input() depth = 0;
   @Input() tableWidth = 380;
   @Input() disableSelectedTimelineItem = false;
@@ -49,6 +51,12 @@ export class TimelineTableItemComponent {
 
   protected childStripeIndex(childIndex: number): number {
     return this.stripeIndex + 1 + visibleRowsBeforeChild(this.item, childIndex);
+  }
+
+  get rowHighlighted(): boolean {
+    const id = this.item?.id;
+    if (id === undefined || id === null || id === '') return false;
+    return String(id) === this.highlightedId;
   }
 
   protected onHover(inside: boolean): void {

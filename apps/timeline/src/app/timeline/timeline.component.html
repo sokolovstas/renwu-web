@@ -79,6 +79,7 @@
           <renwu-timeline-table-item
             [item]="row"
             [stripeIndex]="stripeIndexForRoot($index)"
+            [highlightedId]="hoveredIssueId()"
             [depth]="0"
             [tableWidth]="settings().tableWidth"
             (selected)="onSelected($event)"
@@ -119,6 +120,7 @@
             <renwu-timeline-item
               [item]="row"
               [stripeIndex]="stripeIndexForRoot($index)"
+              [highlightedId]="hoveredIssueId()"
               [scale]="settings().scale"
               [dateStart]="dateStart()"
               [dateEnd]="rulerLimit()"

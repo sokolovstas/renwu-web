@@ -3,6 +3,9 @@
     <div
       class="timeline-item-group"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
+      [class.timeline-row-highlight]="rowHighlighted"
+      (mouseenter)="onRowHover(true)"
+      (mouseleave)="onRowHover(false)"
     >
       <!-- group row placeholder - no bar -->
     </div>
@@ -10,7 +13,10 @@
     <div
       class="timeline-item"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
+      [class.timeline-row-highlight]="rowHighlighted"
       [style.width.px]="lineWidth"
+      (mouseenter)="onRowHover(true)"
+      (mouseleave)="onRowHover(false)"
     >
       <div
         class="bar"
@@ -37,6 +43,9 @@
     <div
       class="timeline-item-empty"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
+      [class.timeline-row-highlight]="rowHighlighted"
+      (mouseenter)="onRowHover(true)"
+      (mouseleave)="onRowHover(false)"
     ></div>
   }
 
@@ -45,6 +54,7 @@
       <renwu-timeline-item
         [item]="child"
         [stripeIndex]="childStripeIndex(ci)"
+        [highlightedId]="highlightedId"
         [scale]="scale"
         [dateStart]="dateStart"
         [dateEnd]="dateEnd"

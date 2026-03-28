@@ -24,6 +24,8 @@ export class TimelineItemComponent implements OnChanges {
   @Input() item!: TimelineIssue;
   /** DFS index among visible rows (striping aligned with the table column). */
   @Input() stripeIndex = 0;
+  /** When set, row with this issue id is highlighted (sync with table hover). */
+  @Input() highlightedId: string | null = null;
   @Input() scale!: number;
   @Input() dateStart!: Date;
   @Input() dateEnd!: Date;
@@ -107,6 +109,17 @@ export class TimelineItemComponent implements OnChanges {
 
   protected childStripeIndex(childIndex: number): number {
     return this.stripeIndex + 1 + visibleRowsBeforeChild(this.item, childIndex);
+  }
+
+  get rowHighlighted(): boolean {
+    const id = this.item?.id;
+    if (id === undefined || id === null || id === '') return false;
+    return String(id) === this.highlightedId;
+  }
+
+  protected onRowHover(inside: boolean): void {
+    if (!this.item?.id) return;
+    this.selected.emit({ ...this.item, __selected: inside } as TimelineIssue);
   }
 
   protected onItemClick(): void {

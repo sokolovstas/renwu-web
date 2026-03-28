@@ -14,20 +14,44 @@
     background: var(--white);
 
     &.timeline-row-alt {
-      background: var(--gray-50);
+      background: var(--gray-100);
     }
 
     &:hover {
       background: var(--gray-100);
     }
+
+    &.timeline-row-alt:hover {
+      background: var(--gray-200);
+    }
+
+    &.timeline-row-highlight {
+      background: var(--gray-200);
+    }
+
+    &.timeline-row-highlight:hover {
+      background: var(--gray-300);
+    }
   }
 
   &.group-row:hover {
-    filter: brightness(0.97);
+    background: var(--gray-200);
   }
 
   &.group-row.timeline-row-alt {
     background: var(--gray-200);
+  }
+
+  &.group-row.timeline-row-alt:hover {
+    background: var(--gray-300);
+  }
+
+  &.group-row.timeline-row-highlight {
+    background: var(--gray-300);
+  }
+
+  &.group-row.timeline-row-highlight:hover {
+    background: var(--gray-400);
   }
 }
 

@@ -195,6 +195,8 @@ export class TimelineComponent {
   private readonly activeContainerId = signal<string | null>(null);
   private readonly pendingReload = signal(false);
   private selectedIssueId: string | null = null;
+  /** Synced hover highlight between table and graph rows (issue id). */
+  protected readonly hoveredIssueId = signal<string | null>(null);
   private dragTimeline = false;
   private scrollSource: 'graph' | 'table' | null = null;
   private resizeTableHandle: (() => void) | null = null;
@@ -463,7 +465,21 @@ export class TimelineComponent {
     this.centerAtIssue(item);
   }
 
-  protected onSelected(item: TimelineIssue): void {
+  protected onSelected(item: TimelineIssue & { __selected?: boolean }): void {
+    const pulse = (item as { __selected?: boolean }).__selected;
+    if (typeof pulse === 'boolean') {
+      const id =
+        item.id !== undefined && item.id !== null && String(item.id).length > 0
+          ? String(item.id)
+          : null;
+      if (pulse && id) {
+        this.hoveredIssueId.set(id);
+      } else if (!pulse && id && this.hoveredIssueId() === id) {
+        this.hoveredIssueId.set(null);
+      }
+      return;
+    }
+
     if (!item?.id) return;
     if (this.selectedIssueId && this.selectedIssueId !== item.id) {
       this.stateService.setSelected(this.selectedIssueId, false);
