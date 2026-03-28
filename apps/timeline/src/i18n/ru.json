@@ -1,4 +1,8 @@
 {
+  "components": {
+    "type-for-search": "Введите для поиска",
+    "load-more": "Ещё"
+  },
   "timeline": {
     "loading": "Загрузка таймлайна...",
     "fit": "Подогнать",

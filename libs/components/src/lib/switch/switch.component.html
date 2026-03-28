@@ -1,3 +1,8 @@
+<!-- Natural text width (items below are clamped to `width`, so we measure copies off-screen) -->
+<div class="rw-switch-measure" aria-hidden="true">
+  <span #measureUnchecked class="rw-switch-measure-label">{{ labelUnchecked }}</span>
+  <span #measureChecked class="rw-switch-measure-label">{{ labelChecked }}</span>
+</div>
 <div class="wrapper" [class.checked]="value">
   <input id="checkboxInput" type="checkbox" [(ngModel)]="valueInside" />
   <label for="checkboxInput" [style.width.px]="width * 2">

@@ -6,6 +6,29 @@
   border-radius: $rw-control-border-radius;
   border-bottom: $rw-control-default-border solid transparent;
   padding: $rw-control-default-padding - 2px 0;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Off-screen copies for natural text width (do not clip — parent width:0 would measure 0) */
+.rw-switch-measure {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  pointer-events: none;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.rw-switch-measure-label {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0 5px;
+  box-sizing: border-box;
+  font: inherit;
 }
 
 .wrapper {
@@ -16,6 +39,8 @@
   background-color: $switch-color;
   display: flex;
   color: rgba($always-white, 0.7);
+  overflow: hidden;
+  flex-shrink: 0;
 
   input {
     position: absolute;
@@ -45,6 +70,12 @@
   justify-content: center;
   border-radius: $rw-control-border-radius;
   pointer-events: none;
+  box-sizing: border-box;
+  span {
+    white-space: nowrap;
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
 }
 
 .switch.checked {
@@ -58,6 +89,9 @@
   justify-content: center;
   padding: 0px 5px;
   pointer-events: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .item.active {

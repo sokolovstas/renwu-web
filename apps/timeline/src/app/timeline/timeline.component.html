@@ -62,6 +62,7 @@
           [dateStart]="dateStart()"
           [dateEnd]="rulerLimit()"
           [hours24InDay]="hours24InDay()"
+          [nowLinePx]="nowLinePx()"
         />
       </div>
     </div>
@@ -74,9 +75,10 @@
         [style.min-width.px]="settings().tableWidth"
         (scroll)="onTableScroll($event)"
       >
-        @for (row of rootChild().childs; track row.id || row.title) {
+        @for (row of rootChild().childs; track trackRootRow($index, row)) {
           <renwu-timeline-table-item
             [item]="row"
+            [stripeIndex]="stripeIndexForRoot($index)"
             [depth]="0"
             [tableWidth]="settings().tableWidth"
             (selected)="onSelected($event)"
@@ -97,6 +99,9 @@
         (dragEnd)="onTimelineDragEnd()"
       >
         <div class="timeline-graph-content">
+          @if (nowLinePx() !== null) {
+            <div class="timeline-now-line" [style.left.px]="nowLinePx()!"></div>
+          }
           @for (pos of gridLines(); track pos) {
             <div class="timeline-grid-line" [style.left.px]="pos"></div>
           }
@@ -110,9 +115,10 @@
             />
           }
 
-          @for (row of rootChild().childs; track row.id || row.title) {
+          @for (row of rootChild().childs; track trackRootRow($index, row)) {
             <renwu-timeline-item
               [item]="row"
+              [stripeIndex]="stripeIndexForRoot($index)"
               [scale]="settings().scale"
               [dateStart]="dateStart()"
               [dateEnd]="rulerLimit()"

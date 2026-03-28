@@ -1,5 +1,17 @@
-
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, HostBinding, Input, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  forwardRef,
+  HostBinding,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -25,7 +37,9 @@ const noop = () => {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RwSwitchComponent implements AfterViewInit, ControlValueAccessor {
+export class RwSwitchComponent
+  implements AfterViewInit, OnChanges, ControlValueAccessor
+{
   private cd = inject(ChangeDetectorRef);
 
   @Input()
@@ -40,7 +54,8 @@ export class RwSwitchComponent implements AfterViewInit, ControlValueAccessor {
 
   value: boolean;
 
-  width: number;
+  /** Half-width of the track (one side); must stay in sync with label text (i18n). */
+  width = 36;
 
   set valueInside(value: boolean) {
     this.value = value;
@@ -56,19 +71,58 @@ export class RwSwitchComponent implements AfterViewInit, ControlValueAccessor {
   @ViewChild('idUnchecked', { static: true })
   idUnchecked: ElementRef;
 
+  @ViewChild('measureChecked')
+  measureChecked?: ElementRef<HTMLElement>;
+
+  @ViewChild('measureUnchecked')
+  measureUnchecked?: ElementRef<HTMLElement>;
+
   private onTouchedCallback: () => void = noop;
 
   private onChangeCallback: (_: boolean) => void = noop;
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['labelChecked'] && !changes['labelUnchecked']) {
+      return;
+    }
+    this.scheduleMeasureWidth();
+  }
+
   ngAfterViewInit(): void {
-    const checkedWidth = (
-      this.idChecked.nativeElement as HTMLElement
-    ).getBoundingClientRect().width;
-    const uncheckedWidth = (
-      this.idUnchecked.nativeElement as HTMLElement
-    ).getBoundingClientRect().width;
-    this.width = Math.max(checkedWidth, uncheckedWidth);
-    this.cd.detectChanges();
+    this.measureWidth();
+    this.scheduleMeasureWidth();
+  }
+
+  /** Re-run after layout so async i18n (e.g. transloco) updates label width. */
+  private scheduleMeasureWidth(): void {
+    queueMicrotask(() => this.measureWidth());
+    requestAnimationFrame(() => this.measureWidth());
+  }
+
+  private measureWidth(): void {
+    const checkedM = this.measureChecked?.nativeElement;
+    const uncheckedM = this.measureUnchecked?.nativeElement;
+    const checkedEl = this.idChecked?.nativeElement as HTMLElement | undefined;
+    const uncheckedEl = this.idUnchecked?.nativeElement as HTMLElement | undefined;
+
+    let checkedW = 0;
+    let uncheckedW = 0;
+
+    if (checkedM && uncheckedM) {
+      checkedW = checkedM.getBoundingClientRect().width;
+      uncheckedW = uncheckedM.getBoundingClientRect().width;
+    } else if (checkedEl && uncheckedEl) {
+      checkedW = checkedEl.scrollWidth;
+      uncheckedW = uncheckedEl.scrollWidth;
+    } else {
+      return;
+    }
+
+    const next = Math.ceil(Math.max(checkedW, uncheckedW, 24));
+    if (next !== this.width) {
+      this.width = next;
+      this.cd.markForCheck();
+    }
   }
 
   writeValue(value: boolean): void {

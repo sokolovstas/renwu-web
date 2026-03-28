@@ -1,4 +1,8 @@
 {
+  "components": {
+    "type-for-search": "输入以搜索",
+    "load-more": "加载更多"
+  },
   "timeline": {
     "loading": "时间线加载中...",
     "fit": "适配",

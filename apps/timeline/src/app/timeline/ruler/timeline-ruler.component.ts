@@ -27,6 +27,8 @@ export class TimelineRulerComponent implements OnChanges {
   @Input() dateStart!: Date;
   @Input() dateEnd!: Date;
   @Input() hours24InDay = true;
+  /** X position of "now" in px; `null` hides the line. */
+  @Input() nowLinePx: number | null = null;
 
   totalWidth = 0;
   majorLabels: RulerLabel[] = [];

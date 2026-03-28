@@ -67,16 +67,57 @@ export class WorkloadUserStatComponent implements OnChanges {
     const v0 = unixSecondsVirtual(startDate, h24, '');
     const v1 = unixSecondsVirtual(endDate, h24, '');
     const position = (v0 - originVirtual) / this.scale;
-    const width = (v1 - v0) / this.scale;
-    const capacity = item.time_to_now || 0;
-    const total = item.total || 0;
+    const widthRaw = (v1 - v0) / this.scale;
+    const width = Math.max(widthRaw, 2);
 
+    const totalCap = WorkloadUserStatComponent.num(item.total);
+    const ttn = WorkloadUserStatComponent.num(item.time_to_now);
+    const vtn = WorkloadUserStatComponent.num(item.value_to_now);
+    const vfn = WorkloadUserStatComponent.num(item.value_from_now);
+    const assignedSum = vfn + vtn;
+
+    const nowUnix = unixSeconds(new Date());
+    const isCurrent = nowUnix >= range.startUnix && nowUnix < range.endUnix;
+    const remainder = totalCap - ttn;
+
+    const ri = (x: unknown): number =>
+      Math.round(WorkloadUserStatComponent.num(x));
+
+    if (isCurrent && totalCap > 0 && ttn > 0 && remainder > 0) {
+      /* Match .workload-bar-split { gap: 1px } so halves are not flex-shrunk vs bar.width */
+      const gapPx = 1;
+      const innerW = Math.max(width - gapPx, 0);
+      const leftW = innerW * (ttn / totalCap);
+      const rightW = innerW * (remainder / totalCap);
+      const leftRatio = vtn / ttn;
+      const rightRatio = remainder > 0 ? vfn / remainder : 0;
+      return {
+        position,
+        width,
+        total: totalCap,
+        capacity: totalCap,
+        ratio: Math.max(leftRatio, rightRatio),
+        split: {
+          leftWidth: Math.max(leftW, 1),
+          rightWidth: Math.max(rightW, 1),
+          leftRatio,
+          rightRatio,
+          leftNum: ri(vtn),
+          leftDen: ri(ttn),
+          rightNum: ri(vfn),
+          rightDen: ri(remainder),
+        },
+      };
+    }
+
+    const ratio = totalCap > 0 ? assignedSum / totalCap : 0;
     return {
       position,
-      width: Math.max(width, 2),
-      total,
-      capacity,
-      ratio: capacity > 0 ? total / capacity : 0,
+      width,
+      total: totalCap,
+      capacity: totalCap,
+      ratio,
+      assignedSum,
     };
   }
 
@@ -114,5 +155,11 @@ export class WorkloadUserStatComponent implements OnChanges {
     const start = new Date(Date.UTC(year, startMonth, 1));
     const end = new Date(Date.UTC(year, startMonth + 3, 1));
     return { startUnix: unixSeconds(start), endUnix: unixSeconds(end) };
+  }
+
+  private static num(v: unknown): number {
+    if (typeof v === 'number' && Number.isFinite(v)) return v;
+    const x = Number(v);
+    return Number.isFinite(x) ? x : 0;
   }
 }

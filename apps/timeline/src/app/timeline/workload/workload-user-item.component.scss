@@ -3,11 +3,31 @@
   top: 2px;
   height: 22px;
   border-radius: 3px;
+  /* Inset stroke: same look as hairline border without shifting inner fill vs timeline grid */
+  box-shadow: inset 0 0 0 0.5px var(--gray-100);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   min-width: 2px;
+}
+
+.workload-bar-split {
+  background: transparent;
+  padding: 0;
+  gap: 1px;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.workload-bar-half {
+  position: relative;
+  display: block;
+  min-width: 0;
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .bar-empty {
@@ -36,4 +56,20 @@
   white-space: nowrap;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
   padding: 0 4px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Center text inside each split half; flex min-width:auto was stretching past allocated px */
+.workload-bar-half > .workload-bar-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

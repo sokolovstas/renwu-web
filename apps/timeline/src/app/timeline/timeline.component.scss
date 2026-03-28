@@ -167,6 +167,16 @@
   pointer-events: none;
 }
 
+.timeline-now-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--error-color);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .timeline-layout-workload {
   flex-shrink: 0;
   border-top: 1px solid var(--gray-300);
@@ -206,6 +216,12 @@
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
+  border-radius: 2px;
+  transition: background-color 0.12s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
 }
 
 .workforce-user-name {

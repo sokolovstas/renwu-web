@@ -1,11 +1,15 @@
 @if (item) {
   @if (isGroup) {
-    <div class="timeline-item-group">
+    <div
+      class="timeline-item-group"
+      [class.timeline-row-alt]="stripeIndex % 2 === 1"
+    >
       <!-- group row placeholder - no bar -->
     </div>
   } @else if (width > 0) {
     <div
       class="timeline-item"
+      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [style.width.px]="lineWidth"
     >
       <div
@@ -30,13 +34,17 @@
       }
     </div>
   } @else {
-    <div class="timeline-item-empty"></div>
+    <div
+      class="timeline-item-empty"
+      [class.timeline-row-alt]="stripeIndex % 2 === 1"
+    ></div>
   }
 
   @if (item._SHOWCHILDS !== false && item.childs?.length) {
-    @for (child of item.childs; track child.id || child.title) {
+    @for (child of item.childs; track child.id || child.title; let ci = $index) {
       <renwu-timeline-item
         [item]="child"
+        [stripeIndex]="childStripeIndex(ci)"
         [scale]="scale"
         [dateStart]="dateStart"
         [dateEnd]="dateEnd"

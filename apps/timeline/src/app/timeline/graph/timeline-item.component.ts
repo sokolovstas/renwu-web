@@ -6,7 +6,9 @@ import {
   OnChanges,
   Output,
 } from '@angular/core';
+import { Status } from '@renwu/core';
 import { TimelineIssue } from '../models/timeline-issue.model';
+import { visibleRowsBeforeChild } from '../row-striping';
 import { parseUtcLike, unixSeconds } from '../date-helpers';
 import { unixSecondsVirtual } from '../virtual-hours';
 
@@ -20,6 +22,8 @@ import { unixSecondsVirtual } from '../virtual-hours';
 })
 export class TimelineItemComponent implements OnChanges {
   @Input() item!: TimelineIssue;
+  /** DFS index among visible rows (striping aligned with the table column). */
+  @Input() stripeIndex = 0;
   @Input() scale!: number;
   @Input() dateStart!: Date;
   @Input() dateEnd!: Date;
@@ -60,13 +64,20 @@ export class TimelineItemComponent implements OnChanges {
     this.isGroup = String(this.item.type) === 'group';
     this.titleLabel = this.item.title || '';
 
+    const statusObj = this.item.status as Status | string | undefined;
     const typeObj = this.item.type as
       | { color?: string; symbol?: string }
       | string
       | undefined;
-    if (typeObj && typeof typeObj === 'object' && typeObj.color) {
-      this.barColor = typeObj.color;
-      this.progressColor = this.darkenColor(typeObj.color, 30);
+    let base: string | undefined;
+    if (statusObj && typeof statusObj === 'object' && statusObj.color) {
+      base = statusObj.color;
+    } else if (typeObj && typeof typeObj === 'object' && typeObj.color) {
+      base = typeObj.color;
+    }
+    if (base) {
+      this.barColor = base;
+      this.progressColor = this.darkenColor(base, 30);
     } else {
       this.barColor = '#d1d5db';
       this.progressColor = '#4b5563';
@@ -92,6 +103,10 @@ export class TimelineItemComponent implements OnChanges {
     this.width = Math.max((endUnix - startUnix) / this.scale, 5);
     this.widthProgress =
       ((this.item.completion ?? 0) * this.width) / 100;
+  }
+
+  protected childStripeIndex(childIndex: number): number {
+    return this.stripeIndex + 1 + visibleRowsBeforeChild(this.item, childIndex);
   }
 
   protected onItemClick(): void {

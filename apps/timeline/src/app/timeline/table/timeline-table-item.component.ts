@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { IssueTypeComponent, IssueStatusComponent, IssueAssigneesComponent, Type, Status } from '@renwu/core';
 import { TimelineIssue } from '../models/timeline-issue.model';
+import { visibleRowsBeforeChild } from '../row-striping';
 import { TimelineSettingsService } from '../services/timeline-settings.service';
 
 @Component({
@@ -23,6 +24,8 @@ export class TimelineTableItemComponent {
   private settingsService = inject(TimelineSettingsService);
 
   @Input() item!: TimelineIssue;
+  /** DFS index among visible rows (for alternating striping with the graph column). */
+  @Input() stripeIndex = 0;
   @Input() depth = 0;
   @Input() tableWidth = 380;
   @Input() disableSelectedTimelineItem = false;
@@ -42,6 +45,10 @@ export class TimelineTableItemComponent {
 
   get statusInfo(): Status | null {
     return (this.item?.status as Status) ?? null;
+  }
+
+  protected childStripeIndex(childIndex: number): number {
+    return this.stripeIndex + 1 + visibleRowsBeforeChild(this.item, childIndex);
   }
 
   protected onHover(inside: boolean): void {

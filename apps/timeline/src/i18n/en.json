@@ -1,4 +1,8 @@
 {
+  "components": {
+    "type-for-search": "Type to search",
+    "load-more": "Load more"
+  },
   "timeline": {
     "loading": "Loading timeline...",
     "fit": "Fit",

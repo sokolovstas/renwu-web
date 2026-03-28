@@ -1,4 +1,7 @@
 <div class="timeline-ruler" [style.width.px]="totalWidth">
+  @if (nowLinePx !== null && nowLinePx !== undefined) {
+    <div class="ruler-now-line" [style.left.px]="nowLinePx"></div>
+  }
   @if (majorLabels.length) {
     <div class="ruler-major">
       @for (label of majorLabels; track label.position) {

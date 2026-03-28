@@ -1,5 +1,5 @@
 <div class="workload-user-stat" [style.width.px]="totalWidth">
-  @for (bar of bars; track bar.position) {
+  @for (bar of bars; track $index) {
     <renwu-timeline-workload-user-item
       [bar]="bar"
     />

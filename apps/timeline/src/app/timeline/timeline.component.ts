@@ -3,8 +3,10 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  Injector,
   Renderer2,
   ViewChild,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -35,6 +37,7 @@ import { TimelineSettingsService } from './services/timeline-settings.service';
 import { TimelineTableItemComponent } from './table/timeline-table-item.component';
 import { TimelineItemComponent } from './graph/timeline-item.component';
 import { IssueTreeRoot, TimelineIssue, TimelineLink } from './models/timeline-issue.model';
+import { countVisibleTimelineRows } from './row-striping';
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
 import { WorkloadUserComponent } from './workload/workload-user.component';
@@ -86,6 +89,7 @@ export class TimelineComponent {
   private readonly coreTimelineService = inject(CoreTimelineService);
   private readonly stateService = inject(TimelineStateService);
   private readonly renderer = inject(Renderer2);
+  private readonly injector = inject(Injector);
   private readonly issueDateTimeSvc = inject(RwIssueDateTimeService);
 
   /** `true` = linear 24h calendar axis; `false` = compressed 8h workday mapping (see `IssueDateTime`). */
@@ -149,6 +153,27 @@ export class TimelineComponent {
       }
     }
     return lines;
+  });
+
+  /** Ticks once per minute so the "now" line position updates. */
+  private readonly nowClock = signal(0);
+
+  /** Horizontal px from `dateStart` to current time; `null` if now is outside [dateStart, rulerLimit]. */
+  protected readonly nowLinePx = computed(() => {
+    this.nowClock();
+    const start = this.dateStart();
+    const end = this.rulerLimit();
+    const scale = this.settings().scale;
+    const h24 = this.hours24InDay();
+    if (!start || !end || !scale) return null;
+    const now = new Date();
+    const nowCal = unixSeconds(now);
+    const startCal = unixSeconds(start);
+    const endCal = unixSeconds(end);
+    if (nowCal < startCal || nowCal > endCal) return null;
+    const origin = unixSecondsVirtual(start, h24, '');
+    const nowV = unixSecondsVirtual(now, h24, '');
+    return (nowV - origin) / scale;
   });
 
   protected readonly selectedUsers = signal<User[]>([]);
@@ -283,8 +308,13 @@ export class TimelineComponent {
             );
             this.dateStart.set(range.dateStart);
             this.dateEnd.set(range.dateEnd);
-            this.centerNow();
             this.loading.set(false);
+            afterNextRender(
+              () => {
+                requestAnimationFrame(() => this.centerNow());
+              },
+              { injector: this.injector },
+            );
           },
           error: () => this.loading.set(false),
         });
@@ -380,17 +410,24 @@ export class TimelineComponent {
         });
         this.requestReload();
       });
+
+    const nowLineInterval = setInterval(
+      () => this.nowClock.update((n) => n + 1),
+      60_000,
+    );
+    this.destroyRef.onDestroy(() => clearInterval(nowLineInterval));
   }
 
   protected onScaleChanged(): void {
     this.hours24InDay.set(this.issueDateTimeSvc.issueDateTime.hours24InDay);
     const graphEl = this.graphScroll?.nativeElement;
     if (!graphEl) return;
+    const h24 = this.hours24InDay();
+    const startV = unixSecondsVirtual(this.dateStart(), h24, '');
     const centerPx = this.scrollLeftGraph() + graphEl.clientWidth / 2;
-    const centerUnix = unixSeconds(this.dateStart()) + centerPx * this.settings().oldScale;
+    const centerVirtual = startV + centerPx * this.settings().oldScale;
     const nextLeft =
-      (centerUnix - unixSeconds(this.dateStart())) / this.settings().scale -
-      graphEl.clientWidth / 2;
+      (centerVirtual - startV) / this.settings().scale - graphEl.clientWidth / 2;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
   }
 
@@ -481,6 +518,17 @@ export class TimelineComponent {
     this.settingsService.setShowWorkforce(!this.settings().showWorkforce);
   }
 
+  /** Stripe index for the i-th root row (aligned with visible subtree sizes). */
+  protected stripeIndexForRoot(i: number): number {
+    const childs = this.rootChild().childs;
+    if (!childs || i <= 0) return 0;
+    let sum = 0;
+    for (let j = 0; j < i; j++) {
+      sum += countVisibleTimelineRows(childs[j]);
+    }
+    return sum;
+  }
+
   protected onQueryChanged(query: string): void {
     this.searchService.updateQuery(query || '');
   }
@@ -544,16 +592,31 @@ export class TimelineComponent {
       key?.title ||
       key?.full_name ||
       key?.name ||
-      this.translocoService.translate('groupFallback')
+      this.translocoService.translate('timeline.groupFallback')
     );
   }
 
+  /**
+   * Scroll so "now" is centered. Uses the same virtual axis as the graph (`unixSecondsVirtual`).
+   * Retries briefly if the graph host is not in the DOM yet (first paint after load).
+   */
   private centerNow(): void {
+    this.centerOnNow(0);
+  }
+
+  private centerOnNow(attempt: number): void {
     const graphEl = this.graphScroll?.nativeElement;
-    if (!graphEl) return;
-    const nowOffset =
-      (unixSeconds(new Date()) - unixSeconds(this.dateStart())) /
-      this.settings().scale;
+    if (!graphEl || graphEl.clientWidth <= 0) {
+      if (attempt < 24) {
+        requestAnimationFrame(() => this.centerOnNow(attempt + 1));
+      }
+      return;
+    }
+    const h24 = this.hours24InDay();
+    const nowV = unixSecondsVirtual(new Date(), h24, '');
+    const startV = unixSecondsVirtual(this.dateStart(), h24, '');
+    const scale = this.settings().scale;
+    const nowOffset = (nowV - startV) / scale;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nowOffset - graphEl.clientWidth / 2)));
   }
 
@@ -562,10 +625,11 @@ export class TimelineComponent {
     if (!graphEl) return;
     const centerDate = parseUtcLike(issue.date_start_calc);
     if (!centerDate) return;
-    const centerUnix = unixSeconds(centerDate);
+    const h24 = this.hours24InDay();
+    const centerV = unixSecondsVirtual(centerDate, h24, 'start');
+    const startV = unixSecondsVirtual(this.dateStart(), h24, '');
     const nextLeft =
-      (centerUnix - unixSeconds(this.dateStart())) / this.settings().scale -
-      graphEl.clientWidth / 2;
+      (centerV - startV) / this.settings().scale - graphEl.clientWidth / 2;
     this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
   }
 
@@ -575,6 +639,18 @@ export class TimelineComponent {
       return;
     }
     this.reloadCounter.update((v) => v + 1);
+  }
+
+  /**
+   * Unique keys for @for over groups/issues: duplicate titles (e.g. fallback label)
+   * must not collapse to one DOM node.
+   */
+  protected trackRootRow(index: number, row: TimelineIssue): string {
+    const id = row.id;
+    if (id !== undefined && id !== null && String(id).length > 0) {
+      return String(id);
+    }
+    return `root-row-${index}`;
   }
 }
 

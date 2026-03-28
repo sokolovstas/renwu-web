@@ -3,6 +3,16 @@
   min-width: max-content;
 }
 
+.ruler-now-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--error-color);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .ruler-major {
   position: relative;
   height: 20px;

@@ -2,6 +2,7 @@
   @if (isGroup()) {
     <div
       class="timeline-table-row group-row"
+      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [style.paddingLeft.px]="depth * 12"
       (click)="onItemClick()"
     >
@@ -15,6 +16,7 @@
   } @else {
     <div
       class="timeline-table-row issue-row"
+      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       (mouseenter)="onHover(true)"
       (mouseleave)="onHover(false)"
       (click)="onItemClick()"
@@ -46,9 +48,10 @@
   }
 
   @if (item._SHOWCHILDS !== false && item.childs?.length) {
-    @for (child of item.childs; track child.id || child.title) {
+    @for (child of item.childs; track child.id || child.title; let ci = $index) {
       <renwu-timeline-table-item
         [item]="child"
+        [stripeIndex]="childStripeIndex(ci)"
         [depth]="depth + 1"
         [tableWidth]="tableWidth"
         [disableSelectedTimelineItem]="disableSelectedTimelineItem"

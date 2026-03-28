@@ -8,9 +8,26 @@
   max-height: $timeline-row-height;
   cursor: pointer;
   border-bottom: 1px solid var(--gray-100);
+  transition: background-color 0.12s ease;
 
-  &:hover {
-    background: var(--gray-100);
+  &.issue-row {
+    background: var(--white);
+
+    &.timeline-row-alt {
+      background: var(--gray-50);
+    }
+
+    &:hover {
+      background: var(--gray-100);
+    }
+  }
+
+  &.group-row:hover {
+    filter: brightness(0.97);
+  }
+
+  &.group-row.timeline-row-alt {
+    background: var(--gray-200);
   }
 }
 

@@ -3,6 +3,16 @@
 .timeline-item-group {
   height: $timeline-row-height;
   min-height: $timeline-row-height;
+  background: var(--gray-100);
+  transition: background-color 0.12s ease;
+
+  &.timeline-row-alt {
+    background: var(--gray-200);
+  }
+
+  &:hover {
+    filter: brightness(0.97);
+  }
 }
 
 .timeline-item {
@@ -11,11 +21,29 @@
   align-items: center;
   height: $timeline-row-height;
   min-height: $timeline-row-height;
+  transition: background-color 0.12s ease;
+
+  &.timeline-row-alt {
+    background: var(--gray-50);
+  }
+
+  &:hover {
+    background: var(--gray-100);
+  }
 }
 
 .timeline-item-empty {
   height: $timeline-row-height;
   min-height: $timeline-row-height;
+  transition: background-color 0.12s ease;
+
+  &.timeline-row-alt {
+    background: var(--gray-50);
+  }
+
+  &:hover {
+    background: var(--gray-100);
+  }
 }
 
 .bar {
