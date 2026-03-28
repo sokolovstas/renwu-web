@@ -1,10 +1,15 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  DestroyRef,
   Input,
   OnChanges,
+  inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TimelineTicksId, UserWorkloadItem } from '@renwu/core';
+import { interval } from 'rxjs';
 import { unixSeconds } from '../date-helpers';
 import { unixSecondsVirtual } from '../virtual-hours';
 import {
@@ -21,6 +26,9 @@ import {
   imports: [WorkloadUserItemComponent],
 })
 export class WorkloadUserStatComponent implements OnChanges {
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
+
   @Input() user: unknown;
   @Input() stat: unknown;
   @Input() items: UserWorkloadItem[] = [];
@@ -33,6 +41,15 @@ export class WorkloadUserStatComponent implements OnChanges {
 
   bars: WorkloadBar[] = [];
   totalWidth = 0;
+
+  constructor() {
+    interval(60_000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.calculateBars();
+        this.cdr.markForCheck();
+      });
+  }
 
   ngOnChanges(): void {
     this.calculateBars();
@@ -75,21 +92,33 @@ export class WorkloadUserStatComponent implements OnChanges {
     const vtn = WorkloadUserStatComponent.num(item.value_to_now);
     const vfn = WorkloadUserStatComponent.num(item.value_from_now);
     const assignedSum = vfn + vtn;
-
-    const nowUnix = unixSeconds(new Date());
-    const isCurrent = nowUnix >= range.startUnix && nowUnix < range.endUnix;
     const remainder = totalCap - ttn;
+
+    const periodLen = v1 - v0;
+    const nowV = unixSecondsVirtual(new Date(), h24, '');
+    const isCurrent =
+      periodLen > 0 && nowV >= v0 && nowV < v1;
+    /** Visual split only: share of period elapsed on the virtual timeline axis (matches “now” line). */
+    const elapsedFrac =
+      periodLen > 0
+        ? Math.min(1, Math.max(0, (nowV - v0) / periodLen))
+        : 0;
 
     const ri = (x: unknown): number =>
       Math.round(WorkloadUserStatComponent.num(x));
 
-    if (isCurrent && totalCap > 0 && ttn > 0 && remainder > 0) {
+    if (
+      isCurrent &&
+      totalCap > 0 &&
+      elapsedFrac > 0 &&
+      elapsedFrac < 1
+    ) {
       /* Match .workload-bar-split { gap: 1px } so halves are not flex-shrunk vs bar.width */
       const gapPx = 1;
       const innerW = Math.max(width - gapPx, 0);
-      const leftW = innerW * (ttn / totalCap);
-      const rightW = innerW * (remainder / totalCap);
-      const leftRatio = vtn / ttn;
+      const leftW = innerW * elapsedFrac;
+      const rightW = innerW * (1 - elapsedFrac);
+      const leftRatio = ttn > 0 ? vtn / ttn : 0;
       const rightRatio = remainder > 0 ? vfn / remainder : 0;
       return {
         position,
