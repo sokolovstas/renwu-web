@@ -11,7 +11,7 @@
 
     <rw-checkbox
       [label]="'timeline.showMilestones' | transloco"
-      [ngModel]="settings.showMilestones"
+      [ngModel]="settings().showMilestones"
       (ngModelChange)="onShowMilestonesChange($event)"
     />
 
@@ -45,13 +45,13 @@
         [min]="50"
         [max]="200"
         [step]="5"
-        [ngModel]="settings.scaleValue"
+        [ngModel]="settings().scaleValue"
         [live]="true"
         (changed)="onSliderChange($event)"
       />
     </span>
 
-    <span class="scale-percent">{{ scalePercent }}%</span>
+    <span class="scale-percent">{{ settings().scaleValue }}%</span>
 
     <rw-button
       [text]="'timeline.now' | transloco"

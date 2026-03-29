@@ -1,11 +1,6 @@
-@use '../styles/timeline-variables' as *;
-
 .timeline-table-row {
   display: flex;
   align-items: center;
-  height: $timeline-row-height;
-  min-height: $timeline-row-height;
-  max-height: $timeline-row-height;
   cursor: pointer;
   border-bottom: 1px solid var(--gray-100);
   transition: background-color 0.12s ease;
@@ -113,6 +108,17 @@
   width: 120px;
   min-width: 80px;
   color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
+  renwu-issue-assignees {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
 }
 
 .td-pct {

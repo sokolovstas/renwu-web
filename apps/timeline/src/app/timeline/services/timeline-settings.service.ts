@@ -46,7 +46,8 @@ export class TimelineSettingsService {
     scaleValue: 100,
 
     tableWidth: 380,
-    issueRowHeightPx: 37,
+    /** Issue row height (px); not persisted — only `initialSettings` / deploy. */
+    issueRowHeightPx: 30,
     milestoneRowHeightPx: 24,
     showMilestones: true,
     showWorkforce: true,
@@ -64,6 +65,9 @@ export class TimelineSettingsService {
   };
 
   private settingsSignal = signal<TimelineSettings>(this.initialSettings);
+
+  /** Use in `computed()` so templates react when settings change (not only via `getTimeline()`). */
+  readonly timelineSettings = this.settingsSignal.asReadonly();
 
   /**
    * Mutably exposed "settings timeline" snapshot for the feature UI.
@@ -87,9 +91,7 @@ export class TimelineSettingsService {
 
   initFromLocalStorage(userId?: string): void {
     const key =
-      userId != null
-        ? `${STORAGE_PREFIX}${userId}`
-        : this.storageKey();
+      userId != null ? `${STORAGE_PREFIX}${userId}` : this.storageKey();
     if (!key) return;
 
     try {
@@ -100,33 +102,54 @@ export class TimelineSettingsService {
           displayHoursPerDay?: boolean;
         };
         const {
-          hoursPerDay: _omitHours,
-          displayHoursPerDay: _omitDisplay,
+          hoursPerDay,
+          displayHoursPerDay,
           ...timelineRest
         } = parsed;
-        const scaleTick =
-          timelineRest.scaleTick ?? this.initialSettings.scaleTick;
-        const scaleValue =
-          timelineRest.scaleValue ?? this.initialSettings.scaleValue;
-        const scale = this.computeActualScale(scaleTick, scaleValue);
-        this.settingsSignal.update((prev) => ({
-          ...prev,
-          ...timelineRest,
-          ticks: TICKS,
-          scale,
-          oldScale: scale,
-          issueRowHeightPx:
-            timelineRest.issueRowHeightPx ?? prev.issueRowHeightPx,
-          milestoneRowHeightPx:
-            timelineRest.milestoneRowHeightPx ?? prev.milestoneRowHeightPx,
-          open_index: timelineRest.open_index ?? prev.open_index,
-          open_index_group: timelineRest.open_index_group ?? prev.open_index_group,
-        }));
+        void hoursPerDay;
+        void displayHoursPerDay;
+        this.settingsSignal.set(this.mergePersistedPartial(timelineRest));
       }
       this.mergeWorkloadFromLocalStorage(userId);
     } catch {
       // ignore broken localStorage
     }
+  }
+
+  /**
+   * Rebuild full settings: code-only fields from `initialSettings`, user fields from persisted partial.
+   * Ignores legacy keys in storage that are no longer persisted (e.g. `issueRowHeightPx`).
+   */
+  private mergePersistedPartial(
+    parsed: Partial<TimelineSettings>,
+  ): TimelineSettings {
+    const i = this.initialSettings;
+    const scaleTick = parsed.scaleTick ?? i.scaleTick;
+    const scaleValue = parsed.scaleValue ?? i.scaleValue;
+    const scale = this.computeActualScale(scaleTick, scaleValue);
+    const rowH = i.issueRowHeightPx;
+
+    return {
+      ...i,
+      grouping: parsed.grouping ?? i.grouping,
+      scaleTick,
+      scaleValue,
+      scale,
+      oldScale: scale,
+      showMilestones: parsed.showMilestones ?? i.showMilestones,
+      showTitleInside: parsed.showTitleInside ?? i.showTitleInside,
+      showTitleRight: parsed.showTitleRight ?? i.showTitleRight,
+      showWorkforce: parsed.showWorkforce ?? i.showWorkforce,
+      tableWidth: parsed.tableWidth ?? i.tableWidth,
+      open_index: parsed.open_index ?? i.open_index,
+      open_index_group: parsed.open_index_group ?? i.open_index_group,
+      sort: parsed.sort ?? i.sort,
+      ticks: TICKS,
+      issueRowHeightPx: rowH,
+      fontSize: this.deriveTimelineTableFontSizePx(rowH),
+      milestoneRowHeightPx: i.milestoneRowHeightPx,
+      workforceHeight: i.workforceHeight,
+    };
   }
 
   private mergeWorkloadFromLocalStorage(userId?: string): void {
@@ -139,8 +162,12 @@ export class TimelineSettingsService {
       const w = JSON.parse(raw) as TimelineWorkloadStorage;
       this.settingsSignal.update((prev) => ({
         ...prev,
-        ...(w.showWorkforce !== undefined ? { showWorkforce: w.showWorkforce } : {}),
-        ...(w.workforceHeight !== undefined ? { workforceHeight: w.workforceHeight } : {}),
+        ...(w.showWorkforce !== undefined
+          ? { showWorkforce: w.showWorkforce }
+          : {}),
+        ...(w.workforceHeight !== undefined
+          ? { workforceHeight: w.workforceHeight }
+          : {}),
       }));
     } catch {
       // ignore
@@ -161,7 +188,7 @@ export class TimelineSettingsService {
     const userId = key.slice(STORAGE_PREFIX.length);
     const workloadKey = `${RW_WORKLOAD_SETTINGS_STORAGE_PREFIX}${userId}`;
     try {
-      localStorage.setItem(key, JSON.stringify(state));
+      localStorage.setItem(key, JSON.stringify(this.pickPersistableSettings(state)));
       localStorage.setItem(
         workloadKey,
         JSON.stringify(this.pickWorkloadForStorage(state)),
@@ -169,6 +196,23 @@ export class TimelineSettingsService {
     } catch {
       // ignore storage quota / disabled storage
     }
+  }
+
+  /** Only user-controlled fields; layout/code defaults (`issueRowHeightPx`, `fontSize`, …) stay in code. */
+  private pickPersistableSettings(s: TimelineSettings): Record<string, unknown> {
+    return {
+      grouping: s.grouping,
+      scaleTick: s.scaleTick,
+      scaleValue: s.scaleValue,
+      showMilestones: s.showMilestones,
+      showTitleInside: s.showTitleInside,
+      showTitleRight: s.showTitleRight,
+      showWorkforce: s.showWorkforce,
+      tableWidth: s.tableWidth,
+      open_index: s.open_index,
+      open_index_group: s.open_index_group,
+      sort: s.sort,
+    };
   }
 
   get ticks(): TimelineScaleTick[] {
@@ -180,10 +224,13 @@ export class TimelineSettingsService {
    * Formula from the old codebase: `actualScale = tickBaseScale * 50 / scaleValue`
    * where scaleValue is a percentage (50 = most zoomed out, 200 = most zoomed in).
    */
-  private computeActualScale(tickId: TimelineTicksId, scaleValue: number): number {
+  private computeActualScale(
+    tickId: TimelineTicksId,
+    scaleValue: number,
+  ): number {
     const tick = TICKS.find((t) => t.id === tickId);
     if (!tick || !tick.scale || !scaleValue) return 5000;
-    return Math.max(1, Math.round(tick.scale * 50 / scaleValue));
+    return Math.max(1, Math.round((tick.scale * 50) / scaleValue));
   }
 
   getTickBaseScale(tickId: TimelineTicksId): number {
@@ -224,11 +271,6 @@ export class TimelineSettingsService {
     this.persist();
   }
 
-  setFontSize(value: number): void {
-    this.settingsSignal.update((s) => ({ ...s, fontSize: value }));
-    this.persist();
-  }
-
   setShowMilestones(value: boolean): void {
     this.settingsSignal.update((s) => ({ ...s, showMilestones: value }));
     this.persist();
@@ -254,18 +296,9 @@ export class TimelineSettingsService {
     this.persist();
   }
 
-  /** Clamp 24–96 px; updates `--timeline-issue-row-height` via settings snapshot. */
-  setIssueRowHeightPx(value: number): void {
-    const v = Math.max(24, Math.min(96, Math.round(value)));
-    this.settingsSignal.update((s) => ({ ...s, issueRowHeightPx: v }));
-    this.persist();
-  }
-
-  /** Clamp 18–48 px; height of each milestone track in the roadmap strip. */
-  setMilestoneRowHeightPx(value: number): void {
-    const v = Math.max(18, Math.min(48, Math.round(value)));
-    this.settingsSignal.update((s) => ({ ...s, milestoneRowHeightPx: v }));
-    this.persist();
+  /** Table label font (px): same scale as legacy 12px text in a 37px row. */
+  private deriveTimelineTableFontSizePx(issueRowHeightPx: number): number {
+    return Math.max(10, Math.round((issueRowHeightPx * 12) / 37));
   }
 
   setOpenIndex(issueId: string, opened: boolean): void {
@@ -290,4 +323,3 @@ export class TimelineSettingsService {
     this.persist();
   }
 }
-

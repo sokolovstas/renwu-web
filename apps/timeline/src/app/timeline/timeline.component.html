@@ -1,6 +1,5 @@
 <div
   class="timeline-container"
-  [style.--timeline-issue-row-height.px]="settings().issueRowHeightPx"
   [style.--timeline-milestone-row-height.px]="settings().milestoneRowHeightPx"
   [style.--timeline-roadmap-band-height.px]="roadmapBandHeightPx()"
 >
@@ -97,6 +96,8 @@
             [highlightedId]="hoveredIssueId()"
             [depth]="0"
             [tableWidth]="settings().tableWidth"
+            [issueRowHeightPx]="settings().issueRowHeightPx"
+            [tableFontSizePx]="settings().fontSize"
             (selected)="onSelected($event)"
             (scrollTo)="onScrollTo($event)"
           />
@@ -168,6 +169,7 @@
               [hours24InDay]="hours24InDay()"
               [showTitleInside]="settings().showTitleInside"
               [showTitleRight]="settings().showTitleRight"
+              [issueRowHeightPx]="settings().issueRowHeightPx"
               [selectMilestone]="selectMilestone()"
               (selected)="onSelected($event)"
               (scrollTo)="onScrollTo($event)"

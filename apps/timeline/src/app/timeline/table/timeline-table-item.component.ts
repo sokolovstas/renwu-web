@@ -6,11 +6,30 @@ import {
   Output,
   computed,
   inject,
+  input,
 } from '@angular/core';
-import { IssueTypeComponent, IssueStatusComponent, IssueAssigneesComponent, Type, Status } from '@renwu/core';
+import {
+  IssueTypeComponent,
+  IssueStatusComponent,
+  IssueAssigneesComponent,
+  Type,
+  Status,
+} from '@renwu/core';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { visibleRowsBeforeChild } from '../row-striping';
 import { TimelineSettingsService } from '../services/timeline-settings.service';
+
+/** Align with `.td-assignee` + `.td-col` padding in `timeline-table-item.component.scss`. */
+const ASSIGNEE_COL_WIDTH_PX = 120;
+const TD_COL_HORIZONTAL_PADDING_PX = 8;
+const ASSIGNEE_AVATAR_INSET_PX = 8;
+
+function assigneeAvatarSizeFromRowHeightPx(rowHeightPx: number): string {
+  const inner = ASSIGNEE_COL_WIDTH_PX - TD_COL_HORIZONTAL_PADDING_PX;
+  const fromWidth = inner - ASSIGNEE_AVATAR_INSET_PX;
+  const fromRow = Math.max(1, rowHeightPx - ASSIGNEE_AVATAR_INSET_PX);
+  return `${Math.min(fromWidth, fromRow)}px`;
+}
 
 @Component({
   selector: 'renwu-timeline-table-item',
@@ -18,10 +37,21 @@ import { TimelineSettingsService } from '../services/timeline-settings.service';
   templateUrl: './timeline-table-item.component.html',
   styleUrl: './timeline-table-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TimelineTableItemComponent, IssueTypeComponent, IssueStatusComponent, IssueAssigneesComponent],
+  imports: [
+    TimelineTableItemComponent,
+    IssueTypeComponent,
+    IssueStatusComponent,
+    IssueAssigneesComponent,
+  ],
 })
 export class TimelineTableItemComponent {
   private settingsService = inject(TimelineSettingsService);
+
+  /** Same source as table/graph row height (`TimelineSettings.issueRowHeightPx`). */
+  issueRowHeightPx = input.required<number>();
+
+  /** From `TimelineSettings.fontSize` — derived from row height when settings load / persist. */
+  tableFontSizePx = input.required<number>();
 
   @Input() item!: TimelineIssue;
   /** DFS index among visible rows (for alternating striping with the graph column). */
@@ -36,8 +66,17 @@ export class TimelineTableItemComponent {
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
   @Output() expanded = new EventEmitter<TimelineIssue>();
 
-  protected readonly isGroup = computed(() => String(this.item?.type) === 'group');
-  protected readonly isRoot = computed(() => String(this.item?.type) === 'root');
+  protected readonly isGroup = computed(
+    () => String(this.item?.type) === 'group',
+  );
+  protected readonly isRoot = computed(
+    () => String(this.item?.type) === 'root',
+  );
+
+  /** Square avatar edge: column inner width minus 4px, capped by row height minus 4px. */
+  protected readonly assigneeAvatarSize = computed(() =>
+    assigneeAvatarSizeFromRowHeightPx(this.issueRowHeightPx()),
+  );
 
   get typeInfo(): Type | null {
     const t = this.item?.type;

@@ -16,6 +16,9 @@ import { Resolution, Status } from '../../../settings/dictionary.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IssueStatusComponent implements OnInit, AfterViewInit {
+  /** When set (e.g. timeline table), label font size in px; overrides `fontSizeStatus`. */
+  @Input() fontSizePx: number | null = null;
+
   @Input()
   set value(value: Status | Resolution) {
     if (value) {
@@ -59,5 +62,12 @@ export class IssueStatusComponent implements OnInit, AfterViewInit {
     //     this.fontSizeStatus = '100%';
     //   }
     // }
+  }
+
+  protected labelFontStyle(): string | null {
+    if (this.fontSizePx != null && this.fontSizePx > 0) {
+      return `${this.fontSizePx}px`;
+    }
+    return this.fontSizeStatus?.length ? this.fontSizeStatus : null;
   }
 }

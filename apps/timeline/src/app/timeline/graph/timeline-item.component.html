@@ -4,6 +4,7 @@
       class="timeline-item-group"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [style.height.px]="issueRowHeightPx()"
       (mouseenter)="onRowHover(true)"
       (mouseleave)="onRowHover(false)"
     >
@@ -14,6 +15,7 @@
       class="timeline-item"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [style.height.px]="issueRowHeightPx()"
       [style.width.px]="lineWidth"
       (mouseenter)="onRowHover(true)"
       (mouseleave)="onRowHover(false)"
@@ -21,6 +23,7 @@
       <div
         class="bar"
         [class.auto-scheduled]="isAutoScheduled"
+        [style.height.px]="barHeightPx()"
         [style.marginLeft.px]="offsetForItem"
         [style.width.px]="width"
         [style.background]="barColor"
@@ -44,6 +47,7 @@
       class="timeline-item-empty"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [style.height.px]="issueRowHeightPx()"
       (mouseenter)="onRowHover(true)"
       (mouseleave)="onRowHover(false)"
     ></div>
@@ -55,6 +59,7 @@
         [item]="child"
         [stripeIndex]="childStripeIndex(ci)"
         [highlightedId]="highlightedId"
+        [issueRowHeightPx]="issueRowHeightPx()"
         [scale]="scale"
         [dateStart]="dateStart"
         [dateEnd]="dateEnd"

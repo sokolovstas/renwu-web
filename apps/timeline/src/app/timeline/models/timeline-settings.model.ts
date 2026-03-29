@@ -1,6 +1,7 @@
 import { ListOptionsFilters, TimelineScaleTick, TimelineTicksId } from '@renwu/core';
 
 export interface TimelineSettings {
+  /** Table row label font (px); derived from `issueRowHeightPx` in code — not persisted. */
   fontSize: number;
   grouping: string;
 
@@ -10,9 +11,9 @@ export interface TimelineSettings {
   scaleValue: number;
 
   tableWidth: number;
-  /** Issue / graph row height in px (also drives `--timeline-issue-row-height`). */
+  /** Issue / graph row height (px); code default only — not persisted. */
   issueRowHeightPx: number;
-  /** One horizontal track for a milestone bar in the roadmap strip. */
+  /** Roadmap milestone track height (px); code default only — not persisted. */
   milestoneRowHeightPx: number;
   showMilestones: boolean;
   showWorkforce: boolean;

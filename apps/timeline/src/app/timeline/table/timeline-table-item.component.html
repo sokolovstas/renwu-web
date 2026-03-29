@@ -4,6 +4,8 @@
       class="timeline-table-row group-row"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [style.height.px]="issueRowHeightPx()"
+      [style.font-size.px]="tableFontSizePx()"
       [style.paddingLeft.px]="depth * 12"
       (mouseenter)="onHover(true)"
       (mouseleave)="onHover(false)"
@@ -21,6 +23,8 @@
       class="timeline-table-row issue-row"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [style.height.px]="issueRowHeightPx()"
+      [style.font-size.px]="tableFontSizePx()"
       (mouseenter)="onHover(true)"
       (mouseleave)="onHover(false)"
       (click)="onItemClick()"
@@ -40,12 +44,15 @@
         {{ item.title }}
       </span>
       <span class="td-col td-assignee">
-        <renwu-issue-assignees [issue]="$any(item)" />
+        <renwu-issue-assignees
+          [issue]="$any(item)"
+          [avatarSize]="assigneeAvatarSize()"
+        />
       </span>
       <span class="td-col td-pct">{{ item.completion || 0 }}%</span>
       <span class="td-col td-status">
         @if (statusInfo) {
-          <renwu-issue-status [value]="statusInfo" />
+          <renwu-issue-status [value]="statusInfo" [fontSizePx]="tableFontSizePx()" />
         }
       </span>
     </div>
@@ -59,6 +66,8 @@
         [highlightedId]="highlightedId"
         [depth]="depth + 1"
         [tableWidth]="tableWidth"
+        [issueRowHeightPx]="issueRowHeightPx()"
+        [tableFontSizePx]="tableFontSizePx()"
         [disableSelectedTimelineItem]="disableSelectedTimelineItem"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"

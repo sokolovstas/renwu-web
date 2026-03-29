@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  computed,
   DestroyRef,
   EventEmitter,
   Input,
@@ -59,13 +60,8 @@ export class TimelineScaleComponent implements OnInit {
   protected groupingModel = this.createGroupingModel();
   protected scaleTickModel = this.createScaleTickModel();
 
-  get settings() {
-    return this.settingsService.getTimeline();
-  }
-
-  get scalePercent(): number {
-    return this.settings.scaleValue;
-  }
+  /** Reactive snapshot; use in template as `settings()` so OnPush updates when storage/slider changes. */
+  protected readonly settings = computed(() => this.settingsService.timelineSettings());
 
   ngOnInit(): void {
     this.refreshSelectLabels();

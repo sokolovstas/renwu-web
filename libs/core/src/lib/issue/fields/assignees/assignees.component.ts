@@ -13,6 +13,9 @@ import { Issue } from '../../issue.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IssueAssigneesComponent {
+  /** Passed to `renwu-avatar` `[size]` (e.g. `108px`). Default `30px` when unset. */
+  @Input() avatarSize?: string;
+
   @Input()
   set issue(value: Issue) {
     this._issue = value;

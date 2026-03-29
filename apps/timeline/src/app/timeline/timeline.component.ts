@@ -117,7 +117,7 @@ export class TimelineComponent {
     return this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
   });
 
-  protected readonly settings = computed(() => this.settingsService.getTimeline());
+  protected readonly settings = computed(() => this.settingsService.timelineSettings());
 
   protected readonly dateStart = signal<Date>(new Date());
   protected readonly dateEnd = signal<Date>(addMonthsUtc(new Date(), 1));

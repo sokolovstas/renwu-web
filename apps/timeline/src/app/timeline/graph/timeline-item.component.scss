@@ -1,8 +1,4 @@
-@use '../styles/timeline-variables' as *;
-
 .timeline-item-group {
-  height: $timeline-row-height;
-  min-height: $timeline-row-height;
   background: var(--gray-100);
   transition: background-color 0.12s ease;
 
@@ -31,8 +27,6 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: $timeline-row-height;
-  min-height: $timeline-row-height;
   transition: background-color 0.12s ease;
 
   &.timeline-row-alt {
@@ -57,8 +51,6 @@
 }
 
 .timeline-item-empty {
-  height: $timeline-row-height;
-  min-height: $timeline-row-height;
   transition: background-color 0.12s ease;
 
   &.timeline-row-alt {
@@ -84,7 +76,6 @@
 
 .bar {
   position: relative;
-  height: 18px;
   border-radius: 3px;
   cursor: pointer;
   flex-shrink: 0;

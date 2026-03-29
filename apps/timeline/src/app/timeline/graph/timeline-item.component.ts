@@ -1,16 +1,22 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   EventEmitter,
   Input,
   OnChanges,
   Output,
+  input,
 } from '@angular/core';
 import { Status } from '@renwu/core';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { visibleRowsBeforeChild } from '../row-striping';
 import { parseUtcLike, unixSeconds } from '../date-helpers';
 import { unixSecondsVirtual } from '../virtual-hours';
+
+/** Original UI: 18px bar height inside a 37px row — scale bar with `issueRowHeightPx`. */
+const TIMELINE_BAR_TO_ROW_RATIO = 18 / 37;
+const TIMELINE_BAR_HEIGHT_MIN_PX = 14;
 
 @Component({
   selector: 'renwu-timeline-item',
@@ -21,6 +27,16 @@ import { unixSecondsVirtual } from '../virtual-hours';
   imports: [TimelineItemComponent],
 })
 export class TimelineItemComponent implements OnChanges {
+  issueRowHeightPx = input.required<number>();
+
+  protected readonly barHeightPx = computed(() => {
+    const row = this.issueRowHeightPx();
+    return Math.max(
+      TIMELINE_BAR_HEIGHT_MIN_PX,
+      Math.round(row * TIMELINE_BAR_TO_ROW_RATIO),
+    );
+  });
+
   @Input() item!: TimelineIssue;
   /** DFS index among visible rows (striping aligned with the table column). */
   @Input() stripeIndex = 0;
