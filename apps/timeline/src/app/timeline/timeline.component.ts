@@ -40,6 +40,7 @@ import { IssueTreeRoot, TimelineIssue, TimelineLink } from './models/timeline-is
 import { countVisibleTimelineRows } from './row-striping';
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
+import { milestoneSelectPayload } from './roadmap/milestone-select-helpers';
 import { WorkloadUserComponent } from './workload/workload-user.component';
 import { TimelineHolderDirective } from './shared/directives/timeline-holder.directive';
 import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
@@ -187,6 +188,26 @@ export class TimelineComponent {
     childs: [],
   });
   protected readonly roadmapItems = signal<Milestone[]>([]);
+
+  /** Same width as ruler / graph issue rows (virtual axis length in px). */
+  protected readonly timelineTrackWidthPx = computed(() => {
+    const start = this.dateStart();
+    const end = this.rulerLimit();
+    const scale = this.settings().scale;
+    const h24 = this.hours24InDay();
+    if (!start || !end || !scale) return 0;
+    const o = unixSecondsVirtual(start, h24, '');
+    const endV = unixSecondsVirtual(end, h24, '');
+    return Math.max(0, (endV - o) / scale);
+  });
+
+  /** Total height of the sticky milestone strip (`milestones × milestoneRowHeightPx`). */
+  protected readonly roadmapBandHeightPx = computed(() => {
+    const s = this.settings();
+    if (!s.showMilestones) return 0;
+    return this.roadmapItems().length * s.milestoneRowHeightPx;
+  });
+
   protected readonly loading = signal(false);
   protected readonly workload = signal<UserWorkload | null>(null);
   protected readonly links = signal<TimelineLink[]>([]);
@@ -206,7 +227,6 @@ export class TimelineComponent {
   @ViewChild('rulerWrapper') private rulerWrapper?: ElementRef<HTMLDivElement>;
   @ViewChild('tableBody') private tableBody?: ElementRef<HTMLDivElement>;
   @ViewChild('workloadBars') private workloadBars?: ElementRef<HTMLDivElement>;
-  @ViewChild('roadmapScroll') private roadmapScroll?: ElementRef<HTMLDivElement>;
 
   private readonly queryParams = toSignal(
     this.route.queryParamMap.pipe(
@@ -382,9 +402,6 @@ export class TimelineComponent {
       if (this.workloadBars?.nativeElement) {
         this.workloadBars.nativeElement.scrollLeft = left;
       }
-      if (this.roadmapScroll?.nativeElement) {
-        this.roadmapScroll.nativeElement.scrollLeft = left;
-      }
     });
 
     // Keep local state in sync with route and resolve query string from hash.
@@ -520,9 +537,6 @@ export class TimelineComponent {
     if (this.workloadBars?.nativeElement) {
       this.workloadBars.nativeElement.scrollLeft = target.scrollLeft;
     }
-    if (this.roadmapScroll?.nativeElement) {
-      this.roadmapScroll.nativeElement.scrollLeft = target.scrollLeft;
-    }
     requestAnimationFrame(() => (this.scrollSource = null));
   }
 
@@ -532,6 +546,21 @@ export class TimelineComponent {
 
   protected onToggleWorkforce(): void {
     this.settingsService.setShowWorkforce(!this.settings().showWorkforce);
+  }
+
+  protected onMilestoneListClick(m: Milestone): void {
+    const cur = this.selectMilestone();
+    if (cur?.id === m.id) {
+      this.selectMilestone.set(null);
+      return;
+    }
+    const p = milestoneSelectPayload(
+      m,
+      this.dateStart(),
+      this.settings().scale,
+      this.hours24InDay(),
+    );
+    if (p) this.selectMilestone.set(p);
   }
 
   /** Stripe index for the i-th root row (aligned with visible subtree sizes). */

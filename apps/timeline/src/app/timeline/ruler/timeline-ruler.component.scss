@@ -1,6 +1,8 @@
 .timeline-ruler {
   position: relative;
   min-width: max-content;
+  /* Keeps chrome height stable when `ruler-major` is absent; pairs with table header in `timeline.component.scss`. */
+  min-height: 41px;
 }
 
 .ruler-now-line {

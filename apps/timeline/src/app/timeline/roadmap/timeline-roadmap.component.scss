@@ -1,5 +1,15 @@
 .timeline-roadmap {
   position: relative;
-  height: 56px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  min-width: max-content;
+}
+
+.timeline-roadmap-row {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
   min-width: max-content;
 }

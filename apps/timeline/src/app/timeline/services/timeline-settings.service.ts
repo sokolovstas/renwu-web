@@ -46,6 +46,8 @@ export class TimelineSettingsService {
     scaleValue: 100,
 
     tableWidth: 380,
+    issueRowHeightPx: 37,
+    milestoneRowHeightPx: 22,
     showMilestones: true,
     showWorkforce: true,
     showTitleInside: true,
@@ -113,6 +115,10 @@ export class TimelineSettingsService {
           ticks: TICKS,
           scale,
           oldScale: scale,
+          issueRowHeightPx:
+            timelineRest.issueRowHeightPx ?? prev.issueRowHeightPx,
+          milestoneRowHeightPx:
+            timelineRest.milestoneRowHeightPx ?? prev.milestoneRowHeightPx,
           open_index: timelineRest.open_index ?? prev.open_index,
           open_index_group: timelineRest.open_index_group ?? prev.open_index_group,
         }));
@@ -245,6 +251,20 @@ export class TimelineSettingsService {
 
   setTableWidth(value: number): void {
     this.settingsSignal.update((s) => ({ ...s, tableWidth: value }));
+    this.persist();
+  }
+
+  /** Clamp 24–96 px; updates `--timeline-issue-row-height` via settings snapshot. */
+  setIssueRowHeightPx(value: number): void {
+    const v = Math.max(24, Math.min(96, Math.round(value)));
+    this.settingsSignal.update((s) => ({ ...s, issueRowHeightPx: v }));
+    this.persist();
+  }
+
+  /** Clamp 18–48 px; height of each milestone track in the roadmap strip. */
+  setMilestoneRowHeightPx(value: number): void {
+    const v = Math.max(18, Math.min(48, Math.round(value)));
+    this.settingsSignal.update((s) => ({ ...s, milestoneRowHeightPx: v }));
     this.persist();
   }
 

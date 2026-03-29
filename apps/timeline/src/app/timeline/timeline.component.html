@@ -1,4 +1,9 @@
-<div class="timeline-container">
+<div
+  class="timeline-container"
+  [style.--timeline-issue-row-height.px]="settings().issueRowHeightPx"
+  [style.--timeline-milestone-row-height.px]="settings().milestoneRowHeightPx"
+  [style.--timeline-roadmap-band-height.px]="roadmapBandHeightPx()"
+>
   @if (!isWorkload()) {
     <div class="timeline-filters">
       <renwu-query-builder
@@ -18,22 +23,6 @@
     (fitToScreen)="onFitToScreen()"
     (nowClicked)="onCenterNow()"
   />
-
-  @if (settings().showMilestones) {
-    <div class="timeline-roadmap-wrapper" #roadmapWrapper>
-      <div class="timeline-roadmap-spacer" [style.width.px]="settings().tableWidth"></div>
-      <div class="timeline-roadmap-scroll" #roadmapScroll>
-        <renwu-timeline-roadmap
-          [items]="roadmapItems()"
-          [dateStart]="dateStart()"
-          [scale]="settings().scale"
-          [hours24InDay]="hours24InDay()"
-          [selectedMilestoneId]="selectMilestone()?.id ?? null"
-          (selectedMilestoneChange)="selectMilestone.set($event)"
-        />
-      </div>
-    </div>
-  }
 
   <div class="timeline-layout">
     <div
@@ -75,6 +64,28 @@
         [style.min-width.px]="settings().tableWidth"
         (scroll)="onTableScroll($event)"
       >
+        @if (settings().showMilestones && roadmapItems().length) {
+          <div
+            class="timeline-table-milestones"
+            [style.height.px]="roadmapBandHeightPx()"
+          >
+            @for (m of roadmapItems(); track m.id) {
+              <div
+                class="timeline-milestone-list-row"
+                [style.height.px]="settings().milestoneRowHeightPx"
+              >
+                <button
+                  type="button"
+                  class="timeline-milestone-list-item"
+                  [class.timeline-milestone-list-item--selected]="selectMilestone()?.id === m.id"
+                  (click)="onMilestoneListClick(m)"
+                >
+                  {{ m.title }}
+                </button>
+              </div>
+            }
+          </div>
+        }
         @for (row of rootChild().childs; track trackRootRow($index, row)) {
           <renwu-timeline-table-item
             [item]="row"
@@ -99,7 +110,24 @@
         (dragDelta)="onTimelineDrag($event)"
         (dragEnd)="onTimelineDragEnd()"
       >
-        <div class="timeline-graph-content">
+        <div
+          class="timeline-graph-content"
+          [class.has-milestones]="settings().showMilestones && roadmapBandHeightPx() > 0"
+        >
+          @if (settings().showMilestones && roadmapItems().length) {
+            <div class="timeline-roadmap-sticky">
+              <renwu-timeline-roadmap
+                [items]="roadmapItems()"
+                [dateStart]="dateStart()"
+                [scale]="settings().scale"
+                [hours24InDay]="hours24InDay()"
+                [rowHeightPx]="settings().milestoneRowHeightPx"
+                [trackWidthPx]="timelineTrackWidthPx()"
+                [selectedMilestoneId]="selectMilestone()?.id ?? null"
+                (selectedMilestoneChange)="selectMilestone.set($event)"
+              />
+            </div>
+          }
           @if (nowLinePx() !== null) {
             <div class="timeline-now-line" [style.left.px]="nowLinePx()!"></div>
           }

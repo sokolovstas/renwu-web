@@ -10,6 +10,10 @@ export interface TimelineSettings {
   scaleValue: number;
 
   tableWidth: number;
+  /** Issue / graph row height in px (also drives `--timeline-issue-row-height`). */
+  issueRowHeightPx: number;
+  /** One horizontal track for a milestone bar in the roadmap strip. */
+  milestoneRowHeightPx: number;
   showMilestones: boolean;
   showWorkforce: boolean;
   showTitleInside: boolean;

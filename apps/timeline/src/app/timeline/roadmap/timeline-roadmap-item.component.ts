@@ -7,8 +7,9 @@ import {
   Output,
 } from '@angular/core';
 import { Milestone } from '@renwu/core';
-import { parseUtcLike, unixSeconds } from '../date-helpers';
+import { parseUtcLike } from '../date-helpers';
 import { unixSecondsVirtual } from '../virtual-hours';
+import { milestoneSelectPayload } from './milestone-select-helpers';
 
 @Component({
   selector: 'renwu-timeline-roadmap-item',
@@ -69,11 +70,13 @@ export class TimelineRoadmapItemComponent implements OnChanges {
       this.selectMilestone.emit(null);
       return;
     }
-    this.selectMilestone.emit({
-      id: this.item.id,
-      offset: this.due ? this.left + this.width : this.left,
-      due: this.due,
-    });
+    const payload = milestoneSelectPayload(
+      this.item,
+      this.dateStart,
+      this.scale,
+      this.hours24InDay,
+    );
+    if (payload) this.selectMilestone.emit(payload);
   }
 }
 

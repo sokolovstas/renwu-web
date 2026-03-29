@@ -1,13 +1,18 @@
-<div class="timeline-roadmap">
+<div
+  class="timeline-roadmap"
+  [style.width.px]="trackWidthPx > 0 ? trackWidthPx : null"
+>
   @for (item of items; track item.id) {
-    <renwu-timeline-roadmap-item
-      [item]="item"
-      [dateStart]="dateStart"
-      [scale]="scale"
-      [hours24InDay]="hours24InDay"
-      [selectedMilestoneId]="selectedMilestoneId"
-      (selectMilestone)="onSelectMilestone($event)"
-    />
+    <div class="timeline-roadmap-row" [style.height.px]="rowHeightPx">
+      <renwu-timeline-roadmap-item
+        [item]="item"
+        [dateStart]="dateStart"
+        [scale]="scale"
+        [hours24InDay]="hours24InDay"
+        [selectedMilestoneId]="selectedMilestoneId"
+        (selectMilestone)="onSelectMilestone($event)"
+      />
+    </div>
   }
 </div>
 

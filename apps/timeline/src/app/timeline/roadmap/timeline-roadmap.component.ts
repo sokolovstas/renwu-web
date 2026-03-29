@@ -16,6 +16,10 @@ export class TimelineRoadmapComponent {
   @Input() dateStart!: Date;
   @Input() scale = 1;
   @Input() hours24InDay = true;
+  /** Height of each milestone track (row); from `TimelineSettings.milestoneRowHeightPx`. */
+  @Input() rowHeightPx = 22;
+  /** Horizontal width of the axis (same as ruler / graph content). */
+  @Input() trackWidthPx = 0;
 
   @Input() selectedMilestoneId: string | null = null;
 
