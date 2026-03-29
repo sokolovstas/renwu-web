@@ -161,6 +161,8 @@ export class TimelineScaleComponent implements OnInit {
 
   private createGroupingModel(): SelectModelBase<string> {
     const model = new SelectModelBase<string>();
+    /** Resolve selected row from `staticData` by id so `label` is shown, not raw `id`. */
+    model.loadSelected = true;
     model.staticData = this.buildGroupingItems();
     void model.setData(this.settingsService.getTimeline().grouping || 'none');
     return model;
@@ -168,6 +170,7 @@ export class TimelineScaleComponent implements OnInit {
 
   private createScaleTickModel(): SelectModelBase<string> {
     const model = new SelectModelBase<string>();
+    model.loadSelected = true;
     model.staticData = this.buildScaleTickItems();
     void model.setData(this.settingsService.getTimeline().scaleTick);
     return model;
