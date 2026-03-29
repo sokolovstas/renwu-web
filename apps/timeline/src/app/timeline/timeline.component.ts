@@ -627,8 +627,35 @@ export class TimelineComponent {
       type: 'group',
       title: this.getGroupTitle(g),
       _SHOWCHILDS: true,
-      childs: (g.issues || []) as TimelineIssue[],
+      childs: this.sortIssueTree((g.issues || []) as TimelineIssue[]),
     }));
+  }
+
+  /** Ascending by start date (`date_start_calc`, else `date_start`); missing dates last. */
+  private issueStartSortKey(issue: TimelineIssue): number {
+    const calc = issue.date_start_calc;
+    if (calc) {
+      const d = parseUtcLike(calc);
+      if (d) return d.getTime();
+    }
+    const ds = issue.date_start;
+    if (ds) {
+      const d = parseUtcLike(ds);
+      if (d) return d.getTime();
+    }
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  private sortIssueTree(issues: TimelineIssue[]): TimelineIssue[] {
+    if (!issues.length) return issues;
+    return [...issues]
+      .map((issue) => ({
+        ...issue,
+        childs: issue.childs?.length
+          ? this.sortIssueTree(issue.childs)
+          : issue.childs,
+      }))
+      .sort((a, b) => this.issueStartSortKey(a) - this.issueStartSortKey(b));
   }
 
   private getGroupTitle(group: IssueGroup): string {
