@@ -1,5 +1,26 @@
 import { TimelineIssue } from './models/timeline-issue.model';
 
+/**
+ * Preorder DFS of visible rows (same order as `renwu-timeline-item` templates), over all root nodes.
+ */
+export function flattenVisibleTimelinePreorder(
+  rootChilds: TimelineIssue[],
+): TimelineIssue[] {
+  const out: TimelineIssue[] = [];
+  function walk(n: TimelineIssue) {
+    out.push(n);
+    if (n._SHOWCHILDS !== false && n.childs?.length) {
+      for (const c of n.childs) {
+        walk(c);
+      }
+    }
+  }
+  for (const r of rootChilds || []) {
+    walk(r);
+  }
+  return out;
+}
+
 /** Rows rendered for this node (self + visible descendants), same rules as templates (`_SHOWCHILDS`). */
 export function countVisibleTimelineRows(node: TimelineIssue): number {
   if (!node) return 0;

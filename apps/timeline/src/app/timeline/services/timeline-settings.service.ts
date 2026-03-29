@@ -47,7 +47,7 @@ export class TimelineSettingsService {
 
     tableWidth: 380,
     issueRowHeightPx: 37,
-    milestoneRowHeightPx: 22,
+    milestoneRowHeightPx: 24,
     showMilestones: true,
     showWorkforce: true,
     showTitleInside: true,

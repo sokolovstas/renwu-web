@@ -1,9 +1,8 @@
 <div
   class="timeline-roadmap-item"
   [class.due]="due"
-  [class.selected]="selected"
   [style.left.px]="left"
-  [style.width.px]="width + 8"
+  [style.width.px]="width"
   (click)="toggleSelect()"
 >
   <span class="title">{{ item.title }}</span>

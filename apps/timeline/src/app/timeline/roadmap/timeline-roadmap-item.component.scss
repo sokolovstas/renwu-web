@@ -4,11 +4,13 @@
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   min-width: 16px;
   height: 18px;
   flex-shrink: 0;
-  padding: 0 6px;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--accent-lighter-color);
   color: var(--accent-secondary-color);
   cursor: pointer;
@@ -20,11 +22,10 @@
   color: var(--toast-error-color);
 }
 
-.timeline-roadmap-item.selected {
-  box-shadow: 0 0 0 2px var(--accent-primary-color) inset;
-}
-
 .title {
+  min-width: 0;
+  flex: 1;
+  padding: 0 6px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

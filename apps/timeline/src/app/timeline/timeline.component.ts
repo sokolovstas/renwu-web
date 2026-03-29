@@ -37,10 +37,16 @@ import { TimelineSettingsService } from './services/timeline-settings.service';
 import { TimelineTableItemComponent } from './table/timeline-table-item.component';
 import { TimelineItemComponent } from './graph/timeline-item.component';
 import { IssueTreeRoot, TimelineIssue, TimelineLink } from './models/timeline-issue.model';
-import { countVisibleTimelineRows } from './row-striping';
+import {
+  countVisibleTimelineRows,
+  flattenVisibleTimelinePreorder,
+} from './row-striping';
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineRoadmapComponent } from './roadmap/timeline-roadmap.component';
-import { milestoneSelectPayload } from './roadmap/milestone-select-helpers';
+import {
+  milestoneBarGeometry,
+  milestoneSelectPayload,
+} from './roadmap/milestone-select-helpers';
 import { WorkloadUserComponent } from './workload/workload-user.component';
 import { TimelineHolderDirective } from './shared/directives/timeline-holder.directive';
 import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
@@ -50,6 +56,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoService } from '@jsverse/transloco';
 
 type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
+
+/** Matches `.timeline-link` (margin-top + height) in `timeline-link.component.scss`. */
+const TIMELINE_LINK_ROW_PX = 6;
 
 @Component({
   selector: 'renwu-timeline-timeline',
@@ -206,6 +215,57 @@ export class TimelineComponent {
     const s = this.settings();
     if (!s.showMilestones) return 0;
     return this.roadmapItems().length * s.milestoneRowHeightPx;
+  });
+
+  /**
+   * Vertical dashed line at the milestone bar’s end (same px as roadmap), from the top of the graph
+   * down to the bottom of the last visible row that references this milestone.
+   */
+  protected readonly milestoneEndMarkers = computed(() => {
+    const s = this.settings();
+    if (!s.showMilestones) return [];
+    const milestones = this.roadmapItems();
+    const roots = this.rootChild().childs;
+    if (!milestones.length || !roots?.length) return [];
+
+    const band = this.roadmapBandHeightPx();
+    const linkBlock = this.links().length * TIMELINE_LINK_ROW_PX;
+    const rowH = s.issueRowHeightPx;
+    const dateStart = this.dateStart();
+    const scale = s.scale;
+    const h24 = this.hours24InDay();
+
+    const flat = flattenVisibleTimelinePreorder(roots);
+    const markers: Array<{
+      id: string;
+      leftPx: number;
+      heightPx: number;
+      due: boolean;
+    }> = [];
+
+    for (const m of milestones) {
+      if (!m.id) continue;
+      let lastIdx = -1;
+      flat.forEach((node, idx) => {
+        if (String(node.type) === 'group') return;
+        const hit =
+          node.milestones?.some((x) => x?.id === m.id) ||
+          node.parent_milestones?.some((x) => x?.id === m.id);
+        if (hit) lastIdx = idx;
+      });
+      if (lastIdx < 0) continue;
+
+      const g = milestoneBarGeometry(m, dateStart, scale, h24);
+      if (!g) continue;
+
+      markers.push({
+        id: m.id,
+        leftPx: g.endPx,
+        heightPx: band + linkBlock + (lastIdx + 1) * rowH,
+        due: g.due,
+      });
+    }
+    return markers;
   });
 
   protected readonly loading = signal(false);
@@ -560,7 +620,70 @@ export class TimelineComponent {
       this.settings().scale,
       this.hours24InDay(),
     );
-    if (p) this.selectMilestone.set(p);
+    if (!p) return;
+    this.selectMilestone.set(p);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.scrollGraphToMilestoneEnd(m));
+    });
+  }
+
+  /** Formats `date_calc` / `date` for the milestone list (user timezone). */
+  protected milestoneListDateLabel(m: Milestone): string {
+    const dCalc = m.date_calc ? parseUtcLike(m.date_calc) : null;
+    const dDate = m.date ? parseUtcLike(m.date) : null;
+    if (!dCalc && !dDate) return '';
+    const tz = this.timezone();
+    const opts: Intl.DateTimeFormatOptions = {
+      timeZone: tz,
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    };
+    const single = dCalc ?? dDate;
+    if (!single) return '';
+    try {
+      const fmt = new Intl.DateTimeFormat(undefined, opts);
+      if (dCalc && dDate) {
+        const lo = dCalc < dDate ? dCalc : dDate;
+        const hi = dCalc > dDate ? dCalc : dDate;
+        const a = fmt.format(lo);
+        const b = fmt.format(hi);
+        return a === b ? a : `${a} — ${b}`;
+      }
+      return fmt.format(single);
+    } catch {
+      const fmt = new Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+      if (dCalc && dDate) {
+        const lo = dCalc < dDate ? dCalc : dDate;
+        const hi = dCalc > dDate ? dCalc : dDate;
+        const a = fmt.format(lo);
+        const b = fmt.format(hi);
+        return a === b ? a : `${a} — ${b}`;
+      }
+      return fmt.format(single);
+    }
+  }
+
+  /** Horizontally scrolls the graph so the milestone’s end date sits near the center. */
+  private scrollGraphToMilestoneEnd(m: Milestone): void {
+    const graphEl = this.graphScroll?.nativeElement;
+    if (!graphEl || graphEl.clientWidth <= 0) return;
+    const g = milestoneBarGeometry(
+      m,
+      this.dateStart(),
+      this.settings().scale,
+      this.hours24InDay(),
+    );
+    if (!g) return;
+    const nextLeft = Math.max(
+      0,
+      Math.floor(g.endPx - graphEl.clientWidth / 2),
+    );
+    this.scrollLeftGraph.set(nextLeft);
   }
 
   /** Stripe index for the i-th root row (aligned with visible subtree sizes). */

@@ -7,9 +7,10 @@ import {
   Output,
 } from '@angular/core';
 import { Milestone } from '@renwu/core';
-import { parseUtcLike } from '../date-helpers';
-import { unixSecondsVirtual } from '../virtual-hours';
-import { milestoneSelectPayload } from './milestone-select-helpers';
+import {
+  milestoneBarGeometry,
+  milestoneSelectPayload,
+} from './milestone-select-helpers';
 
 @Component({
   selector: 'renwu-timeline-roadmap-item',
@@ -41,26 +42,21 @@ export class TimelineRoadmapItemComponent implements OnChanges {
     if (!this.item || !this.dateStart || !this.scale) {
       return;
     }
-    const dateCalc = this.item.date_calc
-      ? parseUtcLike(this.item.date_calc)
-      : null;
-    const date = this.item.date ? parseUtcLike(this.item.date) : null;
-
-    const h24 = this.hours24InDay;
-    const origin = unixSecondsVirtual(this.dateStart, h24, '');
-
-    const calcOffset = dateCalc
-      ? Math.floor(
-          (unixSecondsVirtual(dateCalc, h24, '') - origin) / this.scale,
-        )
-      : 0;
-    const dateOffset = date
-      ? Math.floor((unixSecondsVirtual(date, h24, '') - origin) / this.scale)
-      : calcOffset;
-
-    this.due = calcOffset > dateOffset;
-    this.left = Math.min(calcOffset, dateOffset);
-    this.width = Math.abs(calcOffset - dateOffset);
+    const g = milestoneBarGeometry(
+      this.item,
+      this.dateStart,
+      this.scale,
+      this.hours24InDay,
+    );
+    if (g) {
+      this.due = g.due;
+      this.left = g.left;
+      this.width = g.width;
+    } else {
+      this.due = false;
+      this.left = 0;
+      this.width = 0;
+    }
     this.selected = this.selectedMilestoneId === this.item.id;
   }
 

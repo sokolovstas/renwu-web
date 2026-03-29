@@ -70,6 +70,7 @@
             [style.height.px]="roadmapBandHeightPx()"
           >
             @for (m of roadmapItems(); track m.id) {
+              @let dates = milestoneListDateLabel(m);
               <div
                 class="timeline-milestone-list-row"
                 [style.height.px]="settings().milestoneRowHeightPx"
@@ -80,7 +81,10 @@
                   [class.timeline-milestone-list-item--selected]="selectMilestone()?.id === m.id"
                   (click)="onMilestoneListClick(m)"
                 >
-                  {{ m.title }}
+                  <span class="timeline-milestone-list-item-title">{{ m.title }}</span>
+                  @if (dates) {
+                    <span class="timeline-milestone-list-item-dates">{{ dates }}</span>
+                  }
                 </button>
               </div>
             }
@@ -133,6 +137,15 @@
           }
           @for (pos of gridLines(); track pos) {
             <div class="timeline-grid-line" [style.left.px]="pos"></div>
+          }
+
+          @for (marker of milestoneEndMarkers(); track marker.id) {
+            <div
+              class="timeline-milestone-end-marker"
+              [class.timeline-milestone-end-marker--due]="marker.due"
+              [style.left.px]="marker.leftPx"
+              [style.height.px]="marker.heightPx"
+            ></div>
           }
 
           @for (link of links(); track link.issue.id + '-' + link.link.id + '-' + link.type) {
