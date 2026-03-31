@@ -1,10 +1,36 @@
-<div
+<button
+  type="button"
   class="timeline-roadmap-item"
   [class.due]="due"
-  [style.left.px]="left"
-  [style.width.px]="width"
+  [class.selected]="selected"
   (click)="toggleSelect()"
+  [attr.aria-label]="item.title"
 >
-  <span class="title">{{ item.title }}</span>
-</div>
+  @if (due && linkWidthPx > 0) {
+    <span
+      class="timeline-roadmap-item-link"
+      [style.left.px]="linkLeftPx"
+      [style.width.px]="linkWidthPx"
+    ></span>
+  }
+  <span
+    class="timeline-roadmap-item-dot"
+    [style.left.px]="plannedPx"
+    [title]="item.title"
+  ></span>
+  <span
+    class="timeline-roadmap-item-title"
+    [style.left.px]="plannedPx"
+    [title]="item.title"
+  >
+    {{ item.title }}
+  </span>
+  @if (due) {
+    <span
+      class="timeline-roadmap-item-triangle"
+      [style.left.px]="actualPx"
+      [title]="item.title"
+    ></span>
+  }
+</button>
 

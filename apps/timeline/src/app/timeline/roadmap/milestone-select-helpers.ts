@@ -2,13 +2,20 @@ import { Milestone } from '@renwu/core';
 import { parseUtcLike } from '../date-helpers';
 import { unixSecondsVirtual } from '../virtual-hours';
 
-/** Same horizontal math as `TimelineRoadmapItemComponent` (bar left/width and “due” state). */
+/** Horizontal positions for milestone markers (planned/date end vs overdue/actual). */
 export function milestoneBarGeometry(
   m: Milestone,
   dateStart: Date,
   scale: number,
   hours24InDay: boolean,
-): { left: number; width: number; due: boolean; endPx: number } | null {
+): {
+  due: boolean;
+  plannedPx: number;
+  actualPx: number;
+  leftPx: number;
+  rightPx: number;
+  linkWidthPx: number;
+} | null {
   if (!m?.id || !dateStart || !scale) return null;
   const dateCalc = m.date_calc ? parseUtcLike(m.date_calc) : null;
   const date = m.date ? parseUtcLike(m.date) : null;
@@ -23,9 +30,12 @@ export function milestoneBarGeometry(
     ? Math.floor((unixSecondsVirtual(date, h24, '') - origin) / scale)
     : calcOffset;
   const due = calcOffset > dateOffset;
-  const left = Math.min(calcOffset, dateOffset);
-  const width = Math.abs(calcOffset - dateOffset);
-  return { left, width, due, endPx: left + width };
+  const plannedPx = dateOffset;
+  const actualPx = calcOffset;
+  const leftPx = Math.min(plannedPx, actualPx);
+  const rightPx = Math.max(plannedPx, actualPx);
+  const linkWidthPx = Math.abs(actualPx - plannedPx);
+  return { due, plannedPx, actualPx, leftPx, rightPx, linkWidthPx };
 }
 
 export function milestoneSelectPayload(
@@ -39,7 +49,7 @@ export function milestoneSelectPayload(
   if (!g) return null;
   return {
     id: m.id,
-    offset: g.due ? g.endPx : g.left,
+    offset: g.rightPx,
     due: g.due,
   };
 }

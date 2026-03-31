@@ -260,7 +260,7 @@ export class TimelineComponent {
 
       markers.push({
         id: m.id,
-        leftPx: g.endPx,
+        leftPx: g.rightPx,
         heightPx: band + linkBlock + (lastIdx + 1) * rowH,
         due: g.due,
       });
@@ -681,7 +681,7 @@ export class TimelineComponent {
     if (!g) return;
     const nextLeft = Math.max(
       0,
-      Math.floor(g.endPx - graphEl.clientWidth / 2),
+      Math.floor(g.rightPx - graphEl.clientWidth / 2),
     );
     this.scrollLeftGraph.set(nextLeft);
   }

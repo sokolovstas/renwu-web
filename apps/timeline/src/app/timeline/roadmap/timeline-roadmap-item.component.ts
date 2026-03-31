@@ -34,7 +34,10 @@ export class TimelineRoadmapItemComponent implements OnChanges {
   } | null>();
 
   protected left = 0;
-  protected width = 0;
+  protected plannedPx = 0;
+  protected actualPx = 0;
+  protected linkLeftPx = 0;
+  protected linkWidthPx = 0;
   protected due = false;
   protected selected = false;
 
@@ -50,12 +53,16 @@ export class TimelineRoadmapItemComponent implements OnChanges {
     );
     if (g) {
       this.due = g.due;
-      this.left = g.left;
-      this.width = g.width;
+      this.plannedPx = g.plannedPx;
+      this.actualPx = g.actualPx;
+      this.linkLeftPx = g.leftPx;
+      this.linkWidthPx = g.linkWidthPx;
     } else {
       this.due = false;
-      this.left = 0;
-      this.width = 0;
+      this.plannedPx = 0;
+      this.actualPx = 0;
+      this.linkLeftPx = 0;
+      this.linkWidthPx = 0;
     }
     this.selected = this.selectedMilestoneId === this.item.id;
   }
