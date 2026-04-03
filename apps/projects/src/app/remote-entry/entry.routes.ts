@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   Route,
+  UrlTree,
   createUrlTreeFromSnapshot,
 } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
@@ -35,17 +36,36 @@ const setCurrentProject = (route: ActivatedRouteSnapshot) => {
     route.paramMap.get('containerKey'),
   );
 };
-const checkProjectKey = async (route: ActivatedRouteSnapshot) => {
-  const container = await firstValueFrom(
-    inject(RwContainerService).getContainerByKey(
-      route.paramMap.get('containerKey'),
-    ),
-  );
-  if (!container) {
+const checkProjectKey = async (
+  route: ActivatedRouteSnapshot,
+): Promise<boolean | UrlTree> => {
+  const containerKey = route.paramMap.get('containerKey');
+  if (!containerKey) {
     return createUrlTreeFromSnapshot(route, ['..']);
+  }
+
+  const container = await firstValueFrom(
+    inject(RwContainerService).getContainerByKey(containerKey),
+  ).catch((): null => null);
+
+  // Keep deep-link URL on hard reload even if container lookup is not ready yet.
+  if (!container) {
+    return true;
   }
   return true;
 };
+
+const projectDetailChildren: Route[] = [
+  { path: '', pathMatch: 'full', redirectTo: 'summary' },
+  { path: 'summary', component: SummaryComponent },
+  { path: 'milestone', component: MilestonesComponent },
+  { path: 'milestone/:id', component: MilestoneComponent },
+  { path: 'activity', component: ActivityComponent },
+  // { path: 'backlog', component: BacklogComponent },
+  { path: 'team', component: TeamComponent },
+  { path: 'template', component: TemplateComponent },
+  { path: 'settings', component: SettingsComponent },
+];
 console.log(import.meta.url);
 export const ROUTES: Route[] = [
   {
@@ -71,17 +91,7 @@ export const ROUTES: Route[] = [
         component: DetailComponent,
         resolve: [setCurrentProject],
         canActivate: [checkProjectKey],
-        children: [
-          { path: '', pathMatch: 'full', redirectTo: 'summary' },
-          { path: 'summary', component: SummaryComponent },
-          { path: 'milestone', component: MilestonesComponent },
-          { path: 'milestone/:id', component: MilestoneComponent },
-          { path: 'activity', component: ActivityComponent },
-          // { path: 'backlog', component: BacklogComponent },
-          { path: 'team', component: TeamComponent },
-          { path: 'template', component: TemplateComponent },
-          { path: 'settings', component: SettingsComponent },
-        ],
+        children: projectDetailChildren,
       },
     ],
   },

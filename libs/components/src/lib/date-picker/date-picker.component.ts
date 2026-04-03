@@ -148,7 +148,10 @@ export class RwDatePickerComponent
     if (!this.range) {
       this.selectionEnd = this.value;
     }
-    if (isAfter(this.selectionStart, this.selectionEnd) || !this.selectionEnd) {
+    if (
+      this.selectionStart &&
+      (isAfter(this.selectionStart, this.selectionEnd) || !this.selectionEnd)
+    ) {
       this.labelEnd = format(endOfDay(this.selectionStart), this.displayFormat);
     }
     if (this._labelStart !== value) {
@@ -196,29 +199,40 @@ export class RwDatePickerComponent
       this.selectionEnd = this.selectionEndOld = null;
     } else {
       if (Array.isArray(value) && value.length === 2) {
-        this.value = value[0];
-        this.selectionStart = this.selectionStartOld = value[0];
-        this.selectionEnd = this.selectionEndOld = value[1];
+        const start = this.normalizeIncomingDate(value[0]);
+        const end = this.normalizeIncomingDate(value[1]);
+        this.value = start;
+        this.selectionStart = this.selectionStartOld = start;
+        this.selectionEnd = this.selectionEndOld = end;
       } else {
         if (typeof value === 'string') {
+          const parsed = this.normalizeIncomingDate(parseISO(value as string));
           this.value =
             this.selectionStart =
             this.selectionEnd =
             this.selectionStartOld =
             this.selectionEndOld =
-              parseISO(value as string);
+              parsed;
         } else {
+          const parsed = this.normalizeIncomingDate(value as Date);
           this.value =
             this.selectionStart =
             this.selectionEnd =
             this.selectionStartOld =
             this.selectionEndOld =
-              value as Date;
+              parsed;
         }
       }
     }
     this.setLabel();
     this.cd.detectChanges();
+  }
+
+  private normalizeIncomingDate(date: Date): Date | null {
+    if (!date || !isValid(date) || date.getFullYear() < 1970) {
+      return null;
+    }
+    return date;
   }
 
   registerOnChange(fn: (_: DatePickerValue) => void): void {
@@ -264,6 +278,9 @@ export class RwDatePickerComponent
       return;
     }
     this.opened = !this.opened;
+    if (this.opened) {
+      this.setLabel();
+    }
     this.dropdown.show();
   }
 
@@ -279,6 +296,7 @@ export class RwDatePickerComponent
     if (!this.range) {
       if (this.value) {
         this.label = format(this.value as Date, this.displayFormat);
+        this._labelStart = this.label;
         this.cd.markForCheck();
         return;
       }
@@ -289,12 +307,16 @@ export class RwDatePickerComponent
             format(this.selectionStart, this.displayFormat) +
             ' - ' +
             format(this.selectionEnd, this.displayFormat);
+          this._labelStart = format(this.selectionStart, this.displayFormat);
+          this._labelEnd = format(this.selectionEnd, this.displayFormat);
           this.cd.markForCheck();
           return;
         }
       }
     }
     this.label = '';
+    this._labelStart = '';
+    this._labelEnd = '';
     this.cd.markForCheck();
   }
   onCalendarChangeStart(event: Date): void {
@@ -306,11 +328,12 @@ export class RwDatePickerComponent
     this.onChange();
   }
   onChange(): void {
-    if (this.live || !this.confirmRequired) {
-      this.updateValue();
-    }
     if (!this.live && !this.confirmRequired) {
       this.close();
+      return;
+    }
+    if (this.live || !this.confirmRequired) {
+      this.updateValue();
     }
   }
   onApply(): void {
@@ -328,10 +351,14 @@ export class RwDatePickerComponent
     this.setLabel();
   }
   close(): void {
-    if (this.range) {
-      this.writeValue([this.selectionStartOld, this.selectionEndOld]);
+    if (!this.confirmRequired) {
+      this.updateValue();
     } else {
-      this.writeValue(this.selectionStartOld);
+      if (this.range) {
+        this.writeValue([this.selectionStartOld, this.selectionEndOld]);
+      } else {
+        this.writeValue(this.selectionStartOld);
+      }
     }
     this.opened = false;
     this.dropdown.hide();

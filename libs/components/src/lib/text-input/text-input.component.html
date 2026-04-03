@@ -71,7 +71,7 @@
     ></textarea>
   }
 
-  @if (showClear && value !== undefined && value !== '') {
+  @if (showClear && value != null && value !== '') {
     <rw-icon [tabindex]="-1"
       class="rw-text-input-clear"
       icon="close"

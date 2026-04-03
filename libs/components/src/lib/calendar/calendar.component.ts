@@ -205,29 +205,45 @@ export class RwCalendarComponent implements OnInit, OnChanges {
     this.setSelection();
     this.cd.markForCheck();
   }
+
+  /** Clears selected/period flags when there is no range to show. */
+  private clearDateCellSelection(): void {
+    if (!this.dateCells) {
+      return;
+    }
+    for (const dateCell of this.dateCells) {
+      dateCell.selected = false;
+      dateCell.selectedStart = false;
+      dateCell.selectedEnd = false;
+      dateCell.period = false;
+    }
+  }
+
   setSelection(): void {
-    if (!this.selectionStart || !this.selectionEnd) {
+    const start = this.selectionStart;
+    // Single-day / open-end: only `selectionStart` may be set; `!selectionEnd` must not skip painting.
+    const end = this.selectionEnd ?? this.selectionStart;
+
+    if (!start || !end) {
+      this.clearDateCellSelection();
       return;
     }
 
-    const period =
-      differenceInMonths(this.selectionStart, this.selectionEnd) >= 1;
+    const period = differenceInMonths(start, end) >= 1;
     if (this.dateCells) {
       for (const dateCell of this.dateCells) {
         dateCell.selectedStart = false;
         dateCell.selectedEnd = false;
 
         const selected =
-          (isAfter(dateCell.date, this.selectionStart) ||
-            isSameDay(dateCell.date, this.selectionStart)) &&
-          (isBefore(dateCell.date, this.selectionEnd) ||
-            isSameDay(dateCell.date, this.selectionEnd));
+          (isAfter(dateCell.date, start) || isSameDay(dateCell.date, start)) &&
+          (isBefore(dateCell.date, end) || isSameDay(dateCell.date, end));
         dateCell.selected = !period && selected;
         dateCell.period = period && selected;
-        if (isSameDay(dateCell.date, this.selectionStart) && period) {
+        if (isSameDay(dateCell.date, start) && period) {
           dateCell.selectedStart = true;
         }
-        if (isSameDay(dateCell.date, this.selectionEnd) && period) {
+        if (isSameDay(dateCell.date, end) && period) {
           dateCell.selectedEnd = true;
         }
       }

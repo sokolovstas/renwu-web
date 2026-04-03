@@ -28,8 +28,10 @@
     <div class="dropdown-wrapper" [class.range]="range">
       <div class="picker-wrapper">
         <div class="date-time-wrapper">
-          <rw-text-input [(ngModel)]="labelStart"
+          <rw-text-input
+            [(ngModel)]="labelStart"
             [prompt]="prompt"
+            [showClear]="allowNull && !disabled"
            />
           <rw-calendar class="rw-date-picker-popup-calendar"
             [hideOverflow]="true"
@@ -45,7 +47,10 @@
         @if (range) {
           <div class="separator"></div>
           <div class="date-time-wrapper">
-            <rw-text-input [(ngModel)]="labelEnd" />
+            <rw-text-input
+              [(ngModel)]="labelEnd"
+              [showClear]="allowNull && !disabled"
+             />
             <rw-calendar class="rw-date-picker-popup-calendar"
               [hideOverflow]="true"
               [selectionStart]="selectionStart"
@@ -154,44 +159,28 @@
                                           </div>
                                         </div>
                                         <div class="buttons">
-                                          @if (allowNull) {
+                                          @if (confirmRequired) {
                                             <rw-button
-                                              [isAttention]="true"
                                               class="rw-date-picker-clear-button"
-                                              (clicked)="onClearDate()"
-                                              >{{ 'components.clear-date' | transloco }}</rw-button
+                                              (clicked)="onApply()"
+                                              >{{ 'components.Apply' | transloco }}</rw-button
                                               >
-                                            }
-                                            @if (confirmRequired) {
-                                              <rw-button
-                                                class="rw-date-picker-clear-button"
-                                                (clicked)="onApply()"
-                                                >{{ 'components.Apply' | transloco }}</rw-button
-                                                >
-                                              }
-                                            </div>
+                                          }
+                                        </div>
                                           </div>
                                         }
                                       </div>
                                       @if (!range || !helpers) {
                                         <div class="buttons">
-                                          @if (allowNull) {
+                                          @if (confirmRequired) {
                                             <rw-button
-                                              [isAttention]="true"
                                               class="rw-date-picker-clear-button"
-                                              (clicked)="onClearDate()"
-                                              >{{ 'components.clear-date' | transloco }}</rw-button
+                                              (clicked)="onApply()"
+                                              >{{ 'components.Apply' | transloco }}</rw-button
                                               >
-                                            }
-                                            @if (confirmRequired) {
-                                              <rw-button
-                                                class="rw-date-picker-clear-button"
-                                                (clicked)="onApply()"
-                                                >{{ 'components.Apply' | transloco }}</rw-button
-                                                >
-                                              }
-                                            </div>
                                           }
+                                        </div>
+                                      }
                                         </div>
                                       </ng-template>
                                     </rw-dropdown>

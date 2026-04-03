@@ -4,6 +4,7 @@
 
 export * from './lib/clipboard';
 export * from './lib/color';
+export * from './lib/api-date';
 export * from './lib/dates';
 export * from './lib/dotize';
 export * from './lib/file';

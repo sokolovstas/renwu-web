@@ -34,6 +34,20 @@ export const ROUTES: Route[] = [
         component: TimelineComponent,
       },
       {
+        path: 'RW',
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: 'activity',
+          },
+          {
+            path: 'activity',
+            component: TimelineComponent,
+          },
+        ],
+      },
+      {
         path: '**',
         redirectTo: '',
       },
