@@ -126,8 +126,8 @@ Behavior observed in legacy implementation:
   - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts, image vs file grouping, collapsible list, explicit download link
   - pending: markdown/post-to-messages, image viewer parity
 - `time-log`: in progress
-  - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling
-  - pending: log editor parity, elapsed-time prompt parity, status-coupled completion edge cases
+  - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling, modal editor for existing logs (24h / admin rules, save + patch + prev state)
+  - pending: elapsed-time prompt parity, status-coupled completion edge cases
 - `history`: in progress
   - done: fetch + sort + fallback, inline rendering, event normalization for id/source parity
   - pending: focused tests for payload variants (`id`/`_id`) and ordering

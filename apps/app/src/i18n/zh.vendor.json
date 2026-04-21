@@ -146,6 +146,9 @@
     "time-log-duration-required": "请输入大于零的时长。",
     "time-log-duration-too-long": "时长不能超过 300 小时。",
     "time-log-error": "无法记录工时，请重试。",
+    "time-log-editor-title": "工时记录",
+    "time-log-editor-hint": "仅可编辑自己在过去 24 小时内的记录。",
+    "time-log-editor-save": "保存",
     "history-save-first": "请先保存任务后再查看历史。",
     "history-empty": "无历史记录"
   }

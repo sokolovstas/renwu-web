@@ -11,17 +11,21 @@ import {
   RwButtonComponent,
   RwDatePipe,
   RwDurationToStringPipe,
+  RwIconComponent,
+  RwModalService,
   RwTextAreaComponent,
   RwTimePickerComponent,
   RwToastService,
 } from '@renwu/components';
 import {
+  Issue,
   RwDataService,
   RwFormatUserPipe,
   RwIssueService,
   RwPolicyService,
   TimeLog,
 } from '@renwu/core';
+import { JSONUtils } from '@renwu/utils';
 import {
   distinctUntilChanged,
   firstValueFrom,
@@ -30,7 +34,9 @@ import {
   of,
   startWith,
   switchMap,
+  take,
 } from 'rxjs';
+import { TaskTimeLogsEditorComponent } from './time-logs-editor.component';
 
 @Component({
   selector: 'renwu-task-time-log',
@@ -42,6 +48,7 @@ import {
     RwDatePipe,
     RwDurationToStringPipe,
     RwFormatUserPipe,
+    RwIconComponent,
     RwTextAreaComponent,
     RwTimePickerComponent,
     TranslocoPipe,
@@ -60,6 +67,7 @@ export class TimeLogComponent {
   cd = inject(ChangeDetectorRef);
   fb = inject(FormBuilder);
   policyService = inject(RwPolicyService);
+  modalService = inject(RwModalService);
 
   isNewIssue = this.issueService.newIssue;
 
@@ -126,6 +134,35 @@ export class TimeLogComponent {
       };
     }),
   );
+
+  openTimeLogsEditor(): void {
+    const raw = this.issueService.issueForm.getRawValue();
+    if (raw.id === 'new' || !raw.id) {
+      return;
+    }
+    const prev = JSONUtils.jsonClone(raw) as Issue;
+    const logs = JSONUtils.jsonClone(raw.time_logs ?? []) as TimeLog[];
+    const modal = this.modalService.add(TaskTimeLogsEditorComponent, {
+      logs,
+      issueId: String(raw.id),
+    });
+    modal.save.pipe(take(1)).subscribe(() => {
+      const next = { ...prev, time_logs: logs } as Issue;
+      this.issueService.save(prev, next).subscribe({
+        next: () => {
+          this.issueService.patchIssue({ time_logs: logs }, { emitEvent: true });
+          this.modalService.close();
+          this.issueService.setPrevState();
+          this.cd.markForCheck();
+        },
+        error: () => {
+          this.toastService.error(
+            this.transloco.translate('task.time-log-error'),
+          );
+        },
+      });
+    });
+  }
 
   async addLog(): Promise<void> {
     const raw = this.issueService.issueForm.getRawValue();

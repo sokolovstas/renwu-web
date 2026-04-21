@@ -1,19 +1,32 @@
 @let isNew = isNewIssue | async;
 @let gate = timeLogSection$ | async;
+@let logs = timeLogs$ | async;
 <div class="mt-4 mx-2">
   <div class="font-extralight text-2xl mb-2">{{ 'task.timelog' | transloco }}</div>
   @if (isNew) {
     <p class="text-sm opacity-70 mb-2">{{ 'task.time-log-save-first' | transloco }}</p>
   }
   @if (summary$ | async; as sum) {
-    <div class="text-sm opacity-80 mb-3 px-1 flex flex-wrap gap-x-4 gap-y-1">
-      <span>{{ 'task.time-log-total' | transloco }}:
-        {{
-          sum.time_logged
-            ? (sum.time_logged | rwDurationToString: ['hours'])
-            : '-'
-        }}</span>
-      <span>{{ 'task.time-log-completion' | transloco }}: {{ sum.completion }}%</span>
+    <div
+      class="text-sm opacity-80 mb-3 px-1 flex flex-row flex-wrap items-center justify-between gap-2"
+      >
+      <div class="flex flex-wrap gap-x-4 gap-y-1">
+        <span>{{ 'task.time-log-total' | transloco }}:
+          {{
+            sum.time_logged
+              ? (sum.time_logged | rwDurationToString: ['hours'])
+              : '-'
+          }}</span>
+        <span>{{ 'task.time-log-completion' | transloco }}: {{ sum.completion }}%</span>
+      </div>
+      @if (isNew === false && logs && logs.length > 0) {
+        <rw-icon class="opacity-70 hover:opacity-100 shrink-0"
+          icon="pen"
+          size="normal"
+          cursor="pointer"
+          (click)="openTimeLogsEditor()"
+         />
+      }
     </div>
   }
   @if (isNew === false && gate?.haveChilds) {
@@ -36,7 +49,7 @@
     </form>
   }
   <div class="flex flex-col gap-2 px-1 text-sm max-h-80 overflow-y-auto">
-    @for (log of timeLogs$ | async; track $index) {
+    @for (log of logs ?? []; track $index) {
       <div class="border-b border-gray-100 pb-2 flex flex-col gap-1">
         <div class="flex flex-row justify-between gap-2">
           <span class="font-medium">{{

@@ -1,0 +1,54 @@
+<rw-modal>
+  <div rwModalHeader>
+    <span>{{ 'task.time-log-editor-title' | transloco }}</span>
+  </div>
+  <div rwModalBody>
+    <div class="container">
+      <div class="sorttable-table">
+        <div class="sorttable-body-scroll">
+          @for (tlog of logs; track $index) {
+          <div class="sorttable-row sorttable-row-hover">
+            <div class="sorttable-column-20">
+              <rw-time-picker
+                [max]="300 * 60 * 60"
+                [disabled]="!canEdit(tlog)"
+                [class.disabled]="!canEdit(tlog)"
+                [(ngModel)]="tlog.value"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+            <div class="sorttable-column-80 sorttable-column">
+              <div>
+                <small>
+                  <span>{{ tlog.author | rwFormatUser: true }}</span>
+                  <span [title]="tlog.date_created | rwDate: 'PPp'">
+                    ({{
+                      tlog.date_created
+                        | rwDate: (settingsService.user?.relativeDateFormat ?? 'PPp')
+                    }})
+                  </span>
+                </small>
+              </div>
+
+              <rw-text-input
+                [disabled]="!canEdit(tlog)"
+                [(ngModel)]="tlog.comment"
+                [multiline]="true"
+              />
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <div rwModalFooter>
+    @if (!hideTooltip) {
+      <small class="hint">{{ 'task.time-log-editor-hint' | transloco }}</small>
+    }
+    <div class="flex-spacer"></div>
+    <rw-button (clicked)="onSave()" [tabindex]="100">{{
+      'task.time-log-editor-save' | transloco
+    }}</rw-button>
+  </div>
+</rw-modal>

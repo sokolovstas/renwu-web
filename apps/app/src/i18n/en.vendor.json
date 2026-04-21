@@ -166,6 +166,9 @@
     "time-log-duration-required": "Enter a duration greater than zero.",
     "time-log-duration-too-long": "Duration cannot exceed 300 hours.",
     "time-log-error": "Could not log time. Please try again.",
+    "time-log-editor-title": "Time logs",
+    "time-log-editor-hint": "You can edit only your records for the last 24 hours.",
+    "time-log-editor-save": "Save",
     "history-save-first": "Save the task first to view history.",
     "history-empty": "No history entries"
   }
