@@ -10,16 +10,20 @@ import {
   RwAlertService,
   RwButtonComponent,
   RwDatePipe,
+  RwIconComponent,
   RwToastService,
 } from '@renwu/components';
 import {
   Attachment,
   AttachmentComponent,
   FileUpload,
+  RW_CORE_SETTINGS,
+  RwCoreSettings,
   RwDataService,
   RwIssueService,
   RwPolicyService,
 } from '@renwu/core';
+import { FileUtils } from '@renwu/utils';
 import {
   distinctUntilChanged,
   firstValueFrom,
@@ -29,6 +33,18 @@ import {
   switchMap,
 } from 'rxjs';
 
+export interface TaskUiAttachment extends Attachment {
+  openHref: string;
+  downloadHref: string;
+  isImage: boolean;
+}
+
+export interface TaskAttachmentView {
+  images: TaskUiAttachment[];
+  others: TaskUiAttachment[];
+  hasAny: boolean;
+}
+
 @Component({
   selector: 'renwu-task-attachments',
   standalone: true,
@@ -37,6 +53,7 @@ import {
     AttachmentComponent,
     RwButtonComponent,
     RwDatePipe,
+    RwIconComponent,
     TranslocoPipe,
   ],
   templateUrl: './attachments.component.html',
@@ -51,8 +68,12 @@ export class AttachmentsComponent {
   cd = inject(ChangeDetectorRef);
   alertService = inject(RwAlertService);
   policyService = inject(RwPolicyService);
+  private readonly settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
 
   isNewIssue = this.issueService.newIssue;
+
+  /** Legacy-style expand/collapse for the attachment list. */
+  listExpanded = true;
 
   canEdit$ = merge(
     this.issueService.issue,
@@ -72,15 +93,58 @@ export class AttachmentsComponent {
     switchMap(({ id, cid }) => this.policyService.canEditIssue(id, cid)),
   );
 
-  attachments$ = merge(
+  attachmentView$ = merge(
     this.issueService.issue,
     this.issueService.issueForm.controls.attachments.valueChanges,
   ).pipe(
-    map(
-      () => this.issueService.issueForm.getRawValue().attachments ?? [],
-    ),
-    startWith(this.issueService.issueForm.getRawValue().attachments ?? []),
+    map(() => this.buildAttachmentView()),
+    startWith(this.buildAttachmentView()),
   );
+
+  toggleList(): void {
+    this.listExpanded = !this.listExpanded;
+    this.cd.markForCheck();
+  }
+
+  private buildAttachmentView(): TaskAttachmentView {
+    const raw = this.issueService.issueForm.getRawValue();
+    const list = raw.attachments ?? [];
+    const issueId =
+      raw.id && raw.id !== 'new' ? String(raw.id) : null;
+    const images: TaskUiAttachment[] = [];
+    const others: TaskUiAttachment[] = [];
+    for (const att of list) {
+      const ui = this.mapAttachment(att, issueId);
+      if (ui.isImage) {
+        images.push(ui);
+      } else {
+        others.push(ui);
+      }
+    }
+    return { images, others, hasAny: list.length > 0 };
+  }
+
+  private mapAttachment(
+    att: Attachment,
+    issueId: string | null,
+  ): TaskUiAttachment {
+    const url = att.url ?? '';
+    const mediaBase = (this.settings.mediaUrl ?? '').replace(/\/$/, '');
+    const openHref =
+      url.includes('://') || !mediaBase
+        ? url
+        : `${mediaBase}/${url.replace(/^\//, '')}`;
+    const downloadHref =
+      issueId && att.id
+        ? `${this.settings.rootApiUrl}/issue/${issueId}/attachment/${att.id}?filename=${encodeURIComponent(att.file_name)}`
+        : openHref;
+    return {
+      ...att,
+      openHref,
+      downloadHref,
+      isImage: FileUtils.testImageExtension(att.file_name),
+    };
+  }
 
   async onFileUploaded(file: FileUpload): Promise<void> {
     if (!file.__loaded) {
@@ -111,6 +175,7 @@ export class AttachmentsComponent {
         { emitEvent: true },
       );
       this.issueService.setPrevState();
+      this.listExpanded = true;
     } catch {
       this.toastService.error(
         this.transloco.translate('task.attachments-mutation-error'),

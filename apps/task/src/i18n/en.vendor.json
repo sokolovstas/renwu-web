@@ -153,6 +153,7 @@
     "attachments-delete-title": "Delete attachment?",
     "attachments-delete-message": "Remove \"{{file}}\" from this task?",
     "attachments-mutation-error": "Could not update attachments. Please try again.",
+    "attachments-download": "Download",
     "time-log-save-first": "Save the task first to log time.",
     "time-log-total": "Logged",
     "time-log-completion": "Completion",

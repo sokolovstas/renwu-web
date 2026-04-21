@@ -134,6 +134,7 @@
     "attachments-delete-title": "删除附件？",
     "attachments-delete-message": "从该任务中移除「{{file}}」？",
     "attachments-mutation-error": "无法更新附件，请重试。",
+    "attachments-download": "下载",
     "time-log-save-first": "请先保存任务后再记录工时。",
     "time-log-total": "已记录",
     "time-log-completion": "完成度",

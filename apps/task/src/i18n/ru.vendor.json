@@ -153,6 +153,7 @@
     "attachments-delete-title": "Удалить вложение?",
     "attachments-delete-message": "Удалить «{{file}}» из этой задачи?",
     "attachments-mutation-error": "Не удалось обновить вложения. Попробуйте снова.",
+    "attachments-download": "Скачать",
     "time-log-save-first": "Сохраните задачу, чтобы списывать время.",
     "time-log-total": "Списано",
     "time-log-completion": "Готовность",

@@ -123,8 +123,8 @@ Behavior observed in legacy implementation:
   - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink
   - pending: add child / decomposite parity, richer row fields (milestones/estimate/skill)
 - `attachments`: in progress
-  - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts
-  - pending: image/file grouping, markdown/post-to-messages, image viewer parity
+  - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts, image vs file grouping, collapsible list, explicit download link
+  - pending: markdown/post-to-messages, image viewer parity
 - `time-log`: in progress
   - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling
   - pending: log editor parity, elapsed-time prompt parity, status-coupled completion edge cases
