@@ -114,6 +114,32 @@ Behavior observed in legacy implementation:
 
 ## Iterative Delivery Plan
 
+## Migration Board (Live)
+
+- `related`: in progress
+  - done: add/remove logic, duplicate/self/not-found guards, permission gate, unlink confirm, status badge
+  - pending: regression tests for confirm + permission scenarios
+- `sub-task`: in progress
+  - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink
+  - pending: add child / decomposite parity, richer row fields (milestones/estimate/skill)
+- `attachments`: in progress
+  - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts
+  - pending: image/file grouping, markdown/post-to-messages, image viewer parity
+- `time-log`: in progress
+  - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling
+  - pending: log editor parity, elapsed-time prompt parity, status-coupled completion edge cases
+- `history`: in progress
+  - done: fetch + sort + fallback, inline rendering, event normalization for id/source parity
+  - pending: focused tests for payload variants (`id`/`_id`) and ordering
+
+## Definition of Done (Per Section)
+
+- UI labels resolved in host shell (`apps/app` i18n) and remote app (`apps/task` i18n).
+- New issue guard + permission gate on mutating actions.
+- Backend failures handled without section crash.
+- Section spec covers happy path + key guard/error states.
+- No lint errors in touched files.
+
 ### Phase 0 - Baseline (this commit)
 
 - Add migration requirements and phased checklist.
