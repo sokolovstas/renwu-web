@@ -23,7 +23,7 @@ import {
   RwIssueService,
   RwPolicyService,
 } from '@renwu/core';
-import { FileUtils } from '@renwu/utils';
+import { testImageExtension } from '@renwu/utils';
 import {
   distinctUntilChanged,
   firstValueFrom,
@@ -142,7 +142,7 @@ export class AttachmentsComponent {
       ...att,
       openHref,
       downloadHref,
-      isImage: FileUtils.testImageExtension(att.file_name),
+      isImage: testImageExtension(att.file_name),
     };
   }
 
@@ -185,7 +185,7 @@ export class AttachmentsComponent {
   }
 
   async remove(att: Attachment): Promise<void> {
-    const { id, container } = this.issueService.issueForm.getRawValue();
+    const { id, key, container } = this.issueService.issueForm.getRawValue();
     if (id === 'new' || !id) {
       return;
     }

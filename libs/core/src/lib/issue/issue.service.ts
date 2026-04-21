@@ -3,6 +3,7 @@ import { RwAlertService, RwToastService } from '@renwu/components';
 import { getUnixTime, parseISO } from 'date-fns';
 import {
   BehaviorSubject,
+  Observable,
   Subject,
   firstValueFrom,
   from,
@@ -13,6 +14,7 @@ import {
 import {
   catchError,
   debounceTime,
+  distinctUntilChanged,
   filter,
   map,
   repeat,
@@ -45,7 +47,7 @@ import {
 import { UserD } from '../user/user.model';
 import { RwUserService } from '../user/user.service';
 import { RwWebsocketService } from '../websocket/websocket.service';
-import { Issue } from './issue.model';
+import { Attachment, Issue, IssueLinks, TimeLog } from './issue.model';
 
 @Injectable({ providedIn: 'root' })
 export class RwIssueService implements OnDestroy {
@@ -91,6 +93,20 @@ export class RwIssueService implements OnDestroy {
     estimated_time: new FormControl(4 * 60 * 60, {
       validators: [Validators.required, Validators.min(1)],
     }),
+    links: new FormControl<IssueLinks>(
+      {
+        parent: [],
+        related: [],
+        prev_issue: [],
+        next_issue: [],
+      },
+      { nonNullable: true },
+    ),
+    attachments: new FormControl<Attachment[]>([], { nonNullable: true }),
+    time_logs: new FormControl<TimeLog[]>([], { nonNullable: true }),
+    time_logged: new FormControl<number>(0, { nonNullable: true }),
+    completion: new FormControl<number>(0, { nonNullable: true }),
+    have_childs: new FormControl<boolean>(false, { nonNullable: true }),
   });
 
   private template = new Subject<Issue>();
@@ -132,6 +148,16 @@ export class RwIssueService implements OnDestroy {
     this.issue,
     this.issueForm.valueChanges.pipe(map(() => this.issueForm.getRawValue())),
   ).pipe(map((t) => t.fav_users?.includes(this.userService.getId())));
+
+  /** Current user is listed in `watchers` (also updated after watch/unwatch API). */
+  watchingSelf = merge(
+    this.issue,
+    this.issueForm.valueChanges.pipe(map(() => this.issueForm.getRawValue())),
+  ).pipe(
+    map(() => this.isCurrentUserWatching()),
+    distinctUntilChanged(),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
 
   newIssue = this.issue.pipe(map((p) => p.id === 'new'));
 
@@ -216,10 +242,16 @@ export class RwIssueService implements OnDestroy {
           parent: [],
           next_issue: [],
           prev_issue: [],
+          related: [],
         };
+      } else {
+        issue.links = this.normalizeIssueLinks(issue.links);
       }
       issue.title = issue.title || '';
       issue.attachments = [];
+      issue.time_logs = [];
+      issue.time_logged = issue.time_logged ?? 0;
+      issue.have_childs = issue.have_childs ?? false;
       issue.assignes_calc = [];
       issue.watchers = [];
       issue.completion = 0;
@@ -237,7 +269,9 @@ export class RwIssueService implements OnDestroy {
     another.keys = null;
     another.description = '';
     another.watchers = null;
-    another.attachments = null;
+    another.attachments = [];
+    another.time_logs = [];
+    another.have_childs = false;
     another.fav_users = [];
     another.todos = [];
     if (another.links) {
@@ -300,7 +334,8 @@ export class RwIssueService implements OnDestroy {
           this.toastService.success(
             this.transloco.translate('core.issue-saved-successfully'),
           );
-          return this.setPrevState();
+          this.setPrevState();
+          return issue;
         }),
       );
     }
@@ -385,6 +420,51 @@ export class RwIssueService implements OnDestroy {
         .pipe(tap(() => this.issueForm.patchValue({ fav_users: favUsers })));
     }
   }
+
+  private isCurrentUserWatching(): boolean {
+    const uid = String(this.userService.getId());
+    const list = this.issueForm.getRawValue().watchers ?? [];
+    return list.some((w) => String(w?.id ?? '') === uid);
+  }
+
+  /** Subscribe to add/remove current user as watcher via `/issue/:id/watch`. */
+  setWatchingSelf(watch: boolean): Observable<Issue | null> {
+    const raw = this.issueForm.getRawValue();
+    if (raw.id === 'new' || !raw.id) {
+      this.toastService.info(
+        this.transloco.translate('task.watch-save-first'),
+      );
+      return of(null);
+    }
+    const id = String(raw.id);
+    const key = raw.key || id;
+    const reloadWatchers = (call: Observable<unknown>) =>
+      call.pipe(
+        switchMap(() => this.dataService.getIssue(key)),
+        tap((issue) => {
+          this.patchIssue(
+            { watchers: issue.watchers ?? [] },
+            { emitEvent: true },
+          );
+          this.setPrevState();
+        }),
+        catchError(() => {
+          this.toastService.error(
+            this.transloco.translate('core.failed-to-save-issue'),
+          );
+          return of(null);
+        }),
+      );
+    if (watch) {
+      return reloadWatchers(this.dataService.addInIssueWatchers(id));
+    }
+    return reloadWatchers(this.dataService.removeFromIssueWatchers(id));
+  }
+
+  toggleWatchingSelf(): Observable<Issue | null> {
+    return this.setWatchingSelf(!this.isCurrentUserWatching());
+  }
+
   // toggleTimeLogger(issue: Issue, newStatus?: Status): Observable<boolean> {
   //   return of(true);
   //   const timelog: TimelogComponent = this.modalService.add(
@@ -540,6 +620,15 @@ export class RwIssueService implements OnDestroy {
   setPrevState() {
     this.prevValue.next(this.issueForm.getRawValue());
   }
+  private normalizeIssueLinks(links: IssueLinks | null | undefined): IssueLinks {
+    return {
+      parent: links?.parent ?? [],
+      related: links?.related ?? [],
+      prev_issue: links?.prev_issue ?? [],
+      next_issue: links?.next_issue ?? [],
+    };
+  }
+
   patchIssue(
     issue: Issue,
     params: { emitEvent?: boolean; reset?: boolean } = {
@@ -550,9 +639,18 @@ export class RwIssueService implements OnDestroy {
     const fb = new FormBuilder();
     if (params.reset) {
       issue.todos = issue.todos || [];
+      issue.links = this.normalizeIssueLinks(issue.links);
+      issue.attachments = issue.attachments ?? [];
+      issue.time_logs = issue.time_logs ?? [];
+      issue.time_logged = issue.time_logged ?? 0;
+      issue.completion = issue.completion ?? 0;
       this.issueForm.reset(issue, { emitEvent: params.emitEvent });
     } else {
-      this.issueForm.patchValue(issue, { emitEvent: params.emitEvent });
+      const patch: Issue = { ...issue };
+      if (issue.links !== undefined) {
+        patch.links = this.normalizeIssueLinks(issue.links);
+      }
+      this.issueForm.patchValue(patch, { emitEvent: params.emitEvent });
     }
     if (issue.todos) {
       this.issueForm.controls.todos.clear();

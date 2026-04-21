@@ -27,6 +27,7 @@ import {
 } from '@renwu/core';
 import { JSONUtils } from '@renwu/utils';
 import {
+  Observable,
   distinctUntilChanged,
   firstValueFrom,
   map,
@@ -148,7 +149,7 @@ export class TimeLogComponent {
     });
     modal.save.pipe(take(1)).subscribe(() => {
       const next = { ...prev, time_logs: logs } as Issue;
-      this.issueService.save(prev, next).subscribe({
+      (this.issueService.save(prev, next) as Observable<Issue | null>).subscribe({
         next: () => {
           this.issueService.patchIssue({ time_logs: logs }, { emitEvent: true });
           this.modalService.close();
