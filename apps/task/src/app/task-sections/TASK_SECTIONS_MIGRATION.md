@@ -129,8 +129,8 @@ Behavior observed in legacy implementation:
   - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling, modal editor for existing logs (24h / admin rules, save + patch + prev state)
   - pending: elapsed-time prompt parity, status-coupled completion edge cases
 - `history`: in progress
-  - done: fetch + sort + fallback, inline rendering, event normalization for id/source parity
-  - pending: focused tests for payload variants (`id`/`_id`) and ordering
+  - done: fetch + sort + fallback, inline rendering, event normalization for id/source parity, unit tests for `_id`→`id`, source strip, and descending sort
+  - pending: component-level integration spec with mocked `getIssueEvents`
 
 ## Definition of Done (Per Section)
 

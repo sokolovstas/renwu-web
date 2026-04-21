@@ -9,14 +9,7 @@ import {
 } from '@renwu/core';
 import { catchError, map, of, switchMap } from 'rxjs';
 
-function normalizeTaskHistoryEvent(ev: IssueChangeEvent): IssueChangeEvent {
-  const e = { ...ev } as Record<string, unknown>;
-  if (e['id'] == null && e['_id'] != null) {
-    e['id'] = String(e['_id']);
-  }
-  e['source'] = undefined;
-  return e as unknown as IssueChangeEvent;
-}
+import { sortHistoryEventsNewestFirst } from './history.utils';
 
 @Component({
   selector: 'renwu-task-history',
@@ -39,14 +32,7 @@ export class HistoryComponent {
       }
       return this.dataService.getIssueEvents(String(issue.id)).pipe(
         catchError(() => of([] as IssueChangeEvent[])),
-        map((events) =>
-          [...events]
-            .map(normalizeTaskHistoryEvent)
-            .sort(
-              (a, b) =>
-                new Date(b.date).getTime() - new Date(a.date).getTime(),
-            ),
-        ),
+        map((events) => sortHistoryEventsNewestFirst(events)),
       );
     }),
   );
