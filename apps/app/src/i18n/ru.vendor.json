@@ -149,6 +149,8 @@
     "related-unlink-message": "Убрать связь с {{key}}?",
     "related-empty": "Нет связанных задач",
     "subtask-save-first": "Сохраните задачу, чтобы загрузить подзадачи.",
+    "subtask-add": "Добавить подзадачу",
+    "subtask-add-no-container": "Укажите проект у этой задачи, чтобы добавить подзадачу.",
     "subtask-unlink-title": "Отвязать подзадачу?",
     "subtask-unlink-message": "Убрать связь родителя с {{key}}?",
     "subtask-mutation-error": "Не удалось обновить подзадачи. Попробуйте снова.",

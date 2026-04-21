@@ -121,8 +121,8 @@ Behavior observed in legacy implementation:
   - done: add/remove logic, duplicate/self/not-found guards, permission gate, unlink confirm, status badge, Jest coverage for save-first / no-edit / duplicate / self / not-found / success add, confirm dismiss/accept on remove (`related.component.spec.ts`)
   - pending: shallow DOM / `IssueHref` integration if product wants template-level assertions
 - `sub-task`: in progress
-  - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink, Jest coverage for new-issue guard (no fetch), persisted load, `getChildIssues` error → empty list, unlink early exits / confirm / success + `patchIssue`+`setPrevState`+reload, save failure toast (`sub-task.component.spec.ts`)
-  - pending: add child / decomposite parity, richer row fields (milestones/estimate/skill)
+  - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink, **add subtask** (icon opens shell `task/new` + `RwIssueService.updateFromTemplate` with `links.parent` from current issue; toast if no `container`), i18n `task.subtask-add` / `task.subtask-add-no-container` in task + app vendors, Jest for addChild + existing unlink/load specs (`sub-task.component.spec.ts`)
+  - pending: decomposite flow parity (if still used in product), richer row fields (milestones/estimate/skill)
 - `attachments`: in progress
   - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts, image vs file grouping, collapsible list, explicit download link
   - pending: markdown/post-to-messages, image viewer parity
@@ -152,6 +152,7 @@ Behavior observed in legacy implementation:
 - Validate duplicate/self key checks and success flow.
 - Add/adjust tests for add/remove and empty state rendering.
 - Sub-task: regression tests for list load (new vs persisted), API error fallback to empty child list, and unlink flow (policy, confirm, success, mutation error).
+- Sub-task: **Add subtask** action (shell navigation + `updateFromTemplate` parent link); tests for no-container toast, policy gate, and template payload.
 - **Jest note:** `@jsverse/transloco` ships ESM that Jest does not transform by default; component specs that pull `TranslocoPipe` should `jest.mock('@jsverse/transloco', …)` using the standalone stubs in `apps/task/src/testing/transloco-stub.ts` (see `related.component.spec.ts`, `sub-task.component.spec.ts`).
 
 ### Phase 2 - Attachments parity

@@ -7,8 +7,9 @@ jest.mock('@jsverse/transloco', () => {
 });
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { RwAlertService, RwToastService } from '@renwu/components';
 import {
@@ -33,11 +34,18 @@ function emptyChilds(): IssueChilds {
 }
 
 function createIssueForm(issue: Issue): FormGroup {
+  const defaultContainer = { id: 'c1', key: 'c', title: 'C', archived: false };
+  const containerValue = Object.prototype.hasOwnProperty.call(
+    issue,
+    'container',
+  )
+    ? (issue.container ?? null)
+    : defaultContainer;
   return new FormGroup({
     id: new FormControl<string>(String(issue.id ?? 'new')),
     key: new FormControl<string>(String(issue.key ?? 'new')),
-    container: new FormControl<{ id: string } | null>(
-      issue.container ?? { id: 'c1' },
+    container: new FormControl<{ id: string; key?: string; title?: string; archived?: boolean } | null>(
+      containerValue,
     ),
   });
 }
@@ -98,17 +106,25 @@ describe('SubTaskComponent', () => {
         .fn()
         .mockReturnValue(options?.confirm$ ?? of({ affirmative: true })),
     };
-    toastService = { error: jest.fn() };
+    toastService = { error: jest.fn(), info: jest.fn() };
+    updateFromTemplate = jest.fn();
+    routerNavigate = jest.fn().mockResolvedValue(true);
 
     const issueService: Pick<
       RwIssueService,
-      'newIssue' | 'issue' | 'issueForm' | 'patchIssue' | 'setPrevState'
+      | 'newIssue'
+      | 'issue'
+      | 'issueForm'
+      | 'patchIssue'
+      | 'setPrevState'
+      | 'updateFromTemplate'
     > = {
       newIssue: issue$.pipe(map((p) => p.id === 'new')),
       issue: issue$.asObservable(),
       issueForm,
       patchIssue,
       setPrevState,
+      updateFromTemplate,
     };
 
     TestBed.configureTestingModule({
@@ -119,6 +135,7 @@ describe('SubTaskComponent', () => {
         { provide: RwPolicyService, useValue: policyService },
         { provide: RwAlertService, useValue: alertService },
         { provide: RwToastService, useValue: toastService },
+        { provide: Router, useValue: { navigate: routerNavigate } },
         { provide: TranslocoService, useValue: new TranslocoService() },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -156,6 +173,59 @@ describe('SubTaskComponent', () => {
     const data = await firstValueFrom(component.childData$.pipe(take(1)));
     expect(data.childs).toEqual([]);
     expect(dataService.getChildIssues).toHaveBeenCalledWith('7');
+  });
+
+  describe('addChild', () => {
+    it('shows toast when container is missing', async () => {
+      createComponent({ id: '1', key: 'P-1', container: null } as Issue);
+      await component.addChild();
+      expect(toastService.info).toHaveBeenCalledWith(
+        'task.subtask-add-no-container',
+      );
+      expect(routerNavigate).not.toHaveBeenCalled();
+    });
+
+    it('does not navigate when user cannot edit', async () => {
+      createComponent(
+        {
+          id: '1',
+          key: 'P-1',
+          container: { id: 'c1', key: 'k', title: 't', archived: false },
+        },
+        { policyReturns: false },
+      );
+      await component.addChild();
+      expect(routerNavigate).not.toHaveBeenCalled();
+    });
+
+    it('navigates to new task and applies parent link from template', async () => {
+      jest.useFakeTimers();
+      const container = {
+        id: 'cont-1',
+        key: 'CK',
+        title: 'Proj',
+        archived: false,
+      };
+      createComponent({
+        id: '1',
+        key: 'P-1',
+        container,
+        title: 'Parent title',
+        status: { id: 's1' } as Issue['status'],
+      });
+      await component.addChild();
+      expect(routerNavigate).toHaveBeenCalledWith([
+        { outlets: { section: ['task', 'new'] } },
+      ]);
+      expect(updateFromTemplate).not.toHaveBeenCalled();
+      jest.runAllTimers();
+      expect(updateFromTemplate).toHaveBeenCalledTimes(1);
+      const arg = updateFromTemplate.mock.calls[0][0] as Issue;
+      expect(arg.container).toEqual(container);
+      expect(arg.links?.parent?.[0].id).toBe('1');
+      expect(arg.links?.parent?.[0].key).toBe('P-1');
+      jest.useRealTimers();
+    });
   });
 
   describe('unlinkChild', () => {

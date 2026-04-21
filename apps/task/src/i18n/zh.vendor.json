@@ -128,6 +128,8 @@
     "related-unlink-message": "移除与 {{key}} 的关联？",
     "related-empty": "无关联任务",
     "subtask-save-first": "请先保存任务以加载子任务。",
+    "subtask-add": "添加子任务",
+    "subtask-add-no-container": "请先为该任务选择项目，再添加子任务。",
     "subtask-unlink-title": "取消子任务关联？",
     "subtask-unlink-message": "移除与 {{key}} 的父级关联？",
     "subtask-mutation-error": "无法更新子任务，请重试。",

@@ -11,10 +11,13 @@ import {
   RwButtonComponent,
   RwToastService,
 } from '@renwu/components';
+import { Router } from '@angular/router';
 import {
   Issue,
   IssueChilds,
   IssueHrefComponent,
+  IssueLink,
+  IssueLinks,
   IssueStatusComponent,
   IssuesStatusBarComponent,
   RwDataService,
@@ -33,6 +36,18 @@ import {
   switchMap,
 } from 'rxjs';
 
+function parentIssueToLink(issue: Issue): IssueLink {
+  return {
+    id: String(issue.id),
+    title: issue.title ?? '',
+    key: issue.key ?? '',
+    have_childs: issue.have_childs ?? false,
+    date_start: issue.date_start ?? '',
+    date_end: issue.date_end ?? '',
+    status: issue.status as Issue['status'],
+  };
+}
+
 @Component({
   selector: 'renwu-task-sub-task',
   standalone: true,
@@ -48,8 +63,19 @@ import {
     @let isNew = isNewIssue | async;
     @let canEdit = canEdit$ | async;
     <div class="mt-4 mx-2">
-      <div class="font-extralight text-2xl mb-2">
-        {{ 'task.subtask' | transloco }}
+      <div
+        class="font-extralight text-2xl mb-2 flex flex-row flex-wrap items-center justify-between gap-2"
+        >
+        <span>{{ 'task.subtask' | transloco }}</span>
+        @if (isNew === false && canEdit) {
+          <rw-button
+            class="shrink-0 opacity-70 hover:opacity-100"
+            typeButton="icon"
+            iconClass="add-bold"
+            [title]="'task.subtask-add' | transloco"
+            (clicked)="addChild()"
+           />
+        }
       </div>
       @if (isNew) {
         <p class="text-sm opacity-70 mb-2">{{ 'task.subtask-save-first' | transloco }}</p>
@@ -115,6 +141,7 @@ export class SubTaskComponent {
   toastService = inject(RwToastService);
   transloco = inject(TranslocoService);
   cd = inject(ChangeDetectorRef);
+  router = inject(Router);
 
   private readonly reloadChilds$ = new Subject<void>();
 
@@ -161,6 +188,43 @@ export class SubTaskComponent {
 
   hasProgress(data: IssueChilds): boolean {
     return (data.childs_total ?? 0) > 0;
+  }
+
+  /** Opens a new task in the shell with this issue as `links.parent` (same pattern as milestone “add task”). */
+  async addChild(): Promise<void> {
+    const parent = this.issueService.issueForm.getRawValue();
+    if (!parent.id || parent.id === 'new') {
+      return;
+    }
+    if (!parent.container?.id) {
+      this.toastService.info(
+        this.transloco.translate('task.subtask-add-no-container'),
+      );
+      return;
+    }
+    const canEdit = await firstValueFrom(
+      this.policyService.canEditIssue(
+        String(parent.id),
+        String(parent.container.id),
+      ),
+    );
+    if (!canEdit) {
+      return;
+    }
+    const parentLink = parentIssueToLink(parent as Issue);
+    const links: IssueLinks = {
+      parent: [parentLink],
+      related: [],
+      prev_issue: [],
+      next_issue: [],
+    };
+    await this.router.navigate([{ outlets: { section: ['task', 'new'] } }]);
+    setTimeout(() => {
+      this.issueService.updateFromTemplate({
+        container: parent.container,
+        links,
+      });
+    });
   }
 
   async unlinkChild(child: Issue): Promise<void> {

@@ -148,6 +148,8 @@
     "related-unlink-message": "Remove link to {{key}}?",
     "related-empty": "No related issues",
     "subtask-save-first": "Save the task first to load subtasks.",
+    "subtask-add": "Add subtask",
+    "subtask-add-no-container": "Set a project on this task before adding a subtask.",
     "subtask-unlink-title": "Unlink subtask?",
     "subtask-unlink-message": "Remove parent link for {{key}}?",
     "subtask-mutation-error": "Could not update subtasks. Please try again.",
