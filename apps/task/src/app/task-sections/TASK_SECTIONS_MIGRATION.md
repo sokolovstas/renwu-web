@@ -13,7 +13,7 @@ Migrate and complete behavior for:
 Related i18n keys:
 
 - `task.related`, `task.related-add-placeholder`, `task.related-empty`
-- `task.subtask`, `task.subtask-empty`
+- `task.subtask`, `task.subtask-empty`, `task.subtask-decomposite`, `task.subtask-decomposite-*` (modal)
 - `task.attachments`, `task.attachments-empty`
 - `task.timelog`, `task.time-log-total`, `task.time-log-completion`, `task.time-log-duration`, `task.time-log-comment`, `task.time-log-empty`
 - `task.history`, `task.history-empty`
@@ -50,6 +50,7 @@ Behavior observed in legacy implementation:
    - Includes progress/status visualization (`IssueStatusBar`) when children exist.
    - Remove child-parent link is confirm-based and persisted through save calls.
    - Empty list has no explicit text placeholder in legacy UI.
+   - Legacy **Decomposite** modal (`apps/old/.../decomposite`) creates multiple children in one flow from titles, cloning optional to-dos/description from the parent.
 
 3. **Attachments**
    - Upload is available only for editable issues.
@@ -111,6 +112,7 @@ Behavior observed in legacy implementation:
 8. **Documented Deviations from Legacy (Intentional)**
    - New Task UI uses inline sections instead of legacy modal-centric UX for time log/history.
    - New Task UI introduces explicit empty placeholders where legacy sections were silent.
+   - Decomposite is opened from the Subtasks section toolbar (list icon) rather than only from legacy issue chrome; per-row project/skill pickers remain omitted (legacy UI had those selects commented out).
    - Complex legacy attachment utilities (post to messages, markdown copy, image viewer) are treated as optional parity extensions and can ship in follow-up phases.
 
 ## Iterative Delivery Plan
@@ -121,8 +123,8 @@ Behavior observed in legacy implementation:
   - done: add/remove logic, duplicate/self/not-found guards, permission gate, unlink confirm, status badge, Jest coverage for save-first / no-edit / duplicate / self / not-found / success add, confirm dismiss/accept on remove (`related.component.spec.ts`)
   - pending: shallow DOM / `IssueHref` integration if product wants template-level assertions
 - `sub-task`: in progress
-  - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink, **add subtask** (icon opens shell `task/new` + `RwIssueService.updateFromTemplate` with `links.parent` from current issue; toast if no `container`), i18n `task.subtask-add` / `task.subtask-add-no-container` in task + app vendors, Jest for addChild + existing unlink/load specs (`sub-task.component.spec.ts`)
-  - pending: decomposite flow parity (if still used in product), richer row fields (milestones/estimate/skill)
+  - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink, **add subtask** (icon opens shell `task/new` + `RwIssueService.updateFromTemplate` with `links.parent` from current issue; toast if no `container`), **Decomposite** (list icon → `TaskDecompositeModalComponent`: template from `RwContainerService.getIssueTemplate`, sequential `RwDataService.addIssue`, optional clone to-dos/description, `afterCreate` refreshes parent + child list), shared `parentIssueToLink` helper, i18n `task.subtask-decomposite*` in task + app vendors, Jest for addChild + unlink/load (`sub-task.component.spec.ts`)
+  - pending: richer row fields (per-row project/skill like partially commented legacy), milestones on batch create
 - `attachments`: in progress
   - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts, image vs file grouping, collapsible list, explicit download link
   - pending: markdown/post-to-messages, image viewer parity

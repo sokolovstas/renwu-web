@@ -9,6 +9,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   RwAlertService,
   RwButtonComponent,
+  RwModalService,
   RwToastService,
 } from '@renwu/components';
 import { Router } from '@angular/router';
@@ -16,7 +17,6 @@ import {
   Issue,
   IssueChilds,
   IssueHrefComponent,
-  IssueLink,
   IssueLinks,
   IssueStatusComponent,
   IssuesStatusBarComponent,
@@ -36,17 +36,8 @@ import {
   switchMap,
 } from 'rxjs';
 
-function parentIssueToLink(issue: Issue): IssueLink {
-  return {
-    id: String(issue.id),
-    title: issue.title ?? '',
-    key: issue.key ?? '',
-    have_childs: issue.have_childs ?? false,
-    date_start: issue.date_start ?? '',
-    date_end: issue.date_end ?? '',
-    status: issue.status as Issue['status'],
-  };
-}
+import { parentIssueToLink } from './parent-issue-to-link';
+import { TaskDecompositeModalComponent } from './task-decomposite-modal.component';
 
 @Component({
   selector: 'renwu-task-sub-task',
@@ -68,13 +59,22 @@ function parentIssueToLink(issue: Issue): IssueLink {
         >
         <span>{{ 'task.subtask' | transloco }}</span>
         @if (isNew === false && canEdit) {
-          <rw-button
-            class="shrink-0 opacity-70 hover:opacity-100"
-            typeButton="icon"
-            iconClass="add-bold"
-            [title]="'task.subtask-add' | transloco"
-            (clicked)="addChild()"
-           />
+          <div class="flex flex-row gap-1 shrink-0">
+            <rw-button
+              class="opacity-70 hover:opacity-100"
+              typeButton="icon"
+              iconClass="add-bold"
+              [title]="'task.subtask-add' | transloco"
+              (clicked)="addChild()"
+            />
+            <rw-button
+              class="opacity-70 hover:opacity-100"
+              typeButton="icon"
+              iconClass="list"
+              [title]="'task.subtask-decomposite' | transloco"
+              (clicked)="openDecomposite()"
+            />
+          </div>
         }
       </div>
       @if (isNew) {
@@ -142,6 +142,7 @@ export class SubTaskComponent {
   transloco = inject(TranslocoService);
   cd = inject(ChangeDetectorRef);
   router = inject(Router);
+  modalService = inject(RwModalService);
 
   private readonly reloadChilds$ = new Subject<void>();
 
@@ -190,6 +191,35 @@ export class SubTaskComponent {
     return (data.childs_total ?? 0) > 0;
   }
 
+  /** Opens modal to create several child issues from titles (legacy “Decomposite”). */
+  async openDecomposite(): Promise<void> {
+    const parent = this.issueService.issueForm.getRawValue();
+    if (!parent.id || parent.id === 'new') {
+      return;
+    }
+    if (!parent.container?.id) {
+      this.toastService.info(
+        this.transloco.translate('task.subtask-add-no-container'),
+      );
+      return;
+    }
+    const canEdit = await firstValueFrom(
+      this.policyService.canEditIssue(
+        String(parent.id),
+        String(parent.container.id),
+      ),
+    );
+    if (!canEdit) {
+      return;
+    }
+    this.modalService.add(TaskDecompositeModalComponent, {
+      issueParent: parent as Issue,
+      afterCreate: () => {
+        void this.refreshParentAndChildList();
+      },
+    });
+  }
+
   /** Opens a new task in the shell with this issue as `links.parent` (same pattern as milestone “add task”). */
   async addChild(): Promise<void> {
     const parent = this.issueService.issueForm.getRawValue();
@@ -211,7 +241,7 @@ export class SubTaskComponent {
     if (!canEdit) {
       return;
     }
-    const parentLink = parentIssueToLink(parent as Issue);
+    const parentLink = parentIssueToLink(parent);
     const links: IssueLinks = {
       parent: [parentLink],
       related: [],
@@ -274,6 +304,21 @@ export class SubTaskComponent {
           links,
         } as Issue),
       );
+      await this.refreshParentAndChildList();
+    } catch {
+      this.toastService.error(
+        this.transloco.translate('task.subtask-mutation-error'),
+      );
+    }
+    this.cd.markForCheck();
+  }
+
+  private async refreshParentAndChildList(): Promise<void> {
+    const parent = this.issueService.issueForm.getRawValue();
+    if (!parent.id || parent.id === 'new') {
+      return;
+    }
+    try {
       const freshParent = await firstValueFrom(
         this.dataService.getIssue(parent.key || String(parent.id)),
       );

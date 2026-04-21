@@ -11,7 +11,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
-import { RwAlertService, RwToastService } from '@renwu/components';
+import { RwAlertService, RwModalService, RwToastService } from '@renwu/components';
 import {
   Issue,
   IssueChilds,
@@ -22,6 +22,10 @@ import {
 import { BehaviorSubject, firstValueFrom, map, of, take, throwError } from 'rxjs';
 
 import { SubTaskComponent } from './sub-task.component';
+import { TaskDecompositeModalComponent } from './task-decomposite-modal.component';
+
+let updateFromTemplate: jest.Mock;
+let routerNavigate: jest.Mock;
 
 function emptyChilds(): IssueChilds {
   return {
@@ -57,10 +61,11 @@ describe('SubTaskComponent', () => {
   let dataService: { getChildIssues: jest.Mock; getIssue: jest.Mock; saveIssue: jest.Mock };
   let policyService: { canEditIssue: jest.Mock };
   let alertService: { confirm: jest.Mock };
-  let toastService: { error: jest.Mock };
+  let toastService: { error: jest.Mock; info: jest.Mock };
   let issueForm: FormGroup;
   let patchIssue: jest.Mock;
   let setPrevState: jest.Mock;
+  let modalService: { add: jest.Mock };
 
   const sampleChilds: IssueChilds = {
     childs: [
@@ -109,6 +114,9 @@ describe('SubTaskComponent', () => {
     toastService = { error: jest.fn(), info: jest.fn() };
     updateFromTemplate = jest.fn();
     routerNavigate = jest.fn().mockResolvedValue(true);
+    modalService = {
+      add: jest.fn().mockReturnValue({}),
+    };
 
     const issueService: Pick<
       RwIssueService,
@@ -136,6 +144,7 @@ describe('SubTaskComponent', () => {
         { provide: RwAlertService, useValue: alertService },
         { provide: RwToastService, useValue: toastService },
         { provide: Router, useValue: { navigate: routerNavigate } },
+        { provide: RwModalService, useValue: modalService },
         { provide: TranslocoService, useValue: new TranslocoService() },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -225,6 +234,47 @@ describe('SubTaskComponent', () => {
       expect(arg.links?.parent?.[0].id).toBe('1');
       expect(arg.links?.parent?.[0].key).toBe('P-1');
       jest.useRealTimers();
+    });
+  });
+
+  describe('openDecomposite', () => {
+    it('shows toast when container is missing', async () => {
+      createComponent({ id: '1', key: 'P-1', container: null } as Issue);
+      await component.openDecomposite();
+      expect(toastService.info).toHaveBeenCalledWith(
+        'task.subtask-add-no-container',
+      );
+      expect(modalService.add).not.toHaveBeenCalled();
+    });
+
+    it('does not open modal when user cannot edit', async () => {
+      createComponent(
+        {
+          id: '1',
+          key: 'P-1',
+          container: { id: 'c1', key: 'k', title: 't', archived: false },
+        },
+        { policyReturns: false },
+      );
+      await component.openDecomposite();
+      expect(modalService.add).not.toHaveBeenCalled();
+    });
+
+    it('opens decomposite modal with current issue', async () => {
+      const issue = {
+        id: '1',
+        key: 'P-1',
+        container: { id: 'c1', key: 'k', title: 't', archived: false },
+      } as Issue;
+      createComponent(issue);
+      await component.openDecomposite();
+      expect(modalService.add).toHaveBeenCalledWith(
+        TaskDecompositeModalComponent,
+        expect.objectContaining({
+          issueParent: issue,
+          afterCreate: expect.any(Function),
+        }),
+      );
     });
   });
 
