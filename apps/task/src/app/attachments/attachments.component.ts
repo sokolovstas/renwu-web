@@ -150,7 +150,7 @@ export class AttachmentsComponent {
     if (!file.__loaded) {
       return;
     }
-    const { id, key, container } = this.issueService.issueForm.getRawValue();
+    const { id, container } = this.issueService.issueForm.getRawValue();
     if (id === 'new' || !id) {
       this.toastService.info(
         this.transloco.translate('task.attachments-save-first'),
@@ -185,7 +185,7 @@ export class AttachmentsComponent {
   }
 
   async remove(att: Attachment): Promise<void> {
-    const { id, key, container } = this.issueService.issueForm.getRawValue();
+    const { id, container } = this.issueService.issueForm.getRawValue();
     if (id === 'new' || !id) {
       return;
     }
