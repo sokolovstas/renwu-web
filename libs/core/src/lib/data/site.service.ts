@@ -46,6 +46,18 @@ export class RwSiteDataService {
     }
   }
 
+  private redirectToLogin(): void {
+    const location = globalThis.location;
+    if (!location) {
+      return;
+    }
+    if (location.href.startsWith(this.settings.siteLoginUrl)) {
+      return;
+    }
+    const redirect = encodeURIComponent(location.href);
+    location.assign(`${this.settings.siteLoginUrl}?redirect=${redirect}`);
+  }
+
   catchHandler(
     err: HttpErrorResponse,
     loader: Loader,
@@ -57,8 +69,10 @@ export class RwSiteDataService {
     if (err.status === 401) {
       if (this.unauthHandler) {
         this.unauthHandler(err);
-        return throwError(err);
+      } else {
+        this.redirectToLogin();
       }
+      return throwError(err);
     } else {
       if (!err.url) {
         this.toastService.error($localize`core.no-connection`);

@@ -26,17 +26,28 @@ export class RwCoreSettings {
     this.updateURL();
   }
 
+  private isLocalHost(): boolean {
+    const h = this._root.toLowerCase();
+    return (
+      h.startsWith('localhost') ||
+      h.startsWith('127.0.0.1') ||
+      h.startsWith('[::1]')
+    );
+  }
+
   updateURL() {
-    this.siteLoginUrl = `https://${this._root}/login`;
-    this.siteInviteUrl = `https://${this._root}/accept-invite`;
-    this.siteBillingUrl = `https://${this._root}/profile`;
-    this.siteApiUrl = `https://${this._root}/api/v1`;
-    this.mediaUrl = `https://${this._root}/api/core/media`;
-    this.wsServerUrl = `wss://${this._root}/api/core/ws`;
-    this.rootApiUrl = `https://${this._root}/api/core/v1`;
-    this.publicApiUrl = `https://${this._root}/api/core/public/v1`;
-    this.wsMessagesApiUrl = `wss://${this._root}/api/messenger/ws`;
-    this.messagesApiUrl = `https://${this._root}/api/messenger/v1`;
+    const http = this.isLocalHost() ? 'http' : 'https';
+    const ws = this.isLocalHost() ? 'ws' : 'wss';
+    this.siteLoginUrl = `${http}://${this._root}/login`;
+    this.siteInviteUrl = `${http}://${this._root}/accept-invite`;
+    this.siteBillingUrl = `${http}://${this._root}/profile`;
+    this.siteApiUrl = `${http}://${this._root}/api/v1`;
+    this.mediaUrl = `${http}://${this._root}/api/core/media`;
+    this.wsServerUrl = `${ws}://${this._root}/api/core/ws`;
+    this.rootApiUrl = `${http}://${this._root}/api/core/v1`;
+    this.publicApiUrl = `${http}://${this._root}/api/core/public/v1`;
+    this.wsMessagesApiUrl = `${ws}://${this._root}/api/messenger/ws`;
+    this.messagesApiUrl = `${http}://${this._root}/api/messenger/v1`;
   }
 }
 
