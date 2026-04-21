@@ -1,0 +1,46 @@
+<div
+  class="rounded-lg border border-gray-200 bg-gray-50/80 p-3 text-sm dark:border-gray-600 dark:bg-gray-900/40"
+  >
+  <div class="mb-2 font-medium text-gray-700 dark:text-gray-200">
+    {{ 'task.layout-fields' | transloco }}
+  </div>
+  <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+    {{ 'task.layout-fields-hint' | transloco }}
+  </p>
+  @if (!visibility.getContainerId()) {
+    <p class="text-xs text-amber-700 dark:text-amber-300">
+      {{ 'task.layout-fields-no-project' | transloco }}
+    </p>
+  }
+  <div class="flex flex-col gap-2">
+    @for (key of formKeys; track key) {
+      <label class="flex cursor-pointer items-center gap-2">
+        <rw-checkbox
+          [disabled]="!visibility.getContainerId()"
+          [ngModel]="isVisible(key)"
+          (ngModelChange)="setVisible(key, $event)"
+         />
+        <span>{{ formFieldLabels[key] | transloco }}</span>
+      </label>
+    }
+    @for (el of sectionElements; track el) {
+      <label class="flex cursor-pointer items-center gap-2">
+        <rw-checkbox
+          [disabled]="!visibility.getContainerId()"
+          [ngModel]="isVisible(sectionFieldKey(el))"
+          (ngModelChange)="setVisible(sectionFieldKey(el), $event)"
+         />
+        <span>{{ 'task.layout-block' | transloco: { tag: el } }}</span>
+      </label>
+    }
+  </div>
+  <div class="mt-3 flex justify-end">
+    <rw-button
+      typeButton="secondary"
+      padding="0.25rem 0.75rem"
+      [disabled]="!visibility.getContainerId()"
+      (clicked)="restoreDefaults()"
+      >{{ 'task.layout-restore-defaults' | transloco }}</rw-button
+      >
+  </div>
+</div>

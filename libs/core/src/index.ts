@@ -54,6 +54,7 @@ export * from './lib/select/user';
 export * from './lib/settings-token';
 export * from './lib/settings/dictionary.model';
 export * from './lib/settings/settings.model';
+export * from './lib/settings/task-detail-layout.model';
 export * from './lib/settings/settings.service';
 export * from './lib/state/state.service';
 export * from './lib/status-bar/status-bar.component';

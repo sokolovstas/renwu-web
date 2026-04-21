@@ -17,5 +17,10 @@
   "comments": "task.comments",
   "create": "task.create",
   "create-and-add-another": "task.create-and-add-another",
-  "issue-%issue.key%-created-successfully": "task.issue-%issue.key%-created-successfully"
+  "issue-%issue.key%-created-successfully": "task.issue-%issue.key%-created-successfully",
+  "layout-fields": "任务字段",
+  "layout-fields-hint": "这些设置仅适用于所选项目；默认显示所有字段。",
+  "layout-fields-no-project": "请选择项目后再保存要显示的字段。",
+  "layout-restore-defaults": "显示全部字段",
+  "layout-block": "{{tag}}"
 }

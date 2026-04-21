@@ -1,6 +1,7 @@
 @if (issueService.issue | async) {
   @let isNew = issueService.newIssue | async;
   @let isFavorite = issueService.favorite | async;
+  @let watching = issueService.watchingSelf | async;
   <div class="w-full h-full overflow-x-hidden">
     <form
       [formGroup]="issueService.issueForm"
@@ -48,17 +49,52 @@
                    />
                 }
                 @if (isNew === false) {
+                  <button type="button"
+                    class="task-watch-btn"
+                    [class.task-watch-btn--active]="watching"
+                    [attr.aria-pressed]="watching"
+                    [rwTooltip]="
+                      watching
+                        ? ('task.watch-tooltip-off' | transloco)
+                        : ('task.watch-tooltip-on' | transloco)
+                    "
+                    tooltipPlacement="left"
+                    (click)="$event.stopPropagation(); toggleWatch()"
+                    >
+                    <rw-icon [icon]="watching ? 'pulse' : 'pulse-low'"
+                      size="small"
+                      cursor="pointer"
+                     />
+                    <span class="task-watch-btn__label">{{
+                      watching
+                      ? ('task.watching' | transloco)
+                      : ('task.watch' | transloco)
+                    }}</span>
+                  </button>
+                }
+                @if (isNew === false) {
                   <rw-button typeButton="icon"
                     (clicked)="remove()"
                     iconClass="trash"
                    />
                 }
                 <rw-button typeButton="icon"
+                  (clicked)="toggleFieldSettingsPanel()"
+                  iconClass="pen"
+                 />
+                <rw-button typeButton="icon"
                   (clicked)="close()"
                   iconClass="close"
                  />
               </div>
             </div>
+            @if (fieldSettingsOpen() && (sectionsConfig | async); as sectionCfg) {
+              <div class="w-full px-4 pb-2">
+                <renwu-task-detail-field-settings
+                  [sectionElements]="sectionElementTags(sectionCfg)"
+                 />
+              </div>
+            }
             @if (isNew === false) {
               <rw-text-input #title
                 [required]="true"
@@ -81,99 +117,124 @@
                   formControlName="title"
                  />
               }
-              <rw-select class=""
-                [required]="true"
-                modelName="Container"
-                formControlName="container"
-                prompt="{{ 'task.container' | transloco }}"
-               />
-              <rw-select class=""
-                [model]="milestoneSelectModel"
-                formControlName="milestones"
-                [tags]="true"
-                [closeOnSelect]="false"
-                [prompt]="'task.milestones' | transloco"
-               />
-              <rw-select class=""
-                modelName="Type"
-                formControlName="type"
-                [prompt]="'task.type' | transloco"
-               />
-              <rw-select class=""
-                modelName="Priority"
-                formControlName="priority"
-                [prompt]="'task.priority' | transloco"
-               />
-              @switch (isNew) {
-                @case (false) {
-                  <rw-select class=""
-                    [model]="transitionSelectModel"
-                    formControlName="status"
-                    [prompt]="'task.status' | transloco"
-                   />
-                }
-                @case (true) {
-                  <rw-select class=""
-                    modelName="Status"
-                    formControlName="status"
-                    [prompt]="'task.status' | transloco"
-                   />
+              @if (taskLayout.isVisible('container')) {
+                <rw-select class=""
+                  [required]="true"
+                  modelName="Container"
+                  formControlName="container"
+                  prompt="{{ 'task.container' | transloco }}"
+                 />
+              }
+              @if (taskLayout.isVisible('milestones')) {
+                <rw-select class=""
+                  [model]="milestoneSelectModel"
+                  formControlName="milestones"
+                  [tags]="true"
+                  [closeOnSelect]="false"
+                  [prompt]="'task.milestones' | transloco"
+                 />
+              }
+              @if (taskLayout.isVisible('type')) {
+                <rw-select class=""
+                  modelName="Type"
+                  formControlName="type"
+                  [prompt]="'task.type' | transloco"
+                 />
+              }
+              @if (taskLayout.isVisible('priority')) {
+                <rw-select class=""
+                  modelName="Priority"
+                  formControlName="priority"
+                  [prompt]="'task.priority' | transloco"
+                 />
+              }
+              @if (taskLayout.isVisible('status')) {
+                @switch (isNew) {
+                  @case (false) {
+                    <rw-select class=""
+                      [model]="transitionSelectModel"
+                      formControlName="status"
+                      [prompt]="'task.status' | transloco"
+                     />
+                  }
+                  @case (true) {
+                    <rw-select class=""
+                      modelName="Status"
+                      formControlName="status"
+                      [prompt]="'task.status' | transloco"
+                     />
+                  }
                 }
               }
-              <rw-select class=""
-                modelName="Milestone"
-                formControlName="affected_versions"
-                [tags]="true"
-                [closeOnSelect]="false"
-                [prompt]="'task.affected-version' | transloco"
-               />
-              <rw-select modelName="Assignee"
-                formControlName="assignes"
-                manyLayout="vertical"
-                [emptyItem]="{
-                id: 0,
-                label:
-                (issueService.issue | async)?.assignes_calc | rwFormatUser: true
-                }"
-                [prompt]="'task.assignee' | transloco"
-               />
-              <rw-time-picker [required]="true"
-                formControlName="estimated_time"
-                [prompt]="'task.estimated-time' | transloco"
-               />
-              <rw-select class=""
-                modelName="Watcher"
-                formControlName="watchers"
-                manyLayout="vertical"
-                [tags]="true"
-                [closeOnSelect]="false"
-                [prompt]="'task.watchers' | transloco"
-               />
-              <rw-select class=""
-                modelName="Label"
-                formControlName="labels"
-                [tags]="true"
-                [closeOnSelect]="false"
-                [prompt]="'task.labels' | transloco"
-               />
+              @if (taskLayout.isVisible('affected_versions')) {
+                <rw-select class=""
+                  modelName="Milestone"
+                  formControlName="affected_versions"
+                  [tags]="true"
+                  [closeOnSelect]="false"
+                  [prompt]="'task.affected-version' | transloco"
+                 />
+              }
+              @if (taskLayout.isVisible('assignes')) {
+                <rw-select modelName="Assignee"
+                  formControlName="assignes"
+                  manyLayout="vertical"
+                  [emptyItem]="{
+                  id: 0,
+                  label:
+                  (issueService.issue | async)?.assignes_calc | rwFormatUser: true
+                  }"
+                  [prompt]="'task.assignee' | transloco"
+                 />
+              }
+              @if (taskLayout.isVisible('estimated_time')) {
+                <rw-time-picker [required]="true"
+                  formControlName="estimated_time"
+                  [prompt]="'task.estimated-time' | transloco"
+                 />
+              }
+              @if (taskLayout.isVisible('watchers')) {
+                <rw-select class=""
+                  modelName="Watcher"
+                  formControlName="watchers"
+                  manyLayout="vertical"
+                  [tags]="true"
+                  [closeOnSelect]="false"
+                  [prompt]="'task.watchers' | transloco"
+                  [emptyItem]="{
+                    id: 0,
+                    label: ('task.watchers-select-hint' | transloco)
+                  }"
+                 />
+              }
+              @if (taskLayout.isVisible('labels')) {
+                <rw-select class=""
+                  modelName="Label"
+                  formControlName="labels"
+                  [tags]="true"
+                  [closeOnSelect]="false"
+                  [prompt]="'task.labels' | transloco"
+                 />
+              }
               <div class="col-span-2">
-                @for (section of sections | async; track section) {
-                  <renwu-task-section-wrapper [section]="section"
-                   />
+                @for (section of sections | async; track section.element) {
+                  <renwu-task-section-wrapper [section]="section" />
                 }
               </div>
             </div>
             @switch (isNew) {
               @case (false) {
-                <div class="mt-4 mx-4 font-extralight text-2xl mb-2">
-                  {{ 'task.comments' | transloco }}
-                </div>
-                <renwu-messaging-thread [destination]="thread | async"
-                  [noScroll]="true"
-                 />
-                <renwu-messaging-input class="pb-2"
-                  [destination]="thread | async"
-                 />
+                @if (taskLayout.isVisible('comments')) {
+                  <div class="mt-4 mx-4 font-extralight text-2xl mb-2">
+                    {{ 'task.comments' | transloco }}
+                  </div>
+                  <renwu-messaging-thread [destination]="thread | async"
+                    [noScroll]="true"
+                   />
+                  <renwu-messaging-input class="pb-2"
+                    [destination]="thread | async"
+                   />
+                }
               }
               @case (true) {
                 <div

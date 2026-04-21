@@ -17,5 +17,10 @@
   "comments": "Комментарии",
   "create": "Создать",
   "create-and-add-another": "Создать и добавить еще",
-  "issue-%issue.key%-created-successfully": "Задача {{issue.key}} успешно создана"
+  "issue-%issue.key%-created-successfully": "Задача {{issue.key}} успешно создана",
+  "layout-fields": "Поля карточки",
+  "layout-fields-hint": "Настройки действуют только для выбранного проекта. По умолчанию показаны все поля.",
+  "layout-fields-no-project": "Выберите проект, чтобы сохранить, какие поля показывать.",
+  "layout-restore-defaults": "Показать все поля",
+  "layout-block": "{{tag}}"
 }

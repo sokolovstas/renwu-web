@@ -17,5 +17,10 @@
   "comments": "task.comments",
   "create": "task.create",
   "create-and-add-another": "task.create-and-add-another",
-  "issue-%issue.key%-created-successfully": "task.issue-%issue.key%-created-successfully"
+  "issue-%issue.key%-created-successfully": "task.issue-%issue.key%-created-successfully",
+  "layout-fields": "task.layout-fields",
+  "layout-fields-hint": "task.layout-fields-hint",
+  "layout-fields-no-project": "task.layout-fields-no-project",
+  "layout-restore-defaults": "task.layout-restore-defaults",
+  "layout-block": "task.layout-block"
 }

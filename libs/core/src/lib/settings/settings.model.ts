@@ -1,4 +1,6 @@
-import { AppDateFormat } from "@renwu/components";
+import { AppDateFormat } from '@renwu/components';
+
+import type { TaskDetailLayoutFieldKey } from './task-detail-layout.model';
 
 export enum TimelineTicksId {
   FIT = 'fit',
@@ -65,6 +67,11 @@ export interface ProfileSettingsModel {
   };
   tasks_view: string;
   relative_dates: boolean;
+  /**
+   * Per project (container id): which task detail fields/blocks are hidden.
+   * Absent container id or empty list means “show all” for that project.
+   */
+  task_detail_hidden_by_container?: Record<string, TaskDetailLayoutFieldKey[]>;
 }
 export interface UserSettingsServer {
   time_zone_name: string;

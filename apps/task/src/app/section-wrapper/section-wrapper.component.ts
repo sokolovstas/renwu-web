@@ -1,29 +1,32 @@
+import { NgClass } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   ElementRef,
-  Injector,
   Input,
-  OnInit,
+  ViewChild,
   inject,
 } from '@angular/core';
+import { TaskSectionConfig } from '../task-sections/task-section.model';
 
 @Component({
   selector: 'renwu-task-section-wrapper',
   standalone: true,
+  imports: [NgClass],
   templateUrl: './section-wrapper.component.html',
   styleUrl: './section-wrapper.component.css',
 })
-export class SectionWrapperComponent implements OnInit {
+export class SectionWrapperComponent implements AfterViewInit {
   el = inject(ElementRef);
-  injector = inject(Injector);
 
-  @Input()
-  section: { element: string };
-  ngOnInit(): void {
-    const element = document.createElement(
-      this.section.element,
-    ) as HTMLElement & { injector: Injector };
-    element.injector = this.injector;
-    (this.el.nativeElement as HTMLElement).appendChild(element);
+  @Input({ required: true })
+  section: TaskSectionConfig;
+
+  @ViewChild('host', { read: ElementRef })
+  host: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void {
+    const element = document.createElement(this.section.element);
+    this.host.nativeElement.appendChild(element);
   }
 }

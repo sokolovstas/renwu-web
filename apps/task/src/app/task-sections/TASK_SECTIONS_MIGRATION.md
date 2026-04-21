@@ -21,7 +21,8 @@ Related i18n keys:
 ## Current State
 
 - Section registration exists via `register-task-section-elements.ts`.
-- Section order exists in `apps/task/src/assets/task.json`.
+- Section order exists in `apps/task/src/assets/task.json` (mirrored under `apps/app/src/assets/task.json` for the federated shell).
+- Task detail shell loads `task.json`, registers matching custom elements, and filters sections plus main form rows using per-project visibility in the user profile (`task_detail_hidden_by_container`).
 - Components are present and connected to `RwIssueService` / `RwDataService`.
 - Some UX states are incomplete vs expected legacy behavior (empty/loading/error/new-issue handling and consistency between sections).
 - Legacy reference is available at `apps/old/src/app/issue`.

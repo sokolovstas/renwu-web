@@ -6,6 +6,7 @@ import {
   AppThemes,
   ProfileSettingsModel,
 } from './settings.model';
+import type { TaskDetailLayoutFieldKey } from './task-detail-layout.model';
 import { RwSettingsService } from './settings.service';
 
 export class UserSettings {
@@ -20,6 +21,7 @@ export class UserSettings {
     },
     tasks_view: 'recent',
     relative_dates: true,
+    task_detail_hidden_by_container: {},
   };
   time_zone_name: string = globalThis.Intl
     ? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -111,6 +113,62 @@ export class UserSettings {
   }
   get labs_global_milestones(): boolean {
     return this.settings.labs.global_milestones;
+  }
+
+  isTaskDetailFieldVisible(
+    containerId: string | null | undefined,
+    field: TaskDetailLayoutFieldKey,
+  ): boolean {
+    if (!containerId) {
+      return true;
+    }
+    const hidden =
+      this.settings.task_detail_hidden_by_container?.[containerId] ?? [];
+    return !hidden.includes(field);
+  }
+
+  setTaskDetailFieldVisible(
+    containerId: string | null | undefined,
+    field: TaskDetailLayoutFieldKey,
+    visible: boolean,
+  ): void {
+    if (!containerId) {
+      return;
+    }
+    if (!this.settings.task_detail_hidden_by_container) {
+      this.settings.task_detail_hidden_by_container = {};
+    }
+    const prev =
+      this.settings.task_detail_hidden_by_container[containerId] ?? [];
+    const set = new Set(prev);
+    if (visible) {
+      set.delete(field);
+    } else {
+      set.add(field);
+    }
+    const next = [...set];
+    if (next.length === 0) {
+      delete this.settings.task_detail_hidden_by_container[containerId];
+      if (
+        Object.keys(this.settings.task_detail_hidden_by_container).length === 0
+      ) {
+        delete this.settings.task_detail_hidden_by_container;
+      }
+    } else {
+      this.settings.task_detail_hidden_by_container[containerId] = next;
+    }
+    this.save();
+  }
+
+  clearTaskDetailLayoutForContainer(containerId: string | null | undefined): void {
+    if (!containerId || !this.settings.task_detail_hidden_by_container) {
+      return;
+    }
+    delete this.settings.task_detail_hidden_by_container[containerId];
+    if (Object.keys(this.settings.task_detail_hidden_by_container).length === 0) {
+      delete this.settings.task_detail_hidden_by_container;
+    }
+    this.save();
   }
 
   // isColumnVisible(view: ProfileSettingsTableColumns, key: string): boolean {

@@ -6,29 +6,32 @@ import {
   DestroyRef,
   Injector,
   OnDestroy,
+  signal,
   ViewChild,
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { createCustomElement } from '@angular/elements';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RenwuSidebarService } from '@renwu/app-ui';
 import {
   RwButtonComponent,
+  RwIconComponent,
   RwSelectComponent,
   RwTextInputComponent,
   RwTimePickerComponent,
-  RwToastService
+  RwToastService,
+  RwTooltipDirective,
 } from '@renwu/components';
 import {
   RwFormatUserPipe,
   RwIssueService,
+  RwSettingsService,
   SelectModelMilestones,
   SelectModelTransition,
   StateService,
-  WorkflowTransition
+  WorkflowTransition,
 } from '@renwu/core';
 import {
   DestinationType,
@@ -37,6 +40,7 @@ import {
   RwMessageService
 } from '@renwu/messaging';
 import {
+  combineLatest,
   distinctUntilChanged,
   firstValueFrom,
   from,
@@ -44,18 +48,16 @@ import {
   merge,
   of,
   shareReplay,
+  startWith,
   switchMap,
   tap,
 } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
-import { AttachmentsComponent } from '../attachments/attachments.component';
-import { DescriptionComponent } from '../description/description.component';
-import { LinksComponent } from '../links/links.component';
-import { RelatedComponent } from '../related/related.component';
+import { TaskDetailFieldSettingsComponent } from '../task-detail-layout/task-detail-field-settings.component';
+import { TaskDetailVisibilityService } from '../task-detail-layout/task-detail-visibility.service';
+import { registerTaskSectionElements } from '../task-sections/register-task-section-elements';
+import { TaskLayoutConfig, TaskSectionConfig } from '../task-sections/task-section.model';
 import { SectionWrapperComponent } from '../section-wrapper/section-wrapper.component';
-import { SubTaskComponent } from '../sub-task/sub-task.component';
-import { TimeLogComponent } from '../time-log/time-log.component';
-import { TodoComponent } from '../todo/todo.component';
 
 @Component({
   selector: 'renwu-task-detail',
@@ -70,8 +72,11 @@ import { TodoComponent } from '../todo/todo.component';
     MessageThreadComponent,
     MessageInputComponent,
     RwFormatUserPipe,
+    RwIconComponent,
+    RwTooltipDirective,
     TranslocoPipe,
     SectionWrapperComponent,
+    TaskDetailFieldSettingsComponent,
     ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.scss',
@@ -90,6 +95,10 @@ export class DetailComponent implements OnDestroy {
   sidebarService = inject(RenwuSidebarService);
   destroy = inject(DestroyRef);
   transloco = inject(TranslocoService);
+  settingsService = inject(RwSettingsService);
+  taskLayout = inject(TaskDetailVisibilityService);
+
+  fieldSettingsOpen = signal(false);
 
   transitionSelectModel = new SelectModelTransition();
   milestoneSelectModel = new SelectModelMilestones();
@@ -106,52 +115,50 @@ export class DetailComponent implements OnDestroy {
   @ViewChild('title')
   titleInput: RwTextInputComponent;
 
-  sections = fromFetch('assets/task.json').pipe(
-    switchMap((v) => from(v.json())),
-    map((v) => v.sections),
+  private readonly layoutRefresh$ = merge(
+    this.issueService.issue,
+    this.issueService.issueForm.valueChanges.pipe(startWith(null)),
+    this.settingsService.user.updated,
+  );
+
+  /** Full ordered sections from `task.json` (after registering custom elements). */
+  readonly sectionsConfig = fromFetch('assets/task.json').pipe(
+    switchMap((v) => from(v.json() as Promise<TaskLayoutConfig>)),
+    switchMap((cfg) => {
+      const sorted = [...(cfg.sections ?? [])].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
+      const tags = sorted.map((s) => s.element);
+      return from(registerTaskSectionElements(this.injector, tags)).pipe(
+        map(() => sorted),
+      );
+    }),
     shareReplay({ bufferSize: 1, refCount: false }),
   );
 
+  sections = combineLatest([this.sectionsConfig, this.layoutRefresh$]).pipe(
+    map(([sorted]) => this.taskLayout.filterSections(sorted)),
+  );
+
+  sectionElementTags(sections: TaskSectionConfig[]): string[] {
+    return sections.map((s) => s.element);
+  }
+
   constructor() {
-    customElements.define(
-      'renwu-task-todo',
-      createCustomElement(TodoComponent, { injector: this.injector }),
-    );
-
-    customElements.define(
-      'renwu-task-description',
-      createCustomElement(DescriptionComponent, { injector: this.injector }),
-    );
-
-    customElements.define(
-      'renwu-task-related',
-      createCustomElement(RelatedComponent, { injector: this.injector }),
-    );
-
-    customElements.define(
-      'renwu-task-links',
-      createCustomElement(LinksComponent, { injector: this.injector }),
-    );
-
-    customElements.define(
-      'renwu-task-attachments',
-      createCustomElement(AttachmentsComponent, { injector: this.injector }),
-    );
-
-    customElements.define(
-      'renwu-task-sub-task',
-      createCustomElement(SubTaskComponent, { injector: this.injector }),
-    );
-    customElements.define(
-      'renwu-task-time-log',
-      createCustomElement(TimeLogComponent, { injector: this.injector }),
-    );
-
-    merge(this.issueService.issueForm.valueChanges, this.issueService.issue)
+    merge(
+      this.issueService.issueForm.valueChanges,
+      this.issueService.issue,
+      this.settingsService.user.updated,
+    )
       .pipe(
         tap((issue) => {
-          this.transitionSelectModel.id = issue?.id;
-          this.milestoneSelectModel.containerId = issue?.container?.id;
+          if (issue && typeof issue === 'object') {
+            this.transitionSelectModel.id = (issue as { id?: string }).id;
+            this.milestoneSelectModel.containerId = (
+              issue as { container?: { id?: string } }
+            ).container?.id;
+          }
+          this.cd.markForCheck();
         }),
         takeUntilDestroyed(this.destroy),
       )
@@ -206,5 +213,14 @@ export class DetailComponent implements OnDestroy {
   }
   async removeFromFav() {
     await firstValueFrom(this.issueService.setFavorite(false));
+  }
+
+  async toggleWatch(): Promise<void> {
+    await firstValueFrom(this.issueService.toggleWatchingSelf());
+    this.cd.markForCheck();
+  }
+
+  toggleFieldSettingsPanel(): void {
+    this.fieldSettingsOpen.update((open) => !open);
   }
 }

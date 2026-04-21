@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwTextAreaComponent } from '@renwu/components';
@@ -11,13 +11,6 @@ import { RwIssueService } from '@renwu/core';
   templateUrl: './description.component.html',
   styleUrl: './description.component.scss',
 })
-export class DescriptionComponent implements OnInit {
-  injector: Injector;
-
+export class DescriptionComponent {
   issueService = inject(RwIssueService);
-
-  ngOnInit() {
-    // this.issueService = this.injector.get(RwIssueService);
-    return;
-  }
 }
