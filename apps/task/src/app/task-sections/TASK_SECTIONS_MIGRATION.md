@@ -90,11 +90,12 @@ Behavior observed in legacy implementation:
      - comment = empty string
    - Summary must always render stable values:
      - total defaults to `0` (or display placeholder if product requires)
-     - completion defaults to `0` when absent (aligns with legacy modal baseline before status-driven overrides).
+     - completion summary defaults to `95` when absent (matches legacy “reopen / in-progress” display baseline); API payloads still use the issue’s actual `completion` field when present.
 
 5. **I18n Completeness**
    - Required keys must exist in `en.vendor.json`, `ru.vendor.json`, `zh.vendor.json` and source bundle.
    - No hardcoded human text in templates.
+   - **Federated shell rule**: when Task runs inside `apps/app`, Transloco loads `apps/app/src/i18n/*.vendor.json` only — the `task` namespace must exist there (keep in sync with `apps/task/src/i18n/*.vendor.json`), otherwise `task.*` keys render as missing.
 
 6. **State Sync**
    - After successful mutations, sync `issueForm` and previous state via `RwIssueService` (`patchIssue`, `setPrevState`) to avoid stale sections.

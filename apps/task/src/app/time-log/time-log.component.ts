@@ -121,7 +121,8 @@ export class TimeLogComponent {
       const v = this.issueService.issueForm.getRawValue();
       return {
         time_logged: v.time_logged ?? 0,
-        completion: v.completion ?? 0,
+        /** Display default when API omits completion (legacy modal baseline). */
+        completion: v.completion ?? 95,
       };
     }),
   );
