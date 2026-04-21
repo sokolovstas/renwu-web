@@ -1,7 +1,19 @@
-<div class="mt-4 mx-2 font-extralight text-2xl mb-2">
-  {{ 'task.history' | transloco }}
-  <rw-button class="inline-block"
-    iconClass="add-bold"
-    typeButton="icon"
-   />
+@let isNew = isNewIssue | async;
+<div class="mt-4 mx-2">
+  <div class="font-extralight text-2xl mb-2">{{ 'task.history' | transloco }}</div>
+  @if (isNew) {
+    <p class="text-sm opacity-70 mb-2">{{ 'task.history-save-first' | transloco }}</p>
+  }
+  @if (isNew === false) {
+    <div class="flex flex-col gap-2 px-1 max-h-96 overflow-y-auto text-sm">
+      @for (ev of events$ | async; track ev.id) {
+        <renwu-issue-history-item [value]="ev"
+          [showSource]="false"
+          idField="_id"
+         />
+      } @empty {
+        <span class="text-sm opacity-50">{{ 'task.history-empty' | transloco }}</span>
+      }
+    </div>
+  }
 </div>

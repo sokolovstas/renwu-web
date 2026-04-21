@@ -1,7 +1,45 @@
-<div class="mt-4 mx-2 font-extralight text-2xl mb-2">
-  {{ 'task.attachments' | transloco }}
-  <rw-button class="inline-block"
-    iconClass="add-bold"
-    typeButton="icon"
-   />
+@let isNew = isNewIssue | async;
+@let canEdit = canEdit$ | async;
+<div class="mt-4 mx-2">
+  <div
+    class="font-extralight text-2xl mb-2 flex flex-row flex-wrap items-center justify-between gap-2"
+    >
+    <span>{{ 'task.attachments' | transloco }}</span>
+    @if (isNew === false && canEdit) {
+      <renwu-attachment [flagButton]="true"
+        [flagDropZone]="true"
+        [flagPaste]="true"
+        (fileUploaded)="onFileUploaded($event)"
+       />
+    }
+  </div>
+  @if (isNew) {
+    <p class="text-sm opacity-70 mb-2">{{ 'task.attachments-save-first' | transloco }}</p>
+  }
+  <div class="flex flex-col gap-2 px-1 text-sm">
+    @for (att of attachments$ | async; track att.id) {
+      <div
+        class="flex flex-row items-center justify-between gap-2 border-b border-gray-100 pb-1"
+        >
+        <a class="truncate text-blue-600 hover:underline"
+          [href]="att.url"
+          target="_blank"
+          rel="noopener"
+          >{{ att.file_name }}</a
+          >
+        <div class="flex flex-row items-center gap-2 shrink-0 opacity-70 text-xs">
+          <span>{{ att.date_created | rwDate: 'PPp' }}</span>
+          @if (isNew === false && canEdit) {
+            <rw-button class="opacity-50 hover:opacity-100"
+              typeButton="icon"
+              iconClass="trash"
+              (clicked)="remove(att)"
+             />
+          }
+        </div>
+      </div>
+    } @empty {
+      <span class="text-sm opacity-50">{{ 'task.attachments-empty' | transloco }}</span>
+    }
+  </div>
 </div>

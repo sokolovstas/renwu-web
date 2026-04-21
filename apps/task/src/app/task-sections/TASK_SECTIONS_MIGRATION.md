@@ -24,7 +24,48 @@ Related i18n keys:
 - Section order exists in `apps/task/src/assets/task.json`.
 - Components are present and connected to `RwIssueService` / `RwDataService`.
 - Some UX states are incomplete vs expected legacy behavior (empty/loading/error/new-issue handling and consistency between sections).
-- Legacy reference path `apps/old/src/app/issue` is not present in current repository snapshot and must be уточнен by branch/tag/path.
+- Legacy reference is available at `apps/old/src/app/issue`.
+
+## Legacy Baseline (Source of Truth)
+
+Baseline files used for migration decisions:
+
+- Related: `apps/old/src/app/issue/detail/related`
+- Subtasks (legacy name "Childs"): `apps/old/src/app/issue/detail/implemented`
+- Attachments: `apps/old/src/app/issue/detail/attachment`
+- Time log modal + side summary: `apps/old/src/app/issue/timelog` and `apps/old/src/app/issue/detail/time-tracking`
+- History modal: `apps/old/src/app/issue/history`
+
+Behavior observed in legacy implementation:
+
+1. **Related**
+   - Section is editable only when user can edit issue and issue is persisted (not `new`).
+   - Remove action is confirm-based.
+   - Section renders issue link and status for each related item.
+   - Empty list has no explicit text placeholder in legacy UI.
+
+2. **Subtasks**
+   - Legacy section is named "Childs" and backed by `getChildIssues(issue.id)`.
+   - Includes progress/status visualization (`IssueStatusBar`) when children exist.
+   - Remove child-parent link is confirm-based and persisted through save calls.
+   - Empty list has no explicit text placeholder in legacy UI.
+
+3. **Attachments**
+   - Upload is available only for editable issues.
+   - Attachments are split into two groups: images and non-images.
+   - Supports open/download/delete, post-to-messages, and copy-markdown link.
+   - Delete action is confirm-based (different endpoint for unsaved/saved flow).
+   - Collapsible list when attachments exist.
+
+4. **Time Log**
+   - Primary action is modal-driven logging flow.
+   - Side panel shows aggregated `time_logged` and allows opening editor for existing logs.
+   - "Log time" is disabled for `new` issues and for parent issues with child tasks.
+   - Completion in modal is coupled with status transitions (`completed/closed` semantics).
+
+5. **History**
+   - Legacy history is modal-based (`getIssueEvents(issueId)`), rendered as event list.
+   - No explicit empty placeholder in modal template.
 
 ## Requirements (Implementation Contract)
 
@@ -32,7 +73,7 @@ Related i18n keys:
    - For sections requiring persisted issue ID (related add, attachments upload/delete, timelog add), show save-first hint and block mutating actions.
 
 2. **Empty States**
-   - Every section must have deterministic empty state:
+   - Every section must have deterministic empty state in new Task UI (explicit improvement over legacy):
      - related: `task.related-empty`
      - subtask: `task.subtask-empty`
      - attachments: `task.attachments-empty`
@@ -49,7 +90,7 @@ Related i18n keys:
      - comment = empty string
    - Summary must always render stable values:
      - total defaults to `0` (or display placeholder if product requires)
-     - completion defaults to `0`.
+     - completion defaults to `0` when absent (aligns with legacy modal baseline before status-driven overrides).
 
 5. **I18n Completeness**
    - Required keys must exist in `en.vendor.json`, `ru.vendor.json`, `zh.vendor.json` and source bundle.
@@ -60,13 +101,22 @@ Related i18n keys:
 
 7. **Backward Compatibility**
    - Keep API payload format compatible with existing backend endpoints used by `RwDataService`.
+   - Preserve legacy gating rules:
+     - block log time for `new` issues,
+     - keep mutate actions behind edit permissions,
+     - keep child-issue fetch and event history fetch contract unchanged.
+
+8. **Documented Deviations from Legacy (Intentional)**
+   - New Task UI uses inline sections instead of legacy modal-centric UX for time log/history.
+   - New Task UI introduces explicit empty placeholders where legacy sections were silent.
+   - Complex legacy attachment utilities (post to messages, markdown copy, image viewer) are treated as optional parity extensions and can ship in follow-up phases.
 
 ## Iterative Delivery Plan
 
 ### Phase 0 - Baseline (this commit)
 
 - Add migration requirements and phased checklist.
-- Confirm legacy reference location from product/owner.
+- Confirmed and documented legacy baseline from `apps/old/src/app/issue`.
 
 ### Phase 1 - Related/Subtask UX parity
 
@@ -78,17 +128,25 @@ Related i18n keys:
 
 - Ensure upload/remove behavior is resilient and reflects latest issue state.
 - Add tests for save-first guard and empty state fallback.
+- Evaluate feature parity gaps vs legacy:
+  - grouped image/non-image rendering,
+  - delete confirm flow,
+  - post-to-messages / markdown copy (optional follow-up).
 
 ### Phase 3 - Time Log parity
 
 - Stabilize summary defaults and add flow.
 - Confirm duration display formatting (`1 hour`) and completion behavior.
 - Add tests for addLog payload and post-save reset.
+- Reconcile legacy constraints:
+  - disabled logging for parent issues with childs,
+  - completion semantics near close/complete transitions.
 
 ### Phase 4 - History parity
 
 - Validate ordering, empty state, and error fallback.
 - Add tests for descending event sorting.
+- Verify parity with legacy event payload normalization before render.
 
 ### Phase 5 - Regression Sweep
 
@@ -106,6 +164,8 @@ Related i18n keys:
 
 ## Open Input Needed
 
-- Provide actual legacy source location for comparison:
-  - branch/tag/path that contains old `issue` components.
-  - or confirmation to treat current behavior + API contract as source of truth.
+- Confirm parity target for optional legacy features:
+  - attachments "post to messages",
+  - attachments "copy markdown link",
+  - attachments image viewer/edit overlay,
+  - timelog modal-specific prompts based on elapsed tracking.
