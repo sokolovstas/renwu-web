@@ -1,7 +1,60 @@
-<div class="mt-4 mx-2 font-extralight text-2xl mb-2">
-  {{ 'task.timelog' | transloco }}
-  <rw-button class="inline-block"
-    iconClass="add-bold"
-    typeButton="icon"
-   />
+@let isNew = isNewIssue | async;
+<div class="mt-4 mx-2">
+  <div class="font-extralight text-2xl mb-2">{{ 'task.timelog' | transloco }}</div>
+  @if (isNew) {
+    <p class="text-sm opacity-70 mb-2">{{ 'task.time-log-save-first' | transloco }}</p>
+  }
+  @if (summary$ | async; as sum) {
+    <div class="text-sm opacity-80 mb-3 px-1 flex flex-wrap gap-x-4 gap-y-1">
+      <span>{{ 'task.time-log-total' | transloco }}:
+        {{
+          sum.time_logged
+            ? (sum.time_logged | rwDurationToString: ['hours'])
+            : '-'
+        }}</span>
+      <span>{{ 'task.time-log-completion' | transloco }}: {{ sum.completion }}%</span>
+    </div>
+  }
+  @if (isNew === false) {
+    <form [formGroup]="logForm" class="flex flex-col gap-2 mb-4 px-1">
+      <rw-time-picker formControlName="duration"
+        [prompt]="'task.time-log-duration' | transloco"
+       />
+      <rw-text-area formControlName="comment"
+        [borderless]="true"
+        prompt="{{ 'task.time-log-comment' | transloco }}"
+       />
+      <rw-button typeButton="secondary" (clicked)="addLog()">{{
+        'task.time-log-add' | transloco
+      }}</rw-button>
+    </form>
+  }
+  <div class="flex flex-col gap-2 px-1 text-sm max-h-80 overflow-y-auto">
+    @for (log of timeLogs$ | async; track $index) {
+      <div class="border-b border-gray-100 pb-2 flex flex-col gap-1">
+        <div class="flex flex-row justify-between gap-2">
+          <span class="font-medium">{{
+            log.value | rwDurationToString: ['hours']
+          }}</span>
+          @if (log.date_created) {
+            <span class="opacity-70 text-xs">{{
+              log.date_created | rwDate: 'PPp'
+            }}</span>
+          }
+        </div>
+        @if (log.comment) {
+          <span class="text-xs opacity-90 whitespace-pre-wrap">{{
+            log.comment
+          }}</span>
+        }
+        @if (log.author) {
+          <span class="text-xs opacity-70">{{
+            log.author | rwFormatUser: true
+          }}</span>
+        }
+      </div>
+    } @empty {
+      <span class="text-sm opacity-50">{{ 'task.time-log-empty' | transloco }}</span>
+    }
+  </div>
 </div>
