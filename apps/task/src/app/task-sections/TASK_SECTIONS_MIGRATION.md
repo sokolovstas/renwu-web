@@ -118,8 +118,8 @@ Behavior observed in legacy implementation:
 ## Migration Board (Live)
 
 - `related`: in progress
-  - done: add/remove logic, duplicate/self/not-found guards, permission gate, unlink confirm, status badge
-  - pending: regression tests for confirm + permission scenarios
+  - done: add/remove logic, duplicate/self/not-found guards, permission gate, unlink confirm, status badge, Jest coverage for save-first / no-edit / duplicate / self / not-found / success add, confirm dismiss/accept on remove (`related.component.spec.ts`)
+  - pending: shallow DOM / `IssueHref` integration if product wants template-level assertions
 - `sub-task`: in progress
   - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink
   - pending: add child / decomposite parity, richer row fields (milestones/estimate/skill)
@@ -151,6 +151,7 @@ Behavior observed in legacy implementation:
 - Normalize empty/new/error states.
 - Validate duplicate/self key checks and success flow.
 - Add/adjust tests for add/remove and empty state rendering.
+- **Jest note:** `@jsverse/transloco` ships ESM that Jest does not transform by default; component specs that pull `TranslocoPipe` should `jest.mock('@jsverse/transloco', …)` using the standalone stubs in `apps/task/src/testing/transloco-stub.ts` (see `related.component.spec.ts`).
 
 ### Phase 2 - Attachments parity
 
