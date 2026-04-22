@@ -1,26 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { IssuesStatusBarComponent } from './status-bar.component';
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { StatusBarComponent } from './issue/status-bar/status-bar.component';
+describe('IssuesStatusBarComponent', () => {
+  let fixture: ComponentFixture<IssuesStatusBarComponent>;
 
-describe('StatusBarComponent', () => {
-  let component: StatusBarComponent;
-  let fixture: ComponentFixture<StatusBarComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [StatusBarComponent],
-      schemas: [NO_ERRORS_SCHEMA],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [IssuesStatusBarComponent],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StatusBarComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = TestBed.createComponent(IssuesStatusBarComponent);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

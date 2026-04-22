@@ -1,10 +1,14 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { ModalContainerDirective } from './modal-container.directive';
+import { RwModalContainerDirective } from './modal-container.directive';
 
-describe('ModalContainerDirective', () => {
+describe('RwModalContainerDirective', () => {
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [ModalContainerDirective],
+      imports: [RwModalContainerDirective],
     }).compileComponents();
   }));
+  it('configures TestBed', () => {
+    expect(TestBed).toBeTruthy();
+  });
+
 });

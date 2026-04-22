@@ -1,8 +1,8 @@
-import { ParseBooleanPipe } from './parse-boolean.pipe';
+import { RwParseBooleanPipe } from './parse-boolean.pipe';
 
-describe('ParseBooleanPipe', () => {
+describe('RwParseBooleanPipe', () => {
   it('create an instance', () => {
-    const pipe = new ParseBooleanPipe();
+    const pipe = new RwParseBooleanPipe();
     expect(pipe).toBeTruthy();
     expect(pipe.transform('true')).toBeTruthy();
     expect(pipe.transform('1')).toBeTruthy();

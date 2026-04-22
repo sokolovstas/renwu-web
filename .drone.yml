@@ -51,14 +51,25 @@ steps:
       - name: cache-angular
         path: /drone/src/.angular
     commands:
-      - echo npm run test
-
+      - npm install --legacy-peer-deps
+      - npx nx run-many -t test --all --configuration=ci
+      - npx nx build app --bundle=true --baseHref /app/
+      - npx nx build dashboard --bundle=true --baseHref /app/modules/dashboard/
+      - npx nx build projects --bundle=true --baseHref /app/modules/projects/
+      - npx nx build tasks --bundle=true --baseHref /app/modules/tasks/
+      - npx nx build task --bundle=true --baseHref /app/modules/task/
+      - npx nx build profile --bundle=true --baseHref /app/modules/profile/
+      - npx nx build settings --bundle=true --baseHref /app/modules/settings/
+      - npx nx build messenger --bundle=true --baseHref /app/modules/messenger/
+      - npx nx build timeline --bundle=true --baseHref /app/modules/timeline/
+      - npx nx build todos --baseHref /app/modules/todos/
+      - npx nx build boards --baseHref /app/modules/boards/
+      - npx nx build documents --baseHref /app/modules/documents/
     when:
-      target:
-        exclude:
-          - production
-          - dev
-          - clean
+      event:
+        - push
+        - pull_request
+        - tag
 
   - name: build
     image: cypress/included:12.17.2
@@ -71,6 +82,7 @@ steps:
         path: /drone/src/.angular
     commands:
       - npm install --legacy-peer-deps
+      - npx nx run-many -t test --all --configuration=ci
       - npx nx build app --bundle=true --baseHref /app/
       - npx nx build dashboard --bundle=true --baseHref /app/modules/dashboard/
       - npx nx build projects --bundle=true --baseHref /app/modules/projects/
@@ -79,6 +91,7 @@ steps:
       - npx nx build profile --bundle=true --baseHref /app/modules/profile/
       - npx nx build settings --bundle=true --baseHref /app/modules/settings/
       - npx nx build messenger --bundle=true --baseHref /app/modules/messenger/
+      - npx nx build timeline --bundle=true --baseHref /app/modules/timeline/
       - npx nx build todos --baseHref /app/modules/todos/
       - npx nx build boards --baseHref /app/modules/boards/
       - npx nx build documents --baseHref /app/modules/documents/

@@ -1,42 +1,41 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { RenwuSidebarService, RenwuTourService } from '@renwu/app-ui';
+import {
+  RwAlertService,
+  RwModalService,
+  RwTooltipService,
+} from '@renwu/components';
+import { RwLoaderService, RwTitleService, StateService } from '@renwu/core';
 import { AppComponent } from './app.component';
-import { NxWelcomeComponent } from './nx-welcome.component';
-import { provideLocationMocks } from '@angular/common/testing';
-import { Router, provideRouter } from '@angular/router';
+import { CheckForUpdateService } from './sw-check.service';
 
 describe('AppComponent', () => {
+  let fixture: ComponentFixture<AppComponent>;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [],
+      imports: [AppComponent],
       providers: [
-        provideRouter([{ path: '', component: NxWelcomeComponent }]),
-        provideLocationMocks(),
+        provideRouter([]),
+        { provide: StateService, useValue: {} },
+        { provide: RenwuSidebarService, useValue: { init: () => undefined } },
+        { provide: RwTitleService, useValue: {} },
+        { provide: RwLoaderService, useValue: {} },
+        { provide: RwModalService, useValue: {} },
+        { provide: RwAlertService, useValue: {} },
+        { provide: RwTooltipService, useValue: {} },
+        { provide: CheckForUpdateService, useValue: {} },
+        { provide: RenwuTourService, useValue: {} },
       ],
-      declarations: [AppComponent, NxWelcomeComponent],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
   });
 
-  it(`should have as title 'web-app'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('web-app');
+  it('should create', () => {
+    expect(fixture.componentInstance).toBeTruthy();
   });
-
-  it('should render title', fakeAsync(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const router = TestBed.inject(Router);
-    fixture.ngZone?.run(() => router.navigate(['']));
-    tick();
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Welcome web-app',
-    );
-  }));
 });

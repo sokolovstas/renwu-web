@@ -1,28 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent } from '../button/button.component';
-import { IconComponent } from '../icon/icon.component';
-import { PreventParentScrollDirective } from '../prevent-parent-scroll/prevent-parent-scroll.directive';
-import { TextInputComponent } from './text-input.component';
+import { RwTextInputComponent } from './text-input.component';
 
-describe('TextInputComponent', () => {
-  let component: TextInputComponent;
-  let fixture: ComponentFixture<TextInputComponent>;
+describe('RwTextInputComponent', () => {
+  let component: RwTextInputComponent;
+  let fixture: ComponentFixture<RwTextInputComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      imports: [FormsModule],
-      declarations: [
-        PreventParentScrollDirective,
-        ButtonComponent,
-        TextInputComponent,
-        IconComponent,
-      ],
+      imports: [FormsModule, RwTextInputComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TextInputComponent);
+    fixture = TestBed.createComponent(RwTextInputComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { DropDownComponent } from './dropdown.component';
+import { RwDropDownComponent } from './dropdown.component';
 
-describe('DropDownComponent', () => {
-  let component: DropDownComponent;
-  let fixture: ComponentFixture<DropDownComponent>;
+describe('RwDropDownComponent', () => {
+  let component: RwDropDownComponent;
+  let fixture: ComponentFixture<RwDropDownComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [DropDownComponent],
+      imports: [RwDropDownComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DropDownComponent);
+    fixture = TestBed.createComponent(RwDropDownComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,8 +1,19 @@
-import { DropdownDirective } from './dropdown.directive';
+import { Component } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { RwDropDownDirective } from './dropdown.directive';
 
-describe('DropdownDirective', () => {
-  it('should create an instance', () => {
-    const directive = new DropdownDirective();
-    expect(directive).toBeTruthy();
+@Component({
+  standalone: true,
+  imports: [RwDropDownDirective],
+  template: `<div rwDropdown></div>`,
+})
+class HostComponent {}
+
+describe('RwDropDownDirective', () => {
+  it('loads with host template', async () => {
+    await TestBed.configureTestingModule({
+      imports: [HostComponent],
+    }).compileComponents();
+    expect(TestBed.createComponent(HostComponent)).toBeTruthy();
   });
 });

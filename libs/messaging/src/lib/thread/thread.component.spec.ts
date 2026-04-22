@@ -1,26 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MessageThreadComponent } from './message/thread/thread.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MessageThreadComponent } from './thread.component';
 
 describe('MessageThreadComponent', () => {
-  let component: MessageThreadComponent;
   let fixture: ComponentFixture<MessageThreadComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [MessageThreadComponent],
-      schemas: [NO_ERRORS_SCHEMA],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MessageThreadComponent],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MessageThreadComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

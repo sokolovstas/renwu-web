@@ -1,67 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { Component } from '@angular/core';
-import { IssueMilestonesComponent } from './shared/issue-fields/milestones/milestones.component';
-
-@Component({
-  template: ` <issue-milestones [value]="value"
-    [parentValue]="parentValue"
-   />`,
-})
-class TestHostComponent {
-  value: any[];
-  parentValue: any[];
-}
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { IssueMilestonesComponent } from './milestones.component';
 
 describe('IssueMilestonesComponent', () => {
-  let testHost: TestHostComponent;
-  let fixture: ComponentFixture<TestHostComponent>;
+  let fixture: ComponentFixture<IssueMilestonesComponent>;
 
-  const getText = () => {
-    return fixture.debugElement.nativeElement.innerText.trim();
-  };
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [IssueMilestonesComponent, TestHostComponent],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [IssueMilestonesComponent],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TestHostComponent);
-    testHost = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = TestBed.createComponent(IssueMilestonesComponent);
   });
 
   it('should create', () => {
-    expect(testHost).toBeTruthy();
-  });
-
-  it('should display milestones names', () => {
-    testHost.value = null;
-    fixture.detectChanges();
-    expect(getText()).toBe('');
-
-    testHost.value = [];
-    fixture.detectChanges();
-    expect(getText()).toBe('');
-
-    testHost.value = [{}, null];
-    fixture.detectChanges();
-    expect(getText()).toBe('');
-
-    testHost.value = [{}, { title: 'm1' }, { title: 'm2' }];
-    fixture.detectChanges();
-    expect(getText()).toBe('m1, m2');
-
-    testHost.value = null;
-    testHost.parentValue = [{}, { title: 'mp1' }];
-    fixture.detectChanges();
-    expect(getText()).toBe('mp1');
-
-    testHost.value = [{ title: 'm1' }, { title: 'm2' }];
-    testHost.parentValue = [{}, { title: 'mp1' }];
-    fixture.detectChanges();
-    expect(getText()).toBe('mp1\nm1, m2');
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

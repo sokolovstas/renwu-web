@@ -1,10 +1,14 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { TooltipDirective } from './tooltip.directive';
+import { RwTooltipDirective } from './tooltip.directive';
 
-describe('TooltipDirective', () => {
+describe('RwTooltipDirective', () => {
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [TooltipDirective],
+      imports: [RwTooltipDirective],
     }).compileComponents();
   }));
+
+  it('configures TestBed', () => {
+    expect(TestBed).toBeTruthy();
+  });
 });

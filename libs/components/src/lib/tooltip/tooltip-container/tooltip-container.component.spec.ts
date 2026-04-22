@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { TooltipService } from '../tooltip.service';
-import { TooltipContainerComponent } from './tooltip-container.component';
+import { RwTooltipService } from '../tooltip.service';
+import { RwTooltipContainerComponent } from './tooltip-container.component';
 
-describe('TooltipContainerComponent', () => {
-  let component: TooltipContainerComponent;
-  let fixture: ComponentFixture<TooltipContainerComponent>;
+describe('RwTooltipContainerComponent', () => {
+  let component: RwTooltipContainerComponent;
+  let fixture: ComponentFixture<RwTooltipContainerComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [TooltipContainerComponent],
+      imports: [RwTooltipContainerComponent],
       providers: [
         {
-          provide: TooltipService,
+          provide: RwTooltipService,
           useClass: class {
             registerContainer = () => {
               return;
@@ -24,7 +24,7 @@ describe('TooltipContainerComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TooltipContainerComponent);
+    fixture = TestBed.createComponent(RwTooltipContainerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

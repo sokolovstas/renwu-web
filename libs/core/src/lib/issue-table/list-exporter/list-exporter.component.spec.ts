@@ -1,26 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ListExporterComponent } from './container/list-exporter/list-exporter.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ListExporterComponent } from './list-exporter.component';
 
 describe('ListExporterComponent', () => {
-  let component: ListExporterComponent;
   let fixture: ComponentFixture<ListExporterComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ListExporterComponent],
-      schemas: [NO_ERRORS_SCHEMA],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ListExporterComponent],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ListExporterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

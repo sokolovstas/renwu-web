@@ -2,18 +2,17 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ShortcutService } from '../../shortcut/shortcut.service';
+import { ShortcutService } from '../shortcut/shortcut.service';
 import { ShortcutServiceStub } from '../../test/shortcut-service-stub';
-import { TimePickerComponent } from './time-picker.component';
+import { RwTimePickerComponent } from './time-picker.component';
 
-describe('TimePickerComponent', () => {
-  let component: TimePickerComponent;
-  let fixture: ComponentFixture<TimePickerComponent>;
+describe('RwTimePickerComponent', () => {
+  let component: RwTimePickerComponent;
+  let fixture: ComponentFixture<RwTimePickerComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [TimePickerComponent],
-      imports: [FormsModule],
+      imports: [FormsModule, RwTimePickerComponent],
       providers: [
         {
           provide: ShortcutService,
@@ -25,9 +24,8 @@ describe('TimePickerComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TimePickerComponent);
+    fixture = TestBed.createComponent(RwTimePickerComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

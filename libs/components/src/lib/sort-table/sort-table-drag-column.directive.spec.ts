@@ -1,10 +1,14 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { SortTableDragColumnDirective } from './sort-table-drag-column.directive';
+import { RwSortTableDragColumnDirective } from './sort-table-drag-column.directive';
 
-describe('SortTableDragColumnDirective', () => {
+describe('RwSortTableDragColumnDirective', () => {
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [SortTableDragColumnDirective],
+      imports: [RwSortTableDragColumnDirective],
     }).compileComponents();
   }));
+  it('configures TestBed', () => {
+    expect(TestBed).toBeTruthy();
+  });
+
 });

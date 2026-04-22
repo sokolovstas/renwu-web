@@ -15,10 +15,6 @@ export default {
       },
     ],
   },
-  /** Allow transpiling ESM from @jsverse (e.g. @jsverse/utils used by Transloco). */
-  transformIgnorePatterns: [
-    'node_modules/(?!((@angular|@jsverse)/|.*\\.mjs$))',
-  ],
   testPathIgnorePatterns: ['<rootDir>/e2e/'],
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',

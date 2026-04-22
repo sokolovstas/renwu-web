@@ -1,21 +1,28 @@
-import { async } from '@angular/core/testing';
-import { FormatUserPipe } from './shared/pipes/format-user.pipe';
+import { TestBed } from '@angular/core/testing';
+import { User } from '../user.model';
+import { RwUserService } from '../user.service';
+import { RwFormatUserPipe } from './format-user.pipe';
 
-describe('FormatUserPipe', () => {
-  let pipe: FormatUserPipe;
+describe('RwFormatUserPipe', () => {
+  let pipe: RwFormatUserPipe;
 
-  beforeEach(async(() => {
-    pipe = new FormatUserPipe();
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        RwFormatUserPipe,
+        { provide: RwUserService, useValue: { getUser: () => null } },
+      ],
+    });
+    pipe = TestBed.inject(RwFormatUserPipe);
+  });
 
   it('create an instance', () => {
-    pipe = new FormatUserPipe();
     expect(pipe).toBeTruthy();
   });
 
   it('empty array', () => {
     expect(pipe.transform([])).toBe('❉ Team');
-    expect(pipe.transform(null)).toBe('❉ Team');
+    expect(pipe.transform(null)).toBe('-');
   });
 
   it('one user', () => {
@@ -27,7 +34,9 @@ describe('FormatUserPipe', () => {
   });
 
   it('user array', () => {
-    expect(pipe.transform(['User 1', 'User 2'])).toBe('User 1, User 2');
+    expect(
+      pipe.transform(['User 1', 'User 2'] as unknown as User[]),
+    ).toBe('-');
     expect(
       pipe.transform([
         { username: 'test1' },

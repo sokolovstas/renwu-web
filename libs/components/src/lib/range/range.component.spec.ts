@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { RangeComponent } from './range.component';
+import { RwRangeComponent } from './range.component';
 
-describe('RangeComponent', () => {
-  let component: RangeComponent;
-  let fixture: ComponentFixture<RangeComponent>;
+describe('RwRangeComponent', () => {
+  let component: RwRangeComponent;
+  let fixture: ComponentFixture<RwRangeComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [RangeComponent],
+      imports: [RwRangeComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RangeComponent);
+    fixture = TestBed.createComponent(RwRangeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

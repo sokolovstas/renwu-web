@@ -1,32 +1,29 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FormsModule } from '@angular/forms';
 import { provideLocationMocks } from '@angular/common/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { NgxPopperModule } from 'ngx-popper';
-import { OzModule } from 'oz';
-import { CoreModule } from './core/core.module';
+import { RwQueryBuilderService } from '../search/query-builder.service';
 import { QueryBuilderComponent } from './query-builder.component';
 
 describe('QueryBuilderComponent', () => {
-  let component: QueryBuilderComponent;
   let fixture: ComponentFixture<QueryBuilderComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [OzModule, FormsModule, NgxPopperModule, CoreModule],
-      declarations: [QueryBuilderComponent],
-      providers: [provideRouter([]), provideLocationMocks()],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [QueryBuilderComponent],
+      providers: [
+        provideRouter([]),
+        provideLocationMocks(),
+        { provide: RwQueryBuilderService, useValue: {} },
+      ],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(QueryBuilderComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

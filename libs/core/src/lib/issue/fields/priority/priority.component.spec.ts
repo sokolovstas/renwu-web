@@ -1,25 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { IssuePriorityComponent } from './shared/issue-fields/priority/priority.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { IssuePriorityComponent } from './priority.component';
 
 describe('IssuePriorityComponent', () => {
-  let component: IssuePriorityComponent;
   let fixture: ComponentFixture<IssuePriorityComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [RwModule],
-      declarations: [IssuePriorityComponent],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [IssuePriorityComponent],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(IssuePriorityComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

@@ -1,29 +1,43 @@
-import { waitForAsync } from '@angular/core/testing';
-import { AbstractControl } from '@angular/forms';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { RwWithOutSpacesValidatorDirective } from './without-spaces-validator.directive';
 
-import { WithOutSpacesValidatorDirective } from './without-spaces-validator.directive';
+@Component({
+  standalone: true,
+  imports: [ReactiveFormsModule, RwWithOutSpacesValidatorDirective],
+  template:
+    '<input rwValidateWithOutSpaces validateWithOutSpaces="x" [formControl]="ctrl" />',
+})
+class HostComponent {
+  ctrl = new FormControl('');
+}
 
-describe('WithOutSpacesValidatorDirective', () => {
-  let directive: WithOutSpacesValidatorDirective;
-  beforeEach(waitForAsync(() => {
-    directive = new WithOutSpacesValidatorDirective('a');
-  }));
-  it('should create an instance', () => {
-    expect(directive).toBeTruthy();
+describe('RwWithOutSpacesValidatorDirective', () => {
+  let fixture: ComponentFixture<HostComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [HostComponent],
+    }).compileComponents();
+    fixture = TestBed.createComponent(HostComponent);
   });
+
   it('should be valid on A', () => {
-    expect(directive.validate({ value: 'A' } as AbstractControl)).toBeNull();
+    fixture.componentInstance.ctrl.setValue('A');
+    fixture.detectChanges();
+    expect(fixture.componentInstance.ctrl.valid).toBe(true);
   });
-  it('should be valid on A', () => {
-    expect(
-      directive.validate({ value: '  A  ' } as AbstractControl),
-    ).toBeNull();
+
+  it('should trim and be valid', () => {
+    fixture.componentInstance.ctrl.setValue('  A  ');
+    fixture.detectChanges();
+    expect(fixture.componentInstance.ctrl.valid).toBe(true);
   });
+
   it('should be invalid on space char', () => {
-    expect(directive.validate({ value: ' ' } as AbstractControl)).toEqual(
-      jasmine.objectContaining({
-        validateWithoutSpaces: false,
-      }),
-    );
+    fixture.componentInstance.ctrl.setValue(' ');
+    fixture.detectChanges();
+    expect(fixture.componentInstance.ctrl.valid).toBe(false);
   });
 });

@@ -1,35 +1,21 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { RwToastContainerComponent } from './toast-container.component';
 
-import { ToastComponent } from './toast.component';
-import { ToastService } from './toast.service';
-
-describe('ToastComponent', () => {
-  let component: ToastComponent;
-  let fixture: ComponentFixture<ToastComponent>;
+describe('RwToastContainerComponent', () => {
+  let fixture: ComponentFixture<RwToastContainerComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [ToastComponent],
-      providers: [
-        {
-          provide: ToastService,
-          useClass: class {
-            close = () => {
-              return;
-            };
-          },
-        },
-      ],
+      imports: [RwToastContainerComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ToastComponent);
-    component = fixture.componentInstance;
+    fixture = TestBed.createComponent(RwToastContainerComponent);
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

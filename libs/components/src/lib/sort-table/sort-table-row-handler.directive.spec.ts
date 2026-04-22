@@ -1,10 +1,14 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { SortTableRowHandlerDirective } from './sort-table-row-handler.directive';
+import { RwSortTableRowHandlerDirective } from './sort-table-row-handler.directive';
 
-describe('SortTableRowHandlerDirective', () => {
+describe('RwSortTableRowHandlerDirective', () => {
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [SortTableRowHandlerDirective],
+      imports: [RwSortTableRowHandlerDirective],
     }).compileComponents();
   }));
+  it('configures TestBed', () => {
+    expect(TestBed).toBeTruthy();
+  });
+
 });

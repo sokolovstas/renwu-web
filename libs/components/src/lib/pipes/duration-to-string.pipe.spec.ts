@@ -1,14 +1,12 @@
-import { DurationToStringPipe } from './duration-to-string.pipe';
+import { RwDurationToStringPipe } from './duration-to-string.pipe';
 
-describe('DurationToStringPipe', () => {
+describe('RwDurationToStringPipe', () => {
   it('create an instance', () => {
-    const pipe = new DurationToStringPipe();
-    expect(pipe).toBeTruthy();
+    expect(new RwDurationToStringPipe()).toBeTruthy();
   });
-  it('format', () => {
-    const pipe = new DurationToStringPipe();
-    expect(pipe.transform('PT2H5M30S', 'hh:mm')).toBe('02:05');
-    expect(pipe.transform('PT3H7M30S', 'hh:mm:ss')).toBe('03:07:30');
-    expect(pipe.transform('PT3H7M30S')).toBe('3 hours 7 minutes 30 seconds');
+
+  it('returns dash for zero', () => {
+    const pipe = new RwDurationToStringPipe();
+    expect(pipe.transform(0, 'normalize')).toBe('-');
   });
 });

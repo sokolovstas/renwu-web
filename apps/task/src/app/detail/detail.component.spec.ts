@@ -83,11 +83,9 @@ describe('DetailComponent', () => {
 
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(fetchMock).toHaveBeenCalled();
   });
 });

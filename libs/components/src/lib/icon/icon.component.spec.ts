@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { IconComponent } from './icon.component';
+import { RwIconComponent } from './icon.component';
 
-describe('IconComponent', () => {
-  let component: IconComponent;
-  let fixture: ComponentFixture<IconComponent>;
+describe('RwIconComponent', () => {
+  let component: RwIconComponent;
+  let fixture: ComponentFixture<RwIconComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [IconComponent],
+      imports: [RwIconComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IconComponent);
+    fixture = TestBed.createComponent(RwIconComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

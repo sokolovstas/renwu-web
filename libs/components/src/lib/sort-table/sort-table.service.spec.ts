@@ -1,17 +1,17 @@
 import { inject, TestBed } from '@angular/core/testing';
-import { SortTableService } from './sort-table.service';
-import { SortTableSettingsService } from './sort-table.settings.service';
+import { RwSortTableService } from './sort-table.service';
+import { RwSortTableSettingsService } from './sort-table.settings.service';
 
-describe('SortTableService', () => {
+describe('RwSortTableService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SortTableSettingsService, SortTableService],
+      providers: [RwSortTableSettingsService, RwSortTableService],
     });
   });
 
   it('should be created', inject(
-    [SortTableService],
-    (service: SortTableService) => {
+    [RwSortTableService],
+    (service: RwSortTableService) => {
       expect(service).toBeTruthy();
     },
   ));

@@ -1,17 +1,17 @@
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ShortcutService } from './shortcut.service';
+import { RwShortcutService } from './shortcut.service';
 
-describe('ShortcutService', () => {
+describe('RwShortcutService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ShortcutService],
+      providers: [RwShortcutService],
     });
   });
 
   it('should be created', inject(
-    [ShortcutService],
-    (service: ShortcutService) => {
+    [RwShortcutService],
+    (service: RwShortcutService) => {
       expect(service).toBeTruthy();
     },
   ));

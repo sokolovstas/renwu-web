@@ -1,8 +1,8 @@
-import { FilterPipe } from './filter.pipe';
+import { RwFilterPipe } from './filter.pipe';
 
-describe('FilterPipe', () => {
+describe('RwFilterPipe', () => {
   it('create an instance', () => {
-    const pipe = new FilterPipe();
+    const pipe = new RwFilterPipe();
     expect(pipe).toBeTruthy();
   });
 });

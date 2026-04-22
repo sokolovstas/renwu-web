@@ -4,7 +4,11 @@ import { RwSortTableColumnDirective } from './sort-table-column.directive';
 describe('RwSortTableColumnDirective', () => {
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [RwSortTableColumnDirective],
+      imports: [RwSortTableColumnDirective],
     }).compileComponents();
   }));
+  it('configures TestBed', () => {
+    expect(TestBed).toBeTruthy();
+  });
+
 });

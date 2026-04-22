@@ -1,32 +1,29 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { provideLocationMocks } from '@angular/common/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { OzModule } from 'oz';
-import { CoreModule } from './core/core.module';
-import { IconWarningComponent } from './issue/icon-warning/icon-warning.component';
+import { RwContainerService } from '../../../container/container.service';
+import { IconWarningComponent } from './icon-warning.component';
 
 describe('IconWarningComponent', () => {
-  let component: IconWarningComponent;
   let fixture: ComponentFixture<IconWarningComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [CoreModule, OzModule],
-      declarations: [IconWarningComponent],
-      providers: [provideRouter([]), provideLocationMocks()],
-      schemas: [NO_ERRORS_SCHEMA],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [IconWarningComponent],
+      providers: [
+        provideRouter([]),
+        provideLocationMocks(),
+        { provide: RwContainerService, useValue: {} },
+      ],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(IconWarningComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

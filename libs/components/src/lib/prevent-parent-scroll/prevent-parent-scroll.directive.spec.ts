@@ -1,10 +1,14 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { PreventParentScrollDirective } from './prevent-parent-scroll.directive';
+import { RwPreventParentScrollDirective } from './prevent-parent-scroll.directive';
 
-describe('PreventParentScrollDirective', () => {
+describe('RwPreventParentScrollDirective', () => {
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [PreventParentScrollDirective],
+      imports: [RwPreventParentScrollDirective],
     }).compileComponents();
   }));
+  it('configures TestBed', () => {
+    expect(TestBed).toBeTruthy();
+  });
+
 });

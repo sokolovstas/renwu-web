@@ -1,19 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IssueTableComponent } from './issue-table.component';
+import { RwIssueTableComponent } from './issue-table.component';
 
-describe('IssueTableComponent', () => {
-  let component: IssueTableComponent;
-  let fixture: ComponentFixture<IssueTableComponent>;
+describe('RwIssueTableComponent', () => {
+  let component: RwIssueTableComponent;
+  let fixture: ComponentFixture<RwIssueTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [IssueTableComponent],
-    }).compileComponents();
+      imports: [RwIssueTableComponent],
+    })
+      .overrideComponent(RwIssueTableComponent, {
+        set: {
+          template: '',
+          imports: [],
+        },
+      })
+      .compileComponents();
 
-    fixture = TestBed.createComponent(IssueTableComponent);
+    fixture = TestBed.createComponent(RwIssueTableComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

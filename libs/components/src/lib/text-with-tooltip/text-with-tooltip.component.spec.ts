@@ -1,23 +1,22 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TextWithTooltipComponent } from './text-with-tooltip.component';
+import { RwTextWithTooltipComponent } from './text-with-tooltip.component';
 
-describe('TextWithTooltipComponent', () => {
-  let component: TextWithTooltipComponent;
-  let fixture: ComponentFixture<TextWithTooltipComponent>;
+describe('RwTextWithTooltipComponent', () => {
+  let component: RwTextWithTooltipComponent;
+  let fixture: ComponentFixture<RwTextWithTooltipComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [TextWithTooltipComponent],
+      imports: [RwTextWithTooltipComponent],
       providers: [],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TextWithTooltipComponent);
+    fixture = TestBed.createComponent(RwTextWithTooltipComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

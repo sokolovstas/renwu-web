@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { IconComponent } from '../icon/icon.component';
-import { ButtonComponent } from './button.component';
+import { RwIconComponent } from '../icon/icon.component';
+import { RwButtonComponent } from './button.component';
 
-describe('ButtonComponent', () => {
-  let component: ButtonComponent;
-  let fixture: ComponentFixture<ButtonComponent>;
+describe('RwButtonComponent', () => {
+  let component: RwButtonComponent;
+  let fixture: ComponentFixture<RwButtonComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      declarations: [ButtonComponent, IconComponent],
+      imports: [RwButtonComponent, RwIconComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ButtonComponent);
+    fixture = TestBed.createComponent(RwButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,8 +1,8 @@
-import { ObjectKeysPipe } from './object-keys.pipe';
+import { RwObjectKeysPipe } from './object-keys.pipe';
 
-describe('ObjectKeysPipe', () => {
+describe('RwObjectKeysPipe', () => {
   it('create an instance', () => {
-    const pipe = new ObjectKeysPipe();
+    const pipe = new RwObjectKeysPipe();
     expect(pipe).toBeTruthy();
   });
 });

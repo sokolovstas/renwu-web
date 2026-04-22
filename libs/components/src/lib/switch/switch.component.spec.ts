@@ -1,21 +1,20 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { FormsModule } from '@angular/forms';
-import { SwitchComponent } from './switch.component';
+import { RwSwitchComponent } from './switch.component';
 
-describe('SwitchComponent', () => {
-  let component: SwitchComponent;
-  let fixture: ComponentFixture<SwitchComponent>;
+describe('RwSwitchComponent', () => {
+  let component: RwSwitchComponent;
+  let fixture: ComponentFixture<RwSwitchComponent>;
 
   beforeEach(waitForAsync(() => {
     return TestBed.configureTestingModule({
-      imports: [FormsModule],
-      declarations: [SwitchComponent],
+      imports: [FormsModule, RwSwitchComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SwitchComponent);
+    fixture = TestBed.createComponent(RwSwitchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

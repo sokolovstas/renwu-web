@@ -1,19 +1,24 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { inject, TestBed } from '@angular/core/testing';
-import { OzModule } from 'projects/components/src/public-api';
-import { UserModule } from 'src/app-old/user/user.module';
-import { CoreModule } from 'src/app/core/core.module';
-import { PolicyService } from 'src/app/core/policy.service';
+import { TestBed } from '@angular/core/testing';
+import { RwToastService } from '@renwu/components';
+import { RwDataService } from '../data/data.service';
+import { RwUserService } from '../user/user.service';
+import { RwPolicyService } from './policy.service';
 
-describe('PolicyService', () => {
+describe('RwPolicyService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, CoreModule, UserModule, OzModule],
-      providers: [],
+      imports: [HttpClientTestingModule],
+      providers: [
+        RwPolicyService,
+        { provide: RwUserService, useValue: {} },
+        { provide: RwDataService, useValue: {} },
+        { provide: RwToastService, useValue: {} },
+      ],
     });
   });
 
-  it('should be created', inject([PolicyService], (service: PolicyService) => {
-    expect(service).toBeTruthy();
-  }));
+  it('should be created', () => {
+    expect(TestBed.inject(RwPolicyService)).toBeTruthy();
+  });
 });

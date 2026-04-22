@@ -1,30 +1,33 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { provideLocationMocks } from '@angular/common/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { OzModule } from 'oz';
-import { CoreModule } from './core/core.module';
-import { AttachmentComponent } from './shared/attachment/attachment.component';
+import { RwToastService } from '@renwu/components';
+import { RwDataService } from '../data/data.service';
+import { RW_CORE_SETTINGS } from '../settings-token';
+import { AttachmentComponent } from './attachment.component';
 
 describe('AttachmentComponent', () => {
-  let component: AttachmentComponent;
   let fixture: ComponentFixture<AttachmentComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [CoreModule, OzModule],
-      declarations: [AttachmentComponent],
-      providers: [provideRouter([]), provideLocationMocks()],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AttachmentComponent],
+      providers: [
+        provideRouter([]),
+        provideLocationMocks(),
+        { provide: RwDataService, useValue: {} },
+        { provide: RwToastService, useValue: {} },
+        { provide: RW_CORE_SETTINGS, useValue: {} },
+      ],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AttachmentComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

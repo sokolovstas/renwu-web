@@ -1,33 +1,28 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideLocationMocks } from '@angular/common/testing';
 import { provideRouter } from '@angular/router';
-import { OzModule } from 'oz';
-import { CoreModule } from './core/core.module';
-import { NewsItemComponent } from './shared/news-item/news-item.component';
-import { FormatUserPipe } from './shared/pipes/format-user.pipe';
+import { RwSettingsService } from '../../settings/settings.service';
+import { IssueHistoryItemComponent } from './history-item.component';
 
-describe('NewsItemComponent', () => {
-  let component: NewsItemComponent;
-  let fixture: ComponentFixture<NewsItemComponent>;
+describe('IssueHistoryItemComponent', () => {
+  let fixture: ComponentFixture<IssueHistoryItemComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [CoreModule, OzModule],
-      declarations: [NewsItemComponent, FormatUserPipe],
-      providers: [provideRouter([]), provideLocationMocks()],
-      schemas: [NO_ERRORS_SCHEMA],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [IssueHistoryItemComponent],
+      providers: [
+        provideRouter([]),
+        provideLocationMocks(),
+        { provide: RwSettingsService, useValue: { user: {} } },
+      ],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NewsItemComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = TestBed.createComponent(IssueHistoryItemComponent);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });
