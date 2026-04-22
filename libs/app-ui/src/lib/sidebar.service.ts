@@ -8,6 +8,7 @@ import {
   BehaviorSubject,
   Observable,
   combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   of,
@@ -134,14 +135,21 @@ export class RenwuSidebarService {
         });
       });
 
-    this.currentTask.subscribe((t) => {
-      if (t && this.scrollContainer) {
-        this.router.navigate([{ outlets: { section: ['task', t.key] } }]);
-        setTimeout(() => {
-          this.scrollToSection();
-        }, 200);
-      }
-    });
+    this.currentTask
+      .pipe(
+        map((t) => (t?.key ?? '').trim()),
+        distinctUntilChanged(),
+        filter((key) => !!key),
+      )
+      .subscribe((key) => {
+        // Section URL must update even if scroll host init runs late (ViewChild inside @if).
+        void this.router.navigate([{ outlets: { section: ['task', key] } }]);
+        if (this.scrollContainer?.nativeElement) {
+          setTimeout(() => {
+            this.scrollToSection();
+          }, 200);
+        }
+      });
   }
   init(scrollContainer: ElementRef) {
     this.scrollContainer = scrollContainer;

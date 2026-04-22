@@ -2,8 +2,9 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  inject,
   ViewChild,
+  afterNextRender,
+  inject,
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
@@ -52,6 +53,11 @@ export class AppComponent implements AfterViewInit {
   protected alertService = inject(RwAlertService);
   protected tooltipService = inject(RwTooltipService);
 
+  constructor() {
+    // #scrollContainer lives inside @if (ready); afterNextRender runs when it actually exists.
+    afterNextRender(() => this.initSidebarScrollHost());
+  }
+
   @ViewChild('scrollContainer', { read: ElementRef })
   scrollContainer: ElementRef;
 
@@ -70,7 +76,13 @@ export class AppComponent implements AfterViewInit {
   checkUpdate = inject(CheckForUpdateService);
   tour = inject(RenwuTourService);
 
-  async ngAfterViewInit(): Promise<void> {
-    this.sidebarService.init(this.scrollContainer);
+  ngAfterViewInit(): void {
+    this.initSidebarScrollHost();
+  }
+
+  private initSidebarScrollHost(): void {
+    if (this.scrollContainer?.nativeElement) {
+      this.sidebarService.init(this.scrollContainer);
+    }
   }
 }

@@ -1,5 +1,15 @@
-
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  inject,
+} from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwTooltipDirective } from '@renwu/components';
 
@@ -11,9 +21,10 @@ import { RwTooltipDirective } from '@renwu/components';
   styleUrl: './issue-href.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IssueHrefComponent implements OnInit {
+export class IssueHrefComponent {
   private el = inject(ElementRef);
   private cd = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   @Input()
   title: string;
@@ -55,59 +66,65 @@ export class IssueHrefComponent implements OnInit {
   ) {
     this.onDblclick(eventMouse);
   }
-  ngOnInit() {
-    // if (this.issue && this.issue.id) {
-    //   this.issue.id = this.issue.id;
-    // }
-    return;
-  }
-  onClick(event: MouseEvent) {
-    // if (!this.issue.id && !this.issue.key) {
-    //   return false;
-    // }
-    // let mouseKey = event.which;
-    // clearTimeout(this.timer);
-    // if (!mouseKey && event.button) {
-    //   // (IE8-)
-    //   if (event.button === 1) {
-    //     mouseKey = 1;
-    //   } else if (event.button === 4) {
-    //     mouseKey = 2;
-    //   } else if (event.button === 2) {
-    //     mouseKey = 3;
-    //   }
-    // }
-    // if (
-    //   !event.altKey &&
-    //   !event.ctrlKey &&
-    //   !event.shiftKey &&
-    //   !event.metaKey &&
-    //   mouseKey !== 2
-    // ) {
-    //   event.preventDefault();
-    //   if (this.openOnClick) {
-    //     this.timer = setTimeout(() => {
-    //       this.issueService.closed.next(false);
-    //       if (this.updateStatus) {
-    //         this.issueService.saved = false;
-    //       }
-    //       this.openIssuePopup();
-    //     }, 200);
-    //   }
-    //   const clickEvent = new MouseEvent('click', {
-    //     view: window,
-    //     bubbles: true,
-    //     cancelable: true,
-    //   });
-    //   window.dispatchEvent(clickEvent);
-    // }
-    // event.stopPropagation();
-  }
-  getHref(): string {
-    if (this.issue.key === '') {
-      return `task/${this.issue.id}`;
+
+  /** Key used in `/…(section:task/:key)` — same as legacy `task/${key}` paths. */
+  private taskOutletKey(): string {
+    const issue = this.issue;
+    if (!issue) {
+      return '';
     }
-    return `task/${this.issue.key}`;
+    if (issue.key === '') {
+      return String(issue.id ?? '');
+    }
+    return String(issue.key ?? this.key ?? '').trim();
+  }
+
+  /**
+   * Absolute app path for `<a href>` so middle‑click / copy work next to
+   * `task/list/…(section:task/…)`; left‑click uses Router to update only the
+   * `section` outlet without breaking the primary `task/list/…` route.
+   */
+  getHref(): string {
+    const k = this.taskOutletKey();
+    if (!k) {
+      return '#';
+    }
+    const url = this.router.url;
+    const normalized = url.startsWith('/') ? url : `/${url}`;
+    const sectionMatch = normalized.match(/^(.*)\(section:task\/[^)]+\)/);
+    if (sectionMatch) {
+      return `${sectionMatch[1]}(section:task/${encodeURIComponent(k)})`;
+    }
+    return `/task/list/(section:task/${encodeURIComponent(k)})`;
+  }
+
+  onClick(event: MouseEvent): void {
+    if (!this.openOnClick) {
+      return;
+    }
+    if (event.defaultPrevented) {
+      return;
+    }
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    if (event.button !== 0) {
+      return;
+    }
+    const k = this.taskOutletKey();
+    if (!k) {
+      return;
+    }
+    event.preventDefault();
+    void this.router.navigate([{ outlets: { section: ['task', k] } }]);
+  }
+
+  private absoluteHrefForCopy(): string {
+    const p = this.getHref();
+    if (p.startsWith('/')) {
+      return `${globalThis.location.origin}${p}`;
+    }
+    return new URL(p, document.baseURI).href;
   }
   getLabel(): string {
     if (this.key && this.title) {
@@ -126,7 +143,7 @@ export class IssueHrefComponent implements OnInit {
       event.preventDefault();
       clearTimeout(this.timer);
       const textArea = document.createElement('textarea');
-      textArea.value = document.baseURI + this.getHref();
+      textArea.value = this.absoluteHrefForCopy();
       document.body.appendChild(textArea);
       textArea.select();
       try {
