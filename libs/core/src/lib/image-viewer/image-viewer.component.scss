@@ -13,6 +13,10 @@
 .image-viewer-body {
   padding: 0 !important;
   background-color: #111;
+  width: 90vw;
+  height: calc(90vh - 7.5rem);
+  min-height: 22rem;
+  display: flex;
 }
 
 .image-viewer-footer {
@@ -24,6 +28,7 @@
   user-select: none;
   position: relative;
   flex: 1 1 100%;
+  min-height: 0;
   display: flex;
 
   &.broken {
