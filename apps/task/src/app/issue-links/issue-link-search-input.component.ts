@@ -40,6 +40,7 @@ export class IssueLinkSearchInputComponent {
 
   /** rw-select CVA value; cleared after each successful pick. */
   selectedIssue: Issue | null = null;
+  renderSelect = true;
 
   readonly selectModelName = 'IssueLink';
 
@@ -69,7 +70,11 @@ export class IssueLinkSearchInputComponent {
   }
 
   private clearSelection(): void {
+    this.selectedIssue = null;
+    this.renderSelect = false;
+    this.cd.markForCheck();
     queueMicrotask(() => {
+      this.renderSelect = true;
       this.selectedIssue = null;
       this.cd.markForCheck();
     });

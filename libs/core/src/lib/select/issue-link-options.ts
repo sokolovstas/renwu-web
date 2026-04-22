@@ -31,7 +31,7 @@ export class SelectModelIssueLink
       try {
         return await firstValueFrom(
           this.dataService
-            .getDictionaryOptions<Issue>('issue/options', null, { q }, 0)
+            .getDictionaryOptions<Issue>('issue/options', '', { q }, 0)
             .pipe(
               tap((r) => this.haveNext.next(!!r.next)),
               map((l) =>

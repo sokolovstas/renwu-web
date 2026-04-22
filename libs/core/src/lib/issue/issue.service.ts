@@ -47,7 +47,7 @@ import {
 import { UserD } from '../user/user.model';
 import { RwUserService } from '../user/user.service';
 import { RwWebsocketService } from '../websocket/websocket.service';
-import { Attachment, Issue, IssueLinks, TimeLog } from './issue.model';
+import { Attachment, Issue, IssueLink, IssueLinks, TimeLog } from './issue.model';
 
 @Injectable({ providedIn: 'root' })
 export class RwIssueService implements OnDestroy {
@@ -314,6 +314,10 @@ export class RwIssueService implements OnDestroy {
       return of(null);
     }
     const diff = this.getDiff(issuePrev, issue);
+    if (diff.links) {
+      // Payload omits empty date fields; cast keeps Partial<Issue> typing for HTTP layer.
+      diff.links = this.normalizeIssueLinksForSave(diff.links) as IssueLinks;
+    }
 
     // Skip status on save
     if (issuePrev.status.id !== issue.status.id) {
@@ -363,7 +367,7 @@ export class RwIssueService implements OnDestroy {
       );
   }
   getDiff(issuePrev: Issue, issue: Issue): Partial<Issue> {
-    const result: any = {};
+    const result: Partial<Issue> = {};
     if (!issuePrev) {
       return result;
     }
@@ -392,7 +396,9 @@ export class RwIssueService implements OnDestroy {
         notEqual = false;
       }
       if (notEqual) {
-        result[issueKey] = issue[issueKey];
+        (
+          result as Record<keyof Issue, Issue[keyof Issue]>
+        )[issueKey] = issue[issueKey] as Issue[keyof Issue];
       }
     }
     return result;
@@ -626,6 +632,36 @@ export class RwIssueService implements OnDestroy {
       related: links?.related ?? [],
       prev_issue: links?.prev_issue ?? [],
       next_issue: links?.next_issue ?? [],
+    };
+  }
+
+  /** Backend expects lightweight link objects; drop UI-only nested fields (e.g. status object). */
+  private normalizeIssueLinksForSave(
+    links: IssueLinks | null | undefined,
+  ): IssueLinks {
+    const normalizeBucket = (arr: IssueLink[] | undefined): IssueLink[] =>
+      (arr ?? []).map((l) => {
+        const ds = (l?.date_start ?? '').trim();
+        const de = (l?.date_end ?? '').trim();
+        const out = {
+          id: String(l?.id ?? ''),
+          title: l?.title ?? '',
+          key: l?.key ?? '',
+          have_childs: !!l?.have_childs,
+        } as IssueLink;
+        if (ds) {
+          out.date_start = ds;
+        }
+        if (de) {
+          out.date_end = de;
+        }
+        return out;
+      });
+    return {
+      parent: normalizeBucket(links?.parent),
+      related: normalizeBucket(links?.related),
+      prev_issue: normalizeBucket(links?.prev_issue),
+      next_issue: normalizeBucket(links?.next_issue),
     };
   }
 

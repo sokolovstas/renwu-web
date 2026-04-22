@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RwAlertService {
   current: AlertInstance;
+  current$ = new BehaviorSubject<AlertInstance | null>(null);
   result: Subject<AlertButton>;
   width = 310;
   // alert, prompt, confirm
@@ -26,6 +27,7 @@ export class RwAlertService {
         class: 'common-button',
       },
     ];
+    this.current$.next(this.current);
     this.result = new Subject();
     return this.result;
   }
@@ -51,6 +53,7 @@ export class RwAlertService {
         affirmative: true,
       },
     ];
+    this.current$.next(this.current);
     this.result = new Subject();
     return this.result;
   }
@@ -85,15 +88,18 @@ export class RwAlertService {
         affirmative: false,
       },
     ];
+    this.current$.next(this.current);
     this.result = new Subject();
     return this.result;
   }
   close(): void {
     if (this.current) {
       this.current.state = 'void';
+      this.current$.next(this.current);
       // HACK: Used simple timeout for brevity
       globalThis.setTimeout(() => {
         this.current = null;
+        this.current$.next(null);
       }, 200);
     }
   }

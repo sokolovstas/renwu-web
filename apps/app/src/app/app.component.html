@@ -49,8 +49,8 @@
       >
       <div #modalContainer></div>
     </div>
-    @if (alertService.current) {
-      <rw-alert [alert]="alertService.current"
+    @if (alertService.current$ | async; as alert) {
+      <rw-alert [alert]="alert"
        />
     }
     <rw-toast-container />
