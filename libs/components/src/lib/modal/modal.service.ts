@@ -57,7 +57,9 @@ export class RwModalService {
     lastModal.modal = modal;
     if (!lastModal.wait) {
       globalThis.setTimeout(() => {
-        lastModal.modal.state = 'show';
+        if (lastModal.modal) {
+          lastModal.modal.state = 'show';
+        }
       });
     }
   }
@@ -96,7 +98,7 @@ export class RwModalService {
   }
   show(): void {
     const lastModal = this.modals[this.modals.length - 1];
-    if (!lastModal) {
+    if (!lastModal?.modal) {
       return;
     }
     lastModal.modal.state = 'show';
@@ -109,6 +111,16 @@ export class RwModalService {
       lastModal = this.modals[this.modals.length - 1];
     }
     if (!lastModal) {
+      return;
+    }
+    if (!lastModal.modal) {
+      if (lastModal.contentRef) {
+        lastModal.contentRef.destroy();
+      }
+      this.modals.splice(this.modals.indexOf(lastModal), 1);
+      this.opened.next(this.modals.length !== 0);
+      this.containers.get(lastModal.containerKey).active =
+        this.modals.length > 0;
       return;
     }
     lastModal.modal.state = 'close';
@@ -125,7 +137,7 @@ export class RwModalService {
   }
   closeAll(): void {
     while (this.modals.length > 0) {
-      this.close(this.modals[this.modals.length - 1].modal);
+      this.close();
     }
   }
 }

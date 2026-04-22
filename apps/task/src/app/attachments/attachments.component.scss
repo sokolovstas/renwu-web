@@ -1,0 +1,65 @@
+/* renwu-attachment uses 100% width/height of its host; without a sized host + visible
+   classButton icon (see libs/messaging attachment usage), the file label had no hit area. */
+.task-attachments-upload-wrap {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-attachments-upload-wrap renwu-attachment {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.task-attachments-upload-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.task-attachments-upload-wrap:hover .task-attachments-upload-icon {
+  opacity: 1;
+}
+
+.task-attachments-images {
+  align-items: flex-start;
+}
+
+.task-attachments-image-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 6.5rem;
+}
+
+.task-attachments-thumb {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  line-height: 0;
+}
+
+.task-attachments-thumb:focus-visible {
+  outline: 2px solid rgb(59 130 246);
+  outline-offset: 2px;
+}
+
+.task-attachments-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+.task-attachments-file-meta {
+  max-width: 100%;
+}

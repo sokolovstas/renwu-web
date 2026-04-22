@@ -1,11 +1,3 @@
-jest.mock('@jsverse/transloco', () => {
-  const s = require('../../testing/transloco-stub');
-  return {
-    TranslocoPipe: s.TranslocoPipeStub,
-    TranslocoService: s.TranslocoServiceStub,
-  };
-});
-
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';

@@ -1,0 +1,10 @@
+<rw-select
+  class="issue-link-rw-select w-full"
+  [modelName]="selectModelName"
+  [prompt]="promptKey | transloco"
+  [borderless]="true"
+  [(ngModel)]="selectedIssue"
+  (ngModelChange)="onSelectValue($event)"
+  [ngModelOptions]="{ standalone: true }"
+  name="issue-link-rw-select"
+/>

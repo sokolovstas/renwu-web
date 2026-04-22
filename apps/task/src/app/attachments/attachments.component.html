@@ -8,11 +8,14 @@
     <span>{{ 'task.attachments' | transloco }}</span>
     <div class="flex flex-row items-center gap-2 shrink-0">
       @if (isNew === false && canEdit) {
-        <renwu-attachment [flagButton]="true"
-          [flagDropZone]="true"
-          [flagPaste]="true"
-          (fileUploaded)="onFileUploaded($event)"
-         />
+        <div class="task-attachments-upload-wrap">
+          <renwu-attachment [flagButton]="true"
+            [classButton]="'task-attachments-upload-icon icon-add'"
+            [flagDropZone]="true"
+            [flagPaste]="true"
+            (fileUploaded)="onFileUploaded($event)"
+           />
+        </div>
       }
       @if (isNew === false && view?.hasAny) {
         <rw-icon class="opacity-60 hover:opacity-100"
@@ -36,46 +39,104 @@
       <span class="text-sm opacity-50 px-1">{{ 'task.attachments-empty' | transloco }}</span>
     } @else if (listExpanded) {
       @if (view.images.length > 0) {
-        <div class="flex flex-row flex-wrap gap-2 px-1 mb-3">
-          @for (att of view.images; track att.id) {
-            <a class="block shrink-0"
-              [href]="att.openHref"
-              target="_blank"
-              rel="noopener"
-              [title]="att.file_name"
-              >
-              <img class="h-16 w-16 rounded border object-cover"
-                [src]="att.openHref"
-                [alt]="att.file_name"
-               />
-            </a>
+        <div class="task-attachments-images flex flex-row flex-wrap gap-3 px-1 mb-3">
+          @for (att of view.images; track att.id; let i = $index) {
+            <div class="task-attachments-image-card">
+              <button type="button"
+                class="task-attachments-thumb"
+                [title]="att.file_name"
+                (click)="openImageViewer(view.images, i)"
+                >
+                <img class="h-16 w-16 rounded border object-cover pointer-events-none"
+                  [src]="att.openHref"
+                  [alt]="att.file_name"
+                 />
+              </button>
+              <div class="task-attachments-actions">
+                <rw-icon size="small"
+                  cursor="pointer"
+                  class="opacity-60 hover:opacity-100"
+                  icon="markdown"
+                  [rwTooltip]="'task.attachments-tooltip-markdown' | transloco"
+                  (click)="copyAttachmentMarkdown(att); $event.stopPropagation()"
+                 />
+                @if (canEdit) {
+                  <rw-icon size="small"
+                    cursor="pointer"
+                    class="opacity-60 hover:opacity-100"
+                    icon="chat-message"
+                    [rwTooltip]="'task.attachments-tooltip-post' | transloco"
+                    (click)="postAttachmentToMessages(att); $event.stopPropagation()"
+                   />
+                }
+                <a class="opacity-60 hover:opacity-100 inline-flex"
+                  [href]="att.downloadHref"
+                  target="_blank"
+                  rel="noopener"
+                  [attr.download]="att.file_name"
+                  [rwTooltip]="'task.attachments-tooltip-download' | transloco"
+                  (click)="$event.stopPropagation()"
+                  >
+                  <rw-icon size="small" cursor="pointer" icon="download" />
+                </a>
+                @if (canEdit) {
+                  <rw-button class="opacity-50 hover:opacity-100"
+                    typeButton="icon"
+                    iconClass="trash"
+                    [rwTooltip]="'task.attachments-tooltip-delete' | transloco"
+                    (clicked)="remove(att)"
+                   />
+                }
+              </div>
+            </div>
           }
         </div>
       }
       <div class="flex flex-col gap-2 px-1 text-sm">
         @for (att of view.others; track att.id) {
           <div
-            class="flex flex-row items-center justify-between gap-2 border-b border-gray-100 pb-1"
+            class="flex flex-row flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-1"
             >
-            <a class="truncate text-blue-600 hover:underline"
+            <a class="truncate text-blue-600 hover:underline min-w-0 flex-1"
               [href]="att.openHref"
               target="_blank"
               rel="noopener"
               >{{ att.file_name }}</a
               >
-            <div class="flex flex-row items-center gap-2 shrink-0 opacity-70 text-xs">
-              <span>{{ att.date_created | rwDate: 'PPp' }}</span>
-              <a class="text-blue-600 hover:underline whitespace-nowrap"
+            <div
+              class="flex flex-row flex-wrap items-center gap-1 shrink-0 opacity-80 text-xs task-attachments-file-meta"
+              >
+              <span class="whitespace-nowrap">{{ att.date_created | rwDate: 'PPp' }}</span>
+              <rw-icon size="small"
+                cursor="pointer"
+                class="opacity-70 hover:opacity-100"
+                icon="markdown"
+                [rwTooltip]="'task.attachments-tooltip-markdown' | transloco"
+                (click)="copyAttachmentMarkdown(att)"
+               />
+              @if (canEdit) {
+                <rw-icon size="small"
+                  cursor="pointer"
+                  class="opacity-70 hover:opacity-100"
+                  icon="chat-message"
+                  [rwTooltip]="'task.attachments-tooltip-post' | transloco"
+                  (click)="postAttachmentToMessages(att)"
+                 />
+              }
+              <a class="inline-flex opacity-70 hover:opacity-100"
                 [href]="att.downloadHref"
                 target="_blank"
                 rel="noopener"
                 [attr.download]="att.file_name"
-                >{{ 'task.attachments-download' | transloco }}</a
+                [rwTooltip]="'task.attachments-tooltip-download' | transloco"
                 >
+                <rw-icon size="small" cursor="pointer" icon="download" />
+              </a>
               @if (isNew === false && canEdit) {
                 <rw-button class="opacity-50 hover:opacity-100"
                   typeButton="icon"
                   iconClass="trash"
+                  [rwTooltip]="'task.attachments-tooltip-delete' | transloco"
                   (clicked)="remove(att)"
                  />
               }

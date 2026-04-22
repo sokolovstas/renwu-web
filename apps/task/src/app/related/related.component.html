@@ -7,16 +7,13 @@
     <span>{{ 'task.related' | transloco }}</span>
     @if (isNew === false && canEdit) {
       <div class="flex flex-row items-center gap-2 flex-1 min-w-0 justify-end">
-        <rw-text-input class="max-w-xs w-full flex-1"
-          [(ngModel)]="addKey"
-          (enter)="add()"
-          [live]="true"
-          prompt="{{ 'task.related-add-placeholder' | transloco }}"
-         />
-        <rw-button typeButton="icon"
-          iconClass="add-bold"
-          (clicked)="add()"
-         />
+        <renwu-task-issue-link-search-input
+          class="max-w-xs w-full flex-1"
+          [promptKey]="'task.related-add-placeholder'"
+          [selfKey]="issueService.issueForm.getRawValue().key ?? null"
+          [forbiddenKeys]="linkedKeys$ | async"
+          (issuePicked)="addIssue($event)"
+        />
       </div>
     }
   </div>
@@ -27,23 +24,23 @@
     @for (link of related$ | async; track link.key) {
       <div class="flex flex-row items-center justify-between gap-2 text-sm">
         <div class="flex flex-row items-center gap-2 min-w-0 flex-1">
-          <renwu-issue-href [issue]="link"
+          <renwu-issue-href
+            [issue]="link"
             [key]="link.key"
             [title]="link.title"
             [linkButton]="true"
-           />
+          />
           @if (link.status) {
-            <renwu-issue-status class="shrink-0"
-              [value]="link.status"
-             />
+            <renwu-issue-status class="shrink-0" [value]="link.status" />
           }
         </div>
         @if (isNew === false && canEdit) {
-          <rw-button class="opacity-40 hover:opacity-100 shrink-0"
+          <rw-button
+            class="opacity-40 hover:opacity-100 shrink-0"
             typeButton="icon"
             iconClass="trash"
             (clicked)="remove(link)"
-           />
+          />
         }
       </div>
     } @empty {

@@ -35,18 +35,11 @@
     }}</p>
   }
   @if (isNew === false && gate?.canLog) {
-    <form [formGroup]="logForm" class="flex flex-col gap-2 mb-4 px-1">
-      <rw-time-picker formControlName="duration"
-        [prompt]="'task.time-log-duration' | transloco"
-       />
-      <rw-text-area formControlName="comment"
-        [borderless]="true"
-        prompt="{{ 'task.time-log-comment' | transloco }}"
-       />
-      <rw-button typeButton="secondary" (clicked)="addLog()">{{
+    <div class="mb-4 px-1">
+      <rw-button typeButton="secondary" (clicked)="openAddLogModal()">{{
         'task.time-log-add' | transloco
       }}</rw-button>
-    </form>
+    </div>
   }
   <div class="flex flex-col gap-2 px-1 text-sm max-h-80 overflow-y-auto">
     @for (log of logs ?? []; track $index) {

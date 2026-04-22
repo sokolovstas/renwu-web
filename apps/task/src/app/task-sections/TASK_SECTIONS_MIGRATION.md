@@ -4,15 +4,17 @@
 
 Migrate and complete behavior for:
 
-- `renwu-task-related`
+- `renwu-task-links` (structural: `links.parent`, `links.prev_issue`, `links.next_issue`)
+- `renwu-task-related` (`links.related` only)
 - `renwu-task-sub-task`
 - `renwu-task-attachments`
 - `renwu-task-time-log`
 - `renwu-task-history`
 
-Related i18n keys:
+Related / links i18n keys:
 
-- `task.related`, `task.related-add-placeholder`, `task.related-empty`
+- `task.links`, `task.links-*` (structural link section)
+- `task.related`, `task.related-add-placeholder`, `task.related-empty`, `task.related-*`
 - `task.subtask`, `task.subtask-empty`, `task.subtask-decomposite`, `task.subtask-decomposite-*` (modal)
 - `task.attachments`, `task.attachments-empty`
 - `task.timelog`, `task.time-log-total`, `task.time-log-completion`, `task.time-log-duration`, `task.time-log-comment`, `task.time-log-empty`
@@ -31,7 +33,7 @@ Related i18n keys:
 
 Baseline files used for migration decisions:
 
-- Related: `apps/old/src/app/issue/detail/related`
+- Related (and structural links in product): legacy UI split varied; new Task UI uses **`renwu-task-links`** for parent / prev / next and **`renwu-task-related`** for `related` only. Legacy folder: `apps/old/src/app/issue/detail/related` (related list).
 - Subtasks (legacy name "Childs"): `apps/old/src/app/issue/detail/implemented`
 - Attachments: `apps/old/src/app/issue/detail/attachment`
 - Time log modal + side summary: `apps/old/src/app/issue/timelog` and `apps/old/src/app/issue/detail/time-tracking`
@@ -113,27 +115,30 @@ Behavior observed in legacy implementation:
    - New Task UI uses inline sections instead of legacy modal-centric UX for time log/history.
    - New Task UI introduces explicit empty placeholders where legacy sections were silent.
    - Decomposite is opened from the Subtasks section toolbar (list icon) rather than only from legacy issue chrome; per-row project/skill pickers remain omitted (legacy UI had those selects commented out).
-   - Complex legacy attachment utilities (post to messages, markdown copy, image viewer) are treated as optional parity extensions and can ship in follow-up phases.
+   - Attachment utilities from legacy (post to messages, markdown copy, image viewer) are now migrated; viewer now uses standard `rw-modal` layout with max viewport bounds.
 
 ## Iterative Delivery Plan
 
 ## Migration Board (Live)
 
-- `related`: in progress
-  - done: add/remove logic, duplicate/self/not-found guards, permission gate, unlink confirm, status badge, Jest coverage for save-first / no-edit / duplicate / self / not-found / success add, confirm dismiss/accept on remove (`related.component.spec.ts`)
-  - pending: shallow DOM / `IssueHref` integration if product wants template-level assertions
+- `links`: done
+  - done: parent / prev / next UI + form `links` updates, duplicate/self/not-found guards, permission gate, unlink confirm, i18n `task.links-*`, Jest smoke (`links.component.spec.ts`)
+  - remaining: no confirmed product gaps; keep visual parity checks in regression sweep
+- `related`: done
+  - done: **related list only** (not parent/prev/next); add/remove logic, duplicate/self/not-found guards (including keys already in structural links), permission gate, unlink confirm, status badge, Jest coverage for save-first / no-edit / duplicate / self / not-found / success add, confirm dismiss/accept on remove (`related.component.spec.ts`)
+  - remaining: optional template-level assertions (`IssueHref`) if stricter DOM tests are requested
 - `sub-task`: in progress
   - done: load by `getChildIssues`, empty/save-first states, text progress, status bar + child status, unlink child (confirm + `saveIssue` + reload parent + refresh list), permission gate on unlink, **add subtask** (icon opens shell `task/new` + `RwIssueService.updateFromTemplate` with `links.parent` from current issue; toast if no `container`), **Decomposite** (list icon → `TaskDecompositeModalComponent`: template from `RwContainerService.getIssueTemplate`, sequential `RwDataService.addIssue`, optional clone to-dos/description, `afterCreate` refreshes parent + child list), shared `parentIssueToLink` helper, i18n `task.subtask-decomposite*` in task + app vendors, Jest for addChild + unlink/load (`sub-task.component.spec.ts`)
-  - pending: richer row fields (per-row project/skill like partially commented legacy), milestones on batch create
-- `attachments`: in progress
-  - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts, image vs file grouping, collapsible list, explicit download link
-  - pending: markdown/post-to-messages, image viewer parity
+  - remaining: richer row fields (per-row project/skill like partially commented legacy), milestones on batch create
+- `attachments`: done
+  - done: upload/remove sync, save-first state, permission gate, delete confirm, error toasts, image vs file grouping, collapsible list, explicit download link, copy markdown link, post-to-messages action, image viewer overlay with navigation/zoom/download/delete
+  - remaining: visual polish-only parity checks during regression sweep
 - `time-log`: in progress
-  - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling, modal editor for existing logs (24h / admin rules, save + patch + prev state)
-  - pending: elapsed-time prompt parity, status-coupled completion edge cases
+  - done: add flow, default duration/comment, total placeholder, 95% fallback display, parent-child guard, duration validation, error handling, dedicated add modal, modal editor for existing logs (24h / admin rules, save + patch + prev state)
+  - remaining: elapsed-time prompt parity, status-coupled completion edge cases
 - `history`: in progress
   - done: fetch + sort + fallback, inline rendering, event normalization for id/source parity, unit tests for `_id`→`id`, source strip, and descending sort
-  - pending: component-level integration spec with mocked `getIssueEvents`
+  - remaining: component-level integration spec with mocked `getIssueEvents`
 
 ## Definition of Done (Per Section)
 
@@ -197,8 +202,6 @@ Behavior observed in legacy implementation:
 
 ## Open Input Needed
 
-- Confirm parity target for optional legacy features:
-  - attachments "post to messages",
-  - attachments "copy markdown link",
-  - attachments image viewer/edit overlay,
+- Confirm parity target for remaining non-blocking gaps:
+  - sub-task batch-create extra row fields (project/skill/milestones),
   - timelog modal-specific prompts based on elapsed tracking.

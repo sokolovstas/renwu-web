@@ -11,19 +11,23 @@ import {
   RwButtonComponent,
   RwDatePipe,
   RwIconComponent,
+  RwModalService,
   RwToastService,
+  RwTooltipDirective,
 } from '@renwu/components';
 import {
   Attachment,
   AttachmentComponent,
   FileUpload,
+  ImageViewerComponent,
   RW_CORE_SETTINGS,
   RwCoreSettings,
   RwDataService,
   RwIssueService,
   RwPolicyService,
 } from '@renwu/core';
-import { testImageExtension } from '@renwu/utils';
+import { DestinationType, RwMessageService } from '@renwu/messaging';
+import { copyToClipboard, testImageExtension } from '@renwu/utils';
 import {
   distinctUntilChanged,
   firstValueFrom,
@@ -31,6 +35,7 @@ import {
   merge,
   startWith,
   switchMap,
+  take,
 } from 'rxjs';
 
 export interface TaskUiAttachment extends Attachment {
@@ -54,6 +59,7 @@ export interface TaskAttachmentView {
     RwButtonComponent,
     RwDatePipe,
     RwIconComponent,
+    RwTooltipDirective,
     TranslocoPipe,
   ],
   templateUrl: './attachments.component.html',
@@ -68,6 +74,8 @@ export class AttachmentsComponent {
   cd = inject(ChangeDetectorRef);
   alertService = inject(RwAlertService);
   policyService = inject(RwPolicyService);
+  modalService = inject(RwModalService);
+  messageService = inject(RwMessageService);
   private readonly settings = inject<RwCoreSettings>(RW_CORE_SETTINGS);
 
   isNewIssue = this.issueService.newIssue;
@@ -104,6 +112,89 @@ export class AttachmentsComponent {
   toggleList(): void {
     this.listExpanded = !this.listExpanded;
     this.cd.markForCheck();
+  }
+
+  openImageViewer(images: TaskUiAttachment[], startIndex: number): void {
+    if (!images.length) {
+      return;
+    }
+    const prepared = images.map((a) => ({
+      ...a,
+      href: a.openHref,
+      href_file_name: a.downloadHref,
+    }));
+    const viewer = this.modalService.add(ImageViewerComponent, {
+      images: prepared,
+      currentIndex: Math.min(
+        Math.max(0, startIndex),
+        prepared.length - 1,
+      ),
+      hostClose: () => this.modalService.close(),
+    });
+    viewer.deleteImage.pipe(take(1)).subscribe((att) => {
+      void this.onImageViewerDelete(att as Attachment);
+    });
+  }
+
+  private async onImageViewerDelete(att: Attachment): Promise<void> {
+    const removed = await this.remove(att);
+    if (removed) {
+      this.modalService.close();
+    }
+  }
+
+  copyAttachmentMarkdown(att: TaskUiAttachment): void {
+    const md = this.buildAttachmentMarkdown(att);
+    void copyToClipboard(md).then(
+      () => {
+        this.toastService.info(
+          this.transloco.translate('task.attachments-markdown-copied'),
+        );
+        this.cd.markForCheck();
+      },
+      () => {
+        this.toastService.error(
+          this.transloco.translate('task.attachments-markdown-copy-error'),
+        );
+        this.cd.markForCheck();
+      },
+    );
+  }
+
+  postAttachmentToMessages(att: TaskUiAttachment): void {
+    const raw = this.issueService.issueForm.getRawValue();
+    if (!raw.id || raw.id === 'new') {
+      return;
+    }
+    const destination = {
+      id: String(raw.id),
+      type: DestinationType.ISSUE,
+    };
+    this.messageService
+      .postFileMessage(destination, att.url ?? '', att.file_name)
+      .subscribe({
+        next: () => {
+          this.toastService.info(
+            this.transloco.translate('task.attachments-posted-to-messages'),
+          );
+          this.cd.markForCheck();
+        },
+        error: () => {
+          this.toastService.error(
+            this.transloco.translate('task.attachments-post-to-messages-error'),
+          );
+          this.cd.markForCheck();
+        },
+      });
+  }
+
+  private buildAttachmentMarkdown(att: TaskUiAttachment): string {
+    const href = att.openHref;
+    const fileName = att.file_name;
+    if (testImageExtension(fileName)) {
+      return `[${fileName}](${href}):\n![${fileName}](${href})\n`;
+    }
+    return `[${fileName}](${href})\n`;
   }
 
   private buildAttachmentView(): TaskAttachmentView {
@@ -146,6 +237,18 @@ export class AttachmentsComponent {
     };
   }
 
+  /** Strip upload progress fields before PUT /issue/:id (legacy payload is Attachment only). */
+  private fileUploadToAttachment(file: FileUpload): Attachment {
+    return {
+      id: String(file.id ?? ''),
+      file_name: file.file_name ?? '',
+      url: file.url ?? '',
+      owner: file.owner,
+      date_created: file.date_created ?? '',
+      source: file.source ?? '',
+    };
+  }
+
   async onFileUploaded(file: FileUpload): Promise<void> {
     if (!file.__loaded) {
       return;
@@ -168,7 +271,10 @@ export class AttachmentsComponent {
     }
     try {
       const issue = await firstValueFrom(
-        this.dataService.addIssueAttachment(String(id), file),
+        this.dataService.addIssueAttachment(
+          String(id),
+          this.fileUploadToAttachment(file),
+        ),
       );
       this.issueService.patchIssue(
         { attachments: issue.attachments ?? [] },
@@ -184,10 +290,11 @@ export class AttachmentsComponent {
     this.cd.markForCheck();
   }
 
-  async remove(att: Attachment): Promise<void> {
+  /** @returns whether the attachment was removed from the server */
+  async remove(att: Attachment): Promise<boolean> {
     const { id, key, container } = this.issueService.issueForm.getRawValue();
     if (id === 'new' || !id) {
-      return;
+      return false;
     }
     const canEdit = await firstValueFrom(
       this.policyService.canEditIssue(
@@ -196,7 +303,7 @@ export class AttachmentsComponent {
       ),
     );
     if (!canEdit) {
-      return;
+      return false;
     }
     const result = await firstValueFrom(
       this.alertService.confirm(
@@ -210,7 +317,7 @@ export class AttachmentsComponent {
       ),
     );
     if (!result?.affirmative) {
-      return;
+      return false;
     }
     try {
       await firstValueFrom(
@@ -224,11 +331,14 @@ export class AttachmentsComponent {
         { emitEvent: true },
       );
       this.issueService.setPrevState();
+      this.cd.markForCheck();
+      return true;
     } catch {
       this.toastService.error(
         this.transloco.translate('task.attachments-mutation-error'),
       );
     }
     this.cd.markForCheck();
+    return false;
   }
 }

@@ -1,59 +1,52 @@
-<div class="controls">
-  <div class="controls-buttons">
-    <div class="filename">
-      {{ imageViewer?.file_name || imageViewer?.href }}
-    </div>
+<rw-modal>
+  <div rwModalHeader>
+    <span class="filename">{{ imageViewer?.file_name || imageViewer?.href }}</span>
   </div>
-  <div class="controls-buttons-auto">
-    <rw-icon class="close"
-      icon="close"
-      size="x-large"
-      cursor="pointer"
-      (click)="closeViewer()"
-     />
-  </div>
-</div>
-<div class="image" [class.broken]="broken" (click)="imageClick($event)">
-  <rw-icon class="left"
-    icon="keyboard_arrow_left"
-    size="x-large"
-    cursor="pointer"
-    (click)="prevImage()"
-   />
-  @if (broken) {
-    <rw-icon class="broken"
-      size="inherit"
-      icon="picture"
-     />
-  }
-  <div class="image-wrapper" [class.zoomed]="zoomed">
-    <img
-      #img
-      src="{{ imageViewer?.href }}"
-      [class.zoomed]="zoomed"
-      (load)="onLoad()"
-      (error)="onError()"
-      />
-  </div>
-</div>
-<div class="controls">
-  @if (images?.length > 1) {
-    <div class="controls-arrows">
+
+  <div rwModalBody class="image-viewer-body">
+    <div class="image" [class.broken]="broken" (click)="imageClick($event)">
       <rw-icon class="left"
         icon="keyboard_arrow_left"
         size="x-large"
         cursor="pointer"
         (click)="prevImage()"
        />
-      <span>{{ currentIndex + 1 }}</span
-        ><span class="{{ 'core.from' | transloco }}">from</span
-        ><span>{{ images?.length }}</span>
-        <rw-icon class="right"
-          icon="keyboard_arrow_right"
+      @if (broken) {
+        <rw-icon class="broken"
+          size="inherit"
+          icon="picture"
+         />
+      }
+      <div class="image-wrapper" [class.zoomed]="zoomed">
+        <img
+          #img
+          src="{{ imageViewer?.href }}"
+          [class.zoomed]="zoomed"
+          (load)="onLoad()"
+          (error)="onError()"
+          />
+      </div>
+    </div>
+  </div>
+
+  <div rwModalFooter class="controls image-viewer-footer">
+    @if (images?.length > 1) {
+      <div class="controls-arrows">
+        <rw-icon class="left"
+          icon="keyboard_arrow_left"
           size="x-large"
           cursor="pointer"
-          (click)="nextImage()"
+          (click)="prevImage()"
          />
+        <span>{{ currentIndex + 1 }}</span>
+        <span class="from">{{ 'components.from' | transloco }}</span>
+        <span>{{ images?.length }}</span>
+          <rw-icon class="right"
+            icon="keyboard_arrow_right"
+            size="x-large"
+            cursor="pointer"
+            (click)="nextImage()"
+           />
       </div>
     }
     <div class="controls-buttons">
@@ -72,12 +65,13 @@
           (click)="switchZoom()"
          />
       }
-      ю/сссю/чЯячювюяюжююююю@if (imageViewer?.id) {
-      <rw-icon icon="trash"
-        size="x-large"
-        cursor="pointer"
-        (click)="onDeleteImage()"
-       />
-    }
+      @if (imageViewer?.id) {
+        <rw-icon icon="trash"
+          size="x-large"
+          cursor="pointer"
+          (click)="onDeleteImage()"
+         />
+      }
+    </div>
   </div>
-</div>
+</rw-modal>

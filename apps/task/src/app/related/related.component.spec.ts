@@ -1,16 +1,7 @@
-jest.mock('@jsverse/transloco', () => {
-  const s = require('../../testing/transloco-stub');
-  return {
-    TranslocoPipe: s.TranslocoPipeStub,
-    TranslocoService: s.TranslocoServiceStub,
-  };
-});
-
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslocoService } from '@jsverse/transloco';
-import { RwAlertService, RwToastService } from '@renwu/components';
+import { FormControl, FormGroup } from '@angular/forms';
+import { RW_SELECT_MODELS, RwAlertService, RwToastService } from '@renwu/components';
 import {
   Issue,
   IssueLink,
@@ -18,10 +9,12 @@ import {
   RwDataService,
   RwIssueService,
   RwPolicyService,
+  SelectModelIssueLink,
 } from '@renwu/core';
-import { BehaviorSubject, Observable, map, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, map, of } from 'rxjs';
 
 import { RelatedComponent } from './related.component';
+import { provideTranslocoStub } from '../../testing/transloco-stub';
 
 function emptyLinks(): IssueLinks {
   return {
@@ -43,7 +36,7 @@ function createIssueForm(issue: Issue, links: IssueLinks): FormGroup {
   });
 }
 
-const loadedIssue: Issue = {
+const pickIssue: Issue = {
   id: '99',
   key: 'PROJ-99',
   title: 'Linked task',
@@ -59,7 +52,6 @@ describe('RelatedComponent', () => {
   let issue$: BehaviorSubject<Issue>;
   let toastService: { info: jest.Mock; error: jest.Mock };
   let alertService: { confirm: jest.Mock };
-  let dataService: { getIssue: jest.Mock };
   let policyService: { canEditIssue: jest.Mock };
   let issueForm: FormGroup;
 
@@ -68,7 +60,6 @@ describe('RelatedComponent', () => {
     links: IssueLinks = emptyLinks(),
     options?: {
       policyReturns?: boolean;
-      getIssue$?: Observable<Issue>;
       confirm$?: Observable<{ affirmative: boolean }>;
     },
   ): void {
@@ -82,11 +73,6 @@ describe('RelatedComponent', () => {
       confirm: jest
         .fn()
         .mockReturnValue(options?.confirm$ ?? of({ affirmative: true })),
-    };
-    dataService = {
-      getIssue: jest
-        .fn()
-        .mockReturnValue(options?.getIssue$ ?? of(loadedIssue)),
     };
     policyService = {
       canEditIssue: jest
@@ -106,12 +92,27 @@ describe('RelatedComponent', () => {
     TestBed.configureTestingModule({
       imports: [RelatedComponent],
       providers: [
+        provideTranslocoStub(),
         { provide: RwIssueService, useValue: issueService },
-        { provide: RwDataService, useValue: dataService },
+        {
+          provide: RwDataService,
+          useValue: {
+            getDictionaryOptions: jest
+              .fn()
+              .mockReturnValue(
+                of({ results: [], next: null, count: 0, previous: null }),
+              ),
+          },
+        },
+        {
+          provide: RW_SELECT_MODELS,
+          useValue: {
+            IssueLink: () => new SelectModelIssueLink(),
+          },
+        },
         { provide: RwToastService, useValue: toastService },
         { provide: RwAlertService, useValue: alertService },
         { provide: RwPolicyService, useValue: policyService },
-        { provide: TranslocoService, useValue: new TranslocoService() },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
@@ -126,25 +127,45 @@ describe('RelatedComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('add', () => {
+  describe('addIssue', () => {
     it('shows save-first toast when issue is new', async () => {
       createComponent({ id: 'new', key: 'new' });
-      component.addKey = 'PROJ-2';
-      await component.add();
+      await component.addIssue(pickIssue);
       expect(toastService.info).toHaveBeenCalledWith('task.related-save-first');
-      expect(dataService.getIssue).not.toHaveBeenCalled();
     });
 
-    it('does not fetch when user cannot edit', async () => {
+    it('does not mutate when user cannot edit', async () => {
       createComponent({ id: '1', key: 'PROJ-1' }, emptyLinks(), {
         policyReturns: false,
       });
-      component.addKey = 'PROJ-2';
-      await component.add();
-      expect(dataService.getIssue).not.toHaveBeenCalled();
+      await component.addIssue(pickIssue);
+      expect(toastService.info).not.toHaveBeenCalled();
+      expect(issueForm.getRawValue().links.related ?? []).toEqual([]);
     });
 
-    it('shows duplicate toast when key already linked', async () => {
+    it('shows duplicate when key already in links.parent', async () => {
+      const links = emptyLinks();
+      links.parent = [
+        {
+          id: '2',
+          key: 'PROJ-2',
+          title: 'x',
+          have_childs: false,
+          date_start: '',
+          date_end: '',
+          status: { id: 'o' } as Issue['status'],
+        },
+      ];
+      createComponent({ id: '1', key: 'PROJ-1' }, links);
+      await component.addIssue({
+        ...pickIssue,
+        id: '2',
+        key: 'PROJ-2',
+      } as Issue);
+      expect(toastService.info).toHaveBeenCalledWith('task.related-duplicate');
+    });
+
+    it('shows duplicate when key already in related', async () => {
       const links = emptyLinks();
       links.related = [
         {
@@ -158,37 +179,29 @@ describe('RelatedComponent', () => {
         },
       ];
       createComponent({ id: '1', key: 'PROJ-1' }, links);
-      component.addKey = 'PROJ-2';
-      await component.add();
+      await component.addIssue({
+        ...pickIssue,
+        id: '2',
+        key: 'PROJ-2',
+      } as Issue);
       expect(toastService.info).toHaveBeenCalledWith('task.related-duplicate');
-      expect(dataService.getIssue).not.toHaveBeenCalled();
     });
 
     it('shows self toast when key matches current issue', async () => {
       createComponent({ id: '1', key: 'PROJ-1' });
-      component.addKey = 'PROJ-1';
-      await component.add();
+      await component.addIssue({
+        ...pickIssue,
+        key: 'PROJ-1',
+        id: '1',
+      } as Issue);
       expect(toastService.info).toHaveBeenCalledWith('task.related-self');
-      expect(dataService.getIssue).not.toHaveBeenCalled();
     });
 
-    it('shows not-found toast when getIssue fails', async () => {
-      createComponent({ id: '1', key: 'PROJ-1' }, emptyLinks(), {
-        getIssue$: throwError(() => new Error('404')),
-      });
-      component.addKey = 'PROJ-404';
-      await component.add();
-      expect(toastService.error).toHaveBeenCalledWith('task.related-not-found');
-    });
-
-    it('appends link and clears input on success', async () => {
+    it('appends link on success', async () => {
       createComponent({ id: '1', key: 'PROJ-1' });
-      component.addKey = 'PROJ-99';
-      await component.add();
+      await component.addIssue(pickIssue);
       const related = issueForm.getRawValue().links.related ?? [];
       expect(related.some((r) => r.key === 'PROJ-99')).toBe(true);
-      expect(component.addKey).toBe('');
-      expect(dataService.getIssue).toHaveBeenCalledWith('PROJ-99');
     });
   });
 

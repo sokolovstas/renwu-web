@@ -5,7 +5,6 @@ import {
   Component,
   inject,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   RwButtonComponent,
@@ -13,13 +12,10 @@ import {
   RwDurationToStringPipe,
   RwIconComponent,
   RwModalService,
-  RwTextAreaComponent,
-  RwTimePickerComponent,
   RwToastService,
 } from '@renwu/components';
 import {
   Issue,
-  RwDataService,
   RwFormatUserPipe,
   RwIssueService,
   RwPolicyService,
@@ -37,6 +33,7 @@ import {
   switchMap,
   take,
 } from 'rxjs';
+import { TaskTimeLogAddModalComponent } from './task-time-log-add-modal.component';
 import { TaskTimeLogsEditorComponent } from './time-logs-editor.component';
 
 @Component({
@@ -44,14 +41,11 @@ import { TaskTimeLogsEditorComponent } from './time-logs-editor.component';
   standalone: true,
   imports: [
     AsyncPipe,
-    ReactiveFormsModule,
     RwButtonComponent,
     RwDatePipe,
     RwDurationToStringPipe,
     RwFormatUserPipe,
     RwIconComponent,
-    RwTextAreaComponent,
-    RwTimePickerComponent,
     TranslocoPipe,
   ],
   templateUrl: './time-log.component.html',
@@ -59,23 +53,14 @@ import { TaskTimeLogsEditorComponent } from './time-logs-editor.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimeLogComponent {
-  private static readonly MAX_LOG_SECONDS = 300 * 3600;
-
   issueService = inject(RwIssueService);
-  dataService = inject(RwDataService);
   toastService = inject(RwToastService);
   transloco = inject(TranslocoService);
   cd = inject(ChangeDetectorRef);
-  fb = inject(FormBuilder);
   policyService = inject(RwPolicyService);
   modalService = inject(RwModalService);
 
   isNewIssue = this.issueService.newIssue;
-
-  logForm = this.fb.nonNullable.group({
-    duration: [3600],
-    comment: [''],
-  });
 
   timeLogs$ = merge(
     this.issueService.issue,
@@ -165,7 +150,7 @@ export class TimeLogComponent {
     });
   }
 
-  async addLog(): Promise<void> {
+  async openAddLogModal(): Promise<void> {
     const raw = this.issueService.issueForm.getRawValue();
     if (raw.id === 'new' || !raw.id) {
       this.toastService.info(
@@ -188,44 +173,11 @@ export class TimeLogComponent {
     if (!canEdit) {
       return;
     }
-    const f = this.logForm.getRawValue();
-    const duration = Number(f.duration) || 0;
-    if (duration <= 0) {
-      this.toastService.info(
-        this.transloco.translate('task.time-log-duration-required'),
-      );
-      return;
-    }
-    if (duration > TimeLogComponent.MAX_LOG_SECONDS) {
-      this.toastService.info(
-        this.transloco.translate('task.time-log-duration-too-long'),
-      );
-      return;
-    }
-    const body = {
-      value: duration,
-      completion: raw.completion ?? 0,
-      comment: (f.comment ?? '').trim(),
-    } as TimeLog;
-    try {
-      const issue = await firstValueFrom(
-        this.dataService.logIssueTime(String(raw.id), body),
-      );
-      this.issueService.patchIssue(
-        {
-          time_logs: issue.time_logs ?? [],
-          time_logged: issue.time_logged,
-          completion: issue.completion,
-        },
-        { emitEvent: true },
-      );
-      this.issueService.setPrevState();
-      this.logForm.patchValue({ duration: 3600, comment: '' });
-    } catch {
-      this.toastService.error(
-        this.transloco.translate('task.time-log-error'),
-      );
-    }
+    this.modalService.add(TaskTimeLogAddModalComponent, {
+      issueId: String(raw.id),
+      containerId: raw.container?.id ? String(raw.container.id) : '',
+      initialCompletion: raw.completion ?? 0,
+    });
     this.cd.markForCheck();
   }
 }

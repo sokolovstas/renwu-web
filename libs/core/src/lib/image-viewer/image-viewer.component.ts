@@ -9,7 +9,13 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { RwIconComponent } from '@renwu/components';
+import {
+  RwIconComponent,
+  RwModalBodyDirective,
+  RwModalComponent,
+  RwModalFooterDirective,
+  RwModalHeaderDirective,
+} from '@renwu/components';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Attachment } from '../issue/issue.model';
@@ -22,13 +28,24 @@ interface PreparedAttachment extends Attachment {
 @Component({
   selector: 'renwu-image-viewer',
   standalone: true,
-  imports: [RwIconComponent, TranslocoPipe],
+  imports: [
+    RwModalComponent,
+    RwModalHeaderDirective,
+    RwModalBodyDirective,
+    RwModalFooterDirective,
+    RwIconComponent,
+    TranslocoPipe,
+  ],
   templateUrl: './image-viewer.component.html',
   styleUrl: './image-viewer.component.scss',
 })
 export class ImageViewerComponent implements OnInit {
   @Input()
   image: PreparedAttachment;
+
+  /** When opened with `RwModalService.add`, pass `() => modalService.close()`. */
+  @Input()
+  hostClose?: () => void;
 
   @Input()
   set images(value: PreparedAttachment[]) {
@@ -82,11 +99,7 @@ export class ImageViewerComponent implements OnInit {
 
   @HostListener('window:keyup', ['$event'])
   onKeyUpWindow(eventKeyboard: KeyboardEvent): void {
-    if (eventKeyboard.key === 'Escape') {
-      this.closeViewer();
-      this.disableEvent(eventKeyboard);
-      return;
-    } else if (eventKeyboard.key === 'ArrowRight') {
+    if (eventKeyboard.key === 'ArrowRight') {
       this.nextImage();
       this.disableEvent(eventKeyboard);
       return;
@@ -105,10 +118,7 @@ export class ImageViewerComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   onKeyDownWindow(eventKeyboard: KeyboardEvent): void {
-    if (eventKeyboard.key === 'Escape') {
-      this.disableEvent(eventKeyboard);
-      return;
-    } else if (eventKeyboard.key === 'ArrowRight') {
+    if (eventKeyboard.key === 'ArrowRight') {
       this.disableEvent(eventKeyboard);
       return;
     } else if (eventKeyboard.key === 'ArrowLeft') {
@@ -152,7 +162,7 @@ export class ImageViewerComponent implements OnInit {
     eventKeyboard.stopImmediatePropagation();
   }
   closeViewer(): void {
-    //   this.modalService.close();
+    this.hostClose?.();
   }
   displayImage(): void {
     this.broken = true;

@@ -1,0 +1,34 @@
+<rw-modal>
+  <div rwModalHeader>
+    <span>{{ 'task.time-log-modal-title' | transloco }}</span>
+  </div>
+  <div rwModalBody>
+    <form [formGroup]="form" class="task-time-log-add-fields">
+      <rw-time-picker
+        formControlName="duration"
+        [max]="300 * 3600"
+        [prompt]="'task.time-log-duration' | transloco"
+       />
+      <rw-text-input
+        formControlName="completion"
+        type="number"
+        [min]="0"
+        [max]="100"
+        [prompt]="'task.time-log-completion' | transloco"
+       />
+      <rw-text-area
+        formControlName="comment"
+        [borderless]="true"
+        [prompt]="'task.time-log-comment' | transloco"
+       />
+    </form>
+  </div>
+  <div rwModalFooter class="task-time-log-add-footer">
+    <rw-button typeButton="secondary" [disabled]="submitting" (clicked)="cancel()">{{
+      'task.time-log-cancel' | transloco
+    }}</rw-button>
+    <rw-button [disabled]="submitting" (clicked)="submit()">{{
+      'task.time-log-add' | transloco
+    }}</rw-button>
+  </div>
+</rw-modal>

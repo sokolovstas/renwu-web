@@ -1,0 +1,14 @@
+.task-time-log-add-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: min(22rem, 100%);
+}
+
+.task-time-log-add-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+}

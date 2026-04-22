@@ -5,12 +5,10 @@ import {
   Component,
   inject,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   RwAlertService,
   RwButtonComponent,
-  RwTextInputComponent,
   RwToastService,
 } from '@renwu/components';
 import {
@@ -19,41 +17,32 @@ import {
   IssueLink,
   IssueLinks,
   IssueStatusComponent,
-  RwDataService,
   RwIssueService,
   RwPolicyService,
 } from '@renwu/core';
 import {
-  catchError,
   distinctUntilChanged,
   firstValueFrom,
   map,
   merge,
-  of,
   startWith,
   switchMap,
 } from 'rxjs';
 
-function issueToLink(issue: Issue): IssueLink {
-  return {
-    id: String(issue.id),
-    title: issue.title,
-    key: issue.key,
-    have_childs: issue.have_childs,
-    date_start: issue.date_start,
-    date_end: issue.date_end,
-    status: issue.status,
-  };
-}
+import { IssueLinkSearchInputComponent } from '../issue-links/issue-link-search-input.component';
+import {
+  collectLinkedIssueKeys,
+  issueToIssueLink,
+  isIssueKeyInAnyLinkBucket,
+} from '../issue-links/issue-links.util';
 
 @Component({
   selector: 'renwu-task-related',
   standalone: true,
   imports: [
     AsyncPipe,
-    FormsModule,
     RwButtonComponent,
-    RwTextInputComponent,
+    IssueLinkSearchInputComponent,
     TranslocoPipe,
     IssueHrefComponent,
     IssueStatusComponent,
@@ -64,7 +53,6 @@ function issueToLink(issue: Issue): IssueLink {
 })
 export class RelatedComponent {
   issueService = inject(RwIssueService);
-  dataService = inject(RwDataService);
   toastService = inject(RwToastService);
   transloco = inject(TranslocoService);
   cd = inject(ChangeDetectorRef);
@@ -102,10 +90,18 @@ export class RelatedComponent {
     startWith([] as IssueLink[]),
   );
 
-  addKey = '';
+  linkedKeys$ = merge(
+    this.issueService.issue,
+    this.issueService.issueForm.controls.links.valueChanges,
+  ).pipe(
+    map(() =>
+      collectLinkedIssueKeys(this.issueService.issueForm.getRawValue().links),
+    ),
+    startWith([] as string[]),
+  );
 
-  async add(): Promise<void> {
-    const key = this.addKey.trim();
+  async addIssue(issue: Issue): Promise<void> {
+    const key = (issue.key ?? '').trim();
     if (!key) {
       return;
     }
@@ -125,36 +121,21 @@ export class RelatedComponent {
     if (!canEdit) {
       return;
     }
-    const related = current.links?.related ?? [];
-    if (related.some((r) => r.key === key)) {
+    if (isIssueKeyInAnyLinkBucket(key, current.links)) {
       this.toastService.info(this.transloco.translate('task.related-duplicate'));
       return;
     }
-    if (current.key === key) {
+    if ((current.key ?? '').trim() === key) {
       this.toastService.info(this.transloco.translate('task.related-self'));
       return;
     }
-    const loaded = await firstValueFrom(
-      this.dataService.getIssue(key).pipe(
-        catchError(() => {
-          this.toastService.error(
-            this.transloco.translate('task.related-not-found'),
-          );
-          return of(null);
-        }),
-      ),
-    );
-    if (!loaded) {
-      return;
-    }
-    const link = issueToLink(loaded);
+    const link = issueToIssueLink(issue);
     const links = this.issueService.issueForm.getRawValue().links;
     const next: IssueLinks = {
       ...links,
       related: [...(links.related ?? []), link],
     };
     this.issueService.issueForm.controls.links.setValue(next);
-    this.addKey = '';
     this.cd.markForCheck();
   }
 

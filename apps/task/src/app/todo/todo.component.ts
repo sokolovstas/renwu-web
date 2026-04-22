@@ -27,10 +27,9 @@ import { RwIssueService } from '@renwu/core';
     RwButtonComponent,
     RwCheckboxComponent,
     RwIconComponent,
-    RwTextAreaComponent,
     RwSortTableRowDirective,
-    RwSortTableRowHandlerDirective
-],
+    RwSortTableRowHandlerDirective,
+  ],
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss',
 })

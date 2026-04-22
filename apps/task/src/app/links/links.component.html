@@ -1,7 +1,61 @@
-<div class="mt-4 mx-2 font-extralight text-2xl mb-2">
-  {{ 'task.links' | transloco }}
-  <rw-button class="inline-block"
-    iconClass="add-bold"
-    typeButton="icon"
-   />
+@let isNew = isNewIssue | async;
+@let canEdit = canEdit$ | async;
+<div class="mt-4 mx-2">
+  <div
+    class="font-extralight text-2xl mb-2 flex flex-row flex-wrap items-center justify-between gap-2"
+    >
+    <span>{{ 'task.links' | transloco }}</span>
+  </div>
+  @if (isNew) {
+    <p class="text-sm opacity-70 mb-2">{{ 'task.links-save-first' | transloco }}</p>
+  }
+  @for (block of blocks; track block.kind) {
+    <section class="links-block mb-4 last:mb-0">
+      <div
+        class="text-sm font-medium opacity-90 mb-1.5 px-1 border-b border-black/10 pb-0.5"
+        >
+        {{ block.titleKey | transloco }}
+      </div>
+      @if (isNew === false && canEdit) {
+        <div class="flex flex-row items-center gap-2 flex-1 min-w-0 justify-end mb-2 px-1">
+          <renwu-task-issue-link-search-input
+            class="max-w-xs w-full flex-1"
+            [promptKey]="'task.links-add-placeholder'"
+            [selfKey]="issueService.issueForm.getRawValue().key ?? null"
+            [forbiddenKeys]="linkedKeys$ | async"
+            (issuePicked)="addIssue(block.kind, $event)"
+          />
+        </div>
+      }
+      <div class="flex flex-col gap-1 px-1">
+        @for (link of block.links$ | async; track link.key) {
+          <div class="flex flex-row items-center justify-between gap-2 text-sm">
+            <div class="flex flex-row items-center gap-2 min-w-0 flex-1">
+              <renwu-issue-href
+                [issue]="link"
+                [key]="link.key"
+                [title]="link.title"
+                [linkButton]="true"
+              />
+              @if (link.status) {
+                <renwu-issue-status class="shrink-0" [value]="link.status" />
+              }
+            </div>
+            @if (isNew === false && canEdit) {
+              <rw-button
+                class="opacity-40 hover:opacity-100 shrink-0"
+                typeButton="icon"
+                iconClass="trash"
+                (clicked)="remove(block.kind, link)"
+              />
+            }
+          </div>
+        } @empty {
+          <span class="text-sm opacity-50 px-1">{{
+            'task.links-empty-block' | transloco
+          }}</span>
+        }
+      </div>
+    </section>
+  }
 </div>

@@ -3,6 +3,20 @@
 :host {
   display: flex;
   flex-direction: column;
+  width: 90vw;
+  height: 90vh;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.image-viewer-body {
+  padding: 0 !important;
+  background-color: #111;
+}
+
+.image-viewer-footer {
+  padding-top: 0.5em !important;
 }
 
 .image {

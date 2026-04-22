@@ -1,6 +1,8 @@
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DescriptionComponent } from './description.component';
+import { provideRwIssueServiceShellMock } from '../../testing/task-rw-issue-service.mock';
 
 describe('DescriptionComponent', () => {
   let component: DescriptionComponent;
@@ -9,6 +11,8 @@ describe('DescriptionComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [DescriptionComponent],
+      providers: [provideRwIssueServiceShellMock()],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
     fixture = TestBed.createComponent(DescriptionComponent);
     component = fixture.componentInstance;
