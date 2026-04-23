@@ -1,32 +1,24 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RwSettingsService } from '@renwu/core';
+import { BoardGroupComponent } from './group.component';
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { provideLocationMocks } from '@angular/common/testing';
-import { provideRouter } from '@angular/router';
-import { GroupComponent } from './board/group/group.component';
-import { CoreModule } from './core/core.module';
-import { SharedModule } from './shared/shared.module';
+describe('BoardGroupComponent', () => {
+  let fixture: ComponentFixture<BoardGroupComponent>;
 
-describe('GroupComponent', () => {
-  let component: GroupComponent;
-  let fixture: ComponentFixture<GroupComponent>;
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [BoardGroupComponent],
+      providers: [{ provide: RwSettingsService, useValue: { user: {} } }],
+    })
+      .overrideComponent(BoardGroupComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [SharedModule, CoreModule],
-      declarations: [GroupComponent],
-      providers: [provideRouter([]), provideLocationMocks()],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(GroupComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture = TestBed.createComponent(BoardGroupComponent);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

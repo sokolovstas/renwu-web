@@ -1,16 +1,23 @@
 import { TestBed } from '@angular/core/testing';
+import { RwDataService, RwSettingsService } from '@renwu/core';
+import { of } from 'rxjs';
+import { RwBoardService } from './board.service';
 
-import { BoardService } from './board.service';
-
-describe('BoardService', () => {
-  beforeEach(() =>
+describe('RwBoardService', () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [],
-    }),
-  );
+      providers: [
+        RwBoardService,
+        {
+          provide: RwDataService,
+          useValue: { getBoards: jest.fn().mockReturnValue(of([])) },
+        },
+        { provide: RwSettingsService, useValue: { user: {} } },
+      ],
+    });
+  });
 
   it('should be created', () => {
-    const service: BoardService = TestBed.inject(BoardService);
-    expect(service).toBeTruthy();
+    expect(TestBed.inject(RwBoardService)).toBeTruthy();
   });
 });

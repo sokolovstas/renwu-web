@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Issue } from '@renwu/core';
 import { CardComponent } from './card.component';
 
 describe('CardComponent', () => {
@@ -12,6 +13,8 @@ describe('CardComponent', () => {
 
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
+    component.issue = { id: '1', key: 'T-1' } as Issue;
+    component.type = 'default';
     fixture.detectChanges();
   });
 
