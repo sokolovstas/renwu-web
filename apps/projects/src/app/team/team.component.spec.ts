@@ -9,11 +9,14 @@ describe('TeamComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TeamComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(TeamComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(TeamComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

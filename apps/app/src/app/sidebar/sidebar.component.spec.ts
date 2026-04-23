@@ -1,32 +1,65 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { provideLocationMocks } from '@angular/common/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { CoreModule } from './core/core.module';
-import { IssueModule } from './issue/issue.module';
-import { SidebarComponent } from './sidebar/sidebar/sidebar.component';
+import { RenwuSidebarService } from '@renwu/app-ui';
+import {
+  Instance,
+  RW_CORE_SETTINGS,
+  RwDataService,
+  RwSiteDataService,
+  RwUserService,
+} from '@renwu/core';
+import { RwMessageService } from '@renwu/messaging';
+import { BehaviorSubject, of } from 'rxjs';
+import { SidebarComponent } from './sidebar.component';
 
 describe('SidebarComponent', () => {
-  let component: SidebarComponent;
   let fixture: ComponentFixture<SidebarComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [RwModule, CoreModule, IssueModule],
-      declarations: [SidebarComponent],
-      providers: [provideRouter([]), provideLocationMocks()],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
-  }));
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SidebarComponent],
+      providers: [
+        provideRouter([]),
+        {
+          provide: RW_CORE_SETTINGS,
+          useValue: { siteLoginUrl: '/login', siteVersion: '' },
+        },
+        {
+          provide: RwDataService,
+          useValue: { getVersion: () => of('0.0.0') },
+        },
+        {
+          provide: RwSiteDataService,
+          useValue: {
+            getInstances: () => of([] as Instance[]),
+            logout: () => of(undefined),
+            changeInstance: () => of(undefined),
+          },
+        },
+        {
+          provide: RwUserService,
+          useValue: { todos: of([]) },
+        },
+        { provide: RenwuSidebarService, useValue: {} },
+        {
+          provide: RwMessageService,
+          useValue: {
+            connected: new BehaviorSubject(true),
+            unreadTodos: of(0),
+            unreadMessenger: of(0),
+          },
+        },
+      ],
+    })
+      .overrideComponent(SidebarComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SidebarComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

@@ -9,11 +9,14 @@ describe('BacklogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BacklogComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(BacklogComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(BacklogComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

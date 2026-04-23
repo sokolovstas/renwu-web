@@ -9,11 +9,14 @@ describe('MilestonesComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MilestonesComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(MilestonesComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(MilestonesComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

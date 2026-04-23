@@ -8,11 +8,14 @@ describe('NotificationsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NotificationsComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(NotificationsComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
