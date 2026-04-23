@@ -18,7 +18,7 @@ describe('ListComponent', () => {
 
   beforeEach(async () => {
     const listOptions = new BehaviorSubject<ListOptions>(new ListOptions());
-    const getRefreshedListMock = (_opts?: Observable<unknown>) => {
+    const getRefreshedListMock = () => {
       return <T>(source: Observable<T>) =>
         source.pipe(shareReplay({ bufferSize: 1, refCount: true }));
     };

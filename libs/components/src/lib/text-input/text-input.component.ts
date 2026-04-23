@@ -132,7 +132,7 @@ export class RwTextInputComponent
     return this.__password;
   }
 
-  inputType: string = 'text';
+  inputType = 'text';
 
   __password: boolean;
 
