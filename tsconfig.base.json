@@ -17,6 +17,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "jest-zone-transloco-setup": ["jest-zone-transloco-setup.ts"],
       "@renwu/board": ["libs/board/src/index.ts"],
       "@renwu/components": ["libs/components/src/index.ts"],
       "@renwu/core": ["libs/core/src/index.ts"],

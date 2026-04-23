@@ -11,6 +11,11 @@ module.exports = {
   ],
   moduleNameMapper: {
     ...(nxPreset.moduleNameMapper || {}),
+    '^jest-zone-transloco-setup$': join(
+      workspaceRoot,
+      'jest-zone-transloco-setup.ts',
+    ),
+    '^mermaid$': join(workspaceRoot, 'jest.stubs/mermaid.ts'),
     '^oz$': join(workspaceRoot, 'jest.stubs/oz.ts'),
     '^projects/components/src/public-api$': join(
       workspaceRoot,
