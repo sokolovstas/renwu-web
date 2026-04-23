@@ -135,7 +135,10 @@ describe('SubTaskComponent', () => {
         { provide: RwPolicyService, useValue: policyService },
         { provide: RwAlertService, useValue: alertService },
         { provide: RwToastService, useValue: toastService },
-        { provide: Router, useValue: { navigate: routerNavigate } },
+        {
+          provide: Router,
+          useValue: { navigate: routerNavigate, url: '/task/list' },
+        },
         { provide: RwModalService, useValue: modalService },
         { provide: TranslocoService, useValue: new TranslocoService() },
       ],

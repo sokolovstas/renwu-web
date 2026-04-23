@@ -89,7 +89,7 @@ export class IssueHrefComponent {
     if (!k) {
       return '#';
     }
-    const url = this.router.url;
+    const url = this.router.url ?? '';
     const normalized = url.startsWith('/') ? url : `/${url}`;
     const sectionMatch = normalized.match(/^(.*)\(section:task\/[^)]+\)/);
     if (sectionMatch) {
