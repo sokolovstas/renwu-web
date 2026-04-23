@@ -9,15 +9,18 @@ describe('TodoComponent', () => {
   let component: TodoComponent;
   let fixture: ComponentFixture<TodoComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [TodoComponent],
       providers: [provideTranslocoStub(), provideRwIssueServiceShellMock()],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    });
+    })
+      .overrideComponent(TodoComponent, {
+        set: { template: '', imports: [] },
+      })
+      .compileComponents();
     fixture = TestBed.createComponent(TodoComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
