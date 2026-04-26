@@ -76,16 +76,13 @@ export class MilestoneComponent {
   );
   currentProject = toSignal(this.projectService.currentProject);
 
-  setListOptionsFromQuery = effect(
-    () => {
-      this.searchService.updateQuery(
-        `milestones="${this.milestone().title}" AND project="${
-          this.milestone().container.key
-        }"`,
-      );
-    },
-    { allowSignalWrites: true },
-  );
+  setListOptionsFromQuery = effect(() => {
+    this.searchService.updateQuery(
+      `milestones="${this.milestone().title}" AND project="${
+        this.milestone().container.key
+      }"`,
+    );
+  });
 
   tasks = this.searchService.listOptions.pipe(
     switchMap((options) =>

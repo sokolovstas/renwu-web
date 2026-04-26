@@ -39,7 +39,6 @@ export class RwModalService {
   opened: BehaviorSubject<boolean>;
 
   constructor() {
-    console.log(Math.random());
     this.modals = [];
     this.removeStack = [];
     this.modalAdded = new Subject();

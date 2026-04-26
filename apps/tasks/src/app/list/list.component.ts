@@ -74,9 +74,8 @@ export class ListComponent implements OnDestroy {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
-  setListOptionsFromQuery = effect(
-    () => this.searchService.setListOptions(new ListOptions(this.query())),
-    { allowSignalWrites: true },
+  setListOptionsFromQuery = effect(() =>
+    this.searchService.setListOptions(new ListOptions(this.query())),
   );
 
   ngOnDestroy(): void {
