@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { differenceInHours } from 'date-fns';
 
 import {
   ChangeDetectionStrategy,
@@ -84,7 +84,7 @@ export class TaskTimeLogsEditorComponent implements OnInit {
     }
     const isAuthor = this.userService.getIsCurrent(tlog.author.id);
     const past24Hour =
-      moment.utc().diff(moment.utc(tlog.date_created), 'hour') < 24;
+      differenceInHours(new Date(), new Date(tlog.date_created)) < 24;
     const canEdit =
       this.userService.getIsAdmin() ||
       (isAuthor && this.canEditLogs && past24Hour);
