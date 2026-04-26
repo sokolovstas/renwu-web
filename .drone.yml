@@ -21,8 +21,9 @@ volumes:
       path: /tmp/drone/cache/.angular
 
 steps:
+  # Angular 21+ requires Node ^20.19 || ^22.12 || >=24 (see package engines).
   - name: cache-clean
-    image: cypress/included:12.17.2
+    image: node:22-bookworm
     volumes:
       - name: cache-node
         path: /drone/src/node_modules
@@ -42,7 +43,7 @@ steps:
         - clean
 
   - name: test
-    image: cypress/included:12.17.2
+    image: node:22-bookworm
     volumes:
       - name: cache-node
         path: /drone/src/node_modules
@@ -72,7 +73,7 @@ steps:
         - tag
 
   - name: build
-    image: cypress/included:12.17.2
+    image: node:22-bookworm
     volumes:
       - name: cache-node
         path: /drone/src/node_modules
