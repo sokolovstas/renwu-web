@@ -40,6 +40,16 @@ npm run start
 npm run locales
 ```
 
+### Deploy layout (client-web)
+
+Сборка приложений в этом репозитории использует Angular builder `@angular-devkit/build-angular:application`.
+Для shell-приложения (`app`) артефакты в Docker-образе публикуются в `/www/app/browser`.
+
+Важно для backend/site:
+- SPA fallback index: `/www/app/browser/index.html`
+- Static root для shell: `/www/app/browser`
+- Remote entry для модулей: `/www/app/modules/<module>/browser/remoteEntry.json`
+
 # Структура
 
 ### /libs - библиотеки

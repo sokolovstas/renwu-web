@@ -1,13 +1,13 @@
 {
-  "documents": "/app/modules/documents/remoteEntry.json",
-  "projects": "/app/modules/projects/remoteEntry.json",
-  "boards": "/app/modules/boards/remoteEntry.json",
-  "tasks": "/app/modules/tasks/remoteEntry.json",
-  "task": "/app/modules/task/remoteEntry.json",
-  "settings": "/app/modules/settings/remoteEntry.json",
-  "profile": "/app/modules/profile/remoteEntry.json",
-  "messenger": "/app/modules/messenger/remoteEntry.json",
-  "todos": "/app/modules/todos/remoteEntry.json",
-  "dashboard": "/app/modules/dashboard/remoteEntry.json",
-  "timeline": "/app/modules/timeline/remoteEntry.json"
+  "documents": "/app/modules/documents/browser/remoteEntry.json",
+  "projects": "/app/modules/projects/browser/remoteEntry.json",
+  "boards": "/app/modules/boards/browser/remoteEntry.json",
+  "tasks": "/app/modules/tasks/browser/remoteEntry.json",
+  "task": "/app/modules/task/browser/remoteEntry.json",
+  "settings": "/app/modules/settings/browser/remoteEntry.json",
+  "profile": "/app/modules/profile/browser/remoteEntry.json",
+  "messenger": "/app/modules/messenger/browser/remoteEntry.json",
+  "todos": "/app/modules/todos/browser/remoteEntry.json",
+  "dashboard": "/app/modules/dashboard/browser/remoteEntry.json",
+  "timeline": "/app/modules/timeline/browser/remoteEntry.json"
 }
