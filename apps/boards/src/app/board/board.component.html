@@ -1,4 +1,69 @@
-<renwu-board-group class="root-group"
-  [config]="board | async"
-  [group]="rootGroup | async"
- />
+<div class="renwu-boards-board__wrapper">
+  <renwu-query-builder
+    class="renwu-boards-board__query-builder"
+    [query]="queryString$ | async"
+    (queryChange)="updateQuery($event)"
+  />
+  <div class="renwu-boards-board__quick-filters">
+    <rw-button typeButton="link" (clicked)="applyQuickFilter('open')">
+      {{ 'boards.quickFilters.open' | transloco }}
+    </rw-button>
+    <rw-button typeButton="link" (clicked)="applyQuickFilter('my')">
+      {{ 'boards.quickFilters.my' | transloco }}
+    </rw-button>
+    <rw-button typeButton="link" (clicked)="applyQuickFilter('unassigned')">
+      {{ 'boards.quickFilters.unassigned' | transloco }}
+    </rw-button>
+    <rw-button typeButton="link" (clicked)="applyQuickFilter('all')">
+      {{ 'boards.quickFilters.all' | transloco }}
+    </rw-button>
+  </div>
+  <div class="renwu-boards-board__group-settings-wrapper">
+    @if (effectiveBoard$ | async; as boardConfig) {
+      <renwu-board-group
+        class="renwu-boards-board__root-group root-group"
+        [config]="boardConfig"
+        [group]="rootGroup$ | async"
+        (check)="onSelected($event)"
+        (addTask)="onAddTask($event)"
+        (openIssue)="onOpenIssue($event)"
+        (issueDrop)="onIssueDropped($event)"
+      />
+    }
+    @if (showSettings() && (settingsBoard$ | async); as settingsCfg) {
+      <renwu-board-settings
+        [groupsConfig]="settingsCfg"
+        (reloadBoards)="onReloadBoards()"
+        (updateGrouping)="onSettingsUpdateGrouping($event)"
+      />
+    }
+  </div>
+  <div class="renwu-boards-board__status-bar">
+    <div class="renwu-boards-board__status-text">
+      {{ taskCount$ | async }} {{ 'boards.statusTaskCount' | transloco }}
+    </div>
+    @if (selectedIssues().length > 0) {
+      <div class="renwu-boards-board__status-selection">
+        {{ selectedIssues().length }} {{ 'boards.selectedTaskCount' | transloco }}
+      </div>
+    }
+    <rw-select
+      class="renwu-boards-board__status-select"
+      [model]="boardViewModel"
+      [borderless]="true"
+      (changed)="onBoardViewOverrideChanged($event)"
+    />
+    <rw-select
+      class="renwu-boards-board__status-select"
+      [model]="boardTypeModel"
+      [borderless]="true"
+      (changed)="onBoardTypeOverrideChanged($event)"
+    />
+    <rw-button typeButton="link" (clicked)="resetDisplayOverride()">
+      {{ 'boards.resetDisplay' | transloco }}
+    </rw-button>
+    <rw-button typeButton="link" (clicked)="toggleSettings()">
+      {{ 'boards.editBoard' | transloco }}
+    </rw-button>
+  </div>
+</div>

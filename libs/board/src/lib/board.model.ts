@@ -26,6 +26,8 @@ export interface GroupedIssues {
   issue: Issue;
   label: string;
   sort: Issue;
+  collapsed?: boolean;
+  wipLimit?: number;
   reduce: {
     count: number;
     timeLogged: number;
@@ -296,6 +298,19 @@ export class BoardSettings {
       ),
     },
     {
+      label: 'Status columns',
+      id: 'status-buckets',
+      sort: 'status',
+      dict: 'statuses',
+      group: group(
+        (issue) => [issue.status ? issue.status.id : null],
+        (issue) => [issue.status],
+        (field) => (field ? field.label : 'Unset'),
+        (issue) => issue,
+        (field) => (field ? { status: field } : { status: undefined }),
+      ),
+    },
+    {
       label: 'Type',
       id: 'type',
       sort: 'type',
@@ -554,6 +569,16 @@ export class BoardSettings {
     { label: 'Color bar (estimated)', id: 'bar-estimate' },
     { label: 'Empty', id: '' },
   ];
+  static cardDensity: BoardGroupsCardDensity[] = [
+    { label: 'Compact', id: 'compact' },
+    { label: 'Normal', id: 'normal' },
+    { label: 'Detailed', id: 'detailed' },
+  ];
+  static colorModes: BoardGroupsColorMode[] = [
+    { label: 'By status', id: 'status' },
+    { label: 'By priority', id: 'priority' },
+    { label: 'By type', id: 'type' },
+  ];
 }
 
 export class BoardGroupsView {
@@ -583,6 +608,16 @@ export class BoardGroupsCardView {
   }
 }
 
+export class BoardGroupsCardDensity {
+  id: string;
+  label: string;
+}
+
+export class BoardGroupsColorMode {
+  id: string;
+  label: string;
+}
+
 export class BoardGroupsField {
   id: string;
   label: string;
@@ -599,13 +634,66 @@ export class BoardGroupsField {
 export class BoardGroupsConfigOverride {
   view?: BoardGroupsCardView;
   type?: BoardGroupsCardType;
+  density?: BoardGroupsCardDensity;
+  colorMode?: BoardGroupsColorMode;
 }
+
+export class BoardStatusColumnConfig {
+  id: string;
+  title: string;
+  query: string;
+  targetStatus: string;
+  collapsed?: boolean;
+  wipLimit?: number;
+
+  constructor(title = 'New column') {
+    this.id = `column-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    this.title = title;
+    this.query = '';
+    this.targetStatus = '';
+    this.collapsed = false;
+  }
+
+  static fromServer(serverColumn: {
+    id?: string;
+    title?: string;
+    query?: string;
+    target_status?: string;
+    targetStatus?: string;
+    collapsed?: boolean;
+    wip_limit?: number;
+    wipLimit?: number;
+  }): BoardStatusColumnConfig {
+    const column = new BoardStatusColumnConfig(serverColumn.title || 'Column');
+    column.id = serverColumn.id || column.id;
+    column.query = serverColumn.query || '';
+    column.targetStatus =
+      serverColumn.target_status || serverColumn.targetStatus || '';
+    column.collapsed = serverColumn.collapsed ?? false;
+    column.wipLimit = serverColumn.wip_limit ?? serverColumn.wipLimit;
+    return column;
+  }
+
+  toServer() {
+    return {
+      id: this.id,
+      title: this.title,
+      query: this.query || '',
+      target_status: this.targetStatus || '',
+      collapsed: this.collapsed,
+      wip_limit: this.wipLimit,
+    };
+  }
+}
+
 export class BoardGroupsConfig {
   id: string;
   title: string;
   groups: BoardGroupConfig[];
   view: BoardGroupsCardView;
   type: BoardGroupsCardType;
+  density: BoardGroupsCardDensity;
+  colorMode: BoardGroupsColorMode;
   showLogs: boolean;
   hideParents: boolean;
   collapseEmpty: boolean;
@@ -620,6 +708,12 @@ export class BoardGroupsConfig {
 
     this.view = BoardSettings.issueViews[0];
     this.type = BoardSettings.cardType[0];
+    this.density = BoardSettings.cardDensity[1];
+    this.colorMode = BoardSettings.colorModes[0];
+    this.shared = false;
+    this.showLogs = false;
+    this.hideParents = false;
+    this.collapseEmpty = false;
   }
 
   static fromServer(serverConfig: BoardGroupsConfigServer): BoardGroupsConfig {
@@ -638,7 +732,10 @@ export class BoardGroupsConfig {
         BoardSettings.groupViews[0];
       group.showEmpty = groupServer.show_empty;
       group.groupOnly = groupServer.group_only;
-      group.fixed = groupServer.fixed;
+      group.fixed = groupServer.fixed ?? [];
+      group.statusColumns = (groupServer.status_columns ?? []).map((column) =>
+        BoardStatusColumnConfig.fromServer(column),
+      );
       config.groups.push(group);
     }
     config.view =
@@ -647,6 +744,14 @@ export class BoardGroupsConfig {
     config.type =
       BoardSettings.cardType.find((type) => type.id === serverConfig.type) ||
       config.type;
+    config.density =
+      BoardSettings.cardDensity.find(
+        (density) => density.id === serverConfig.card_density,
+      ) || config.density;
+    config.colorMode =
+      BoardSettings.colorModes.find(
+        (mode) => mode.id === serverConfig.color_mode,
+      ) || config.colorMode;
     config.shared = serverConfig.shared;
     config.showLogs = serverConfig.show_logs;
     config.hideParents = serverConfig.hide_parents;
@@ -662,6 +767,8 @@ export class BoardGroupsConfig {
       groups: [],
       view: this.view.id,
       type: this.type.id,
+      card_density: this.density.id,
+      color_mode: this.colorMode.id,
       shared: this.shared,
       show_logs: this.showLogs,
       hide_parents: this.hideParents,
@@ -675,6 +782,7 @@ export class BoardGroupsConfig {
         fixed: group.fixed,
         show_empty: group.showEmpty,
         group_only: group.groupOnly,
+        status_columns: group.statusColumns?.map((column) => column.toServer()),
       });
     }
     return config;
@@ -687,11 +795,16 @@ export class BoardGroupConfig {
   field: BoardGroupsField;
   view: BoardGroupsView;
   fixed: string[];
+  statusColumns: BoardStatusColumnConfig[];
   groupOnly: boolean;
   showEmpty: boolean;
   constructor() {
     this.field = BoardSettings.groupFields[0];
     this.view = BoardSettings.groupViews[0];
+    this.fixed = [];
+    this.statusColumns = [];
+    this.groupOnly = false;
+    this.showEmpty = true;
   }
 }
 export class BoardGroup {
@@ -702,6 +815,8 @@ export class BoardGroup {
   parent: BoardGroup;
   issue: Issue;
   sort: Issue;
+  collapsed?: boolean;
+  wipLimit?: number;
   items: Issue[];
   groups: BoardGroup[];
   reduce: any;

@@ -9,7 +9,8 @@ import { Issue, RwSettingsService } from '@renwu/core';
 import { BoardGroup, BoardGroupsConfig } from '../board.model';
 import { CardComponent } from '../card/card.component';
 import { SortListPipe } from '../sort-list/sort-list.pipe';
-import { RwGroupService } from './group.service';
+
+type IssueBoardUi = Issue & { __is_selected?: boolean };
 
 @Component({
   selector: 'renwu-board-group',
@@ -21,7 +22,6 @@ import { RwGroupService } from './group.service';
     CardComponent,
     TranslocoPipe
 ],
-  providers: [RwGroupService],
   templateUrl: './group.component.html',
   styleUrl: './group.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,7 +77,9 @@ export class BoardGroupComponent {
     if (this.group) {
       const openIndexGroup =
         this.settingsService.user.settings.open_index_group;
-      collapsed = !!openIndexGroup[this.group.uid] && !this.groupOnly;
+      collapsed =
+        (openIndexGroup[this.group.uid] ?? this.group.collapsed) &&
+        !this.groupOnly;
     }
     if (
       this.group &&
@@ -109,6 +111,15 @@ export class BoardGroupComponent {
   @HostBinding('attr.uid')
   uid: string;
 
+  @HostBinding('class.wip-limit-exceeded')
+  get wipLimitExceeded(): boolean {
+    return (
+      this.group?.wipLimit != null &&
+      this.group.wipLimit > 0 &&
+      (this.group.reduce?.count ?? 0) > this.group.wipLimit
+    );
+  }
+
   @Output()
   check = new EventEmitter<{
     group: BoardGroup;
@@ -118,6 +129,15 @@ export class BoardGroupComponent {
 
   @Output()
   addTask = new EventEmitter<BoardGroup>();
+
+  @Output()
+  issueDrop = new EventEmitter<{
+    issueId: string;
+    targetGroup: BoardGroup;
+  }>();
+
+  @Output()
+  openIssue = new EventEmitter<Issue>();
 
   @HostBinding('style.flex')
   get flex() {
@@ -210,8 +230,59 @@ export class BoardGroupComponent {
   onIssueCheck(select: { group: BoardGroup; issue: Issue; all: boolean }) {
     this.check.next(select);
   }
+  onIssueSelect(issue: Issue, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.check.next({ group: this.group, issue, all: false });
+  }
+  onIssueOpen(issue: Issue, event: MouseEvent) {
+    if (event.defaultPrevented || event.button !== 0) {
+      return;
+    }
+    event.preventDefault();
+    this.openIssue.next(issue);
+  }
+  onIssueDragStart(issue: Issue, event: DragEvent) {
+    event.dataTransfer?.setData('text/plain', issue.id);
+    event.dataTransfer?.setData('application/x-renwu-issue-id', issue.id);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+  onDragOver(event: DragEvent) {
+    if (event.dataTransfer?.types.includes('application/x-renwu-issue-id')) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+  onDrop(targetGroup: BoardGroup, event: DragEvent) {
+    event.preventDefault();
+    const issueId =
+      event.dataTransfer?.getData('application/x-renwu-issue-id') ||
+      event.dataTransfer?.getData('text/plain');
+    if (issueId && targetGroup?.issue) {
+      this.issueDrop.next({ issueId, targetGroup });
+    }
+  }
+  onGroupSelect(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const issue = this.group.items[0];
+    if (issue) {
+      this.check.next({ group: this.group, issue, all: true });
+    }
+  }
+  isIssueSelected(issue: Issue): boolean {
+    return !!(issue as IssueBoardUi).__is_selected;
+  }
   onAddTask(group: BoardGroup) {
     this.addTask.next(group);
+  }
+  onIssueDrop(event: { issueId: string; targetGroup: BoardGroup }) {
+    this.issueDrop.next(event);
+  }
+  onOpenIssue(issue: Issue) {
+    this.openIssue.next(issue);
   }
   collapse() {
     const openIndexGroup = this.settingsService.user.settings.open_index_group;

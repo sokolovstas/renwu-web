@@ -4,15 +4,26 @@
       class="renwu-board-group__title"
       >
       <div class="renwu-board-group__title-wrapper" (click)="collapse()">
-        {{ group.label }} ({{ group.reduce?.count }})
+        {{ group.label }} ({{ group.reduce?.count }}@if (group.wipLimit) {
+          /{{ group.wipLimit }}
+        })
       </div>
+      @if (group.items.length > 0) {
+        <button
+          class="renwu-board-group__select-all"
+          type="button"
+          (click)="onGroupSelect($event)"
+        >
+          &#10003;
+        </button>
+      }
       &nbsp;
       <rw-icon [states]="{
         true: 'keyboard_arrow_right',
         false: 'keyboard_arrow_down'
         }"
         (click)="collapse()"
-        [state]="collapsed"
+        [boolState]="collapsed"
          />
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       @if (group.issue) {
@@ -33,6 +44,8 @@
     class="renwu-board-group__issues-container renwu-board-group__issues-container-{{
     config.type.id
     }}"
+    (dragover)="onDragOver($event)"
+    (drop)="onDrop(group, $event)"
     >
     @if (!collapsed || groupOnly) {
       <div
@@ -44,12 +57,26 @@
           issue of group.items
           | renwuSortList: { sort: { field: 'key', direction: 'up' } }
           ; track
-          issue) {
+          issue.id) {
           <a
+            draggable="true"
+            [class.renwu-board-group__issue--selected]="isIssueSelected(issue)"
+            (dragstart)="onIssueDragStart(issue, $event)"
+            (click)="onIssueOpen(issue, $event)"
             >
+            <button
+              class="renwu-board-group__issue-select"
+              type="button"
+              [class.renwu-board-group__issue-select--active]="isIssueSelected(issue)"
+              (click)="onIssueSelect(issue, $event)"
+            >
+              &#10003;
+            </button>
             @if (isCardLayoutView(config.view.id)) {
               <renwu-boards-card [issue]="issue"
                 [type]="config.type.id"
+                [density]="config.density.id"
+                [colorMode]="config.colorMode.id"
                />
             }
           </a>
@@ -73,7 +100,7 @@
       : 'up'
       : 'sort'
       ; track
-      g) {
+      g.uid) {
       <renwu-board-group class="renwu-board-group__group-{{
         group.config.view.id
         }} renwu-board-group__group-{{
@@ -81,6 +108,8 @@
         }} renwu-board-group__group-fixed"
         (check)="onIssueCheck($event)"
         (addTask)="onAddTask($event)"
+        (issueDrop)="onIssueDrop($event)"
+        (openIssue)="onOpenIssue($event)"
         [parentGroup]="group"
         [group]="g"
         [config]="config"
@@ -99,12 +128,14 @@
           : 'up'
           : 'sort'
           ; track
-          g) {
+          g.uid) {
           <renwu-board-group class="renwu-board-group__group-{{
             group.config.view.id
             }} renwu-board-group__group-{{ config.view.id }}"
             (check)="onIssueCheck($event)"
             (addTask)="onAddTask($event)"
+            (issueDrop)="onIssueDrop($event)"
+            (openIssue)="onOpenIssue($event)"
             [parentGroup]="group"
             [group]="g"
             [config]="config"

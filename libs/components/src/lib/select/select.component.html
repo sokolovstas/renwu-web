@@ -46,7 +46,7 @@
             >
           }
         } @else {
-          @for (item of selected ?? []; track item; let i = $index) {
+          @for (item of selected ?? []; track item?.id ?? item?.label ?? i; let i = $index) {
             <div
               class="rw-select-label {{ manyLayout }}"
               [class.many]="model.many && opened"

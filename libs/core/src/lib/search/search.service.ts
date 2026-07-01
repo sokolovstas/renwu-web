@@ -55,17 +55,20 @@ export class RwSearchService {
 
   setListOptions(value: ListOptions) {
     if (value) {
+      const nextQuery = value.queryString || '';
+      const nextHash = value.hash || '';
       const changed =
-        (value.queryString || '') !== this._listOptions.queryString;
-      const changedHash = value.hash !== this._listOptions.hash;
-      if (changed && value.queryString !== '') {
-        this._listOptions.queryString = value.queryString;
+        nextQuery !== (this._listOptions.queryString || '');
+      const changedHash = nextHash !== (this._listOptions.hash || '');
+      if (changed && nextQuery !== '') {
+        this._listOptions.queryString = nextQuery;
+        this._listOptions.hash = '';
         this.onChange();
         return;
       }
 
-      if (changedHash && value.hash !== '') {
-        this._listOptions.hash = value.hash;
+      if (changedHash && nextHash !== '') {
+        this._listOptions.hash = nextHash;
         this.dataService
           .getSearchQuery(this._listOptions.hash)
           .subscribe((query) => {

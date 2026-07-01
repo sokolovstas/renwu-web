@@ -10,7 +10,12 @@
     "src/main.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "../../jest-zone-transloco-setup.ts",
+    "../../libs/components/src/index.ts",
+    "../../libs/core/src/index.ts",
+    "../../libs/mentions/src/index.ts",
+    "../../libs/utils/src/index.ts"
   ],
   "exclude": [
     "jest.config.ts",

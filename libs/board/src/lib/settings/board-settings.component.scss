@@ -1,0 +1,179 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 550px;
+  max-width: min(550px, 50vw);
+  overflow: auto;
+  padding: 20px;
+  margin: 0;
+  border: 2px solid var(--gray-300);
+  border-radius: 8px;
+  background-color: var(--gray-100);
+  color: var(--black);
+}
+
+.renwu-board-settings__wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+
+.renwu-board-settings__have-changes {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background-color: var(--gray-300);
+}
+
+.renwu-board-settings__form-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+.renwu-board-settings__form-title:first-child {
+  margin-top: 0;
+}
+
+.renwu-board-settings__title-wrap {
+  display: flex;
+  flex-direction: row;
+}
+
+.renwu-board-settings__title-input {
+  flex: 1 1 100%;
+}
+
+.renwu-board-settings__share {
+  margin-left: 20px;
+}
+
+.renwu-board-settings__group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 16px;
+  margin: 10px 0;
+  border-radius: 6px;
+  background-color: var(--gray-300);
+  gap: 8px;
+}
+
+.renwu-board-settings__group-settings {
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.renwu-board-settings__group-field {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 45%;
+  align-items: center;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.renwu-board-settings__group-field--auto {
+  flex: 0 1 auto;
+  min-width: auto;
+}
+
+.renwu-board-settings__config-title {
+  flex: 0 0 auto;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.renwu-board-settings__select {
+  flex: 1 1 160px;
+  min-width: 120px;
+}
+
+.renwu-board-settings__select--wide {
+  flex: 1 1 260px;
+}
+
+.renwu-board-settings__remove {
+  align-self: stretch;
+  padding-left: 12px;
+  margin-left: auto;
+  border-left: 1px solid var(--gray-300);
+}
+
+.renwu-board-settings__new-group {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  margin: 4px 0;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.renwu-board-settings__new-group:hover {
+  background-color: var(--gray-300);
+}
+
+.renwu-board-settings__checkbox-value {
+  margin-left: 10px;
+}
+
+.renwu-board-settings__status-columns {
+  display: flex;
+  flex: 1 1 100%;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-400);
+}
+
+.renwu-board-settings__status-columns-title {
+  font-weight: 600;
+}
+
+.renwu-board-settings__status-column {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: var(--gray-200);
+}
+
+.renwu-board-settings__status-column-title {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
+.renwu-board-settings__status-column-query {
+  flex: 1 1 100%;
+  min-width: 220px;
+}
+
+.renwu-board-settings__inline-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.renwu-board-settings__number-input {
+  width: 70px;
+  padding: 4px 6px;
+  border: 1px solid var(--gray-400);
+  border-radius: 4px;
+  background-color: var(--gray-100);
+  color: var(--black);
+}

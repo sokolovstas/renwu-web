@@ -4,3 +4,4 @@ export * from './lib/board.settings';
 export * from './lib/group/group.component';
 export * from './lib/group/group.service';
 export * from './lib/providers';
+export * from './lib/settings/board-settings.component';

@@ -56,7 +56,12 @@ export class RenwuSidebarService {
       path: 'project',
       place: 'sidebar',
     },
-    // { icon: 's-board', hint: this.transloco.selectTranslate('renwu.boards'), path: 'board', place: 'sidebar' },
+    {
+      icon: 'list',
+      hint: this.transloco.selectTranslate('renwu.boards'),
+      path: 'board',
+      place: 'sidebar',
+    },
     {
       icon: 's-task',
       hint: this.transloco.selectTranslate('renwu.tasks'),

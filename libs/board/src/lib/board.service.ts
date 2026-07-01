@@ -1,25 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import {
   BoardGroupsConfigServer,
+  ResponseOk,
   RwDataService,
-  RwSettingsService,
+  RwUserService,
 } from '@renwu/core';
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, tap } from 'rxjs';
 import { BoardGroupsConfig } from './board.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RwBoardService {
-  private settingsService = inject(RwSettingsService);
   private dataService = inject(RwDataService);
+  private userService = inject(RwUserService);
 
   boards = new BehaviorSubject<BoardGroupsConfig[]>([]);
-  // favBoards = new BehaviorSubject<BoardGroupsConfig[]>([]);
-
-  constructor() {
-    return;
-  }
 
   init(): Observable<BoardGroupsConfigServer[]> {
     return this.loadBoards();
@@ -28,19 +24,8 @@ export class RwBoardService {
   loadBoards(): Observable<BoardGroupsConfigServer[]> {
     return this.dataService.getBoards().pipe(
       tap((b) => {
-        const boards = new Array<BoardGroupsConfig>();
-        const favBoards = new Array<BoardGroupsConfig>();
-        b.map((board) => BoardGroupsConfig.fromServer(board)).forEach(
-          (board) => {
-            // if (this.settingsService.user.fav_boards.indexOf(board.id) > -1) {
-            // board.fav = true;
-            // favBoards.push(board);
-            // }
-            boards.push(board);
-          },
-        );
+        const boards = b.map((board) => BoardGroupsConfig.fromServer(board));
         this.boards.next(boards);
-        // this.favBoards.next(favBoards);
       }),
     );
   }
@@ -49,25 +34,32 @@ export class RwBoardService {
     this.loadBoards().subscribe();
   }
 
-  getBoard(id: string): Observable<BoardGroupsConfig> {
-    return this.boards.pipe(map((a) => a.find((b) => b.id === id)));
+  /** Emits whenever the board with this id exists in the cached list (including after reload). */
+  getBoard(id: string | null): Observable<BoardGroupsConfig> {
+    return this.boards.pipe(
+      map((list) => (id ? list.find((b) => b.id === id) : undefined)),
+      filter((b): b is BoardGroupsConfig => b != null),
+    );
   }
 
-  // switchFavBoard(board: BoardGroupsConfig): void {
-  //   const position: number = this.settingsService.user.fav_boards.indexOf(
-  //     board.id
-  //   );
-  //   if (position > -1) {
-  //     this.settingsService.user.fav_boards.splice(position, 1);
-  //     this.settingsService.user.fav_boards = JSONUtils.jsonClone(
-  //       this.settingsService.user.fav_boards
-  //     );
-  //   } else {
-  //     this.settingsService.user.fav_boards.push(board.id);
-  //     this.settingsService.user.fav_boards = JSONUtils.jsonClone(
-  //       this.settingsService.user.fav_boards
-  //     );
-  //   }
-  //   this.updateBoardsList();
-  // }
+  saveBoard(config: BoardGroupsConfig): Observable<BoardGroupsConfigServer> {
+    return this.dataService.saveBoard(config.toServer()).pipe(
+      tap(() => this.updateBoardsList()),
+    );
+  }
+
+  deleteBoard(id: string): Observable<ResponseOk> {
+    return this.dataService.deleteBoard(id).pipe(
+      tap(() => this.updateBoardsList()),
+    );
+  }
+
+  addBoard(
+    config: BoardGroupsConfig,
+  ): Observable<BoardGroupsConfigServer> {
+    config.authorId = config.authorId || this.userService.getId();
+    return this.dataService.addBoard(config.toServer()).pipe(
+      tap(() => this.updateBoardsList()),
+    );
+  }
 }

@@ -337,9 +337,12 @@ export class RwSelectComponent implements OnDestroy, ControlValueAccessor {
   }
   onSelect(index: number): void {
     this.model.select(index);
-    if (this.closeOnSelect) {
+    if (this.closeOnSelect && !this.model.many) {
       this.switchPopup(false);
+      return;
     }
+    void this.applyChanges();
+    this.cd.markForCheck();
   }
   dropdownDisplayed(): void {
     this.focusOnInput();

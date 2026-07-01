@@ -1,0 +1,279 @@
+@if (groupsConfig) {
+  <div class="renwu-board-settings__wrapper">
+    @if (haveChanges) {
+      <div class="renwu-board-settings__have-changes">
+        <div>{{ 'boards.settings.unsavedBanner' | transloco }}</div>
+        @if (!viewOnly) {
+          <rw-button (clicked)="save()">{{ 'boards.settings.save' | transloco }}</rw-button>
+          <rw-button [isAttention]="true" (clicked)="discard()">
+            {{ 'boards.settings.discard' | transloco }}
+          </rw-button>
+        }
+      </div>
+    }
+    <div class="renwu-board-settings__form-title">{{ 'boards.settings.titleLabel' | transloco }}</div>
+    <div class="renwu-board-settings__title-wrap">
+      <rw-text-input
+        class="renwu-board-settings__title-input"
+        [(ngModel)]="groupsConfig.title"
+        (ngModelChange)="updateGroupingNext()"
+        name="title"
+        [required]="true"
+        [disabled]="viewOnly"
+        [prompt]="'boards.settings.titlePrompt' | transloco"
+      />
+    </div>
+    <div class="renwu-board-settings__form-title">
+      <span>{{ 'boards.settings.shareLabel' | transloco }}</span>
+      <rw-checkbox
+        class="renwu-board-settings__share"
+        [(ngModel)]="groupsConfig.shared"
+        [disabled]="viewOnly"
+        (ngModelChange)="updateGroupingNext()"
+      />
+    </div>
+    <div class="renwu-board-settings__form-title">{{ 'boards.settings.groupsHeading' | transloco }}</div>
+    @for (group of groupsConfig.groups; track $index) {
+      <div class="renwu-board-settings__group">
+        <div class="renwu-board-settings__group-settings">
+          <div class="renwu-board-settings__group-field">
+            <div class="renwu-board-settings__config-title">{{ 'boards.settings.field' | transloco }}</div>
+            <rw-select
+              class="renwu-board-settings__select"
+              [model]="groupFieldModels[$index]"
+              [disabled]="viewOnly"
+              (changed)="onGroupFieldChanged(group, $event)"
+            />
+          </div>
+          <div class="renwu-board-settings__group-field">
+            <div class="renwu-board-settings__config-title">{{ 'boards.settings.display' | transloco }}</div>
+            <rw-select
+              class="renwu-board-settings__select"
+              [model]="groupViewModels[$index]"
+              [disabled]="viewOnly"
+              (changed)="onGroupViewChanged(group, $event)"
+            />
+          </div>
+          <div class="renwu-board-settings__group-field renwu-board-settings__group-field--auto">
+            <div class="renwu-board-settings__config-title">{{ 'boards.settings.groupOnly' | transloco }}</div>
+            <rw-checkbox
+              [(ngModel)]="group.groupOnly"
+              [disabled]="viewOnly"
+              (ngModelChange)="updateGroupingNext()"
+            />
+          </div>
+          <div class="renwu-board-settings__group-field renwu-board-settings__group-field--auto">
+            <div class="renwu-board-settings__config-title">{{ 'boards.settings.showEmpty' | transloco }}</div>
+            <rw-checkbox
+              [(ngModel)]="group.showEmpty"
+              [disabled]="viewOnly"
+              (ngModelChange)="updateGroupingNext()"
+            />
+          </div>
+          @if (group.field?.dict && group.field?.id !== 'status-buckets') {
+            <div class="renwu-board-settings__group-field renwu-board-settings__group-field--auto">
+              <div class="renwu-board-settings__config-title">{{ 'boards.settings.fixed' | transloco }}</div>
+              <rw-select
+                class="renwu-board-settings__select"
+                [model]="groupFixedModels[$index]"
+                [disabled]="viewOnly"
+                (changed)="onGroupFixedChanged(group, $event)"
+              />
+            </div>
+          }
+          @if (group.field?.id === 'status-buckets') {
+            <div class="renwu-board-settings__status-columns">
+              <div class="renwu-board-settings__status-columns-title">
+                {{ 'boards.settings.statusColumns' | transloco }}
+              </div>
+              @for (column of group.statusColumns; track column.id; let columnIndex = $index) {
+                <div class="renwu-board-settings__status-column">
+                  <rw-text-input
+                    class="renwu-board-settings__status-column-title"
+                    [(ngModel)]="column.title"
+                    [disabled]="viewOnly"
+                    [prompt]="'boards.settings.columnTitle' | transloco"
+                    (ngModelChange)="onStatusColumnTitleChanged()"
+                  />
+                  <div class="renwu-board-settings__config-title">
+                    {{ 'boards.settings.quickStatuses' | transloco }}
+                  </div>
+                  <rw-select
+                    class="renwu-board-settings__select renwu-board-settings__select--wide"
+                    [model]="getStatusColumnStatusModel($index, columnIndex, column)"
+                    [disabled]="viewOnly"
+                    (changed)="onStatusColumnStatusesChanged(column, $event)"
+                  />
+                  <div class="renwu-board-settings__config-title">
+                    {{ 'boards.settings.columnQuery' | transloco }}
+                  </div>
+                  <renwu-query-builder
+                    class="renwu-board-settings__status-column-query"
+                    [query]="column.query"
+                    [disabled]="viewOnly"
+                    [emitOnChange]="true"
+                    (queryChange)="onStatusColumnQueryChanged(column, $event)"
+                  />
+                  <div class="renwu-board-settings__config-title">
+                    {{ 'boards.settings.dropStatus' | transloco }}
+                  </div>
+                  <rw-select
+                    class="renwu-board-settings__select"
+                    [model]="getStatusColumnTargetModel($index, columnIndex, column)"
+                    [disabled]="viewOnly"
+                    (changed)="onStatusColumnTargetChanged(column, $event)"
+                  />
+                  <label class="renwu-board-settings__inline-field">
+                    <span>{{ 'boards.settings.collapsed' | transloco }}</span>
+                    <rw-checkbox
+                      [(ngModel)]="column.collapsed"
+                      [disabled]="viewOnly"
+                      (ngModelChange)="updateGroupingNext()"
+                    />
+                  </label>
+                  <label class="renwu-board-settings__inline-field">
+                    <span>{{ 'boards.settings.wipLimit' | transloco }}</span>
+                    <input
+                      class="renwu-board-settings__number-input"
+                      type="number"
+                      min="0"
+                      [(ngModel)]="column.wipLimit"
+                      [disabled]="viewOnly"
+                      (ngModelChange)="updateGroupingNext()"
+                    />
+                  </label>
+                  @if (!viewOnly) {
+                    <rw-button
+                      typeButton="link"
+                      [disabled]="columnIndex === 0"
+                      (clicked)="moveStatusColumn(group, column, -1)"
+                    >
+                      {{ 'boards.settings.moveUp' | transloco }}
+                    </rw-button>
+                    <rw-button
+                      typeButton="link"
+                      [disabled]="columnIndex === group.statusColumns.length - 1"
+                      (clicked)="moveStatusColumn(group, column, 1)"
+                    >
+                      {{ 'boards.settings.moveDown' | transloco }}
+                    </rw-button>
+                    <rw-button
+                      typeButton="link"
+                      (clicked)="duplicateStatusColumn(group, column)"
+                    >
+                      {{ 'boards.settings.duplicate' | transloco }}
+                    </rw-button>
+                    <rw-button
+                      typeButton="icon"
+                      iconClass="close"
+                      iconSize="small"
+                      (clicked)="removeStatusColumn(group, column)"
+                    />
+                  }
+                </div>
+              }
+              @if (!viewOnly) {
+                <rw-button typeButton="link" (clicked)="addStatusColumn(group)">
+                  {{ 'boards.settings.addColumn' | transloco }}
+                </rw-button>
+              }
+            </div>
+          }
+        </div>
+        @if (!viewOnly) {
+          <rw-button
+            class="renwu-board-settings__remove"
+            typeButton="icon"
+            iconClass="close"
+            iconSize="small"
+            (clicked)="removeGroup(group)"
+          />
+        }
+      </div>
+    }
+    @if (!viewOnly) {
+      <div class="renwu-board-settings__new-group" (click)="addGroup()">
+        <rw-button typeButton="icon" iconClass="add" iconSize="small" />
+      </div>
+    }
+    <div class="renwu-board-settings__form-title">{{ 'boards.settings.taskDisplay' | transloco }}</div>
+    <div class="renwu-board-settings__group">
+      <div class="renwu-board-settings__config-title">{{ 'boards.settings.taskView' | transloco }}</div>
+      <rw-select
+        class="renwu-board-settings__select"
+        [model]="boardViewModel"
+        [disabled]="viewOnly"
+        (changed)="onBoardViewChanged($event)"
+      />
+    </div>
+    <div class="renwu-board-settings__group">
+      <div class="renwu-board-settings__config-title">{{ 'boards.settings.cardType' | transloco }}</div>
+      <rw-select
+        class="renwu-board-settings__select"
+        [model]="boardTypeModel"
+        [disabled]="viewOnly"
+        (changed)="onBoardTypeChanged($event)"
+      />
+    </div>
+    <div class="renwu-board-settings__group">
+      <div class="renwu-board-settings__config-title">{{ 'boards.settings.cardDensity' | transloco }}</div>
+      <rw-select
+        class="renwu-board-settings__select"
+        [model]="boardDensityModel"
+        [disabled]="viewOnly"
+        (changed)="onBoardDensityChanged($event)"
+      />
+    </div>
+    <div class="renwu-board-settings__group">
+      <div class="renwu-board-settings__config-title">{{ 'boards.settings.colorMode' | transloco }}</div>
+      <rw-select
+        class="renwu-board-settings__select"
+        [model]="boardColorModeModel"
+        [disabled]="viewOnly"
+        (changed)="onBoardColorModeChanged($event)"
+      />
+    </div>
+    <div class="renwu-board-settings__group">
+      <div class="renwu-board-settings__group-settings">
+        <div class="renwu-board-settings__group-field">
+          <div class="renwu-board-settings__form-title">
+            <span>{{ 'boards.settings.showLogs' | transloco }}</span>
+            <rw-checkbox
+              class="renwu-board-settings__checkbox-value"
+              [(ngModel)]="groupsConfig.showLogs"
+              [disabled]="viewOnly"
+              (ngModelChange)="updateGroupingNext()"
+            />
+          </div>
+        </div>
+        <div class="renwu-board-settings__group-field">
+          <div class="renwu-board-settings__form-title">
+            <span>{{ 'boards.settings.hideParents' | transloco }}</span>
+            <rw-checkbox
+              class="renwu-board-settings__checkbox-value"
+              [(ngModel)]="groupsConfig.hideParents"
+              [disabled]="viewOnly"
+              (ngModelChange)="updateGroupingNext()"
+            />
+          </div>
+        </div>
+        <div class="renwu-board-settings__group-field">
+          <div class="renwu-board-settings__form-title">
+            <span>{{ 'boards.settings.collapseEmpty' | transloco }}</span>
+            <rw-checkbox
+              class="renwu-board-settings__checkbox-value"
+              [(ngModel)]="groupsConfig.collapseEmpty"
+              [disabled]="viewOnly"
+              (ngModelChange)="updateGroupingNext()"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    @if (!viewOnly) {
+      <rw-button [isAttention]="true" (clicked)="delete()">
+        {{ 'boards.settings.delete' | transloco }}
+      </rw-button>
+    }
+  </div>
+}

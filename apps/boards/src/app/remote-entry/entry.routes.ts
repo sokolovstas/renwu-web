@@ -1,5 +1,7 @@
 import { Route } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
+import { RwGroupService } from '@renwu/board';
+import { RwQueryBuilderService, RwSearchService } from '@renwu/core';
 import { BoardComponent } from '../board/board.component';
 import { MainComponent } from '../main/main.component';
 
@@ -23,7 +25,7 @@ export const ROUTES: Route[] = [
       {
         provide: TRANSLOCO_SCOPE,
         useValue: {
-          scope: 'profile',
+          scope: 'boards',
           loader: createInlineLoader(['en', 'ru', 'zh']),
         },
       },
@@ -32,6 +34,7 @@ export const ROUTES: Route[] = [
       {
         path: ':id',
         component: BoardComponent,
+        providers: [RwGroupService, RwQueryBuilderService, RwSearchService],
       },
     ],
   },

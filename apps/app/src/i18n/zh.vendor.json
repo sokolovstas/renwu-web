@@ -141,6 +141,7 @@
   "renwu": {
     "dashboard": "renwu.dashboard",
     "projects": "renwu.projects",
+    "boards": "看板",
     "tasks": "renwu.tasks",
     "messenger": "renwu.messenger",
     "timeline": "renwu.timeline",

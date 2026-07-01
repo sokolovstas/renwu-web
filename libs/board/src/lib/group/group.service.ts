@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import {
+  BoardBucketsResponse,
   Issue,
   Milestone,
   Priority,
@@ -10,11 +11,13 @@ import {
 } from '@renwu/core';
 import { Observable, forkJoin } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import durationFns from 'duration-fns';
 import {
   BoardGroup,
   BoardGroupConfig,
   BoardGroupsConfig,
   BoardSettings,
+  BoardStatusColumnConfig,
   DictKeys,
   GroupedIssues,
 } from '../board.model';
@@ -38,27 +41,19 @@ export class RwGroupService {
     >();
     this.dictionaries.set(
       'statuses',
-      Object.keys(this.containerService.statusMap).map((i) =>
-        this.containerService.statusMap.get(i),
-      ),
+      Array.from(this.containerService.statusMap.values()),
     );
     this.dictionaries.set(
       'priorities',
-      Object.keys(this.containerService.priorityMap).map((i) =>
-        this.containerService.priorityMap.get(i),
-      ),
+      Array.from(this.containerService.priorityMap.values()),
     );
     this.dictionaries.set(
       'types',
-      Object.keys(this.containerService.typeMap).map((i) =>
-        this.containerService.typeMap.get(i),
-      ),
+      Array.from(this.containerService.typeMap.values()),
     );
     this.dictionaries.set(
       'resolutions',
-      Object.keys(this.containerService.resolutionMap).map((i) =>
-        this.containerService.resolutionMap.get(i),
-      ),
+      Array.from(this.containerService.resolutionMap.values()),
     );
     // if (this.containerService.currentContainer.team) {
     //   this.dictionaries.set(
@@ -99,6 +94,7 @@ export class RwGroupService {
   public group(
     issues: Issue[],
     config: BoardGroupsConfig,
+    buckets?: BoardBucketsResponse,
   ): Observable<BoardGroup> {
     if (config.hideParents) {
       issues = issues.filter((issue) => !issue.have_childs);
@@ -120,7 +116,7 @@ export class RwGroupService {
       sort: {},
       reduce,
     };
-    const root = this.createGroup(rootGroup, null, config.groups, 0);
+    const root = this.createGroup(rootGroup, null, config.groups, 0, buckets);
     return root;
   }
 
@@ -129,6 +125,7 @@ export class RwGroupService {
     parent: BoardGroup,
     configs: BoardGroupConfig[],
     depth: number,
+    buckets?: BoardBucketsResponse,
   ): Observable<BoardGroup> {
     return new Observable((observer) => {
       // Run this in worker
@@ -137,6 +134,8 @@ export class RwGroupService {
       group.label = groupInitial.label;
       group.items = groupInitial.items;
       group.sort = groupInitial.sort;
+      group.collapsed = groupInitial.collapsed;
+      group.wipLimit = groupInitial.wipLimit;
       group.parent = parent;
 
       if (parent) {
@@ -166,10 +165,19 @@ export class RwGroupService {
         BoardSettings.groupFields.find(
           (field) => field.id === group.config.field.id,
         ) || BoardSettings.groupFields[0];
-      const groupFunction = groupField.group;
+      const groupFunction =
+        group.config.field.id === 'status-buckets' &&
+        group.config.statusColumns?.length
+          ? this.createStatusColumnsGroupFunction(
+              group.config.statusColumns,
+              buckets,
+            )
+          : groupField.group;
       const initFunction = groupField.init;
 
-      if (initFunction && group.config.showEmpty) {
+      if (group.config.field.id === 'status-buckets' && group.config.showEmpty) {
+        initial = this.createStatusColumnsInitial(group.config.statusColumns);
+      } else if (initFunction && group.config.showEmpty) {
         initial = initFunction(this.dictionaries).reduce(
           groupFunction,
           initial,
@@ -185,7 +193,9 @@ export class RwGroupService {
       const groupsObservables = new Array<Observable<BoardGroup>>();
       const grouped: { [key: string]: GroupedIssues } = groups;
       Object.values(grouped).forEach((g) =>
-        groupsObservables.push(this.createGroup(g, group, configs, depth + 1)),
+        groupsObservables.push(
+          this.createGroup(g, group, configs, depth + 1, buckets),
+        ),
       );
       if (groupsObservables.length === 0) {
         observer.next(group);
@@ -199,5 +209,107 @@ export class RwGroupService {
         return;
       });
     });
+  }
+
+  private createStatusColumnsInitial(
+    columns: BoardStatusColumnConfig[],
+  ): Record<string, GroupedIssues> {
+    return (columns || []).reduce<Record<string, GroupedIssues>>(
+      (acc, column, index) => {
+        acc[column.id] = this.createStatusColumnGroup(column, index);
+        return acc;
+      },
+      {},
+    );
+  }
+
+  private createStatusColumnsGroupFunction(
+    columns: BoardStatusColumnConfig[],
+    buckets?: BoardBucketsResponse,
+  ): (
+    acc: Record<string, GroupedIssues>,
+    issue: Issue,
+  ) => Record<string, GroupedIssues> {
+    const statuses = new Map(
+      ((this.dictionaries?.get('statuses') ?? []) as Status[]).map((status) => [
+        status.id,
+        status,
+      ]),
+    );
+    const columnsById = new Map(columns.map((column) => [column.id, column]));
+    const columnIdByIssueId = new Map<string, string>();
+    for (const column of buckets?.columns ?? []) {
+      for (const issueId of column.issue_ids ?? column.issueIds ?? []) {
+        if (!columnIdByIssueId.has(issueId)) {
+          columnIdByIssueId.set(issueId, column.id);
+        }
+      }
+    }
+
+    return (acc, issue) => {
+      const columnId = issue.id ? columnIdByIssueId.get(issue.id) : undefined;
+      let column = columnId ? columnsById.get(columnId) : undefined;
+      if (!column) {
+        column = this.createOtherStatusColumn();
+      }
+      if (!acc[column.id]) {
+        acc[column.id] = this.createStatusColumnGroup(column, columns.length);
+      }
+      const targetStatusId = column.targetStatus;
+      const targetStatus = targetStatusId ? statuses.get(targetStatusId) : undefined;
+      const item = acc[column.id];
+      item.items.push(issue);
+      item.ids.add(issue.id);
+      item.issue = targetStatus ? { status: targetStatus } : {};
+      item.sort = { status: targetStatus ?? issue.status };
+      item.reduce.count += 1;
+      if (issue.estimated_time) {
+        const estimated = durationFns.toSeconds({
+          seconds: issue.estimated_time,
+        });
+        item.reduce.timePlanned += estimated;
+        item.reduce.timeRemaining += ((100 - issue.completion) * estimated) / 100;
+      }
+      if (issue.time_logs && Array.isArray(issue.time_logs)) {
+        for (const timeLog of issue.time_logs) {
+          item.reduce.timeLogged += durationFns.toSeconds({
+            seconds: timeLog.value,
+          });
+        }
+      }
+      return acc;
+    };
+  }
+
+  private createStatusColumnGroup(
+    column: BoardStatusColumnConfig,
+    sortIndex: number,
+  ): GroupedIssues {
+    const targetStatus = ((this.dictionaries?.get('statuses') ?? []) as Status[]).find(
+      (status) => status.id === column.targetStatus,
+    );
+    return {
+      uid: column.id,
+      ids: new Set<string>(),
+      items: [],
+      label: column.title,
+      issue: targetStatus ? { status: targetStatus } : {},
+      sort: { sort: sortIndex },
+      collapsed: column.collapsed,
+      wipLimit: column.wipLimit,
+      reduce: {
+        count: 0,
+        timeLogged: 0,
+        timePlanned: 0,
+        timeRemaining: 0,
+      },
+    } as GroupedIssues;
+  }
+
+  private createOtherStatusColumn(): BoardStatusColumnConfig {
+    const column = new BoardStatusColumnConfig('Other');
+    column.id = '__other';
+    column.targetStatus = '';
+    return column;
   }
 }

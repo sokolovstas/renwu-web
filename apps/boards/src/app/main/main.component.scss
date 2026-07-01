@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.renwu-boards-main {
+  min-width: 0;
+}
+
+.renwu-boards-main .app-second-sidebar {
+  flex: 0 0 auto;
+}
+
+.renwu-boards-main .app-main-content {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}

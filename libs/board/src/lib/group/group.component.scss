@@ -39,6 +39,10 @@ renwu-board-group {
     border: 0;
   }
 
+  &.wip-limit-exceeded > .renwu-board-group__title {
+    color: var(--error-color, #d92d20);
+  }
+
   &.root-group > .renwu-board-group__groups-wrapper-columns {
     flex: 1 1 100%;
   }
@@ -54,6 +58,8 @@ renwu-board-group {
     font-weight: 600;
     display: flex;
     flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
   }
   &__title-wrapper {
@@ -130,6 +136,21 @@ renwu-board-group {
   }
   &__issues {
     min-height: 20px;
+
+    & > a {
+      position: relative;
+      display: block;
+      cursor: grab;
+    }
+
+    & > a:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__issue--selected {
+    outline: 2px solid $rw-button-primary-background;
+    outline-offset: 2px;
   }
   &__issues-cards-hw {
     flex-wrap: wrap;
@@ -166,6 +187,39 @@ renwu-board-group {
   &__add-button {
     font-size: 80%;
     opacity: 0.2;
+  }
+
+  &__select-all,
+  &__issue-select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid $rw-button-primary-background;
+    border-radius: 4px;
+    color: transparent;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  &__select-all {
+    flex: 0 0 auto;
+  }
+
+  &__issue-select {
+    position: absolute;
+    z-index: 2;
+    top: 4px;
+    right: 4px;
+    opacity: 0.25;
+  }
+
+  &__issue-select:hover,
+  &__issue-select--active {
+    color: $rw-button-primary-background;
+    background: rgba($rw-button-primary-background, 0.08);
+    opacity: 1;
   }
 
   &__issues-container-table {

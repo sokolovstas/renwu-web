@@ -102,6 +102,12 @@ export class QueryBuilderComponent {
   queryChange = new EventEmitter<string>();
 
   @Input()
+  emitOnChange = false;
+
+  @Input()
+  disabled = false;
+
+  @Input()
   set query(value: string) {
     this.queryString.set(value);
   }
@@ -308,5 +314,8 @@ export class QueryBuilderComponent {
   }
   setQueryString(queryString: string) {
     this.queryString.set(queryString);
+    if (this.emitOnChange && this.errors() === 0) {
+      this.queryChange.next(this.queryString());
+    }
   }
 }

@@ -1,2 +1,71 @@
-{{ issue.key }} - {{ issue.title }}<br />
-<br />
+@if (!hasCustomComponent && !isEmptyType) {
+  @switch (type) {
+    @case ('table') {
+      <div class="renwu-boards-card__table">
+        <span class="renwu-boards-card__key">{{ issue.key }}</span>
+        <span class="renwu-boards-card__title">{{ issue.title }}</span>
+        <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--icon">
+          <renwu-issue-priority [value]="issue.priority" />
+        </span>
+        <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--icon">
+          <renwu-issue-type [value]="issue.type" />
+        </span>
+        <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--status">
+          <renwu-issue-status [value]="issue.status" [fontSizePx]="11" />
+        </span>
+        <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--assignee">
+          <renwu-issue-assignees [issue]="issue" avatarSize="22px" />
+        </span>
+        <span>{{ completion }}%</span>
+      </div>
+    }
+    @case ('stripe') {
+      <div class="renwu-boards-card__stripe" [style.border-left-color]="color">
+        <span class="renwu-boards-card__key">{{ issue.key }}</span>
+        <span class="renwu-boards-card__title">{{ issue.title }}</span>
+      </div>
+    }
+    @case ('bar-key') {
+      <div class="renwu-boards-card__bar renwu-boards-card__bar--key">
+        {{ issue.key }}
+      </div>
+    }
+    @case ('bar-color') {
+      <div class="renwu-boards-card__bar" [style.background-color]="color">
+        {{ issue.key }}
+      </div>
+    }
+    @case ('bar-estimate') {
+      <div class="renwu-boards-card__bar renwu-boards-card__bar--estimate">
+        <div
+          class="renwu-boards-card__bar-progress"
+          [style.width.%]="completion"
+          [style.background-color]="color"
+        ></div>
+        <span>{{ issue.key }}</span>
+      </div>
+    }
+    @default {
+      <div class="renwu-boards-card__default">
+        <div class="renwu-boards-card__title-line">
+          <span class="renwu-boards-card__key">{{ issue.key }}</span>
+          <span class="renwu-boards-card__title">{{ issue.title }}</span>
+        </div>
+        <div class="renwu-boards-card__meta">
+          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--icon">
+            <renwu-issue-type [value]="issue.type" />
+          </span>
+          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--icon">
+            <renwu-issue-priority [value]="issue.priority" />
+          </span>
+          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--status">
+            <renwu-issue-status [value]="issue.status" [fontSizePx]="11" />
+          </span>
+          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--assignee">
+            <renwu-issue-assignees [issue]="issue" avatarSize="22px" />
+          </span>
+        </div>
+      </div>
+    }
+  }
+}

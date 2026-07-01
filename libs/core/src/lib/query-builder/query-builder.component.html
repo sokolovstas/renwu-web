@@ -9,6 +9,7 @@
         type="text"
         class="search-input"
         #searchInput
+        [disabled]="disabled"
         (focus)="inputFocus.set(true)"
         (blur)="inputFocus.set(false)"
         [ngModel]="queryString()"

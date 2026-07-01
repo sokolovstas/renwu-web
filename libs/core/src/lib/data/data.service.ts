@@ -62,7 +62,11 @@ import {
   UserWorkload,
   UserWorkloadIssues,
 } from '../user/user.model';
-import { BoardGroupsConfigServer } from './board.model';
+import {
+  BoardBucketsRequest,
+  BoardBucketsResponse,
+  BoardGroupsConfigServer,
+} from './board.model';
 import {
   OptionsResponse,
   ResponseOk,
@@ -947,6 +951,20 @@ export class RwDataService {
     ).pipe(
       map((response) => {
         response.hits = response.hits || [];
+        response.issues = response.issues || [];
+        return response;
+      }),
+    );
+  }
+
+  getBoardBuckets(query: BoardBucketsRequest): Observable<BoardBucketsResponse> {
+    return this.sendToAPI<BoardBucketsResponse>(
+      'post',
+      '/board/buckets',
+      query,
+    ).pipe(
+      map((response) => {
+        response.columns = response.columns || [];
         response.issues = response.issues || [];
         return response;
       }),
