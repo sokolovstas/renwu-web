@@ -150,27 +150,94 @@ export class RwContainerService {
     return this.containersIDMap.pipe(map((m) => m.get(id)));
   }
   async getIssueTemplate(containerId: string): Promise<Issue> {
-    const container: Container = await firstValueFrom(
-      this.getContainerByID(containerId),
-    );
+    const container = await this.resolveContainer(containerId);
+    const issueSettings = container?.settings?.issue || ({} as Issue);
+    const defaults = await this.getGlobalIssueDefaults(issueSettings);
     const issueTemplate = {
+      ...defaults,
       viewType: 'newFromContainer',
-      estimated_time: container.settings.issue.estimated_time,
-      type: container.settings.issue.type,
-      priority: container.settings.issue.priority,
-      status: container.settings.issue.status,
-      auto_scheduling: container.settings.auto_scheduling,
-      container: null as Container,
+      estimated_time:
+        issueSettings.estimated_time || defaults.estimated_time,
+      auto_scheduling:
+        container?.settings?.auto_scheduling ?? defaults.auto_scheduling,
       assignes: null as User[],
+      container: container
+        ? {
+            id: container.id,
+            title: container.title,
+            key: container.key,
+          }
+        : null,
     };
-    issueTemplate.container = {
-      id: container.id,
-      title: container.title,
-      key: container.key,
-      archived: false,
-    };
-    return issueTemplate;
+    return issueTemplate as Issue;
   }
+
+  /** Defaults for a new issue when container template fields are empty. */
+  async getGlobalIssueDefaults(
+    issueSettings: Partial<Issue> = {},
+  ): Promise<Pick<Issue, 'type' | 'priority' | 'status' | 'estimated_time' | 'auto_scheduling'>> {
+    const [type, priority, status] = await Promise.all([
+      this.resolveDictionaryDefault(issueSettings.type, 'type'),
+      this.resolveDictionaryDefault(issueSettings.priority, 'priority'),
+      this.resolveDictionaryDefault(issueSettings.status, 'status'),
+    ]);
+    return {
+      type,
+      priority,
+      status,
+      estimated_time: issueSettings.estimated_time || 4 * 60 * 60,
+      auto_scheduling: true,
+    };
+  }
+
+  private async resolveContainer(
+    containerId: string,
+  ): Promise<Container | null> {
+    if (!containerId) {
+      return null;
+    }
+    let container = await firstValueFrom(this.getContainerByID(containerId));
+    if (!container) {
+      try {
+        container = await firstValueFrom(
+          this.dataService.getContainer(containerId),
+        );
+        if (container) {
+          this.updateContainers([container]);
+        }
+      } catch {
+        return null;
+      }
+    }
+    return container ?? null;
+  }
+
+  /**
+   * Prefer container template value; otherwise take the global dictionary
+   * item marked default (or the first item), matching backend GetDefault.
+   */
+  private async resolveDictionaryDefault<
+    T extends { id: string; default: boolean },
+  >(
+    value: T | null | undefined,
+    dictionary: 'status' | 'priority' | 'type',
+  ): Promise<T | null> {
+    if (value?.id) {
+      return value;
+    }
+    const map = this.getDictionaryMap(dictionary) as unknown as Map<string, T>;
+    let items = Array.from(map.values());
+    if (!items.length) {
+      items = await firstValueFrom(
+        this.dataService.getDictionary<T>(`dictionary/${dictionary}`),
+      );
+      for (const item of items) {
+        map.set(item.id, item);
+      }
+    }
+    return items.find((item) => item.default) || items[0] || null;
+  }
+
   getMilestones(
     containerID?: string,
     archived?: boolean,

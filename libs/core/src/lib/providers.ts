@@ -35,7 +35,7 @@ import { RwWebsocketService } from './websocket/websocket.service';
 
 import { TranslocoService } from '@jsverse/transloco';
 import { SelectModelLabel } from './select/label';
-import { SelectModelIssueLink } from './select/issue-link-options';
+import { SelectModelIssue } from './select/issue';
 
 export function initSelectorModels(): Record<string, () => ISelectModel<any>> {
   return {
@@ -93,8 +93,9 @@ export function initSelectorModels(): Record<string, () => ISelectModel<any>> {
         { id: AppDateFormat.ZH_CN, label: 'Chinese' },
       ]),
     Timezones: () => new SelectModelTimezone(),
-    /** Task detail: pick issue for structural links / related (`/issue/options?q=`). */
-    IssueLink: () => new SelectModelIssueLink(),
+    /** Issue picker: `/issue/options` (recent issues when search is empty). */
+    Issue: () => new SelectModelIssue(),
+    IssueLink: () => new SelectModelIssue(),
   };
 }
 

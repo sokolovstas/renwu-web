@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { Mentions } from '@renwu/mentions';
 import { of } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
-import { RwContainerService } from '../container/container.service';
 import { RwDataService } from '../data/data.service';
 import { Issue } from '../issue/issue.model';
 import { User, UserStatic } from '../user/user.model';
@@ -14,7 +13,6 @@ import { MentionUserComponent } from './mention-items/mention-user.component';
   providedIn: 'root',
 })
 export class RwMentionsProviderService {
-  private containerService = inject(RwContainerService);
   private userService = inject(RwUserService);
   private dataService = inject(RwDataService);
 
@@ -49,15 +47,10 @@ export class RwMentionsProviderService {
       itemComponent: MentionIssueComponent,
       getItems: (search) => {
         return this.dataService
-          .getDictionaryOptions<Issue>(
-            'issue/options',
-            null,
-            {
-              /*container: this.containerService.currentContainer,*/ q: search,
-            },
-            0,
-          )
-          .pipe(map((v) => v.results));
+          .getDictionaryOptions<Issue>('issue/options', '', {
+            q: (search ?? '').trim(),
+          }, 0)
+          .pipe(map((v) => v.results ?? []));
       },
       mentionSelect: (item: Issue) => `#${item.key}`,
     };

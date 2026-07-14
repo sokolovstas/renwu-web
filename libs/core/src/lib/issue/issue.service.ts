@@ -32,6 +32,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { JSONUtils } from '@renwu/utils';
 import { ContainerD } from '../container/container.model';
@@ -59,6 +60,7 @@ export class RwIssueService implements OnDestroy {
   private readonly containerService = inject(RwContainerService);
   private readonly destroy = inject(DestroyRef);
   private readonly websocketService = inject(RwWebsocketService);
+  private readonly router = inject(Router);
 
   public key = new Subject<string>();
 
@@ -221,16 +223,35 @@ export class RwIssueService implements OnDestroy {
       issue.key = 'new';
     }
     if (issue.id === 'new') {
-      let issueTemplate = {};
-      if (issue.container) {
+      if (!issue.container?.id) {
+        const fromRoute = await this.containerFromProjectRoute();
+        if (fromRoute) {
+          issue.container = fromRoute;
+        }
+      }
+
+      let issueTemplate: Partial<Issue> = {};
+      if (issue.container?.id) {
         issueTemplate = await this.containerService.getIssueTemplate(
           issue.container.id,
         );
+      } else {
+        issueTemplate =
+          await this.containerService.getGlobalIssueDefaults();
       }
 
-      if (issueTemplate) {
-        issue = { ...issue, ...issueTemplate };
+      issue = { ...issue, ...issueTemplate };
+
+      if (!issue.type?.id || !issue.priority?.id || !issue.status?.id) {
+        const defaults =
+          await this.containerService.getGlobalIssueDefaults(issue);
+        issue.type = issue.type?.id ? issue.type : defaults.type;
+        issue.priority = issue.priority?.id
+          ? issue.priority
+          : defaults.priority;
+        issue.status = issue.status?.id ? issue.status : defaults.status;
       }
+
       if (!issue.assignes) {
         issue.assignes = [];
       }
@@ -260,6 +281,26 @@ export class RwIssueService implements OnDestroy {
       issue = { id: issue.id, key: issue.key };
       return firstValueFrom(this.loadIssue(issue));
     }
+  }
+
+  /** When opening task/new from /project/:key/..., prefill that container. */
+  private async containerFromProjectRoute(): Promise<ContainerD | null> {
+    const match = this.router.url.match(/\/project\/([^/?#(]+)/);
+    const key = match?.[1] ? decodeURIComponent(match[1]) : '';
+    if (!key || key === 'new') {
+      return null;
+    }
+    const container = await firstValueFrom(
+      this.containerService.getContainerByKey(key),
+    ).catch((): null => null);
+    if (!container?.id) {
+      return null;
+    }
+    return {
+      id: container.id,
+      title: container.title,
+      key: container.key,
+    };
   }
   createAnother(issue: Issue) {
     const another = JSONUtils.jsonClone(issue);

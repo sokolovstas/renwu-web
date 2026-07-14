@@ -109,7 +109,7 @@ export class QueryBuilderComponent {
 
   @Input()
   set query(value: string) {
-    this.queryString.set(value);
+    this.queryString.set(value ?? '');
   }
 
   onHintNavigate(event: KeyboardEvent) {
@@ -313,7 +313,7 @@ export class QueryBuilderComponent {
     this.queryChange.next(this.queryString());
   }
   setQueryString(queryString: string) {
-    this.queryString.set(queryString);
+    this.queryString.set(queryString ?? '');
     if (this.emitOnChange && this.errors() === 0) {
       this.queryChange.next(this.queryString());
     }

@@ -46,7 +46,7 @@ export * from './lib/search/search.model';
 export * from './lib/search/search.service';
 export * from './lib/search/sort.model';
 export * from './lib/select/dictionary';
-export * from './lib/select/issue-link-options';
+export * from './lib/select/issue';
 export * from './lib/select/holidays';
 export * from './lib/select/milestone';
 export * from './lib/select/string';

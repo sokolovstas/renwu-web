@@ -912,6 +912,8 @@ export class RwQueryBuilderService {
   }
 
   getHints(query: string, position: number): Observable<SearchHint[]> {
+    query = query ?? '';
+    position = Number.isFinite(position) ? Math.max(0, position) : 0;
     const searchPosition = position;
     if (position > query.length) {
       position = query.length;
@@ -991,6 +993,7 @@ export class RwQueryBuilderService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     pos: number,
   ): { query: string; position: number } {
+    query = query ?? '';
     let position: number = query.length;
 
     const prev = query.slice(0, hint.start);

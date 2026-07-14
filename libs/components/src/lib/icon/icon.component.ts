@@ -43,10 +43,12 @@ export class RwIconComponent implements OnChanges {
   boolState: boolean;
 
   ngOnChanges(): void {
-    let key = this.state;
+    let key: string | number | boolean | undefined = this.state;
     if (this.boolState !== undefined) {
       key = this.boolState ? 'true' : 'false';
     }
-    this.icon = this.states?.[key.toString()] || this.icon;
+    if (this.states && key !== undefined && key !== null) {
+      this.icon = this.states[key.toString()] || this.icon;
+    }
   }
 }
