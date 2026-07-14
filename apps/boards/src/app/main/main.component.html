@@ -1,46 +1,20 @@
-<div class="renwu-boards-main flex flex-row h-full w-full overflow-hidden">
-  <div class="app-second-sidebar flex flex-col bg-gray-100 h-full flex-none">
-    <div
-      class="text-2xl p-4 pt-0 flex flex-row items-center justify-between font-extralight gap-2"
-    >
-      <span>{{ 'boards.listTitle' | transloco }}</span>
-      <rw-button typeButton="link" (clicked)="createBoard()">
-        + {{ 'boards.createBoard' | transloco }}
-      </rw-button>
+<renwu-page-with-sidebar>
+  <div sidebar>
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      <a class="flex" routerLink="./">{{ 'boards.listTitle' | transloco }}</a>
     </div>
-    @if (boards | async; as boardList) {
-      @if (boardList.length > 0) {
-        <ul class="flex flex-col overflow-auto w-full">
-          @for (board of boardList; track board.id) {
-            <li>
-              <a
-                class="flex p-4"
-                [routerLink]="[board.id]"
-                routerLinkActive="router-link-active"
-              >
-                {{ board.title }}
-              </a>
-            </li>
-          }
-        </ul>
-      } @else {
-        <div class="flex flex-col gap-3 p-4 text-sm text-gray-600">
-          <div class="font-semibold text-black">
-            {{ 'boards.emptyTitle' | transloco }}
-          </div>
-          <div>{{ 'boards.emptyText' | transloco }}</div>
-          <rw-button typeButton="primary" (clicked)="createBoard()">
-            {{ 'boards.createBoard' | transloco }}
-          </rw-button>
-        </div>
+    <ul class="flex flex-col overflow-auto w-full mb-4">
+      @for (board of boards | async; track board.id) {
+        <li>
+          <a
+            class="flex p-4"
+            [routerLink]="[board.id]"
+            routerLinkActive="router-link-active"
+            >{{ board.title }}</a
+          >
+        </li>
       }
-    } @else {
-      <div class="p-4 text-sm text-gray-600">
-        {{ 'components.loading' | transloco }}
-      </div>
-    }
+    </ul>
   </div>
-  <div class="app-main-content flex flex-col overflow-hidden h-full min-w-0 min-h-0">
-    <router-outlet />
-  </div>
-</div>
+  <router-outlet />
+</renwu-page-with-sidebar>

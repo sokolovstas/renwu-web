@@ -1,0 +1,41 @@
+<renwu-page title="{{ 'boards.listTitle' | transloco }}">
+  @if (boards | async; as boardList) {
+    @if (boardList.length > 0) {
+      <div rwSortTable="boards" class="flex flex-col w-full">
+        <div class="flex flex-row w-full">
+          <div rwSortTableColumnHead="title">
+            {{ 'boards.name' | transloco }}
+          </div>
+          <div rwSortTableColumnHead="checkbox">
+            {{ 'boards.shared' | transloco }}
+          </div>
+        </div>
+        @for (board of boardList; track board.id; let i = $index) {
+          <a
+            class="flex flex-row w-full"
+            [rwSortTableRow]="i"
+            [routerLink]="board.id"
+            routerLinkActive="router-link-active"
+          >
+            <div rwSortTableColumn="title">
+              {{ board.title }}
+            </div>
+            <div rwSortTableColumn="checkbox">
+              <rw-checkbox class="inline-block" [ngModel]="board.shared" />
+            </div>
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="flex flex-col gap-3 text-sm text-gray-600">
+        <div class="font-semibold text-black">
+          {{ 'boards.emptyTitle' | transloco }}
+        </div>
+        <div>{{ 'boards.emptyText' | transloco }}</div>
+      </div>
+    }
+  }
+  <rw-button action iconClass="add-bold" (clicked)="createBoard()">{{
+    'boards.createBoard' | transloco
+  }}</rw-button>
+</renwu-page>

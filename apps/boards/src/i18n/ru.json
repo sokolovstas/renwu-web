@@ -5,7 +5,9 @@
   "selectedTaskCount": "выбрано",
   "resetDisplay": "Сбросить вид",
   "listTitle": "Доски",
-  "createBoard": "Создать доску",
+  "name": "Название",
+  "shared": "Общая",
+  "createBoard": "Добавить доску",
   "emptyTitle": "Досок пока нет",
   "emptyText": "Создайте доску, чтобы начать группировать задачи.",
   "quickFilters": {

@@ -5,7 +5,9 @@
   "selectedTaskCount": "已选择",
   "resetDisplay": "重置显示",
   "listTitle": "看板",
-  "createBoard": "创建看板",
+  "name": "名称",
+  "shared": "共享",
+  "createBoard": "添加看板",
   "emptyTitle": "还没有看板",
   "emptyText": "创建一个看板开始对任务分组。",
   "quickFilters": {

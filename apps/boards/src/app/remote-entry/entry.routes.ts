@@ -3,6 +3,7 @@ import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { RwGroupService } from '@renwu/board';
 import { RwQueryBuilderService, RwSearchService } from '@renwu/core';
 import { BoardComponent } from '../board/board.component';
+import { ListComponent } from '../list/list.component';
 import { MainComponent } from '../main/main.component';
 
 const createInlineLoader = (languages: Array<string>): InlineLoader => {
@@ -31,6 +32,11 @@ export const ROUTES: Route[] = [
       },
     ],
     children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: ListComponent,
+      },
       {
         path: ':id',
         component: BoardComponent,

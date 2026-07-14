@@ -5,7 +5,9 @@
   "selectedTaskCount": "selected",
   "resetDisplay": "Reset display",
   "listTitle": "Boards",
-  "createBoard": "Create board",
+  "name": "Name",
+  "shared": "Shared",
+  "createBoard": "Add board",
   "emptyTitle": "No boards yet",
   "emptyText": "Create a board to start grouping tasks.",
   "quickFilters": {
