@@ -28,6 +28,8 @@
   "show-archived-projects": "Показывать архивные",
   "archived": "Архивный",
   "add-project": "Добавить проект",
+  "emptyTitle": "Проектов пока нет",
+  "emptyText": "Создайте проект, чтобы начать работу с задачами.",
   "reset-filter": "сбросить фильтры",
   "add-task": "Добавить задачу",
   "show-archived-milestones": "Показывать архивные",

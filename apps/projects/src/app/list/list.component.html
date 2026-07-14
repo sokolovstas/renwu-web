@@ -23,37 +23,48 @@
       (ngModelChange)="showArchived.next($event)"
       [label]="'projects.show-archived-projects' | transloco"
      />
-    <div rwSortTable="users" class="flex flex-col w-full">
-      <div class="flex flex-row w-full">
-        <div rwSortTableColumnHead="key">{{ 'projects.key' | transloco }}</div>
-        <div rwSortTableColumnHead="title">
-          {{ 'projects.name' | transloco }}
+    @if (containers | async; as projectList) {
+      @if (projectList.length > 0) {
+        <div rwSortTable="users" class="flex flex-col w-full">
+          <div class="flex flex-row w-full">
+            <div rwSortTableColumnHead="key">{{ 'projects.key' | transloco }}</div>
+            <div rwSortTableColumnHead="title">
+              {{ 'projects.name' | transloco }}
+            </div>
+            <div rwSortTableColumnHead="checkbox">
+              {{ 'projects.archived' | transloco }}
+            </div>
+          </div>
+          @for (container of projectList; track container; let i = $index) {
+            <a
+              class="flex flex-row w-full"
+              [rwSortTableRow]="i"
+              [routerLink]="container.key"
+              routerLinkActive="router-link-active"
+            >
+              <div rwSortTableColumn="key">
+                {{ container.key }}
+              </div>
+              <div rwSortTableColumn="title">
+                {{ container.title }}
+              </div>
+              <div rwSortTableColumn="checkbox">
+                <rw-checkbox class="inline-block"
+                  [ngModel]="container.archived"
+                 />
+              </div>
+            </a>
+          }
         </div>
-        <div rwSortTableColumnHead="checkbox">
-          {{ 'projects.archived' | transloco }}
+      } @else {
+        <div class="flex flex-col gap-3 text-sm text-gray-600">
+          <div class="font-semibold text-black">
+            {{ 'projects.emptyTitle' | transloco }}
+          </div>
+          <div>{{ 'projects.emptyText' | transloco }}</div>
         </div>
-      </div>
-      @for (container of containers | async; track container; let i = $index) {
-        <a
-          class="flex flex-row w-full"
-          [rwSortTableRow]="i"
-          [routerLink]="container.key"
-          routerLinkActive="router-link-active"
-        >
-          <div rwSortTableColumn="key">
-            {{ container.key }}
-          </div>
-          <div rwSortTableColumn="title">
-            {{ container.title }}
-          </div>
-          <div rwSortTableColumn="checkbox">
-            <rw-checkbox class="inline-block"
-              [ngModel]="container.archived"
-             />
-          </div>
-        </a>
       }
-    </div>
+    }
     <rw-button
       action
       iconClass="add-bold"

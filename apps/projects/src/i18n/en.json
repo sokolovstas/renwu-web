@@ -28,6 +28,8 @@
   "show-archived-projects": "Show archived",
   "archived": "Archived",
   "add-project": "Add project",
+  "emptyTitle": "No projects yet",
+  "emptyText": "Create a project to start working with tasks.",
   "reset-filter": "reset filter",
   "add-task": "Add task",
   "show-archived-milestones": "Show archived",

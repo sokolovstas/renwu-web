@@ -48,9 +48,8 @@ const checkProjectKey = async (
     inject(RwContainerService).getContainerByKey(containerKey),
   ).catch((): null => null);
 
-  // Keep deep-link URL on hard reload even if container lookup is not ready yet.
   if (!container) {
-    return true;
+    return createUrlTreeFromSnapshot(route, ['..']);
   }
   return true;
 };

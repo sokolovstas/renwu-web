@@ -28,6 +28,8 @@
   "show-archived-projects": "projects.show-archived-projects",
   "archived": "projects.archived",
   "add-project": "projects.add-project",
+  "emptyTitle": "projects.emptyTitle",
+  "emptyText": "projects.emptyText",
   "reset-filter": "projects.reset-filter",
   "add-task": "projects.add-task",
   "show-archived-milestones": "projects.show-archived-milestones",
