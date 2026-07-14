@@ -1,3 +1,12 @@
 {
-  "filters": "Filters"
+  "filters": "Filters",
+  "filter-name": "Name",
+  "filter-shared": "Shared",
+  "filter-channel": "Channel",
+  "add-filter": "Add filter",
+  "edit-filter": "Edit filter",
+  "save-filter": "Save filter",
+  "delete-filter": "Delete",
+  "emptyTitle": "No filters yet",
+  "emptyText": "Create a filter to save task search conditions."
 }

@@ -11,6 +11,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RenwuPageComponent, RenwuSidebarService } from '@renwu/app-ui';
+import {
+  RwButtonComponent,
+  RwModalService,
+} from '@renwu/components';
 
 import {
   Issue,
@@ -22,9 +26,11 @@ import {
   RwIssueTableComponent,
   RwQueryBuilderService,
   RwSearchService,
-  RwWebsocketService
+  RwWebsocketService,
+  SavedSearchQuery,
 } from '@renwu/core';
-import { distinctUntilChanged, map, of, shareReplay, switchMap } from 'rxjs';
+import { distinctUntilChanged, map, of, shareReplay, switchMap, tap } from 'rxjs';
+import { SaveFilterComponent } from '../save-filter/save-filter.component';
 
 @Component({
   selector: 'renwu-tasks-list',
@@ -35,9 +41,10 @@ import { distinctUntilChanged, map, of, shareReplay, switchMap } from 'rxjs';
     RenwuPageComponent,
     RwIssueTableComponent,
     QueryBuilderComponent,
+    RwButtonComponent,
     TranslocoPipe,
   ],
-  providers: [RwQueryBuilderService, IssueTableService, RwSearchService],
+  providers: [IssueTableService],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,18 +56,30 @@ export class ListComponent implements OnDestroy {
   queryBuilderService = inject(RwQueryBuilderService);
   websocketService = inject(RwWebsocketService);
   issueTableService = inject(IssueTableService);
+  modalService = inject(RwModalService);
   router = inject(Router);
   route = inject(ActivatedRoute);
 
   listOptions = toSignal(this.searchService.listOptions);
   query = toSignal(
     this.route.paramMap.pipe(
+      map((params) => params.get('id')),
       distinctUntilChanged(),
-      switchMap((map) => this.dataService.getSearchQuery(map.get('id'))),
+      switchMap((id) =>
+        id ? this.dataService.getSearchQuery(id) : of(null),
+      ),
     ),
   );
 
-  queryString = computed(() => this.listOptions().queryString);
+  queryString = computed(() => this.listOptions()?.queryString || '');
+  isDirty = computed(() => {
+    const saved = this.query();
+    const current = this.queryString();
+    if (!saved) {
+      return !!current;
+    }
+    return (saved.query_string || '') !== current;
+  });
 
   allTask = this.searchService.listOptions.pipe(
     switchMap((q: ListOptions) => {
@@ -100,5 +119,43 @@ export class ListComponent implements OnDestroy {
   }
   async resetFilter() {
     this.searchService.setListOptions(new ListOptions(this.query()));
+  }
+
+  saveFilter(): void {
+    const current = this.query();
+    const modal = this.modalService.add(SaveFilterComponent, {
+      filter: current,
+      queryString: this.queryString(),
+    });
+    modal.saved
+      .pipe(
+        switchMap((filter: SavedSearchQuery) =>
+          current?.id
+            ? this.dataService.saveSearchQuery(current.id, filter)
+            : this.dataService.addSearchQuery(filter),
+        ),
+        tap(() => {
+          this.searchService.updateSaved.next();
+          this.modalService.close();
+        }),
+      )
+      .subscribe((saved) => {
+        if (!current?.id && saved.id) {
+          void this.router.navigate(['../', saved.id], {
+            relativeTo: this.route,
+          });
+        }
+      });
+    modal.deleted
+      .pipe(
+        switchMap((id) => this.dataService.deleteSearchQuery(id)),
+        tap(() => {
+          this.searchService.updateSaved.next();
+          this.modalService.close();
+        }),
+      )
+      .subscribe(() => {
+        void this.router.navigate(['..'], { relativeTo: this.route });
+      });
   }
 }

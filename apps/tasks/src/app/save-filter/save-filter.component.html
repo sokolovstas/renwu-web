@@ -1,0 +1,40 @@
+<rw-modal>
+  <div rwModalHeader>
+    <span>{{
+      (canDelete ? 'tasks.edit-filter' : 'tasks.add-filter') | transloco
+    }}</span>
+  </div>
+  <div rwModalBody class="w-96">
+    <form [formGroup]="filterForm" class="flex flex-col gap-4">
+      <label class="form-label">
+        <rw-text-input
+          formControlName="title"
+          [prompt]="'tasks.filter-name' | transloco"
+        />
+      </label>
+      <label class="form-label flex flex-row items-center gap-2">
+        <rw-checkbox formControlName="shared" />
+        <span>{{ 'tasks.filter-shared' | transloco }}</span>
+      </label>
+      <label class="form-label flex flex-row items-center gap-2">
+        <rw-checkbox formControlName="channel" />
+        <span>{{ 'tasks.filter-channel' | transloco }}</span>
+      </label>
+      <div class="text-sm text-gray-500 break-all">
+        {{ queryString }}
+      </div>
+    </form>
+  </div>
+  <div rwModalFooter class="flex flex-row gap-2">
+    @if (canDelete) {
+      <rw-button typeButton="secondary" (clicked)="remove()">{{
+        'tasks.delete-filter' | transloco
+      }}</rw-button>
+    }
+    <rw-button
+      [disabled]="(filterForm.statusChanges | async) !== 'VALID'"
+      (clicked)="save()"
+      >{{ 'tasks.save-filter' | transloco }}</rw-button
+    >
+  </div>
+</rw-modal>

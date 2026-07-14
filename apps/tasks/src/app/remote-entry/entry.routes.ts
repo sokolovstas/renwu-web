@@ -5,8 +5,9 @@ import {
   createUrlTreeFromSnapshot,
 } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
-import { RwDataService } from '@renwu/core';
+import { RwDataService, RwQueryBuilderService, RwSearchService } from '@renwu/core';
 import { firstValueFrom } from 'rxjs';
+import { FiltersListComponent } from '../filters-list/filters-list.component';
 import { ListComponent } from '../list/list.component';
 import { MainComponent } from '../main/main.component';
 import { TimelineComponent } from '../timeline/timeline.component';
@@ -16,8 +17,14 @@ const checkEmptyFilter = async (route: ActivatedRouteSnapshot) => {
   const queries = await firstValueFrom(
     inject(RwDataService).getSearchQueries(),
   );
-  if (queries.findIndex((v) => v.id === route.paramMap.get('id')) === -1) {
-    return createUrlTreeFromSnapshot(route, ['..', queries[0].id]);
+  const id = route.paramMap.get('id');
+
+  if (!id) {
+    return true;
+  }
+
+  if (!queries?.length || queries.findIndex((v) => v.id === id) === -1) {
+    return createUrlTreeFromSnapshot(route, ['..']);
   }
   return true;
 };
@@ -39,6 +46,8 @@ export const ROUTES: Route[] = [
     path: '',
     component: MainComponent,
     providers: [
+      RwSearchService,
+      RwQueryBuilderService,
       {
         provide: TRANSLOCO_SCOPE,
         useValue: {
@@ -49,9 +58,19 @@ export const ROUTES: Route[] = [
     ],
     children: [
       {
-        path: 'list/:id',
-        canActivate: [checkEmptyFilter],
-        component: ListComponent,
+        path: 'list',
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            component: FiltersListComponent,
+          },
+          {
+            path: ':id',
+            canActivate: [checkEmptyFilter],
+            component: ListComponent,
+          },
+        ],
       },
       {
         path: 'timeline',
@@ -64,7 +83,7 @@ export const ROUTES: Route[] = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'list/',
+        redirectTo: 'list',
       },
     ],
   },

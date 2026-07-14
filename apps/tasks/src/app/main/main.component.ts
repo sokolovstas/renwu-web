@@ -1,7 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
-  Router,
   RouterLink,
   RouterLinkActive,
   RouterOutlet,
@@ -11,8 +10,7 @@ import {
   RenwuPageWithSidebarComponent,
   RenwuSidebarService,
 } from '@renwu/app-ui';
-
-import { RwDataService } from '@renwu/core';
+import { RwSearchService } from '@renwu/core';
 
 @Component({
   selector: 'renwu-tasks-main',
@@ -31,12 +29,9 @@ import { RwDataService } from '@renwu/core';
 })
 export class MainComponent {
   sidebarService = inject(RenwuSidebarService);
-  dataService = inject(RwDataService);
-  router = inject(Router);
-  queries = this.dataService.getSearchQueries();
-  addTask() {
-    this.sidebarService.currentTask.next({ key: 'new' });
-  }
+  searchService = inject(RwSearchService);
+  queries = this.searchService.savedQueries;
+
   filterClick() {
     this.sidebarService.scrollToMain();
   }
