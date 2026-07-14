@@ -15,6 +15,7 @@
       class="timeline-item"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [class.timeline-item-dimmed]="dimmed"
       [style.height.px]="issueRowHeightPx()"
       [style.width.px]="lineWidth"
       (mouseenter)="onRowHover(true)"
@@ -34,9 +35,7 @@
           [style.width.px]="widthProgress"
           [style.background]="progressColor"
         ></div>
-        @if (showTitleInside && width > 40) {
-          <span class="bar-title-inside">{{ titleLabel }}</span>
-        }
+        <span class="bar-title-inside">{{ titleLabel }}</span>
       </div>
       @if (showTitleRight) {
         <span class="bar-title-right">{{ titleLabel }}</span>
@@ -50,7 +49,8 @@
       [style.height.px]="issueRowHeightPx()"
       (mouseenter)="onRowHover(true)"
       (mouseleave)="onRowHover(false)"
-    ></div>
+    >
+    </div>
   }
 
   @if (item._SHOWCHILDS !== false && item.childs?.length) {
@@ -59,12 +59,12 @@
         [item]="child"
         [stripeIndex]="childStripeIndex(ci)"
         [highlightedId]="highlightedId"
+        [dimmed]="dimmed"
         [issueRowHeightPx]="issueRowHeightPx()"
         [scale]="scale"
         [dateStart]="dateStart"
         [dateEnd]="dateEnd"
         [hours24InDay]="hours24InDay"
-        [showTitleInside]="showTitleInside"
         [showTitleRight]="showTitleRight"
         [containerTop]="containerTop"
         [selectMilestone]="selectMilestone"

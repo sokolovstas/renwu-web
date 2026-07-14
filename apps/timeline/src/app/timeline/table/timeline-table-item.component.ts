@@ -12,6 +12,7 @@ import {
   IssueTypeComponent,
   IssueStatusComponent,
   IssueAssigneesComponent,
+  IssuePriorityComponent,
   Type,
   Status,
 } from '@renwu/core';
@@ -42,6 +43,7 @@ function assigneeAvatarSizeFromRowHeightPx(rowHeightPx: number): string {
     IssueTypeComponent,
     IssueStatusComponent,
     IssueAssigneesComponent,
+    IssuePriorityComponent,
   ],
 })
 export class TimelineTableItemComponent {
@@ -58,6 +60,8 @@ export class TimelineTableItemComponent {
   @Input() stripeIndex = 0;
   /** When set, row with this issue id is highlighted (sync with graph hover). */
   @Input() highlightedId: string | null = null;
+  /** Dim row while a related link is hovered elsewhere. */
+  @Input() dimmed = false;
   @Input() depth = 0;
   @Input() tableWidth = 380;
   @Input() disableSelectedTimelineItem = false;

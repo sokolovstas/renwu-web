@@ -23,6 +23,7 @@
       class="timeline-table-row issue-row"
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
+      [class.timeline-table-row-dimmed]="dimmed"
       [style.height.px]="issueRowHeightPx()"
       [style.font-size.px]="tableFontSizePx()"
       (mouseenter)="onHover(true)"
@@ -34,6 +35,9 @@
         @if (typeInfo) {
           <renwu-issue-type [value]="typeInfo" [tooltipDisabled]="true" />
         }
+      </span>
+      <span class="td-col td-priority">
+        <renwu-issue-priority [value]="item.priority" [tooltipDisabled]="true" />
       </span>
       <span class="td-col td-title" [title]="item.title || ''">
         @if (item.childs?.length) {
@@ -64,6 +68,7 @@
         [item]="child"
         [stripeIndex]="childStripeIndex(ci)"
         [highlightedId]="highlightedId"
+        [dimmed]="dimmed"
         [depth]="depth + 1"
         [tableWidth]="tableWidth"
         [issueRowHeightPx]="issueRowHeightPx()"

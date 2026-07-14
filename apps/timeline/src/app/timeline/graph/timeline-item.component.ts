@@ -42,11 +42,12 @@ export class TimelineItemComponent implements OnChanges {
   @Input() stripeIndex = 0;
   /** When set, row with this issue id is highlighted (sync with table hover). */
   @Input() highlightedId: string | null = null;
+  /** Dim task bar while a related link is hovered elsewhere. */
+  @Input() dimmed = false;
   @Input() scale!: number;
   @Input() dateStart!: Date;
   @Input() dateEnd!: Date;
   @Input() hours24InDay = true;
-  @Input() showTitleInside = false;
   @Input() showTitleRight = false;
   @Input() containerTop = 0;
   @Input() selectMilestone: unknown;

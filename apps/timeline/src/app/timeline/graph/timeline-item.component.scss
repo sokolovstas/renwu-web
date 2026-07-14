@@ -51,6 +51,8 @@
 }
 
 .timeline-item-empty {
+  display: flex;
+  align-items: center;
   transition: background-color 0.12s ease;
 
   &.timeline-row-alt {
@@ -83,6 +85,7 @@
   align-items: center;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: opacity 0.12s ease;
 
   &:hover {
     filter: brightness(1.08);
@@ -128,4 +131,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: opacity 0.12s ease;
+}
+
+.timeline-item-dimmed {
+  .bar,
+  .bar-title-right {
+    opacity: 0.7;
+  }
 }

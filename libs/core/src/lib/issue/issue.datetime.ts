@@ -1,26 +1,21 @@
 import { Injectable } from '@angular/core';
-import { JSONUtils } from '@renwu/utils';
 import { getHours } from 'date-fns';
 import { Subject } from 'rxjs';
 
+/** In-memory timeline axis mode; persisted via `TimelineSettingsService` / `profile.timeline`. */
 export class IssueDateTime {
+  private _hours24InDay = true;
+
   set hours24InDay(value: boolean) {
     this._hours24InDay = value;
-    if (this.show24HoursInDay) {
-      this.show24HoursInDay.next(value);
-    }
-    this.save();
+    this.show24HoursInDay.next(value);
   }
+
   get hours24InDay(): boolean {
     return this._hours24InDay;
   }
-  _hours24InDay: boolean;
 
-  public show24HoursInDay = new Subject<boolean>();
-
-  constructor() {
-    this.load();
-  }
+  readonly show24HoursInDay = new Subject<boolean>();
 
   setVirtualHours(date: Date, type = ''): Date {
     if (this.hours24InDay) {
@@ -41,18 +36,8 @@ export class IssueDateTime {
     result.setHours(hour);
     return result;
   }
-  save(): void {
-    JSONUtils.setLocalStorage('renwu_hours24InDay', this.hours24InDay);
-  }
-  load(): void {
-    this._hours24InDay = JSONUtils.parseLocalStorage(
-      'renwu_hours24InDay',
-      true,
-    );
-  }
 }
 
-/** Shared timeline / issue axis mode (`renwu_hours24InDay` in localStorage). */
 @Injectable({ providedIn: 'root' })
 export class RwIssueDateTimeService {
   readonly issueDateTime = new IssueDateTime();

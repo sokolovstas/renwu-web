@@ -1,8 +1,38 @@
-<div
-  class="timeline-link"
-  [style.marginLeft.px]="left"
-  [style.width.px]="width"
-  [class.before]="data?.type === 'before'"
-  [class.after]="data?.type === 'after'"
-></div>
-
+@if (visible) {
+  <svg
+    class="timeline-link-svg"
+    [attr.width]="boxWidth"
+    [attr.height]="boxHeight"
+    [attr.viewBox]="'0 0 ' + boxWidth + ' ' + boxHeight"
+  >
+    <defs>
+      <marker
+        [attr.id]="markerId"
+        viewBox="0 0 6 6"
+        refX="5.5"
+        refY="3"
+        markerWidth="5"
+        markerHeight="5"
+        orient="auto"
+      >
+        <path
+          class="timeline-link-arrowhead"
+          [class.timeline-link-arrowhead--highlighted]="highlighted"
+          d="M0.5 0.5 L5.5 3 L0.5 5.5 Z"
+        />
+      </marker>
+    </defs>
+    <path
+      class="timeline-link-hit"
+      [attr.d]="pathD"
+      (mouseenter)="onPathHover(true)"
+      (mouseleave)="onPathHover(false)"
+    />
+    <path
+      class="timeline-link-path"
+      [class.timeline-link-path--highlighted]="highlighted"
+      [attr.d]="pathD"
+      [attr.marker-end]="'url(#' + markerId + ')'"
+    />
+  </svg>
+}

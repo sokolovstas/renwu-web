@@ -12,16 +12,15 @@ export class JSONUtils {
     return result;
   }
   static parseLocalStorage<T>(key: string, def: T): T {
-    let result = def;
     try {
-      result = JSON.parse(localStorage.getItem(key)) as T;
-    } catch (e) {
-      result = def;
+      const item = localStorage.getItem(key);
+      if (item === null) {
+        return def;
+      }
+      return JSON.parse(item) as T;
+    } catch {
+      return def;
     }
-    if (!result) {
-      result = def;
-    }
-    return result;
   }
   static setLocalStorage(key: string, def: unknown): void {
     if (localStorage) {

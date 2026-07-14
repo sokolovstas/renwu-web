@@ -18,7 +18,9 @@ import { addMonthsUtc, parseUtcLike, unixSeconds } from './date-helpers';
 import { unixSecondsVirtual } from './virtual-hours';
 import { TimelineRulerComponent } from './ruler/timeline-ruler.component';
 import { TimelineScaleComponent } from './scale/timeline-scale.component';
+import { RenwuSidebarService } from '@renwu/app-ui';
 import {
+  Issue,
   IssueGroup,
   ListOptions,
   Milestone,
@@ -53,12 +55,15 @@ import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type SelectedMilestone = { id: string; offset: number; due: boolean } | null;
 
-/** Matches `.timeline-link` (margin-top + height) in `timeline-link.component.scss`. */
-const TIMELINE_LINK_ROW_PX = 6;
+export interface TimelineLinkLayout {
+  link: TimelineLink;
+  issueRowIndex: number;
+  linkRowIndex: number;
+}
 
 @Component({
   selector: 'renwu-timeline-timeline',
@@ -82,6 +87,7 @@ const TIMELINE_LINK_ROW_PX = 6;
     TimelineRoadmapComponent,
     WorkloadUserComponent,
     TimelineHolderDirective,
+    TranslocoPipe,
   ],
 })
 export class TimelineComponent {
@@ -98,6 +104,7 @@ export class TimelineComponent {
   private readonly dataService = inject(TimelineDataService);
   private readonly coreTimelineService = inject(CoreTimelineService);
   private readonly stateService = inject(TimelineStateService);
+  private readonly sidebarService = inject(RenwuSidebarService);
   private readonly renderer = inject(Renderer2);
   private readonly injector = inject(Injector);
   private readonly issueDateTimeSvc = inject(RwIssueDateTimeService);
@@ -229,7 +236,6 @@ export class TimelineComponent {
     if (!milestones.length || !roots?.length) return [];
 
     const band = this.roadmapBandHeightPx();
-    const linkBlock = this.links().length * TIMELINE_LINK_ROW_PX;
     const rowH = s.issueRowHeightPx;
     const dateStart = this.dateStart();
     const scale = s.scale;
@@ -261,7 +267,7 @@ export class TimelineComponent {
       markers.push({
         id: m.id,
         leftPx: g.rightPx,
-        heightPx: band + linkBlock + (lastIdx + 1) * rowH,
+        heightPx: band + (lastIdx + 1) * rowH,
         due: g.due,
       });
     }
@@ -271,6 +277,36 @@ export class TimelineComponent {
   protected readonly loading = signal(false);
   protected readonly workload = signal<UserWorkload | null>(null);
   protected readonly links = signal<TimelineLink[]>([]);
+
+  /** Visible row indices for dependency connectors (same preorder as graph rows). */
+  protected readonly linksLayout = computed((): TimelineLinkLayout[] => {
+    const links = this.links();
+    const roots = this.rootChild().childs;
+    if (!links.length || !roots?.length) return [];
+
+    const flat = flattenVisibleTimelinePreorder(roots);
+    const rowById = new Map<string, number>();
+    flat.forEach((node, index) => {
+      if (String(node.type) === 'group') return;
+      const id = node.id;
+      if (id !== undefined && id !== null && String(id).length > 0) {
+        rowById.set(String(id), index);
+      }
+    });
+
+    const out: TimelineLinkLayout[] = [];
+    for (const link of links) {
+      const issueId = link.issue?.id;
+      const linkedId = link.link?.id;
+      if (issueId == null || linkedId == null) continue;
+      const issueRowIndex = rowById.get(String(issueId));
+      const linkRowIndex = rowById.get(String(linkedId));
+      if (issueRowIndex === undefined || linkRowIndex === undefined) continue;
+      out.push({ link, issueRowIndex, linkRowIndex });
+    }
+    return out;
+  });
+
   protected readonly scrollLeftGraph = signal(0);
   protected readonly scrollTopGraph = signal(0);
   private readonly activeContainerId = signal<string | null>(null);
@@ -278,6 +314,45 @@ export class TimelineComponent {
   private selectedIssueId: string | null = null;
   /** Synced hover highlight between table and graph rows (issue id). */
   protected readonly hoveredIssueId = signal<string | null>(null);
+  /** Hovered dependency connector (takes precedence for task dimming). */
+  protected readonly hoveredLinkKey = signal<string | null>(null);
+
+  /** Issue ids that stay bright while a link is hovered. */
+  protected readonly linkFocusIssueIds = computed((): Set<string> | null => {
+    const linkKey = this.hoveredLinkKey();
+    if (!linkKey) return null;
+
+    const layout = this.linksLayout().find(
+      (entry) => this.linkKeyFor(entry.link) === linkKey,
+    );
+    if (!layout) return null;
+
+    return new Set([
+      String(layout.link.issue.id),
+      String(layout.link.link.id),
+    ]);
+  });
+
+  /** Accent color on hovered link or links of hovered issue. */
+  protected readonly highlightedLinkKeys = computed((): Set<string> => {
+    const hoveredLink = this.hoveredLinkKey();
+    if (hoveredLink) return new Set([hoveredLink]);
+
+    const issueId = this.hoveredIssueId();
+    if (!issueId) return new Set<string>();
+
+    const out = new Set<string>();
+    for (const layout of this.linksLayout()) {
+      const { issue, link } = layout.link;
+      const iid = String(issue.id);
+      const lid = String(link.id);
+      if (iid === issueId || lid === issueId) {
+        out.add(this.linkKeyFor(layout.link));
+      }
+    }
+    return out;
+  });
+
   private dragTimeline = false;
   private scrollSource: 'graph' | 'table' | null = null;
   private resizeTableHandle: (() => void) | null = null;
@@ -322,7 +397,7 @@ export class TimelineComponent {
     // Load persisted settings once the current user is available.
     effect(() => {
       const userId = this.currentUser()?.id;
-      this.settingsService.initFromLocalStorage(userId ?? undefined);
+      this.settingsService.initSettings(userId ?? undefined);
     });
 
     effect((onCleanup) => {
@@ -540,6 +615,9 @@ export class TimelineComponent {
   protected onScrollTo(item: TimelineIssue): void {
     this.onSelected(item);
     this.centerAtIssue(item);
+    if (String(item.type) !== 'group' && item?.key) {
+      this.sidebarService.currentTask.next(item as Issue);
+    }
   }
 
   protected onSelected(item: TimelineIssue & { __selected?: boolean }): void {
@@ -563,6 +641,31 @@ export class TimelineComponent {
     }
     this.selectedIssueId = item.id;
     this.stateService.setSelected(item.id, true);
+  }
+
+  protected linkKeyFor(link: TimelineLink): string {
+    return `${link.issue.id}-${link.link.id}-${link.type}`;
+  }
+
+  protected isLinkHighlighted(layout: TimelineLinkLayout): boolean {
+    return this.highlightedLinkKeys().has(this.linkKeyFor(layout.link));
+  }
+
+  protected onLinkHover(layout: TimelineLinkLayout, inside: boolean): void {
+    const key = this.linkKeyFor(layout.link);
+    if (inside) {
+      this.hoveredLinkKey.set(key);
+      return;
+    }
+    if (this.hoveredLinkKey() === key) {
+      this.hoveredLinkKey.set(null);
+    }
+  }
+
+  protected isIssueDimmed(issueId: string | null | undefined): boolean {
+    const focus = this.linkFocusIssueIds();
+    if (!focus || issueId == null) return false;
+    return !focus.has(String(issueId));
   }
 
   protected currentUserValue(): User | null {

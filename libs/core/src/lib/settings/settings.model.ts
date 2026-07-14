@@ -56,6 +56,24 @@ export type NotificationSettingsChannels = Partial<
 export interface NotificationSettingsModel {
   channels: NotificationSettingsChannels;
 }
+
+/** Timeline UI preferences stored in user profile (`profile.timeline`). */
+export interface TimelineProfileSettings {
+  grouping?: string;
+  scaleTick?: TimelineTicksId;
+  scaleValue?: number;
+  showMilestones?: boolean;
+  showTitleRight?: boolean;
+  showWorkforce?: boolean;
+  tableWidth?: number;
+  open_index?: Record<string, boolean>;
+  open_index_group?: Record<string, boolean>;
+  sort?: { field?: string; direction?: string };
+  /** `true` = full 24h day axis; `false` = compressed 8h workday axis. */
+  hours24InDay?: boolean;
+  workforceHeight?: { id: string; value: number } | null;
+}
+
 export interface ProfileSettingsModel {
   language: AppLangs;
   formats: AppDateFormat;
@@ -72,6 +90,7 @@ export interface ProfileSettingsModel {
    * Absent container id or empty list means “show all” for that project.
    */
   task_detail_hidden_by_container?: Record<string, TaskDetailLayoutFieldKey[]>;
+  timeline?: TimelineProfileSettings;
 }
 export interface UserSettingsServer {
   time_zone_name: string;
@@ -79,6 +98,3 @@ export interface UserSettingsServer {
   notifications: NotificationSettingsModel;
   date_last_update?: string;
 }
-
-/** localStorage key: `${RW_WORKLOAD_SETTINGS_STORAGE_PREFIX}${userId}` — cleared in RwSettingsService.resetAllSettings. */
-export const RW_WORKLOAD_SETTINGS_STORAGE_PREFIX = 'renwu_workload_settings_';

@@ -17,7 +17,6 @@ export interface TimelineSettings {
   milestoneRowHeightPx: number;
   showMilestones: boolean;
   showWorkforce: boolean;
-  showTitleInside: boolean;
   showTitleRight: boolean;
 
   workforceHeight: { id: string; value: number } | null;

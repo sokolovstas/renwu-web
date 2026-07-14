@@ -15,6 +15,12 @@
       (ngModelChange)="onShowMilestonesChange($event)"
     />
 
+    <rw-checkbox
+      [label]="'timeline.showTitleRight' | transloco"
+      [ngModel]="settings().showTitleRight"
+      (ngModelChange)="onShowTitleRightChange($event)"
+    />
+
     <span class="scale-info">
       {{ 'timeline.currentTimeZone' | transloco }}: {{ timezone }}
     </span>

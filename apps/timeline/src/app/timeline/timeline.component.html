@@ -36,12 +36,13 @@
         [style.width.px]="settings().tableWidth"
         [style.min-width.px]="settings().tableWidth"
       >
-        <span class="th-col th-key">Key</span>
-        <span class="th-col th-type">T</span>
-        <span class="th-col th-title">Title</span>
-        <span class="th-col th-assignee">Assignee</span>
-        <span class="th-col th-pct">%</span>
-        <span class="th-col th-status">Status</span>
+        <span class="th-col th-key">{{ 'timeline.colKey' | transloco }}</span>
+        <span class="th-col th-type">{{ 'timeline.colType' | transloco }}</span>
+        <span class="th-col th-priority">{{ 'timeline.colPriority' | transloco }}</span>
+        <span class="th-col th-title">{{ 'timeline.colTitle' | transloco }}</span>
+        <span class="th-col th-assignee">{{ 'timeline.colAssignee' | transloco }}</span>
+        <span class="th-col th-pct">{{ 'timeline.colCompletion' | transloco }}</span>
+        <span class="th-col th-status">{{ 'timeline.colStatus' | transloco }}</span>
       </div>
       <div class="timeline-ruler-wrapper" #rulerWrapper>
         <renwu-timeline-ruler
@@ -94,6 +95,7 @@
             [item]="row"
             [stripeIndex]="stripeIndexForRoot($index)"
             [highlightedId]="hoveredIssueId()"
+            [dimmed]="isIssueDimmed(row.id)"
             [depth]="0"
             [tableWidth]="settings().tableWidth"
             [issueRowHeightPx]="settings().issueRowHeightPx"
@@ -149,30 +151,36 @@
             ></div>
           }
 
-          @for (link of links(); track link.issue.id + '-' + link.link.id + '-' + link.type) {
-            <renwu-timeline-link
-              [data]="link"
-              [dateStart]="dateStart()"
-              [scale]="settings().scale"
-              [hours24InDay]="hours24InDay()"
-            />
-          }
-
           @for (row of rootChild().childs; track trackRootRow($index, row)) {
             <renwu-timeline-item
               [item]="row"
               [stripeIndex]="stripeIndexForRoot($index)"
               [highlightedId]="hoveredIssueId()"
+              [dimmed]="isIssueDimmed(row.id)"
               [scale]="settings().scale"
               [dateStart]="dateStart()"
               [dateEnd]="rulerLimit()"
               [hours24InDay]="hours24InDay()"
-              [showTitleInside]="settings().showTitleInside"
               [showTitleRight]="settings().showTitleRight"
               [issueRowHeightPx]="settings().issueRowHeightPx"
               [selectMilestone]="selectMilestone()"
               (selected)="onSelected($event)"
               (scrollTo)="onScrollTo($event)"
+            />
+          }
+
+          @for (layout of linksLayout(); track layout.link.issue.id + '-' + layout.link.link.id + '-' + layout.link.type) {
+            <renwu-timeline-link
+              [data]="layout.link"
+              [issueRowIndex]="layout.issueRowIndex"
+              [linkRowIndex]="layout.linkRowIndex"
+              [issueRowHeightPx]="settings().issueRowHeightPx"
+              [roadmapBandHeightPx]="roadmapBandHeightPx()"
+              [dateStart]="dateStart()"
+              [scale]="settings().scale"
+              [hours24InDay]="hours24InDay()"
+              [highlighted]="isLinkHighlighted(layout)"
+              (linkHover)="onLinkHover(layout, $event)"
             />
           }
         </div>
@@ -182,7 +190,7 @@
     <div class="timeline-layout-workload">
       <div class="workforce-tab" (click)="onToggleWorkforce()">
         <span class="workforce-arrow">{{ settings().showWorkforce ? '▾' : '▸' }}</span>
-        <span>Workforce</span>
+        <span>{{ 'timeline.workforce' | transloco }}</span>
       </div>
       @if (settings().showWorkforce) {
         <div class="timeline-workload-content">
