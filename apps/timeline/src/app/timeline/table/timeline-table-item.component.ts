@@ -65,6 +65,10 @@ export class TimelineTableItemComponent {
   @Input() depth = 0;
   @Input() tableWidth = 380;
   @Input() disableSelectedTimelineItem = false;
+  /** Row belongs to an expanded parent issue scope. */
+  @Input() inParentScope = false;
+  /** Parent revision counter — changes force OnPush refresh after expand/collapse. */
+  @Input() treeRevision = 0;
 
   @Output() selected = new EventEmitter<TimelineIssue>();
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
@@ -75,6 +79,10 @@ export class TimelineTableItemComponent {
   );
   protected readonly isRoot = computed(
     () => String(this.item?.type) === 'root',
+  );
+  protected readonly hasChildIssues = computed(
+    () =>
+      Boolean(this.item?.childs?.length && this.item._SHOWCHILDS !== false),
   );
 
   /** Square avatar edge: column inner width minus 4px, capped by row height minus 4px. */

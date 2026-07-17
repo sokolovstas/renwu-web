@@ -30,14 +30,18 @@ export class TimelineDataService {
     return this.dataService.getMilestones(containerId, archived);
   }
 
+  /**
+   * Loads the ungrouped issue tree. Grouping (type/assignee/…) is applied
+   * on the timeline client so hierarchy mode can control the rules.
+   */
   loadIssueTree(
     containerId: string,
-    grouping: string,
+    _grouping: string,
     filters: IssueTreeFilters,
   ): Observable<IssueGroup[]> {
     return this.dataService.getContainerIssueTreeGrouped(
       containerId,
-      grouping.toLowerCase(),
+      'none',
       filters,
     );
   }

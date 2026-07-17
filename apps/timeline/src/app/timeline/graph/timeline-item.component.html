@@ -24,6 +24,8 @@
       <div
         class="bar"
         [class.auto-scheduled]="isAutoScheduled"
+        [class.bar-in-parent-scope]="inParentScope"
+        [class.bar-has-childs]="hasChildIssues"
         [style.height.px]="barHeightPx()"
         [style.marginLeft.px]="offsetForItem"
         [style.width.px]="width"
@@ -70,6 +72,8 @@
         [selectMilestone]="selectMilestone"
         [timelineGraphContentBound]="timelineGraphContentBound"
         [depth]="depth + 1"
+        [inParentScope]="hasChildIssues"
+        [treeRevision]="treeRevision"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
         (issueLaidOut)="issueLaidOut.emit($event)"

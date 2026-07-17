@@ -1,83 +1,120 @@
+/* Graph stacking: row bg (0) → row highlight (1) → parent scope (2) → bar (4). */
+$timeline-layer-row-bg: 0;
+$timeline-layer-row-highlight: 1;
+$timeline-layer-bar: 4;
+
+@mixin timeline-graph-row-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: transparent;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: $timeline-layer-row-bg;
+    pointer-events: none;
+    transition: background-color 0.12s ease;
+  }
+
+  &.timeline-row-highlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: $timeline-layer-row-highlight;
+    pointer-events: none;
+    transition: background-color 0.12s ease;
+  }
+}
+
 .timeline-item-group {
-  background: var(--gray-100);
-  transition: background-color 0.12s ease;
+  @include timeline-graph-row-shell;
 
-  &.timeline-row-alt {
+  &::before {
+    background: var(--gray-100);
+  }
+
+  &.timeline-row-alt::before {
     background: var(--gray-200);
   }
 
-  &:hover {
+  &:hover::before {
     background: var(--gray-200);
   }
 
-  &.timeline-row-alt:hover {
+  &.timeline-row-alt:hover::before {
     background: var(--gray-300);
   }
 
-  &.timeline-row-highlight {
+  &.timeline-row-highlight::after {
     background: var(--gray-300);
   }
 
-  &.timeline-row-highlight:hover {
+  &.timeline-row-highlight:hover::after {
     background: var(--gray-400);
   }
 }
 
 .timeline-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.12s ease;
+  @include timeline-graph-row-shell;
 
-  &.timeline-row-alt {
+  &::before {
+    background: transparent;
+  }
+
+  &.timeline-row-alt::before {
     background: var(--gray-100);
   }
 
-  &:hover {
+  &:hover::before {
     background: var(--gray-100);
   }
 
-  &.timeline-row-alt:hover {
+  &.timeline-row-alt:hover::before {
     background: var(--gray-200);
   }
 
-  &.timeline-row-highlight {
+  &.timeline-row-highlight::after {
     background: var(--gray-200);
   }
 
-  &.timeline-row-highlight:hover {
+  &.timeline-row-highlight:hover::after {
     background: var(--gray-300);
   }
 }
 
 .timeline-item-empty {
-  display: flex;
-  align-items: center;
-  transition: background-color 0.12s ease;
+  @include timeline-graph-row-shell;
 
-  &.timeline-row-alt {
+  &::before {
+    background: transparent;
+  }
+
+  &.timeline-row-alt::before {
     background: var(--gray-100);
   }
 
-  &:hover {
+  &:hover::before {
     background: var(--gray-100);
   }
 
-  &.timeline-row-alt:hover {
+  &.timeline-row-alt:hover::before {
     background: var(--gray-200);
   }
 
-  &.timeline-row-highlight {
+  &.timeline-row-highlight::after {
     background: var(--gray-200);
   }
 
-  &.timeline-row-highlight:hover {
+  &.timeline-row-highlight:hover::after {
     background: var(--gray-300);
   }
 }
 
 .bar {
   position: relative;
+  z-index: $timeline-layer-bar;
   border-radius: 3px;
   cursor: pointer;
   flex-shrink: 0;
@@ -99,6 +136,17 @@
       rgba(255, 255, 255, 0.3) 3px,
       rgba(255, 255, 255, 0.3) 6px
     ) !important;
+  }
+
+  &.bar-in-parent-scope,
+  &.bar-has-childs {
+    box-shadow: 0 0 0 1px var(--gray-400);
+  }
+
+  &.bar-has-childs {
+    box-shadow:
+      0 0 0 1px var(--gray-400),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   }
 }
 
@@ -125,6 +173,8 @@
 }
 
 .bar-title-right {
+  position: relative;
+  z-index: $timeline-layer-bar;
   margin-left: 6px;
   font-size: 10px;
   color: var(--black);

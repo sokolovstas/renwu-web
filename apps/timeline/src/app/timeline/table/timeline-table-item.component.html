@@ -13,7 +13,7 @@
     >
       @if (item.childs?.length) {
         <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
-          {{ item._SHOWCHILDS ? '▾' : '▸' }}
+          {{ (item._SHOWCHILDS ?? true) ? '▾' : '▸' }}
         </button>
       }
       <span class="group-title">{{ item.title || item.key || item.id }}</span>
@@ -24,6 +24,8 @@
       [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
       [class.timeline-table-row-dimmed]="dimmed"
+      [class.timeline-table-row-in-parent-scope]="inParentScope"
+      [class.timeline-table-row-has-childs]="hasChildIssues()"
       [style.height.px]="issueRowHeightPx()"
       [style.font-size.px]="tableFontSizePx()"
       (mouseenter)="onHover(true)"
@@ -42,7 +44,7 @@
       <span class="td-col td-title" [title]="item.title || ''">
         @if (item.childs?.length) {
           <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
-            {{ item._SHOWCHILDS ? '▾' : '▸' }}
+            {{ (item._SHOWCHILDS ?? true) ? '▾' : '▸' }}
           </button>
         }
         {{ item.title }}
@@ -74,6 +76,8 @@
         [issueRowHeightPx]="issueRowHeightPx()"
         [tableFontSizePx]="tableFontSizePx()"
         [disableSelectedTimelineItem]="disableSelectedTimelineItem"
+        [inParentScope]="hasChildIssues()"
+        [treeRevision]="treeRevision"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
         (expanded)="expanded.emit($event)"

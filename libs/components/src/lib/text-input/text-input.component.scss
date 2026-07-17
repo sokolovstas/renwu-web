@@ -17,6 +17,11 @@
   border-radius: 0;
 }
 
+/* Reserve top space only when the floating prompt label is shown */
+:host.rw-text-input-no-prompt:not(.borderless) {
+  padding-top: $rw-control-default-padding;
+}
+
 :host.disabled {
   border-bottom: $rw-control-default-border solid
     $rw-control-border-disabled-color !important;

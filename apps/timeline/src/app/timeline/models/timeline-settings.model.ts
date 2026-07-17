@@ -1,9 +1,16 @@
-import { ListOptionsFilters, TimelineScaleTick, TimelineTicksId } from '@renwu/core';
+import {
+  ListOptionsFilters,
+  TimelineHierarchyMode,
+  TimelineScaleTick,
+  TimelineTicksId,
+} from '@renwu/core';
 
 export interface TimelineSettings {
   /** Table row label font (px); derived from `issueRowHeightPx` in code — not persisted. */
   fontSize: number;
   grouping: string;
+  /** `subtasks` keeps parent trees; `leaves` shows only terminal issues. */
+  hierarchyMode: TimelineHierarchyMode;
 
   scaleTick: TimelineTicksId;
   scale: number;

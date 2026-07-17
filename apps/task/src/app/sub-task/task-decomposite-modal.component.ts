@@ -3,7 +3,9 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  QueryList,
   ViewChild,
+  ViewChildren,
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -78,6 +80,9 @@ export class TaskDecompositeModalComponent implements AfterViewInit {
   @ViewChild('newTitleInput')
   newTitleInput?: RwTextInputComponent;
 
+  @ViewChildren('rowEstimatePicker')
+  rowEstimatePickers?: QueryList<RwTimePickerComponent>;
+
   issues: DecompositeDraftRow[] = [];
   cloneTodoDefault = true;
   newTitle = '';
@@ -138,6 +143,37 @@ export class TaskDecompositeModalComponent implements AfterViewInit {
     });
     this.newTitle = '';
     this.cd.markForCheck();
+  }
+
+  onNewTitleEnter(): void {
+    this.focusRowEstimate(this.issues.length - 1);
+  }
+
+  onRowTitleEnter(index: number): void {
+    this.focusRowEstimate(index);
+  }
+
+  onRowEstimateEnter(): void {
+    this.focusNewTitle();
+  }
+
+  private focusRowEstimate(index: number): void {
+    if (index < 0) {
+      return;
+    }
+    if (this.canEditEstimate) {
+      globalThis.setTimeout(() => {
+        this.rowEstimatePickers?.get(index)?.setFocus();
+      });
+      return;
+    }
+    this.focusNewTitle();
+  }
+
+  private focusNewTitle(): void {
+    globalThis.setTimeout(() => {
+      this.newTitleInput?.setFocus();
+    });
   }
 
   deleteIssue(index: number): void {

@@ -71,12 +71,11 @@ export class IssueLinkSearchInputComponent {
 
   private clearSelection(): void {
     this.selectedIssue = null;
+    // Remount so search text / suggestions reset (detectChanges forces destroy before recreate).
     this.renderSelect = false;
+    this.cd.detectChanges();
+    this.renderSelect = true;
+    this.selectedIssue = null;
     this.cd.markForCheck();
-    queueMicrotask(() => {
-      this.renderSelect = true;
-      this.selectedIssue = null;
-      this.cd.markForCheck();
-    });
   }
 }

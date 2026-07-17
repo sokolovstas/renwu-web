@@ -53,6 +53,10 @@ export class TimelineItemComponent implements OnChanges {
   @Input() selectMilestone: unknown;
   @Input() timelineGraphContentBound: unknown;
   @Input() depth = 0;
+  /** Row belongs to an expanded parent issue scope. */
+  @Input() inParentScope = false;
+  /** Parent revision counter — changes force OnPush refresh after expand/collapse. */
+  @Input() treeRevision = 0;
 
   @Output() selected = new EventEmitter<TimelineIssue>();
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
@@ -70,6 +74,7 @@ export class TimelineItemComponent implements OnChanges {
   protected isAutoScheduled = false;
   protected titleLabel = '';
   protected isGroup = false;
+  protected hasChildIssues = false;
 
   ngOnChanges(): void {
     this.recalculate();
@@ -82,6 +87,9 @@ export class TimelineItemComponent implements OnChanges {
 
     this.isGroup = String(this.item.type) === 'group';
     this.titleLabel = this.item.title || '';
+    this.hasChildIssues = Boolean(
+      this.item.childs?.length && this.item._SHOWCHILDS !== false,
+    );
 
     const statusObj = this.item.status as Status | string | undefined;
     const typeObj = this.item.type as

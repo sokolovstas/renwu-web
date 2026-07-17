@@ -5,37 +5,43 @@
   <div rwModalBody>
     @if (issueParent) {
       <div class="decomposite-wrap">
-        <div class="decomposite-section-label">
-          {{ 'task.subtask-decomposite-parent' | transloco }}
-        </div>
         <div class="decomposite-parent-block">
-          <div class="decomposite-parent-project text-sm opacity-70">
+          <div class="decomposite-section-label">
+            {{ 'task.subtask-decomposite-parent' | transloco }}
+          </div>
+          <div class="decomposite-parent-project">
             {{ issueParent.container?.title }}
           </div>
           <div class="decomposite-parent-title">{{ issueParent.title }}</div>
           <div class="decomposite-parent-meta">
-            <span class="text-sm opacity-80">{{
-              'task.subtask-decomposite-col-estimate' | transloco
-            }}:</span>
-            <span class="text-sm">{{
-              issueParent.estimated_time
-                | rwDurationToString: ['hours']
-            }}</span>
-            <rw-checkbox
-              class="decomposite-master-clone"
-              [ngModelOptions]="{ standalone: true }"
-              name="issue-clone-master"
-              [(ngModel)]="cloneTodoDefault"
-              (ngModelChange)="onCloneTodoDefaultChange($event)"
-            />
-            <span class="text-sm opacity-80">{{
-              'task.subtask-decomposite-clone-all-short' | transloco
-            }}</span>
+            <div class="decomposite-parent-meta-row">
+              <span class="decomposite-parent-meta-label">{{
+                'task.subtask-decomposite-col-estimate' | transloco
+              }}</span>
+              <span class="decomposite-parent-meta-value">{{
+                issueParent.estimated_time
+                  | rwDurationToString: ['hours']
+              }}</span>
+            </div>
+            <label class="decomposite-parent-meta-row decomposite-clone-row">
+              <rw-checkbox
+                [ngModelOptions]="{ standalone: true }"
+                name="issue-clone-master"
+                [(ngModel)]="cloneTodoDefault"
+                (ngModelChange)="onCloneTodoDefaultChange($event)"
+              />
+              <span class="decomposite-parent-meta-label">{{
+                'task.subtask-decomposite-clone-all-short' | transloco
+              }}</span>
+            </label>
           </div>
         </div>
 
         <div class="decomposite-section-label mt-3">
           {{ 'task.subtask-decomposite-new-rows' | transloco }}
+        </div>
+        <div class="decomposite-keyboard-hint text-sm opacity-70">
+          {{ 'task.subtask-decomposite-keyboard-hint' | transloco }}
         </div>
         <div class="decomposite-head">
           <div class="decomposite-col icon"></div>
@@ -62,21 +68,24 @@
             </div>
             <div class="decomposite-col title">
               <rw-text-input
-                class="w-full"
+                class="w-full flex"
                 [(ngModel)]="issue.title"
                 name="title-{{ i }}"
-                [multiline]="true"
                 [ngModelOptions]="{ standalone: true }"
+                (enter)="onRowTitleEnter(i)"
               />
             </div>
             <div class="decomposite-col estimate">
               @if (canEditEstimate) {
                 <rw-time-picker
+                  #rowEstimatePicker
                   class="w-full"
                   [max]="300 * 60 * 60"
+                  [prompt]="''"
                   [(ngModel)]="issue.estimated_time"
                   name="estimated_time-{{ i }}"
                   [ngModelOptions]="{ standalone: true }"
+                  (enter)="onRowEstimateEnter()"
                 />
               } @else {
                 <span class="text-sm opacity-80">{{
@@ -99,15 +108,13 @@
           <div class="decomposite-col title">
             <rw-text-input
               #newTitleInput
-              class="w-full"
+              class="w-full flex"
               [(ngModel)]="newTitle"
               name="title-new"
-              [prompt]="'task.subtask-decomposite-add-line' | transloco"
               [eraseAfterChange]="true"
-              [keepFocus]="true"
-              [multiline]="true"
               [ngModelOptions]="{ standalone: true }"
               (ngModelChange)="onNewTitleChange($event)"
+              (enter)="onNewTitleEnter()"
             />
           </div>
           <div class="decomposite-col estimate"></div>

@@ -100,8 +100,10 @@
             [tableWidth]="settings().tableWidth"
             [issueRowHeightPx]="settings().issueRowHeightPx"
             [tableFontSizePx]="settings().fontSize"
+            [treeRevision]="treeRevision()"
             (selected)="onSelected($event)"
             (scrollTo)="onScrollTo($event)"
+            (expanded)="onTreeExpanded()"
           />
         }
       </div>
@@ -151,6 +153,13 @@
             ></div>
           }
 
+          @for (scope of parentScopeLayouts(); track scope.parentId) {
+            <renwu-timeline-parent-scope
+              [layout]="scope"
+              [highlighted]="isParentScopeHighlighted(scope)"
+            />
+          }
+
           @for (row of rootChild().childs; track trackRootRow($index, row)) {
             <renwu-timeline-item
               [item]="row"
@@ -164,6 +173,7 @@
               [showTitleRight]="settings().showTitleRight"
               [issueRowHeightPx]="settings().issueRowHeightPx"
               [selectMilestone]="selectMilestone()"
+              [treeRevision]="treeRevision()"
               (selected)="onSelected($event)"
               (scrollTo)="onScrollTo($event)"
             />

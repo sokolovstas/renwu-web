@@ -93,6 +93,12 @@ export class RwTextInputComponent
   @Input()
   prompt: string;
 
+  /** Tighter layout when the floating label (`prompt`) is not used. */
+  @HostBinding('class.rw-text-input-no-prompt')
+  get noPrompt(): boolean {
+    return !this.prompt;
+  }
+
   @Input()
   type: 'string' | 'number' | 'float' = 'string';
 

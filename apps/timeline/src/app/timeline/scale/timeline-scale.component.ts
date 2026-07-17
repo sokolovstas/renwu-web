@@ -26,7 +26,11 @@ import {
   ISelectItem,
   SelectModelBase,
 } from '@renwu/components';
-import { RwIssueDateTimeService, TimelineTicksId } from '@renwu/core';
+import {
+  RwIssueDateTimeService,
+  TimelineHierarchyMode,
+  TimelineTicksId,
+} from '@renwu/core';
 import { forkJoin, merge } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { TimelineSettingsService } from '../services/timeline-settings.service';
@@ -36,6 +40,11 @@ const GROUPING_OPTIONS = [
   { id: 'type', key: 'groupingType' },
   { id: 'status', key: 'groupingStatus' },
   { id: 'assignee', key: 'groupingAssignee' },
+] as const;
+
+const HIERARCHY_OPTIONS = [
+  { id: 'subtasks', key: 'hierarchySubtasks' },
+  { id: 'leaves', key: 'hierarchyLeaves' },
 ] as const;
 
 @Component({
@@ -72,6 +81,7 @@ export class TimelineScaleComponent implements OnInit {
   @Output() nowClicked = new EventEmitter<void>();
 
   protected groupingModel = this.createGroupingModel();
+  protected hierarchyModel = this.createHierarchyModel();
   protected scaleTickModel = this.createScaleTickModel();
 
   /** Reactive snapshot; use in template as `settings()` so OnPush updates when storage/slider changes. */
@@ -100,6 +110,14 @@ export class TimelineScaleComponent implements OnInit {
   protected onGroupingChanged(items: ISelectItem<unknown>[]): void {
     const value = (items?.[0]?.id as string) || 'none';
     this.settingsService.setGrouping(value);
+    this.changed.emit();
+  }
+
+  protected onHierarchyChanged(items: ISelectItem<unknown>[]): void {
+    const value = (items?.[0]?.id as TimelineHierarchyMode) || 'subtasks';
+    this.settingsService.setHierarchyMode(
+      value === 'leaves' ? 'leaves' : 'subtasks',
+    );
     this.changed.emit();
   }
 
@@ -154,6 +172,13 @@ export class TimelineScaleComponent implements OnInit {
             .pipe(take(1)),
         ),
       ),
+      hierarchy: forkJoin(
+        HIERARCHY_OPTIONS.map((option) =>
+          this.transloco
+            .selectTranslate(option.key, {}, this.translocoScope)
+            .pipe(take(1)),
+        ),
+      ),
       ticks: forkJoin(
         tickOptions.map((option) =>
           this.transloco
@@ -163,7 +188,7 @@ export class TimelineScaleComponent implements OnInit {
       ),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ grouping, ticks }) => {
+      .subscribe(({ grouping, hierarchy, ticks }) => {
         this.groupingModel.staticData = GROUPING_OPTIONS.map((option, index) => ({
           id: option.id,
           label: grouping[index],
@@ -171,6 +196,17 @@ export class TimelineScaleComponent implements OnInit {
         const groupingValue = this.settingsService.getTimeline().grouping || 'none';
         void this.groupingModel.setData(groupingValue);
         void this.groupingModel.loadPage(0);
+
+        this.hierarchyModel.staticData = HIERARCHY_OPTIONS.map(
+          (option, index) => ({
+            id: option.id,
+            label: hierarchy[index],
+          }),
+        );
+        const hierarchyValue =
+          this.settingsService.getTimeline().hierarchyMode || 'subtasks';
+        void this.hierarchyModel.setData(hierarchyValue);
+        void this.hierarchyModel.loadPage(0);
 
         this.scaleTickModel.staticData = tickOptions.map((option, index) => ({
           id: option.id,
@@ -212,6 +248,19 @@ export class TimelineScaleComponent implements OnInit {
       label: option.id,
     }));
     void model.setData(this.settingsService.getTimeline().grouping || 'none');
+    return model;
+  }
+
+  private createHierarchyModel(): SelectModelBase<string> {
+    const model = new SelectModelBase<string>();
+    model.loadSelected = true;
+    model.staticData = HIERARCHY_OPTIONS.map((option) => ({
+      id: option.id,
+      label: option.id,
+    }));
+    void model.setData(
+      this.settingsService.getTimeline().hierarchyMode || 'subtasks',
+    );
     return model;
   }
 

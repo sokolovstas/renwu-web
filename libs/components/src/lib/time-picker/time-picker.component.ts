@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, HostBinding, HostListener, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, forwardRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, inject } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -102,6 +102,9 @@ export class RwTimePickerComponent
 
   @Input()
   showClear = false;
+
+  @Output()
+  enter = new EventEmitter<void>();
 
   valueDuration: Duration;
 
@@ -355,6 +358,13 @@ export class RwTimePickerComponent
   onInputChange(value: string): void {
     this.valueInput = value;
     this.openEdit(false);
+  }
+  onInputEnter(): void {
+    this.openEdit(false);
+    this.enter.next();
+  }
+  setFocus(): void {
+    this.openEdit(true);
   }
   onClear(event: MouseEvent): void {
     event.stopImmediatePropagation();

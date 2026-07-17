@@ -16,6 +16,7 @@
       [ngModel]="editOpened ? valueInput : getLabel()"
       (keydown)="onKeyDown($event)"
       (ngModelChange)="onInputChange($event)"
+      (enter)="onInputEnter()"
        />
   </div>
   @if (!disabled && !editOpened) {

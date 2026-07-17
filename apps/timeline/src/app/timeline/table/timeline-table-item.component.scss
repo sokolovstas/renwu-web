@@ -71,6 +71,18 @@
   &.timeline-table-row-dimmed {
     opacity: 0.7;
   }
+
+  &.timeline-table-row-in-parent-scope {
+    box-shadow: inset 2px 0 0 var(--gray-300);
+  }
+
+  &.timeline-table-row-has-childs {
+    background: var(--gray-100);
+
+    &.timeline-row-alt {
+      background: var(--gray-200);
+    }
+  }
 }
 
 .td-col {

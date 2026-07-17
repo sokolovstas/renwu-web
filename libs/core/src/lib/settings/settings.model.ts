@@ -57,9 +57,14 @@ export interface NotificationSettingsModel {
   channels: NotificationSettingsChannels;
 }
 
+/** How parent/child trees are shown in the timeline. */
+export type TimelineHierarchyMode = 'subtasks' | 'leaves';
+
 /** Timeline UI preferences stored in user profile (`profile.timeline`). */
 export interface TimelineProfileSettings {
   grouping?: string;
+  /** `subtasks` = full tree under roots; `leaves` = only leaf issues. */
+  hierarchyMode?: TimelineHierarchyMode;
   scaleTick?: TimelineTicksId;
   scaleValue?: number;
   showMilestones?: boolean;

@@ -9,6 +9,15 @@
       />
     </span>
 
+    <span class="scale-field">
+      <span class="scale-field-label">{{ 'timeline.hierarchy' | transloco }}:</span>
+      <rw-select
+        [model]="hierarchyModel"
+        [borderless]="true"
+        (changed)="onHierarchyChanged($event)"
+      />
+    </span>
+
     <rw-checkbox
       [label]="'timeline.showMilestones' | transloco"
       [ngModel]="settings().showMilestones"

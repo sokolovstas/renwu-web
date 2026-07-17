@@ -11,6 +11,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -32,7 +33,9 @@ import {
   RwShortcutService,
   TimelineService as CoreTimelineService,
   RwIssueDateTimeService,
+  Type,
   User,
+  UserD,
   UserWorkload,
 } from '@renwu/core';
 import { TimelineSettingsService } from './services/timeline-settings.service';
@@ -54,6 +57,8 @@ import { TimelineHolderDirective } from './shared/directives/timeline-holder.dir
 import { debounceTime, filter, forkJoin, map, of, switchMap } from 'rxjs';
 import { TimelineStateService } from './services/timeline-state.service';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
+import { TimelineParentScopeComponent } from './graph/timeline-parent-scope.component';
+import { buildTimelineParentScopeLayouts } from './graph/parent-scope-layout';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
@@ -84,6 +89,7 @@ export interface TimelineLinkLayout {
     TimelineTableItemComponent,
     TimelineItemComponent,
     TimelineLinkComponent,
+    TimelineParentScopeComponent,
     TimelineRoadmapComponent,
     WorkloadUserComponent,
     TimelineHolderDirective,
@@ -229,6 +235,7 @@ export class TimelineComponent {
    * down to the bottom of the last visible row that references this milestone.
    */
   protected readonly milestoneEndMarkers = computed(() => {
+    this.treeRevision();
     const s = this.settings();
     if (!s.showMilestones) return [];
     const milestones = this.roadmapItems();
@@ -278,8 +285,12 @@ export class TimelineComponent {
   protected readonly workload = signal<UserWorkload | null>(null);
   protected readonly links = signal<TimelineLink[]>([]);
 
+  /** Bumped when expand/collapse changes visible rows (OnPush refresh). */
+  protected readonly treeRevision = signal(0);
+
   /** Visible row indices for dependency connectors (same preorder as graph rows). */
   protected readonly linksLayout = computed((): TimelineLinkLayout[] => {
+    this.treeRevision();
     const links = this.links();
     const roots = this.rootChild().childs;
     if (!links.length || !roots?.length) return [];
@@ -305,6 +316,22 @@ export class TimelineComponent {
       out.push({ link, issueRowIndex, linkRowIndex });
     }
     return out;
+  });
+
+  /** Semi-transparent parent scope boxes on the graph (parent + visible children). */
+  protected readonly parentScopeLayouts = computed(() => {
+    this.treeRevision();
+    const roots = this.rootChild().childs;
+    if (!roots?.length) return [];
+
+    const s = this.settings();
+    return buildTimelineParentScopeLayouts(roots, {
+      dateStart: this.dateStart(),
+      scale: s.scale,
+      hours24InDay: this.hours24InDay(),
+      issueRowHeightPx: s.issueRowHeightPx,
+      roadmapBandHeightPx: this.roadmapBandHeightPx(),
+    });
   });
 
   protected readonly scrollLeftGraph = signal(0);
@@ -373,6 +400,10 @@ export class TimelineComponent {
     { initialValue: { containerKey: '', queryHash: '' } },
   );
   private readonly reloadCounter = signal(0);
+  /** Ungrouped root issues from API; client builds groups from this cache. */
+  private readonly loadedRoots = signal<TimelineIssue[]>([]);
+  /** Last applied view key (`grouping|hierarchyMode`) to skip redundant rebuilds. */
+  private appliedViewKey: string | null = null;
 
   constructor() {
     this.issueDateTimeSvc.issueDateTime.show24HoursInDay
@@ -401,7 +432,7 @@ export class TimelineComponent {
     });
 
     effect((onCleanup) => {
-      const grouping = this.settings().grouping || 'none';
+      // Grouping is applied client-side — do not refetch when it changes.
       const params = this.queryParams();
       const routeContainerKey = params.containerKey;
       const queryHash = this.queryHash() || params.queryHash;
@@ -439,7 +470,7 @@ export class TimelineComponent {
             return forkJoin({
               groups: this.dataService.loadIssueTree(
                 container.id,
-                grouping,
+                'none',
                 treeFilters,
               ),
               milestones: this.dataService.loadMilestones(container.id),
@@ -448,15 +479,15 @@ export class TimelineComponent {
         )
         .subscribe({
           next: ({ groups, milestones }: { groups: IssueGroup[]; milestones: Milestone[] }) => {
-            this.rootChild.set({
-              type: 'root',
-              _SHOWCHILDS: true,
-              childs: this.toTree(groups),
-            });
-            this.stateService.recalculateIndexes(this.rootChild());
+            const roots = this.extractRootIssues(groups ?? []);
+            this.loadedRoots.set(roots);
+            this.applyViewFromRoots(roots);
             this.roadmapItems.set(milestones || []);
             const timezone = this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
-            const range = this.coreTimelineService.calcMinMaxDate(groups ?? [], timezone);
+            const range = this.coreTimelineService.calcMinMaxDate(
+              this.groupsForDateRange(roots),
+              timezone,
+            );
             this.links.set(
               this.dataService.parseLinksFromIssues(
                 this.rootChild().childs,
@@ -482,6 +513,30 @@ export class TimelineComponent {
           .loadUserWorkload(user.id, {})
           .subscribe((value) => this.workload.set(value));
       }
+    });
+
+    // Rebuild when grouping or hierarchy mode changes (no API refetch).
+    effect(() => {
+      const viewKey = this.timelineViewKey();
+      const roots = this.loadedRoots();
+      if (this.appliedViewKey === null || this.appliedViewKey === viewKey) {
+        return;
+      }
+      this.applyViewFromRoots(roots);
+      const timezone =
+        this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
+      const range = this.coreTimelineService.calcMinMaxDate(
+        this.groupsForDateRange(roots),
+        timezone,
+      );
+      const childs = untracked(() => this.rootChild().childs);
+      this.links.set(
+        this.dataService.parseLinksFromIssues(
+          childs,
+          range.issuesMap,
+        ) as unknown as TimelineLink[],
+      );
+      this.treeRevision.update((v) => v + 1);
     });
 
     this.websocketService.issue
@@ -620,6 +675,11 @@ export class TimelineComponent {
     }
   }
 
+  protected onTreeExpanded(): void {
+    this.stateService.recalculateIndexes(this.rootChild());
+    this.treeRevision.update((v) => v + 1);
+  }
+
   protected onSelected(item: TimelineIssue & { __selected?: boolean }): void {
     const pulse = (item as { __selected?: boolean }).__selected;
     if (typeof pulse === 'boolean') {
@@ -666,6 +726,14 @@ export class TimelineComponent {
     const focus = this.linkFocusIssueIds();
     if (!focus || issueId == null) return false;
     return !focus.has(String(issueId));
+  }
+
+  protected isParentScopeHighlighted(layout: {
+    issueIds: string[];
+  }): boolean {
+    const hoveredId = this.hoveredIssueId();
+    if (!hoveredId) return false;
+    return layout.issueIds.includes(hoveredId);
   }
 
   protected currentUserValue(): User | null {
@@ -847,14 +915,173 @@ export class TimelineComponent {
     );
   }
 
-  private toTree(groups: IssueGroup[]): TimelineIssue[] {
-    return (groups || []).map((g) => ({
+  private timelineViewKey(): string {
+    return `${this.settingsService.grouping()}|${this.settingsService.hierarchyMode()}`;
+  }
+
+  private extractRootIssues(groups: IssueGroup[]): TimelineIssue[] {
+    return (groups || []).flatMap((g) => (g.issues || []) as TimelineIssue[]);
+  }
+
+  /** calcMinMaxDate expects IssueGroup[]; wrap roots for the shared helper. */
+  private groupsForDateRange(roots: TimelineIssue[]): IssueGroup[] {
+    return [{ id: 'roots', uid: 'roots', key: null, issues: roots }];
+  }
+
+  private applyViewFromRoots(roots: TimelineIssue[]): void {
+    this.appliedViewKey = this.timelineViewKey();
+    this.rootChild.set({
+      type: 'root',
+      _SHOWCHILDS: true,
+      childs: this.buildGroupedTree(roots),
+    });
+    this.stateService.recalculateIndexes(this.rootChild());
+  }
+
+  /**
+   * Client-side grouping:
+   * - subtasks: bucket by top-level issue field, keep full child trees
+   * - leaves: flatten to terminal issues, bucket by each leaf's own field
+   */
+  private buildGroupedTree(roots: TimelineIssue[]): TimelineIssue[] {
+    const grouping = this.settingsService.grouping() || 'none';
+    const leavesOnly = this.settingsService.hierarchyMode() === 'leaves';
+    const source = leavesOnly ? this.collectLeafIssues(roots) : roots;
+
+    if (grouping === 'none') {
+      return [
+        {
+          id: 'all',
+          type: 'group',
+          title: this.translocoService.translate('timeline.groupFallback'),
+          _SHOWCHILDS: this.groupShowChildsById('all'),
+          childs: this.sortIssueTree(source),
+        },
+      ];
+    }
+
+    const groups = this.groupIssuesByField(source, grouping);
+    return groups.map((g) => ({
       id: g.id,
       type: 'group',
       title: this.getGroupTitle(g),
-      _SHOWCHILDS: true,
+      _SHOWCHILDS: this.groupShowChilds(g),
       childs: this.sortIssueTree((g.issues || []) as TimelineIssue[]),
     }));
+  }
+
+  /** Flatten trees to terminal issues (no children). */
+  private collectLeafIssues(issues: TimelineIssue[]): TimelineIssue[] {
+    const leaves: TimelineIssue[] = [];
+    const walk = (nodes: TimelineIssue[]): void => {
+      for (const node of nodes) {
+        if (String(node.type) === 'group') {
+          if (node.childs?.length) {
+            walk(node.childs);
+          }
+          continue;
+        }
+        if (node.childs?.length) {
+          walk(node.childs);
+        } else {
+          leaves.push({ ...node, childs: undefined, _SHOWCHILDS: false });
+        }
+      }
+    };
+    walk(issues);
+    return leaves;
+  }
+
+  private groupIssuesByField(
+    issues: TimelineIssue[],
+    grouping: string,
+  ): IssueGroup[] {
+    const buckets = new Map<
+      string,
+      { key: IssueGroup['key']; issues: TimelineIssue[] }
+    >();
+
+    for (const issue of issues) {
+      const { id, key } = this.issueGroupingBucket(issue, grouping);
+      let bucket = buckets.get(id);
+      if (!bucket) {
+        bucket = { key, issues: [] };
+        buckets.set(id, bucket);
+      }
+      bucket.issues.push(issue);
+    }
+
+    return [...buckets.entries()]
+      .map(
+        ([id, bucket]) =>
+          ({
+            id,
+            uid: id,
+            key: bucket.key,
+            issues: bucket.issues,
+          }) satisfies IssueGroup,
+      )
+      .sort((a, b) =>
+        this.getGroupTitle(a).localeCompare(this.getGroupTitle(b)),
+      );
+  }
+
+  private issueGroupingBucket(
+    issue: TimelineIssue,
+    grouping: string,
+  ): { id: string; key: IssueGroup['key'] } {
+    switch (grouping) {
+      case 'type': {
+        const type = this.asDictionaryType(issue.type);
+        return { id: type?.id ?? '', key: type };
+      }
+      case 'status': {
+        const status = issue.status ?? null;
+        return { id: status?.id ?? '', key: status as IssueGroup['key'] };
+      }
+      case 'assignee': {
+        const assignee = this.issueAssignee(issue);
+        return { id: assignee?.id ?? '', key: assignee as IssueGroup['key'] };
+      }
+      default:
+        return { id: '', key: null };
+    }
+  }
+
+  private asDictionaryType(value: unknown): Type | null {
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+    const type = value as Type;
+    return typeof type.id === 'string' ? type : null;
+  }
+
+  private issueAssignee(issue: TimelineIssue): UserD | null {
+    const direct = issue.assignes?.[0];
+    if (direct?.id) {
+      return direct;
+    }
+    const calc = issue.assignes_calc?.[0];
+    return calc?.id ? calc : null;
+  }
+
+  private groupShowChilds(group: IssueGroup): boolean {
+    return this.groupShowChildsById(String(group.id ?? this.getGroupTitle(group)));
+  }
+
+  private groupShowChildsById(key: string): boolean {
+    const stored = this.settings().open_index_group[key];
+    return stored !== undefined ? stored : true;
+  }
+
+  private issueShowChilds(issue: TimelineIssue): boolean {
+    if (issue.id) {
+      const stored = this.settings().open_index[issue.id];
+      if (stored !== undefined) {
+        return stored;
+      }
+    }
+    return issue._SHOWCHILDS ?? true;
   }
 
   /** Ascending by start date (`date_start_calc`, else `date_start`); missing dates last. */
@@ -877,6 +1104,7 @@ export class TimelineComponent {
     return [...issues]
       .map((issue) => ({
         ...issue,
+        _SHOWCHILDS: this.issueShowChilds(issue),
         childs: issue.childs?.length
           ? this.sortIssueTree(issue.childs)
           : issue.childs,
@@ -885,11 +1113,19 @@ export class TimelineComponent {
   }
 
   private getGroupTitle(group: IssueGroup): string {
-    const key = group.key as { title?: string; full_name?: string; name?: string } | null;
+    const key = group.key as {
+      title?: string;
+      full_name?: string;
+      name?: string;
+      label?: string;
+      username?: string;
+    } | null;
     return (
       key?.title ||
       key?.full_name ||
       key?.name ||
+      key?.label ||
+      key?.username ||
       this.translocoService.translate('timeline.groupFallback')
     );
   }

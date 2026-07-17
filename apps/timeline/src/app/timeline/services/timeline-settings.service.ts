@@ -5,6 +5,7 @@ import {
   RwIssueDateTimeService,
   RwSettingsService,
   RwUserService,
+  TimelineHierarchyMode,
   TimelineProfileSettings,
   TimelineScaleTick,
   TimelineTicksId,
@@ -44,6 +45,7 @@ export class TimelineSettingsService {
   private readonly initialSettings: TimelineSettings = {
     fontSize: 12,
     grouping: 'none',
+    hierarchyMode: 'subtasks',
     scaleTick: TimelineTicksId.DAY,
     scale: this.computeActualScale(TimelineTicksId.DAY, 100),
     oldScale: this.computeActualScale(TimelineTicksId.DAY, 100),
@@ -64,6 +66,14 @@ export class TimelineSettingsService {
   private settingsSignal = signal<TimelineSettings>(this.initialSettings);
 
   readonly timelineSettings = this.settingsSignal.asReadonly();
+
+  /** Narrow selectors so consumers do not refetch on unrelated setting changes. */
+  readonly grouping = computed(
+    () => this.settingsSignal().grouping || 'none',
+  );
+  readonly hierarchyMode = computed(
+    () => this.settingsSignal().hierarchyMode || 'subtasks',
+  );
 
   getTimeline(): TimelineSettings {
     return this.settingsSignal();
@@ -97,6 +107,11 @@ export class TimelineSettingsService {
 
   setGrouping(value: string): void {
     this.settingsSignal.update((s) => ({ ...s, grouping: value }));
+    this.persist();
+  }
+
+  setHierarchyMode(value: TimelineHierarchyMode): void {
+    this.settingsSignal.update((s) => ({ ...s, hierarchyMode: value }));
     this.persist();
   }
 
@@ -230,9 +245,15 @@ export class TimelineSettingsService {
     const scale = this.computeActualScale(scaleTick, scaleValue);
     const rowH = i.issueRowHeightPx;
 
+    const hierarchyMode =
+      parsed.hierarchyMode === 'leaves' || parsed.hierarchyMode === 'subtasks'
+        ? parsed.hierarchyMode
+        : i.hierarchyMode;
+
     return {
       ...i,
       grouping: parsed.grouping ?? i.grouping,
+      hierarchyMode,
       scaleTick,
       scaleValue,
       scale,
@@ -281,6 +302,7 @@ export class TimelineSettingsService {
     const s = this.settingsSignal();
     return {
       grouping: s.grouping,
+      hierarchyMode: s.hierarchyMode,
       scaleTick: s.scaleTick,
       scaleValue: s.scaleValue,
       showMilestones: s.showMilestones,
