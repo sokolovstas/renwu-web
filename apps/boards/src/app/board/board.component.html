@@ -24,6 +24,7 @@
         class="renwu-boards-board__root-group root-group"
         [config]="boardConfig"
         [group]="rootGroup$ | async"
+        [selectedCount]="selectedIssues().length"
         (check)="onSelected($event)"
         (addTask)="onAddTask($event)"
         (openIssue)="onOpenIssue($event)"

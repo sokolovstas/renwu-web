@@ -183,6 +183,11 @@ $message-edit-color: #fdcf37;
 
   --rw-control-border-disabled-color: var(--gray-200);
   --rw-control-border-hover-color: var(--gray-200);
+
+  --rw-card-border-radius: 8px;
+  --rw-card-border-width: 1px;
+  --rw-card-border-color: var(--gray-300);
+  --rw-card-background: var(--gray-200);
 }
 
 html.light {

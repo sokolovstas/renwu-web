@@ -79,6 +79,15 @@ $rw-control-text-color: var(--black);
 $rw-control-text-interactive-color: var(--accent-darker-color);
 
 /////////////////////////////////////
+//// Cards
+/////////////////////////////////////
+$rw-card-border-radius: var(--rw-card-border-radius);
+$rw-card-border-width: var(--rw-card-border-width);
+$rw-card-border-color: var(--rw-card-border-color);
+$rw-card-background: var(--rw-card-background);
+$rw-card-border: $rw-card-border-width solid $rw-card-border-color;
+
+/////////////////////////////////////
 //// Buttons
 /////////////////////////////////////
 

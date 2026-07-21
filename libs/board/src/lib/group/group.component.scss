@@ -21,13 +21,43 @@ renwu-board-group {
       padding: 0;
     }
   }
-  &.collapsed {
+
+  &.collapsed-column {
     min-height: 140px;
 
-    .renwu-board-group__title {
+    > .renwu-board-group__title {
       position: absolute;
       transform: rotate(90deg) translateY(-100%);
       transform-origin: 0 0;
+    }
+  }
+
+  &.collapsed-row {
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: $rw-card-border-radius;
+    background-color: color-mix(in srgb, var(--gray-300) 35%, transparent);
+
+    > .renwu-board-group__title {
+      position: static;
+      transform: none;
+      padding: 4px 8px;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0.7;
+    }
+
+    > .renwu-board-group__title .renwu-board-group__add-button,
+    > .renwu-board-group__title .renwu-board-group__select-all {
+      display: none;
+    }
+
+    > .renwu-board-group__issues-container {
+      display: none;
     }
   }
   &.root-group > .renwu-board-group__title {
@@ -37,10 +67,31 @@ renwu-board-group {
   &.root-group {
     box-shadow: none;
     border: 0;
+    background-color: transparent;
+  }
+
+  &.renwu-board-group__group-columns:not(.root-group) {
+    background-color: var(--gray-100);
+    border-radius: $rw-card-border-radius;
   }
 
   &.wip-limit-exceeded > .renwu-board-group__title {
     color: var(--error-color, #d92d20);
+  }
+
+  &.renwu-board-group--drop-target {
+    outline: 2px solid $rw-button-primary-background;
+    outline-offset: -2px;
+    border-radius: $rw-card-border-radius;
+    background-color: color-mix(
+      in srgb,
+      var(--accent-primary-color) 14%,
+      transparent
+    );
+
+    > .renwu-board-group__title {
+      color: $rw-button-primary-background;
+    }
   }
 
   &.root-group > .renwu-board-group__groups-wrapper-columns {
@@ -90,6 +141,19 @@ renwu-board-group {
     flex: 1 1 100%;
     overflow: auto;
     padding: 10px;
+    border-radius: $rw-card-border-radius;
+    transition:
+      background-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+
+  &__issues-container--drop-target {
+    background-color: color-mix(
+      in srgb,
+      var(--accent-primary-color) 18%,
+      transparent
+    );
+    box-shadow: inset 0 0 0 2px $rw-button-primary-background;
   }
   &__groups-wrapper {
     display: flex;
@@ -141,6 +205,7 @@ renwu-board-group {
       position: relative;
       display: block;
       cursor: grab;
+      border-radius: $rw-card-border-radius;
     }
 
     & > a:active {
@@ -151,37 +216,32 @@ renwu-board-group {
   &__issue--selected {
     outline: 2px solid $rw-button-primary-background;
     outline-offset: 2px;
+    border-radius: $rw-card-border-radius;
   }
+
+  &__issue--dragging {
+    opacity: 0.45;
+  }
+
   &__issues-cards-hw {
+    display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    & > a > issue-card-item {
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
-    & > a > issue-stripe-item {
-      margin: 1px 2px;
-    }
+    gap: 10px;
   }
   &__issues-cards-h {
+    display: flex;
     align-items: flex-end;
+    gap: 10px;
   }
   &__issues-cards-v {
+    display: flex;
     flex-direction: column;
-    // overflow: auto;
-    & > a > issue-card-item {
-      width: auto;
-      margin-bottom: 10px;
-    }
+    gap: 10px;
   }
   &__issues-list {
     flex-direction: column;
     flex: 1 1 100%;
-    & > a > issue-card-item {
-      flex: 1 1 100%;
-      min-height: 30px;
-      max-height: 30px;
-    }
   }
 
   &__add-button {
@@ -224,5 +284,56 @@ renwu-board-group {
 
   &__issues-container-table {
     padding: 0;
+  }
+}
+
+.renwu-board-drag-preview {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  z-index: 10000;
+  pointer-events: none;
+
+  &__stack {
+    position: relative;
+  }
+
+  &__layer {
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: $rw-card-border-radius;
+    color: var(--black);
+
+    &:not(.renwu-board-drag-preview__layer--front) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: $rw-card-border;
+      background-color: $rw-card-background;
+    }
+  }
+
+  &__layer--front {
+    position: relative;
+    z-index: 1;
+    border: 0;
+    background: transparent;
+  }
+
+  &__badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 2;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: $rw-button-primary-background;
+    color: $rw-button-primary-color;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 22px;
+    text-align: center;
   }
 }

@@ -1,56 +1,58 @@
+@use '../../../styles/variables.scss' as *;
+
 :host {
   display: block;
   color: var(--black);
 }
 
+:host(.renwu-boards-card--card),
+:host(.renwu-boards-card--list),
+:host(.renwu-boards-card--table),
+:host(.renwu-boards-card--stripe) {
+  padding: 8px 10px;
+  border: $rw-card-border;
+  border-radius: $rw-card-border-radius;
+  background-color: $rw-card-background;
+}
+
+:host(.renwu-boards-card--list) {
+  padding: 5px 8px;
+}
+
+:host(.renwu-boards-card--compact) {
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+:host(.renwu-boards-card--detailed) {
+  padding: 10px 12px;
+}
+
+:host(.renwu-boards-card--compact) .renwu-boards-card__meta {
+  display: none;
+}
+
+:host(.renwu-boards-card--detailed) .renwu-boards-card__meta {
+  margin-top: 2px;
+}
+
+:host(.renwu-boards-card--table) {
+  padding: 0;
+  border-radius: 0;
+  border-width: 0 0 $rw-card-border-width;
+}
+
+:host(.renwu-boards-card--bar-key),
+:host(.renwu-boards-card--bar-color),
+:host(.renwu-boards-card--bar-estimate) {
+  padding: 0;
+}
+
+:host(.renwu-boards-card--empty) {
+  display: none;
+}
+
 .renwu-boards-card {
-  &--card,
-  &--list,
-  &--table,
-  &--stripe {
-    padding: 8px 10px;
-    border: 1px solid var(--gray-300);
-    border-radius: 8px;
-    background-color: var(--gray-200);
-  }
-
-  &--list {
-    padding: 5px 8px;
-  }
-
-  &--compact {
-    padding: 4px 6px;
-    font-size: 12px;
-  }
-
-  &--detailed {
-    padding: 10px 12px;
-  }
-
-  &--compact &__meta {
-    display: none;
-  }
-
-  &--detailed &__meta {
-    margin-top: 2px;
-  }
-
-  &--table {
-    padding: 0;
-    border-radius: 0;
-    border-width: 0 0 1px;
-  }
-
-  &--bar-key,
-  &--bar-color,
-  &--bar-estimate {
-    padding: 0;
-  }
-
-  &--empty {
-    display: none;
-  }
-
   &__default,
   &__stripe {
     display: flex;
@@ -152,8 +154,8 @@
   }
 
   &__bar--estimate {
-    background-color: var(--gray-200);
-    border: 1px solid var(--gray-300);
+    background-color: $rw-card-background;
+    border: $rw-card-border;
   }
 
   &__bar-progress {

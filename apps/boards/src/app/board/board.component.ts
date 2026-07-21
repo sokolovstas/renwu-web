@@ -387,11 +387,14 @@ export class BoardComponent {
   onIssueDropped(event: { issueId: string; targetGroup: BoardGroup }): void {
     const patch = this.getIssuePatchFromGroup(event.targetGroup);
     const selected = this.selectedIssues();
-    const ids = new Set<string>([event.issueId]);
-    selected.forEach((issue) => ids.add(issue.id));
-    const requests = Array.from(ids)
-      .filter((id) => !!id)
-      .map((id) => this.dataService.saveIssue(id, patch));
+    const draggedSelected = selected.some((issue) => issue.id === event.issueId);
+    const ids =
+      draggedSelected && selected.length > 0
+        ? new Set(selected.map((issue) => issue.id).filter((id) => !!id))
+        : new Set(event.issueId ? [event.issueId] : []);
+    const requests = Array.from(ids).map((id) =>
+      this.dataService.saveIssue(id, patch),
+    );
     if (requests.length === 0) {
       return;
     }

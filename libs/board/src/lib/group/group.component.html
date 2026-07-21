@@ -44,7 +44,10 @@
     class="renwu-board-group__issues-container renwu-board-group__issues-container-{{
     config.type.id
     }}"
+    [class.renwu-board-group__issues-container--drop-target]="dropTargetActive"
+    (dragenter)="onDragEnter($event)"
     (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
     (drop)="onDrop(group, $event)"
     >
     @if (!collapsed || groupOnly) {
@@ -59,9 +62,11 @@
           ; track
           issue.id) {
           <a
+            class="renwu-board-group__issue"
             draggable="true"
             [class.renwu-board-group__issue--selected]="isIssueSelected(issue)"
             (dragstart)="onIssueDragStart(issue, $event)"
+            (dragend)="onIssueDragEnd($event)"
             (click)="onIssueOpen(issue, $event)"
             >
             <button
@@ -113,6 +118,7 @@
         [parentGroup]="group"
         [group]="g"
         [config]="config"
+        [selectedCount]="selectedCount"
          />
     }
     <div class="renwu-board-group__groups-container">
@@ -139,6 +145,7 @@
             [parentGroup]="group"
             [group]="g"
             [config]="config"
+            [selectedCount]="selectedCount"
              />
         }
       </div>
