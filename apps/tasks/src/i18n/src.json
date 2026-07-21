@@ -2,7 +2,6 @@
   "filters": "tasks.filters",
   "filter-name": "tasks.filter-name",
   "filter-shared": "tasks.filter-shared",
-  "filter-channel": "tasks.filter-channel",
   "add-filter": "tasks.add-filter",
   "edit-filter": "tasks.edit-filter",
   "save-filter": "tasks.save-filter",

@@ -67,14 +67,12 @@ export class SaveFilterComponent implements OnInit, OnDestroy {
       validators: [Validators.required, Validators.minLength(2)],
     }),
     shared: new FormControl(false),
-    channel: new FormControl(false),
   });
 
   ngOnInit(): void {
     this.filterForm.patchValue({
       title: this.filter?.title || '',
       shared: this.filter?.shared || false,
-      channel: this.filter?.channel || false,
     });
   }
 
@@ -98,7 +96,7 @@ export class SaveFilterComponent implements OnInit, OnDestroy {
       title: formValue.title,
       query_string: this.queryString,
       shared: formValue.shared,
-      channel: formValue.channel,
+      channel: this.filter?.channel || false,
     });
   }
 

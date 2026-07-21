@@ -9,9 +9,6 @@
           <div rwSortTableColumnHead="checkbox">
             {{ 'tasks.filter-shared' | transloco }}
           </div>
-          <div rwSortTableColumnHead="checkbox">
-            {{ 'tasks.filter-channel' | transloco }}
-          </div>
         </div>
         @for (filter of filterList; track filter.id; let i = $index) {
           <a
@@ -25,9 +22,6 @@
             </div>
             <div rwSortTableColumn="checkbox">
               <rw-checkbox class="inline-block" [ngModel]="filter.shared" />
-            </div>
-            <div rwSortTableColumn="checkbox">
-              <rw-checkbox class="inline-block" [ngModel]="filter.channel" />
             </div>
           </a>
         }
