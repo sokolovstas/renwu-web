@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
-import { RW_SELECT_MODELS, RwAlertService, RwToastService } from '@renwu/components';
+import { RW_SELECT_MODELS, RwToastService } from '@renwu/components';
 import {
   Issue,
   IssueLink,
@@ -11,7 +11,7 @@ import {
   RwPolicyService,
   SelectModelIssueLink,
 } from '@renwu/core';
-import { BehaviorSubject, Observable, map, of } from 'rxjs';
+import { BehaviorSubject, map, of } from 'rxjs';
 
 import { RelatedComponent } from './related.component';
 import { provideTranslocoStub } from '../../testing/transloco-stub';
@@ -51,7 +51,6 @@ describe('RelatedComponent', () => {
   let component: RelatedComponent;
   let issue$: BehaviorSubject<Issue>;
   let toastService: { info: jest.Mock; error: jest.Mock };
-  let alertService: { confirm: jest.Mock };
   let policyService: { canEditIssue: jest.Mock };
   let issueForm: FormGroup;
 
@@ -60,7 +59,6 @@ describe('RelatedComponent', () => {
     links: IssueLinks = emptyLinks(),
     options?: {
       policyReturns?: boolean;
-      confirm$?: Observable<{ affirmative: boolean }>;
     },
   ): void {
     issue$ = new BehaviorSubject<Issue>(issue);
@@ -68,11 +66,6 @@ describe('RelatedComponent', () => {
     toastService = {
       info: jest.fn(),
       error: jest.fn(),
-    };
-    alertService = {
-      confirm: jest
-        .fn()
-        .mockReturnValue(options?.confirm$ ?? of({ affirmative: true })),
     };
     policyService = {
       canEditIssue: jest
@@ -111,7 +104,6 @@ describe('RelatedComponent', () => {
           },
         },
         { provide: RwToastService, useValue: toastService },
-        { provide: RwAlertService, useValue: alertService },
         { provide: RwPolicyService, useValue: policyService },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -216,29 +208,17 @@ describe('RelatedComponent', () => {
       status: { id: 'o' } as Issue['status'],
     };
 
-    it('does not confirm when user cannot edit', async () => {
+    it('does not remove when user cannot edit', async () => {
       const links = emptyLinks();
       links.related = [link];
       createComponent({ id: '1', key: 'PROJ-1' }, links, {
         policyReturns: false,
       });
       await component.remove(link);
-      expect(alertService.confirm).not.toHaveBeenCalled();
       expect(issueForm.getRawValue().links.related?.length).toBe(1);
     });
 
-    it('keeps links when confirm is dismissed', async () => {
-      const links = emptyLinks();
-      links.related = [link];
-      createComponent({ id: '1', key: 'PROJ-1' }, links, {
-        confirm$: of({ affirmative: false }),
-      });
-      await component.remove(link);
-      expect(alertService.confirm).toHaveBeenCalled();
-      expect(issueForm.getRawValue().links.related?.length).toBe(1);
-    });
-
-    it('removes link when confirm is accepted', async () => {
+    it('removes link', async () => {
       const links = emptyLinks();
       links.related = [link];
       createComponent({ id: '1', key: 'PROJ-1' }, links);

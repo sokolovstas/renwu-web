@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
-  RwAlertService,
   RwButtonComponent,
   RwModalService,
   RwToastService,
@@ -31,11 +30,13 @@ import {
   map,
   merge,
   of,
+  shareReplay,
   startWith,
   Subject,
   switchMap,
 } from 'rxjs';
 
+import { IssueLinkSearchInputComponent } from '../issue-links/issue-link-search-input.component';
 import { parentIssueToLink } from './parent-issue-to-link';
 import { TaskDecompositeModalComponent } from './task-decomposite-modal.component';
 
@@ -48,6 +49,7 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
     IssueHrefComponent,
     IssueStatusComponent,
     IssuesStatusBarComponent,
+    IssueLinkSearchInputComponent,
     RwButtonComponent,
   ],
   template: `
@@ -115,17 +117,25 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
                       class="opacity-40 hover:opacity-100"
                       typeButton="icon"
                       iconClass="trash"
+                      [double]="true"
                       (clicked)="unlinkChild(c)"
                     />
                   }
                 </div>
               </div>
-            } @empty {
-              <span class="text-sm opacity-50 px-1">{{
-                'task.subtask-empty' | transloco
-              }}</span>
             }
           </div>
+          @if (canEdit) {
+            <div class="flex flex-row items-center gap-2 flex-1 min-w-0 mt-2 px-1">
+              <renwu-task-issue-link-search-input
+                class="max-w-xs w-full flex-1 subtask-search-input"
+                [promptKey]="'task.subtask-add-placeholder'"
+                [selfKey]="issueService.issueForm.getRawValue().key ?? null"
+                [forbiddenKeys]="childKeys$ | async"
+                (issuePicked)="linkChild($event)"
+              />
+            </div>
+          }
         }
       }
     </div>
@@ -137,7 +147,6 @@ export class SubTaskComponent {
   issueService = inject(RwIssueService);
   dataService = inject(RwDataService);
   policyService = inject(RwPolicyService);
-  alertService = inject(RwAlertService);
   toastService = inject(RwToastService);
   transloco = inject(TranslocoService);
   cd = inject(ChangeDetectorRef);
@@ -185,10 +194,85 @@ export class SubTaskComponent {
         catchError(() => of(this.emptyChilds)),
       );
     }),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  childKeys$ = this.childData$.pipe(
+    map((d) =>
+      (d.childs ?? [])
+        .map((c) => (c.key ?? '').trim())
+        .filter(Boolean),
+    ),
+    startWith([] as string[]),
   );
 
   hasProgress(data: IssueChilds): boolean {
     return (data.childs_total ?? 0) > 0;
+  }
+
+  /** Attach an existing issue as a child via its `links.parent`. */
+  async linkChild(issue: Issue): Promise<void> {
+    const key = (issue.key ?? '').trim();
+    if (!key || !issue.id) {
+      return;
+    }
+    const parent = this.issueService.issueForm.getRawValue();
+    if (!parent.id || parent.id === 'new') {
+      this.toastService.info(
+        this.transloco.translate('task.subtask-save-first'),
+      );
+      return;
+    }
+    const canEdit = await firstValueFrom(
+      this.policyService.canEditIssue(
+        String(parent.id),
+        parent.container?.id ? String(parent.container.id) : '',
+      ),
+    );
+    if (!canEdit) {
+      return;
+    }
+    if ((parent.key ?? '').trim() === key) {
+      this.toastService.info(this.transloco.translate('task.subtask-self'));
+      return;
+    }
+    try {
+      const childIssue = await firstValueFrom(
+        this.dataService.getIssue(String(issue.id)),
+      );
+      const parentId = String(parent.id);
+      const existingParents = childIssue.links?.parent ?? [];
+      if (
+        existingParents.some(
+          (p) =>
+            String(p.id) === parentId ||
+            (p.key ?? '').trim() === (parent.key ?? '').trim(),
+        )
+      ) {
+        this.toastService.info(
+          this.transloco.translate('task.subtask-duplicate'),
+        );
+        return;
+      }
+      const parentLink = parentIssueToLink(parent as Issue);
+      const links = {
+        parent: [...existingParents, parentLink],
+        related: childIssue.links?.related ?? [],
+        prev_issue: childIssue.links?.prev_issue ?? [],
+        next_issue: childIssue.links?.next_issue ?? [],
+      };
+      await firstValueFrom(
+        this.dataService.saveIssue(String(childIssue.id), {
+          links,
+        } as Issue),
+      );
+      await this.refreshParentAndChildList();
+    } catch {
+      this.toastService.error(
+        this.transloco.translate('task.subtask-mutation-error'),
+      );
+    }
+    this.cd.markForCheck();
   }
 
   /** Opens modal to create several child issues from titles (legacy “Decomposite”). */
@@ -269,20 +353,6 @@ export class SubTaskComponent {
       ),
     );
     if (!canEdit) {
-      return;
-    }
-    const confirm = await firstValueFrom(
-      this.alertService.confirm(
-        this.transloco.translate('task.subtask-unlink-title'),
-        this.transloco.translate('task.subtask-unlink-message', {
-          key: child.key || child.title || String(child.id),
-        }),
-        true,
-        this.transloco.translate('core.delete'),
-        this.transloco.translate('core.cancel'),
-      ),
-    );
-    if (!confirm?.affirmative) {
       return;
     }
     try {

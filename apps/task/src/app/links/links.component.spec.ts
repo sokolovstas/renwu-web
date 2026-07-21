@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RW_SELECT_MODELS, RwAlertService, RwToastService } from '@renwu/components';
+import { RW_SELECT_MODELS, RwToastService } from '@renwu/components';
 import {
   Issue,
   IssueLinks,
@@ -81,7 +81,6 @@ describe('LinksComponent', () => {
           },
         },
         { provide: RwToastService, useValue: { info: jest.fn(), error: jest.fn() } },
-        { provide: RwAlertService, useValue: { confirm: jest.fn().mockReturnValue(of({ affirmative: true })) } },
         { provide: RwPolicyService, useValue: { canEditIssue: jest.fn().mockReturnValue(of(true)) } },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],

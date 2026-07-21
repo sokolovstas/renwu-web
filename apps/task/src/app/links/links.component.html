@@ -11,22 +11,9 @@
   }
   @for (block of blocks; track block.kind) {
     <section class="links-block mb-4 last:mb-0">
-      <div
-        class="text-sm font-medium opacity-90 mb-1.5 px-1 border-b border-black/10 pb-0.5"
-        >
+      <div class="text-sm font-medium opacity-90 mb-1.5 px-1">
         {{ block.titleKey | transloco }}
       </div>
-      @if (isNew === false && canEdit) {
-        <div class="flex flex-row items-center gap-2 flex-1 min-w-0 justify-end mb-2 px-1">
-          <renwu-task-issue-link-search-input
-            class="max-w-xs w-full flex-1"
-            [promptKey]="'task.links-add-placeholder'"
-            [selfKey]="issueService.issueForm.getRawValue().key ?? null"
-            [forbiddenKeys]="linkedKeys$ | async"
-            (issuePicked)="addIssue(block.kind, $event)"
-          />
-        </div>
-      }
       <div class="flex flex-col gap-1 px-1">
         @for (link of block.links$ | async; track link.key) {
           <div class="flex flex-row items-center justify-between gap-2 text-sm">
@@ -46,16 +33,24 @@
                 class="opacity-40 hover:opacity-100 shrink-0"
                 typeButton="icon"
                 iconClass="trash"
+                [double]="true"
                 (clicked)="remove(block.kind, link)"
               />
             }
           </div>
-        } @empty {
-          <span class="text-sm opacity-50 px-1">{{
-            'task.links-empty-block' | transloco
-          }}</span>
         }
       </div>
+      @if (isNew === false && canEdit) {
+        <div class="flex flex-row items-center gap-2 flex-1 min-w-0 mt-2 px-1">
+          <renwu-task-issue-link-search-input
+            class="max-w-xs w-full flex-1 links-search-input"
+            [promptKey]="'task.links-add-placeholder'"
+            [selfKey]="issueService.issueForm.getRawValue().key ?? null"
+            [forbiddenKeys]="linkedKeys$ | async"
+            (issuePicked)="addIssue(block.kind, $event)"
+          />
+        </div>
+      }
     </section>
   }
 </div>

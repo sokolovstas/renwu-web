@@ -2,17 +2,18 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslocoService } from '@jsverse/transloco';
-import { RwAlertService, RwModalService, RwToastService } from '@renwu/components';
+import { RW_SELECT_MODELS, RwModalService, RwToastService } from '@renwu/components';
 import {
   Issue,
   IssueChilds,
   RwDataService,
   RwIssueService,
   RwPolicyService,
+  SelectModelIssueLink,
 } from '@renwu/core';
 import { BehaviorSubject, firstValueFrom, map, of, take, throwError } from 'rxjs';
 
+import { provideTranslocoStub } from '../../testing/transloco-stub';
 import { SubTaskComponent } from './sub-task.component';
 import { TaskDecompositeModalComponent } from './task-decomposite-modal.component';
 
@@ -50,9 +51,13 @@ describe('SubTaskComponent', () => {
   let fixture: ComponentFixture<SubTaskComponent>;
   let component: SubTaskComponent;
   let issue$: BehaviorSubject<Issue>;
-  let dataService: { getChildIssues: jest.Mock; getIssue: jest.Mock; saveIssue: jest.Mock };
+  let dataService: {
+    getChildIssues: jest.Mock;
+    getIssue: jest.Mock;
+    saveIssue: jest.Mock;
+    getDictionaryOptions: jest.Mock;
+  };
   let policyService: { canEditIssue: jest.Mock };
-  let alertService: { confirm: jest.Mock };
   let toastService: { error: jest.Mock; info: jest.Mock };
   let issueForm: FormGroup;
   let patchIssue: jest.Mock;
@@ -79,7 +84,6 @@ describe('SubTaskComponent', () => {
     options?: {
       policyReturns?: boolean;
       childIssues$?: ReturnType<typeof of<IssueChilds>>;
-      confirm$?: ReturnType<typeof of<{ affirmative: boolean }>>;
     },
   ): void {
     issue$ = new BehaviorSubject<Issue>(issue);
@@ -92,16 +96,16 @@ describe('SubTaskComponent', () => {
         .mockReturnValue(options?.childIssues$ ?? of(sampleChilds)),
       getIssue: jest.fn(),
       saveIssue: jest.fn().mockReturnValue(of({})),
+      getDictionaryOptions: jest
+        .fn()
+        .mockReturnValue(
+          of({ results: [], next: null, count: 0, previous: null }),
+        ),
     };
     policyService = {
       canEditIssue: jest
         .fn()
         .mockReturnValue(of(options?.policyReturns ?? true)),
-    };
-    alertService = {
-      confirm: jest
-        .fn()
-        .mockReturnValue(options?.confirm$ ?? of({ affirmative: true })),
     };
     toastService = { error: jest.fn(), info: jest.fn() };
     updateFromTemplate = jest.fn();
@@ -130,17 +134,22 @@ describe('SubTaskComponent', () => {
     TestBed.configureTestingModule({
       imports: [SubTaskComponent],
       providers: [
+        provideTranslocoStub(),
         { provide: RwIssueService, useValue: issueService },
         { provide: RwDataService, useValue: dataService },
         { provide: RwPolicyService, useValue: policyService },
-        { provide: RwAlertService, useValue: alertService },
         { provide: RwToastService, useValue: toastService },
         {
           provide: Router,
           useValue: { navigate: routerNavigate, url: '/task/list' },
         },
         { provide: RwModalService, useValue: modalService },
-        { provide: TranslocoService, useValue: new TranslocoService() },
+        {
+          provide: RW_SELECT_MODELS,
+          useValue: {
+            IssueLink: () => new SelectModelIssueLink(),
+          },
+        },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
@@ -273,6 +282,100 @@ describe('SubTaskComponent', () => {
     });
   });
 
+  describe('linkChild', () => {
+    const pick: Issue = {
+      id: '20',
+      key: 'P-20',
+      title: 'Existing',
+    } as Issue;
+
+    it('toasts when parent is new', async () => {
+      createComponent({ id: 'new', key: 'new' });
+      await component.linkChild(pick);
+      expect(toastService.info).toHaveBeenCalledWith('task.subtask-save-first');
+      expect(dataService.getIssue).not.toHaveBeenCalled();
+    });
+
+    it('toasts when linking self', async () => {
+      createComponent({ id: '1', key: 'P-1' });
+      await component.linkChild({ id: '1', key: 'P-1' } as Issue);
+      expect(toastService.info).toHaveBeenCalledWith('task.subtask-self');
+      expect(dataService.getIssue).not.toHaveBeenCalled();
+    });
+
+    it('does not link when user cannot edit', async () => {
+      createComponent({ id: '1', key: 'P-1' }, { policyReturns: false });
+      await component.linkChild(pick);
+      expect(dataService.getIssue).not.toHaveBeenCalled();
+    });
+
+    it('toasts when already a child', async () => {
+      createComponent({ id: '1', key: 'P-1' });
+      dataService.getIssue = jest.fn().mockReturnValue(
+        of({
+          id: '20',
+          key: 'P-20',
+          links: {
+            parent: [{ id: '1', key: 'P-1', title: 'P' } as Issue],
+            related: [],
+            prev_issue: [],
+            next_issue: [],
+          },
+        } as Issue),
+      );
+      await component.linkChild(pick);
+      expect(toastService.info).toHaveBeenCalledWith('task.subtask-duplicate');
+      expect(dataService.saveIssue).not.toHaveBeenCalled();
+    });
+
+    it('saves parent link and refreshes list', async () => {
+      createComponent({
+        id: '1',
+        key: 'P-1',
+        title: 'Parent',
+      });
+      const childIssue: Issue = {
+        id: '20',
+        key: 'P-20',
+        title: 'Existing',
+        links: {
+          parent: [],
+          related: [],
+          prev_issue: [],
+          next_issue: [],
+        },
+      } as Issue;
+      const freshParent: Issue = {
+        id: '1',
+        key: 'P-1',
+        title: 'Parent',
+        have_childs: true,
+      } as Issue;
+
+      let getIssueCalls = 0;
+      dataService.getIssue = jest.fn().mockImplementation(() => {
+        getIssueCalls += 1;
+        if (getIssueCalls === 1) {
+          return of(childIssue);
+        }
+        return of(freshParent);
+      });
+
+      await component.linkChild(pick);
+
+      expect(dataService.saveIssue).toHaveBeenCalledWith(
+        '20',
+        expect.objectContaining({
+          links: expect.objectContaining({
+            parent: [expect.objectContaining({ id: '1', key: 'P-1' })],
+          }),
+        }),
+      );
+      expect(patchIssue).toHaveBeenCalledWith(freshParent, { reset: true });
+      expect(setPrevState).toHaveBeenCalled();
+    });
+  });
+
   describe('unlinkChild', () => {
     const child: Issue = {
       id: '10',
@@ -283,21 +386,12 @@ describe('SubTaskComponent', () => {
     it('returns early when parent is new', async () => {
       createComponent({ id: 'new', key: 'new' });
       await component.unlinkChild(child);
-      expect(alertService.confirm).not.toHaveBeenCalled();
+      expect(dataService.getIssue).not.toHaveBeenCalled();
     });
 
-    it('does not confirm when user cannot edit', async () => {
+    it('does not unlink when user cannot edit', async () => {
       createComponent({ id: '1', key: 'P-1' }, { policyReturns: false });
       await component.unlinkChild(child);
-      expect(alertService.confirm).not.toHaveBeenCalled();
-    });
-
-    it('returns when confirm dismissed', async () => {
-      createComponent({ id: '1', key: 'P-1' }, {
-        confirm$: of({ affirmative: false }),
-      });
-      await component.unlinkChild(child);
-      expect(alertService.confirm).toHaveBeenCalled();
       expect(dataService.getIssue).not.toHaveBeenCalled();
     });
 

@@ -6,11 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import {
-  RwAlertService,
-  RwButtonComponent,
-  RwToastService,
-} from '@renwu/components';
+import { RwButtonComponent, RwToastService } from '@renwu/components';
 import {
   Issue,
   IssueHrefComponent,
@@ -56,7 +52,6 @@ export class RelatedComponent {
   toastService = inject(RwToastService);
   transloco = inject(TranslocoService);
   cd = inject(ChangeDetectorRef);
-  alertService = inject(RwAlertService);
   policyService = inject(RwPolicyService);
 
   isNewIssue = this.issueService.newIssue;
@@ -155,20 +150,6 @@ export class RelatedComponent {
     }
     const links = raw.links;
     if (!links?.related?.length) {
-      return;
-    }
-    const result = await firstValueFrom(
-      this.alertService.confirm(
-        this.transloco.translate('task.related-unlink-title'),
-        this.transloco.translate('task.related-unlink-message', {
-          key: link.key || link.title || '',
-        }),
-        true,
-        this.transloco.translate('core.delete'),
-        this.transloco.translate('core.cancel'),
-      ),
-    );
-    if (!result?.affirmative) {
       return;
     }
     const next: IssueLinks = {

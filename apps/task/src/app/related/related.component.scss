@@ -3,6 +3,14 @@
 }
 
 .related-search-input {
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-weight: 400;
+
+  ::ng-deep {
+    .rw-select-prompt,
+    .rw-select-text,
+    .rw-select-input {
+      font-size: inherit;
+    }
+  }
 }
