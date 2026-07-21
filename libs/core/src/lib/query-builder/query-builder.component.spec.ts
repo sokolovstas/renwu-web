@@ -1,6 +1,8 @@
 import { provideLocationMocks } from '@angular/common/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+import { RwDataService } from '../data/data.service';
 import { RwQueryBuilderService } from '../search/query-builder.service';
 import { QueryBuilderComponent } from './query-builder.component';
 
@@ -14,6 +16,13 @@ describe('QueryBuilderComponent', () => {
         provideRouter([]),
         provideLocationMocks(),
         { provide: RwQueryBuilderService, useValue: {} },
+        {
+          provide: RwDataService,
+          useValue: {
+            getSearchQueries: () => of([]),
+            searchHistory: () => of([]),
+          },
+        },
       ],
     }).compileComponents();
   });

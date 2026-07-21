@@ -272,15 +272,24 @@ export class RwDataService {
   getContainerIssueTreeGrouped(
     id: string,
     group_by: string,
-    filters: ListOptionsFilters & { group_by?: string },
+    filters: ListOptionsFilters & {
+      group_by?: string;
+      hierarchy?: string;
+      q?: string;
+      query?: string;
+      query_hash?: string;
+    },
   ): Observable<IssueGroup[]> {
-    if (group_by !== 'none') {
-      filters.group_by = group_by;
+    const params = { ...filters };
+    if (group_by && group_by !== 'none') {
+      params.group_by = group_by;
+    } else {
+      delete params.group_by;
     }
     return this.sendToAPI<IssueGroup[]>(
       'get',
       `/container/${id}/issues_tree_grouped?${this.serializeParams(
-        filters as any,
+        params as any,
       )}`,
     );
   }

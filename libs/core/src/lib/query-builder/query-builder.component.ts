@@ -16,12 +16,16 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwButtonComponent,
   RwCheckboxComponent,
   RwDropDownComponent,
   RwIconComponent,
+  RwPreventParentScrollDirective,
 } from '@renwu/components';
+import { catchError, forkJoin, of } from 'rxjs';
+import { RwDataService } from '../data/data.service';
 import { OQLParseListener } from '../search/oql/OQLParseListener';
 import OQLParser, {
   AtomContext,
@@ -32,8 +36,28 @@ import {
   SavedSearchQuery,
   SearchHint,
   SearchHintType,
+  SearchHistory,
   SearchParamType,
 } from '../search/search.model';
+
+const HISTORY_LIMIT = 20;
+
+export type QueryListItem =
+  | { kind: 'separator'; id: string; label: string }
+  | {
+      kind: 'saved';
+      id: string;
+      label: string;
+      title?: string;
+      query: string;
+      saved: SavedSearchQuery;
+    }
+  | {
+      kind: 'history';
+      id: string;
+      label: string;
+      query: string;
+    };
 
 @Component({
   selector: 'renwu-query-builder',
@@ -44,6 +68,8 @@ import {
     FormsModule,
     RwIconComponent,
     RwCheckboxComponent,
+    RwPreventParentScrollDirective,
+    TranslocoPipe,
   ],
   templateUrl: './query-builder.component.html',
   styleUrl: './query-builder.component.scss',
@@ -57,9 +83,13 @@ export class QueryBuilderComponent {
   OQLParser = OQLParser;
 
   queryBuilderService = inject(RwQueryBuilderService);
+  private dataService = inject(RwDataService);
 
   @ViewChild('hintDropdown', { read: RwDropDownComponent, static: false })
   hintDropdown: RwDropDownComponent;
+
+  @ViewChild('queriesDropdown', { read: RwDropDownComponent, static: false })
+  queriesDropdown: RwDropDownComponent;
 
   @ViewChildren('searchInput')
   searchInput: QueryList<ElementRef>;
@@ -69,6 +99,10 @@ export class QueryBuilderComponent {
   hintHovered = signal(-1);
   prevSelectionStart = signal(-1);
   prevContext: AtomContext;
+
+  queryListItems = signal<QueryListItem[]>([]);
+  queryListLoading = signal(false);
+  queryListHovered = signal(-1);
 
   errors = computed(
     () => new OQLParseListener(this.queryString()).errors.length,
@@ -112,6 +146,95 @@ export class QueryBuilderComponent {
     this.queryString.set(value ?? '');
   }
 
+  onQueriesDisplayed(): void {
+    if (this.disabled) {
+      this.queriesDropdown?.closeDropdown();
+      return;
+    }
+    this.queryListLoading.set(true);
+    this.queryListHovered.set(-1);
+    forkJoin({
+      saved: this.dataService
+        .getSearchQueries()
+        .pipe(catchError(() => of([] as SavedSearchQuery[]))),
+      history: this.dataService
+        .searchHistory()
+        .pipe(catchError(() => of([] as SearchHistory[]))),
+    }).subscribe(({ saved, history }) => {
+      this.queryListItems.set(this.buildQueryList(saved ?? [], history ?? []));
+      this.queryListLoading.set(false);
+      this.cd.markForCheck();
+    });
+  }
+
+  selectStoredQuery(item: QueryListItem, event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (item.kind === 'separator') {
+      return;
+    }
+    this.queriesDropdown?.closeDropdown();
+    this.clearHints();
+    this.queryString.set(item.query);
+    this.selectedQuery.set(item.kind === 'saved' ? item.saved : null);
+    if (this.searchInput?.first) {
+      const input = this.searchInput.first
+        .nativeElement as HTMLInputElement;
+      input.value = item.query;
+    }
+    this.queryChange.next(item.query);
+  }
+
+  private buildQueryList(
+    saved: SavedSearchQuery[],
+    history: SearchHistory[],
+  ): QueryListItem[] {
+    const items: QueryListItem[] = [];
+
+    if (saved.length) {
+      items.push({
+        kind: 'separator',
+        id: 'sep-saved',
+        label: 'core.query-builder-saved',
+      });
+      for (const q of saved) {
+        const query = q.query_string || '';
+        items.push({
+          kind: 'saved',
+          id: `saved-${q.id || query}`,
+          label: q.title || query,
+          title: q.title,
+          query,
+          saved: q,
+        });
+      }
+    }
+
+    const historyItems = history
+      .map((h) => {
+        const query = h.query_string || h.query || '';
+        return {
+          kind: 'history' as const,
+          id: `history-${h.id || h.hash || query}`,
+          label: query,
+          query,
+        };
+      })
+      .filter((h) => !!h.query)
+      .slice(0, HISTORY_LIMIT);
+
+    if (historyItems.length) {
+      items.push({
+        kind: 'separator',
+        id: 'sep-history',
+        label: 'core.query-builder-history',
+      });
+      items.push(...historyItems);
+    }
+
+    return items;
+  }
+
   onHintNavigate(event: KeyboardEvent) {
     if (event.key === 'ArrowDown') {
       this.hintHovered.update((v) => v + 1);
@@ -139,7 +262,7 @@ export class QueryBuilderComponent {
         .querySelector(
           '.hints .hint:nth-of-type(' + (this.hintHovered() + 1) + ')',
         )
-        .scrollIntoView({ behavior: 'instant', block: 'nearest' });
+        ?.scrollIntoView({ behavior: 'instant', block: 'nearest' });
     }
   }
   // Prepare string on filter change
@@ -280,7 +403,7 @@ export class QueryBuilderComponent {
     this.hints.set([]);
   }
   setHint(hint: SearchHint) {
-    this.hintDropdown.closeDropdown();
+    this.hintDropdown?.closeDropdown();
     if (!hint) {
       return;
     }

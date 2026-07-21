@@ -119,10 +119,10 @@ export interface Issue {
 }
 
 export interface IssueGroup {
-  id: string;
-  uid: string;
+  id?: string;
+  uid?: string;
   issues: Issue[];
-  key: Type | Milestone | User | null;
+  key: Type | Status | Milestone | User | null;
 }
 
 export interface IssueExistResponse {

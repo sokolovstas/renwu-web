@@ -12,8 +12,14 @@
 }
 
 .timeline-filters {
+  flex: 0 0 auto;
   border-bottom: 1px solid var(--gray-200);
-  padding: 4px 8px;
+  padding: 6px 10px;
+  background: var(--gray-50, var(--gray-100));
+
+  renwu-query-builder {
+    display: block;
+  }
 }
 
 .timeline-layout {

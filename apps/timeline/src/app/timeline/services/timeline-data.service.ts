@@ -14,7 +14,8 @@ import {
 } from '@renwu/core';
 
 type IssueTreeFilters = ListOptionsFilters & {
-  group_by?: string;
+  hierarchy?: string;
+  q?: string;
   query_hash?: string;
 };
 
@@ -31,17 +32,17 @@ export class TimelineDataService {
   }
 
   /**
-   * Loads the ungrouped issue tree. Grouping (type/assignee/…) is applied
-   * on the timeline client so hierarchy mode can control the rules.
+   * Loads the server-grouped issue tree. Filtering and grouping happen on core;
+   * the timeline client only maps the response for display.
    */
   loadIssueTree(
     containerId: string,
-    _grouping: string,
+    grouping: string,
     filters: IssueTreeFilters,
   ): Observable<IssueGroup[]> {
     return this.dataService.getContainerIssueTreeGrouped(
       containerId,
-      'none',
+      grouping || 'none',
       filters,
     );
   }
@@ -85,4 +86,3 @@ export class TimelineDataService {
     return this.coreTimelineService.parseLinks(rowsTyped, issuesMap);
   }
 }
-

@@ -1,4 +1,5 @@
 <div
+  #searchRow
   class="wrapper-textinput"
   [class.wrapper-textinput-with-hints]="showHintsContainer()"
   [class.error]="errors() > 0 && queryString()"
@@ -19,62 +20,117 @@
         (keyup)="onSearchKeyUp($event)"
       />
     </div>
-    <rw-icon class="icon"
+    <rw-icon
+      class="icon"
       icon="search"
       cursor="pointer"
       (click)="onSearch()"
-     />
-  </div>
-  @if (showHintsContainer()) {
-
-  <div class="hints-container">
-    <div class="hints">
-      @for (hint of hints(); track i;let i = $index) {
-      <div class="hint" (mousedown)="selectHint(hint)">
-        <div
-          class="hint-text"
-          (mouseover)="hintHovered.set(i)"
-          [class.hovered]="hintHovered() === i"
-        >
-          {{ hint.label }}
-        </div>
-      </div>
-      }
+    />
+    <div
+      #queriesToggle
+      class="icon icon-arrow"
+      [class.disabled]="disabled"
+      (mousedown)="$event.stopPropagation()"
+    >
+      <rw-icon icon="keyboard_arrow_down" cursor="pointer" />
     </div>
   </div>
+  @if (showHintsContainer()) {
+    <div class="hints-container">
+      <div class="hints">
+        @for (hint of hints(); track i; let i = $index) {
+          <div class="hint" (mousedown)="selectHint(hint)">
+            <div
+              class="hint-text"
+              (mouseover)="hintHovered.set(i)"
+              [class.hovered]="hintHovered() === i"
+            >
+              {{ hint.label }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
   }
 </div>
+
 <rw-dropdown #hintDropdown class="hints-popup" [displayBackground]="true">
   <ng-template #dropdownContent>
     @let multiHint = multipleSelectHint();
     <div class="hints">
       @for (hint of hints(); track i; let i = $index) {
-      <div class="hint" (mousedown)="selectHint(hint)">
-        @if (multiHint) {
-        <rw-checkbox class="hint-option"
-          [ngModel]="hint.selected"
-          (ngModelChange)="selectHint($event)"
-          (mousedown)="onCheckboxClick($event)"
-          (mouseover)="hintHovered = undefined"
-         />
-        }
-        <div
-          class="hint-text"
-          (mouseover)="hintHovered.set(i)"
-          [class.hovered]="hintHovered() === i"
-        >
-          {{ hint.label }}
+        <div class="hint" (mousedown)="selectHint(hint)">
+          @if (multiHint) {
+            <rw-checkbox
+              class="hint-option"
+              [ngModel]="hint.selected"
+              (ngModelChange)="selectHint($event)"
+              (mousedown)="onCheckboxClick($event)"
+              (mouseover)="hintHovered = undefined"
+            />
+          }
+          <div
+            class="hint-text"
+            (mouseover)="hintHovered.set(i)"
+            [class.hovered]="hintHovered() === i"
+          >
+            {{ hint.label }}
+          </div>
         </div>
-      </div>
       }
     </div>
     @if (multiHint) {
-    <rw-button
-      class="ok-button"
-      (mouseover)="hintHovered = undefined"
-      (clicked)="setHintValue()"
-      >Ok</rw-button
-    >
+      <rw-button
+        class="ok-button"
+        (mouseover)="hintHovered = undefined"
+        (clicked)="setHintValue()"
+        >Ok</rw-button
+      >
     }
-  </ng-template></rw-dropdown
+  </ng-template>
+</rw-dropdown>
+
+<rw-dropdown
+  #queriesDropdown
+  class="rw-select-dropdown"
+  [displayBackground]="true"
+  [useBindWidth]="true"
+  [bindElement]="searchRow"
+  [activeElement]="queriesToggle"
+  [closeByClickElement]="true"
+  (displayed)="onQueriesDisplayed()"
 >
+  <ng-template #dropdownContent>
+    <div class="rw-select-options" rwPreventParentScroll>
+      @if (queryListLoading()) {
+        <div class="rw-select-option loading">…</div>
+      } @else if (queryListItems().length === 0) {
+        <div class="rw-select-option section-header">
+          {{ 'core.query-builder-empty' | transloco }}
+        </div>
+      } @else {
+        @for (item of queryListItems(); track item.id; let i = $index) {
+          @if (item.kind === 'separator') {
+            <div class="rw-select-option section-header">
+              {{ item.label | transloco }}
+            </div>
+          } @else {
+            <div
+              class="rw-select-option"
+              [class.cursor]="queryListHovered() === i"
+              (mouseover)="queryListHovered.set(i)"
+              (click)="selectStoredQuery(item, $event)"
+            >
+              @if (item.kind === 'saved' && item.title) {
+                <div class="query-title">{{ item.title }}</div>
+                <div class="query-string">{{ item.query }}</div>
+              } @else {
+                {{ item.label }}
+              }
+            </div>
+          }
+        }
+      }
+    </div>
+  </ng-template>
+</rw-dropdown>
