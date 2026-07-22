@@ -4,6 +4,8 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  ElementRef,
+  HostListener,
   Injector,
   OnDestroy,
   signal,
@@ -99,6 +101,7 @@ export class DetailComponent implements OnDestroy {
   taskLayout = inject(TaskDetailVisibilityService);
 
   fieldSettingsOpen = signal(false);
+  private creating = false;
 
   transitionSelectModel = new SelectModelTransition();
   milestoneSelectModel = new SelectModelMilestones();
@@ -114,6 +117,9 @@ export class DetailComponent implements OnDestroy {
 
   @ViewChild('title')
   titleInput: RwTextInputComponent;
+
+  @ViewChild('title', { read: ElementRef })
+  titleEl: ElementRef<HTMLElement>;
 
   private readonly layoutRefresh$ = merge(
     this.issueService.issue,
@@ -186,16 +192,86 @@ export class DetailComponent implements OnDestroy {
     this.sidebarService.currentTask.next(null);
     // this.issueService.key.next(null);
   }
-  async create(another: boolean) {
-    const issue = await firstValueFrom(this.issueService.create());
-    if (!another) {
-      this.router.navigate(['..', issue.key], { relativeTo: this.route });
-    } else {
-      this.titleInput.setFocus();
+
+  @HostListener('document:keydown', ['$event'])
+  onCreateShortcut(event: KeyboardEvent): void {
+    if (event.key !== 'Enter') {
+      return;
     }
-    this.toastService.info(
-      this.transloco.translate('task.issue-%issue.key%-created-successfully'),
+    if (this.issueService.issueForm.getRawValue().id !== 'new') {
+      return;
+    }
+    if (this.creating || this.issueService.issueForm.invalid) {
+      return;
+    }
+
+    const withModifier = event.metaKey || event.ctrlKey;
+    if (withModifier) {
+      event.preventDefault();
+      void this.create(event.altKey);
+      return;
+    }
+
+    // Plain Enter while the title is focused only blurs it (rw-text-input).
+    // Create on the next Enter, once focus has left the title.
+    if (
+      event.defaultPrevented ||
+      event.altKey ||
+      event.shiftKey ||
+      this.isEventFromTitle(event.target) ||
+      this.shouldIgnorePlainEnter(event.target)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    void this.create(false);
+  }
+
+  async create(another: boolean) {
+    if (this.creating || this.issueService.issueForm.invalid) {
+      return;
+    }
+    this.creating = true;
+    try {
+      const issue = await firstValueFrom(this.issueService.create());
+      if (!another) {
+        this.router.navigate(['..', issue.key], { relativeTo: this.route });
+      } else {
+        this.titleInput.setFocus();
+      }
+      this.toastService.info(
+        this.transloco.translate('task.issue-%issue.key%-created-successfully'),
+      );
+    } finally {
+      this.creating = false;
+    }
+  }
+
+  private isEventFromTitle(target: EventTarget | null): boolean {
+    return (
+      target instanceof Node &&
+      !!this.titleEl?.nativeElement?.contains(target)
     );
+  }
+
+  private shouldIgnorePlainEnter(target: EventTarget | null): boolean {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+    const el = target as HTMLElement;
+    if (
+      el.isContentEditable ||
+      el.closest('[contenteditable="true"]') ||
+      el.closest('.ProseMirror')
+    ) {
+      return true;
+    }
+    const tag = el.localName;
+    if (tag === 'textarea' || tag === 'input') {
+      return true;
+    }
+    return !!el.closest('rw-select, rw-button, rw-dropdown, rw-time-picker');
   }
   transit(t: WorkflowTransition) {
     this.issueService.changeIssueStatus(t.step, t.to);

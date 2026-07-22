@@ -103,6 +103,24 @@ export class UserSettings {
     return this.settings.relative_dates;
   }
 
+  set last_used_container(
+    value: ProfileSettingsModel['last_used_container'] | null | undefined,
+  ) {
+    if (!value?.id) {
+      delete this.settings.last_used_container;
+    } else {
+      this.settings.last_used_container = {
+        id: value.id,
+        key: value.key,
+        title: value.title,
+      };
+    }
+    this.save();
+  }
+  get last_used_container(): ProfileSettingsModel['last_used_container'] {
+    return this.settings.last_used_container;
+  }
+
   get relativeDateFormat(): string {
     return this.settings.relative_dates ? 'fromNow' : 'LLL';
   }

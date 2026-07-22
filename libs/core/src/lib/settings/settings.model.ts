@@ -70,7 +70,11 @@ export interface TimelineProfileSettings {
   showMilestones?: boolean;
   showTitleRight?: boolean;
   showWorkforce?: boolean;
+  /** When false, the issue table column is collapsed to free graph width. */
+  showTable?: boolean;
   tableWidth?: number;
+  /** Issue table/graph row height in px; bars and table text scale with it. */
+  issueRowHeightPx?: number;
   open_index?: Record<string, boolean>;
   open_index_group?: Record<string, boolean>;
   sort?: { field?: string; direction?: string };
@@ -95,6 +99,12 @@ export interface ProfileSettingsModel {
    * Absent container id or empty list means “show all” for that project.
    */
   task_detail_hidden_by_container?: Record<string, TaskDetailLayoutFieldKey[]>;
+  /** Last project used when creating a task (for quick create prefill). */
+  last_used_container?: {
+    id: string;
+    key?: string;
+    title?: string;
+  };
   timeline?: TimelineProfileSettings;
 }
 export interface UserSettingsServer {

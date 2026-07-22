@@ -46,6 +46,7 @@ import {
   Type,
   WorkflowTransition,
 } from '../settings/dictionary.model';
+import { RwSettingsService } from '../settings/settings.service';
 import { UserD } from '../user/user.model';
 import { RwUserService } from '../user/user.service';
 import { RwWebsocketService } from '../websocket/websocket.service';
@@ -59,6 +60,7 @@ export class RwIssueService implements OnDestroy {
   private readonly userService = inject(RwUserService);
   private readonly alertService = inject(RwAlertService);
   private readonly containerService = inject(RwContainerService);
+  private readonly settingsService = inject(RwSettingsService);
   private readonly destroy = inject(DestroyRef);
   private readonly websocketService = inject(RwWebsocketService);
   private readonly router = inject(Router);
@@ -211,6 +213,7 @@ export class RwIssueService implements OnDestroy {
             newValue?.container?.id &&
             this.prevValue.getValue()?.container?.id !== newValue?.container?.id
           ) {
+            this.rememberLastUsedContainer(newValue.container);
             const template = await this.containerService.getIssueTemplate(
               newValue?.container?.id,
             );
@@ -260,6 +263,15 @@ export class RwIssueService implements OnDestroy {
         const fromRoute = await this.containerFromProjectRoute();
         if (fromRoute) {
           issue.container = fromRoute;
+        } else {
+          const last = this.settingsService.user.last_used_container;
+          if (last?.id) {
+            issue.container = {
+              id: last.id,
+              key: last.key,
+              title: last.title,
+            };
+          }
         }
       }
 
@@ -335,6 +347,26 @@ export class RwIssueService implements OnDestroy {
       key: container.key,
     };
   }
+
+  private rememberLastUsedContainer(container: ContainerD | null | undefined): void {
+    if (!container?.id) {
+      return;
+    }
+    const prev = this.settingsService.user.last_used_container;
+    if (
+      prev?.id === container.id &&
+      prev?.key === container.key &&
+      prev?.title === container.title
+    ) {
+      return;
+    }
+    this.settingsService.user.last_used_container = {
+      id: container.id,
+      key: container.key,
+      title: container.title,
+    };
+  }
+
   createAnother(issue: Issue) {
     const another = JSONUtils.jsonClone(issue);
     another.id = 'new';
@@ -380,6 +412,7 @@ export class RwIssueService implements OnDestroy {
         ),
       ),
       tap(() => {
+        this.rememberLastUsedContainer(issue.container);
         this.clearPendingSubtasks();
         this.patchIssue(this.createAnother(issue));
       }),

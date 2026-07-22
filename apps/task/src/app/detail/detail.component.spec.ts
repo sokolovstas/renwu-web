@@ -88,4 +88,75 @@ describe('DetailComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('create shortcuts', () => {
+    let createSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      component.issueService.issueForm.patchValue({
+        id: 'new',
+        title: 'New task',
+      });
+      createSpy = jest.spyOn(component, 'create').mockResolvedValue(undefined);
+    });
+
+    function enterEvent(init: KeyboardEventInit = {}): KeyboardEvent {
+      return new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      });
+    }
+
+    it('creates on Ctrl+Enter', () => {
+      component.onCreateShortcut(enterEvent({ ctrlKey: true }));
+      expect(createSpy).toHaveBeenCalledWith(false);
+    });
+
+    it('creates on Meta+Enter', () => {
+      component.onCreateShortcut(enterEvent({ metaKey: true }));
+      expect(createSpy).toHaveBeenCalledWith(false);
+    });
+
+    it('creates and adds another on Ctrl+Alt+Enter', () => {
+      component.onCreateShortcut(enterEvent({ ctrlKey: true, altKey: true }));
+      expect(createSpy).toHaveBeenCalledWith(true);
+    });
+
+    it('creates on plain Enter when title is not focused', () => {
+      const event = enterEvent();
+      Object.defineProperty(event, 'target', { value: document.body });
+      component.onCreateShortcut(event);
+      expect(createSpy).toHaveBeenCalledWith(false);
+    });
+
+    it('does not create on plain Enter from title', () => {
+      const titleHost = document.createElement('div');
+      const input = document.createElement('input');
+      titleHost.appendChild(input);
+      (
+        component as unknown as { titleEl: { nativeElement: HTMLElement } }
+      ).titleEl = { nativeElement: titleHost };
+      const event = enterEvent();
+      Object.defineProperty(event, 'target', { value: input });
+      component.onCreateShortcut(event);
+      expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not create on plain Enter from an input', () => {
+      const event = enterEvent();
+      Object.defineProperty(event, 'target', {
+        value: document.createElement('input'),
+      });
+      component.onCreateShortcut(event);
+      expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not create when form is not new', () => {
+      component.issueService.issueForm.patchValue({ id: '1' });
+      component.onCreateShortcut(enterEvent({ ctrlKey: true }));
+      expect(createSpy).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -195,13 +195,15 @@ export class RwTextInputComponent
   @HostListener('keydown', ['$event'])
   onKeyDownListener(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-      this.switchPopup(false, false, this.keepFocus);
-      this.enter.next({ target: this });
-      if (event.key === 'Enter') {
-        (this.container.nativeElement as HTMLElement).blur();
-        event.preventDefault();
+      // Leave Ctrl/Cmd/Alt+Enter to form-level shortcuts (e.g. create task).
+      if (event.metaKey || event.ctrlKey || event.altKey) {
         return;
       }
+      this.switchPopup(false, false, this.keepFocus);
+      this.enter.next({ target: this });
+      (this.container.nativeElement as HTMLElement).blur();
+      event.preventDefault();
+      return;
     }
     if (event.key === 'Escape') {
       event.preventDefault();

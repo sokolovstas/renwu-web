@@ -87,10 +87,16 @@
     color: $rw-control-prompt-color;
     transition: all 0.1s linear;
     transform-origin: left top;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
+  /* scale shrinks glyphs; widen layout so more of the prompt fits after transform */
   &-prompt-active {
-    transform: scale(0.8) translateY(-12px);
+    --rw-text-input-prompt-scale: 0.8;
+    transform: scale(var(--rw-text-input-prompt-scale)) translateY(-12px);
+    width: calc(100% / var(--rw-text-input-prompt-scale));
   }
 
   &-prompt-borderless {
