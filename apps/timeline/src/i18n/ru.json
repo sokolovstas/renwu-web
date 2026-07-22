@@ -7,6 +7,7 @@
   "grouping": "Группировка",
   "hierarchy": "Задачи",
   "scale": "Шаг",
+  "rowHeight": "Высота строк",
   "showMilestones": "Вехи",
   "showTitleRight": "Название справа",
   "currentTimeZone": "Часовой пояс",
@@ -30,5 +31,7 @@
   "colAssignee": "Исполнитель",
   "colCompletion": "%",
   "colStatus": "Статус",
-  "workforce": "Загрузка"
+  "workforce": "Загрузка",
+  "hideTable": "Скрыть таблицу",
+  "showTable": "Показать таблицу"
 }

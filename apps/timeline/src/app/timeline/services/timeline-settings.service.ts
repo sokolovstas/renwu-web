@@ -33,6 +33,11 @@ const DEFAULT_SORT: ListOptionsFilters['sort'] = {
   direction: 'down',
 };
 
+/** Issue/graph row height bounds (px). Bars and table text scale with this. */
+export const TIMELINE_ROW_HEIGHT_MIN_PX = 22;
+export const TIMELINE_ROW_HEIGHT_MAX_PX = 56;
+export const TIMELINE_ROW_HEIGHT_STEP_PX = 2;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -62,6 +67,7 @@ export class TimelineSettingsService {
     milestoneRowHeightPx: 24,
     showMilestones: true,
     showWorkforce: true,
+    showTable: true,
     showTitleRight: false,
     workforceHeight: null,
     sort: DEFAULT_SORT,
@@ -225,8 +231,27 @@ export class TimelineSettingsService {
     this.persist();
   }
 
+  setShowTable(value: boolean): void {
+    this.settingsSignal.update((s) => ({ ...s, showTable: value }));
+    this.persist();
+  }
+
   setTableWidth(value: number): void {
-    this.settingsSignal.update((s) => ({ ...s, tableWidth: value }));
+    this.settingsSignal.update((s) => ({
+      ...s,
+      tableWidth: value,
+      showTable: true,
+    }));
+    this.persist();
+  }
+
+  setIssueRowHeightPx(value: number): void {
+    const rowH = this.clampIssueRowHeightPx(value);
+    this.settingsSignal.update((s) => ({
+      ...s,
+      issueRowHeightPx: rowH,
+      fontSize: this.deriveTimelineTableFontSizePx(rowH),
+    }));
     this.persist();
   }
 
@@ -311,7 +336,9 @@ export class TimelineSettingsService {
     const scaleTick = parsed.scaleTick ?? i.scaleTick;
     const scaleValue = parsed.scaleValue ?? i.scaleValue;
     const scale = this.computeActualScale(scaleTick, scaleValue);
-    const rowH = i.issueRowHeightPx;
+    const rowH = this.clampIssueRowHeightPx(
+      parsed.issueRowHeightPx ?? i.issueRowHeightPx,
+    );
 
     const hierarchyMode =
       parsed.hierarchyMode === 'leaves' || parsed.hierarchyMode === 'subtasks'
@@ -329,6 +356,7 @@ export class TimelineSettingsService {
       showMilestones: parsed.showMilestones ?? i.showMilestones,
       showTitleRight: parsed.showTitleRight ?? i.showTitleRight,
       showWorkforce: parsed.showWorkforce ?? i.showWorkforce,
+      showTable: parsed.showTable ?? i.showTable,
       tableWidth: parsed.tableWidth ?? i.tableWidth,
       open_index: parsed.open_index ?? i.open_index,
       open_index_group: parsed.open_index_group ?? i.open_index_group,
@@ -376,7 +404,9 @@ export class TimelineSettingsService {
       showMilestones: s.showMilestones,
       showTitleRight: s.showTitleRight,
       showWorkforce: s.showWorkforce,
+      showTable: s.showTable,
       tableWidth: s.tableWidth,
+      issueRowHeightPx: s.issueRowHeightPx,
       open_index: s.open_index,
       open_index_group: s.open_index_group,
       sort: s.sort,
@@ -396,5 +426,18 @@ export class TimelineSettingsService {
 
   private deriveTimelineTableFontSizePx(issueRowHeightPx: number): number {
     return Math.max(10, Math.round((issueRowHeightPx * 12) / 37));
+  }
+
+  private clampIssueRowHeightPx(value: number): number {
+    if (!Number.isFinite(value)) {
+      return this.initialSettings.issueRowHeightPx;
+    }
+    const stepped =
+      Math.round(value / TIMELINE_ROW_HEIGHT_STEP_PX) *
+      TIMELINE_ROW_HEIGHT_STEP_PX;
+    return Math.min(
+      TIMELINE_ROW_HEIGHT_MAX_PX,
+      Math.max(TIMELINE_ROW_HEIGHT_MIN_PX, stepped),
+    );
   }
 }

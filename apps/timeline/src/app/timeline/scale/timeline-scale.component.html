@@ -47,6 +47,21 @@
 
   <div class="scale-right">
     <span class="scale-field">
+      <span class="scale-field-label">{{ 'timeline.rowHeight' | transloco }}:</span>
+      <span class="scale-slider">
+        <rw-range
+          [min]="rowHeightMinPx"
+          [max]="rowHeightMaxPx"
+          [step]="rowHeightStepPx"
+          [ngModel]="settings().issueRowHeightPx"
+          [live]="true"
+          (changed)="onRowHeightChange($event)"
+        />
+      </span>
+      <span class="scale-percent">{{ settings().issueRowHeightPx }}px</span>
+    </span>
+
+    <span class="scale-field">
       <span class="scale-field-label">{{ 'timeline.scale' | transloco }}:</span>
       <rw-select
         [model]="scaleTickModel"

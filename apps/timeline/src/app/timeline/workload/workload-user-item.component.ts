@@ -62,6 +62,12 @@ export class WorkloadUserItemComponent {
     return Number.isFinite(n) ? Math.round(n) : 0;
   }
 
+  /** Width of the progress fill inside the capacity track (0–100). */
+  fillPercent(ratio: number): number {
+    if (!Number.isFinite(ratio) || ratio <= 0) return 0;
+    return Math.min(100, ratio * 100);
+  }
+
   segmentClass(ratio: number): string {
     if (ratio > 1) return 'bar-overload';
     if (ratio > 0.8) return 'bar-high';

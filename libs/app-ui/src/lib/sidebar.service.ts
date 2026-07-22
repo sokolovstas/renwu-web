@@ -41,6 +41,8 @@ export class RenwuSidebarService {
     {},
   );
   scrollContainer: ElementRef;
+  /** When false, the next `currentTask` navigation skips `scrollToSection`. */
+  private scrollToSectionOnTaskOpen = true;
   sections = new BehaviorSubject<SidebarSection[]>([
     {
       icon: 's-document',
@@ -147,14 +149,28 @@ export class RenwuSidebarService {
         filter((key) => !!key),
       )
       .subscribe((key) => {
+        const shouldScroll = this.scrollToSectionOnTaskOpen;
+        this.scrollToSectionOnTaskOpen = true;
         // Section URL must update even if scroll host init runs late (ViewChild inside @if).
         void this.router.navigate([{ outlets: { section: ['task', key] } }]);
-        if (this.scrollContainer?.nativeElement) {
+        if (shouldScroll && this.scrollContainer?.nativeElement) {
           setTimeout(() => {
             this.scrollToSection();
           }, 200);
         }
       });
+  }
+
+  /**
+   * Open / focus a task in the section outlet.
+   * @param scroll when false, do not snap the app shell to the section panel
+   *   (useful when opening from an already-visible canvas like the timeline graph).
+   */
+  setCurrentTask(issue: Issue | null, options?: { scroll?: boolean }): void {
+    if (issue?.key) {
+      this.scrollToSectionOnTaskOpen = options?.scroll !== false;
+    }
+    this.currentTask.next(issue);
   }
   init(scrollContainer: ElementRef) {
     this.scrollContainer = scrollContainer;

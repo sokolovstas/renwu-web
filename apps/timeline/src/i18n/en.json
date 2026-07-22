@@ -7,6 +7,7 @@
   "grouping": "Grouping",
   "hierarchy": "Tasks",
   "scale": "Scale",
+  "rowHeight": "Row height",
   "showMilestones": "Milestones",
   "showTitleRight": "Title on the right",
   "currentTimeZone": "Time zone",
@@ -30,5 +31,7 @@
   "colAssignee": "Assignee",
   "colCompletion": "%",
   "colStatus": "Status",
-  "workforce": "Workforce"
+  "workforce": "Workforce",
+  "hideTable": "Hide table",
+  "showTable": "Show table"
 }

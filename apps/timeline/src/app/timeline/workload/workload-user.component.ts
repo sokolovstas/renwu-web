@@ -3,7 +3,13 @@ import {
   Component,
   Input,
 } from '@angular/core';
-import { TimelineTicksId, User, UserWorkload, UserWorkloadItem } from '@renwu/core';
+import {
+  TimelineTicksId,
+  User,
+  UserD,
+  UserWorkload,
+  UserWorkloadItem,
+} from '@renwu/core';
 import { WorkloadUserStatComponent } from './workload-user-stat.component';
 
 @Component({
@@ -15,7 +21,7 @@ import { WorkloadUserStatComponent } from './workload-user-stat.component';
   imports: [WorkloadUserStatComponent],
 })
 export class WorkloadUserComponent {
-  @Input() user: User | null = null;
+  @Input() user: User | UserD | null = null;
   @Input() workload: UserWorkload | null = null;
   @Input() dateStart!: Date;
   @Input() dateEnd!: Date;

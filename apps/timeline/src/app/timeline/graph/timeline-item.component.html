@@ -28,6 +28,12 @@
         [style.marginLeft.px]="offsetForItem"
         [style.width.px]="width"
         [style.background]="barColor"
+        [tooltipType]="showIssueCardOnHover ? issueCardTooltipType : undefined"
+        [tooltipData]="issueCardTooltipData"
+        [tooltipDisabled]="!showIssueCardOnHover"
+        [tooltipTimeout]="200"
+        tooltipPlacement="top"
+        rwTooltip
         (click)="onItemClick()"
       >
         <div
@@ -35,49 +41,57 @@
           [style.width.px]="widthProgress"
           [style.background]="progressColor"
         ></div>
-        <span class="bar-title-inside">{{ titleLabel }}</span>
+        <span
+          class="bar-title-inside"
+          [style.font-size.px]="barTitleFontSizePx()"
+        >{{ titleLabel }}</span>
       </div>
-      <div
-        class="bar-create-actions"
-        [style.left.px]="offsetForItem"
-        [style.width.px]="width"
-        [style.height.px]="barHeightPx()"
-      >
-        <button
-          type="button"
-          class="bar-create-btn bar-create-btn--prev"
-          title="Previous"
-          (click)="onCreateClick($event, 'prev')"
+      @if (createModifierHeld) {
+        <div
+          class="bar-create-actions"
+          [style.left.px]="offsetForItem"
+          [style.width.px]="width"
+          [style.height.px]="barHeightPx()"
         >
-          <rw-icon icon="add-bold" size="small" />
-        </button>
-        <button
-          type="button"
-          class="bar-create-btn bar-create-btn--next"
-          title="Next"
-          (click)="onCreateClick($event, 'next')"
-        >
-          <rw-icon icon="add-bold" size="small" />
-        </button>
-        <button
-          type="button"
-          class="bar-create-btn bar-create-btn--parent"
-          title="Parent"
-          (click)="onCreateClick($event, 'parent')"
-        >
-          <rw-icon icon="add-bold" size="small" />
-        </button>
-        <button
-          type="button"
-          class="bar-create-btn bar-create-btn--child"
-          title="Child"
-          (click)="onCreateClick($event, 'child')"
-        >
-          <rw-icon icon="add-bold" size="small" />
-        </button>
-      </div>
+          <button
+            type="button"
+            class="bar-create-btn bar-create-btn--prev"
+            title="Previous"
+            (click)="onCreateClick($event, 'prev')"
+          >
+            <rw-icon icon="add-bold" size="small" />
+          </button>
+          <button
+            type="button"
+            class="bar-create-btn bar-create-btn--next"
+            title="Next"
+            (click)="onCreateClick($event, 'next')"
+          >
+            <rw-icon icon="add-bold" size="small" />
+          </button>
+          <button
+            type="button"
+            class="bar-create-btn bar-create-btn--parent"
+            title="Parent"
+            (click)="onCreateClick($event, 'parent')"
+          >
+            <rw-icon icon="add-bold" size="small" />
+          </button>
+          <button
+            type="button"
+            class="bar-create-btn bar-create-btn--child"
+            title="Child"
+            (click)="onCreateClick($event, 'child')"
+          >
+            <rw-icon icon="add-bold" size="small" />
+          </button>
+        </div>
+      }
       @if (showTitleRight) {
-        <span class="bar-title-right">{{ titleLabel }}</span>
+        <span
+          class="bar-title-right"
+          [style.font-size.px]="barTitleFontSizePx()"
+        >{{ titleLabel }}</span>
       }
     </div>
   } @else {
@@ -110,6 +124,8 @@
         [depth]="depth + 1"
         [inParentScope]="hasChildIssues"
         [treeRevision]="treeRevision"
+        [createModifierHeld]="createModifierHeld"
+        [showIssueCardOnHover]="showIssueCardOnHover"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
         (createRelated)="createRelated.emit($event)"

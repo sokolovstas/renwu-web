@@ -5,6 +5,7 @@ import {
   ElementRef,
   Injector,
   Renderer2,
+  Type,
   ViewChild,
   afterNextRender,
   computed,
@@ -17,7 +18,9 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwTooltipDirective } from '@renwu/components';
 import {
+  AvatarComponent,
   Issue,
   IssueGroup,
   IssueLinks,
@@ -34,10 +37,14 @@ import {
   RwWebsocketService,
   TimelineService as CoreTimelineService,
   User,
+  UserCardComponent,
+  UserD,
   UserWorkload,
 } from '@renwu/core';
 import {
+  catchError,
   debounceTime,
+  distinctUntilChanged,
   filter,
   forkJoin,
   map,
@@ -90,6 +97,11 @@ export interface TimelineLinkLayout {
   linkRowIndex: number;
 }
 
+export interface TimelineWorkforceRow {
+  user: UserD;
+  workload: UserWorkload | null;
+}
+
 @Component({
   selector: 'renwu-timeline-timeline',
   standalone: true,
@@ -115,6 +127,8 @@ export interface TimelineLinkLayout {
     WorkloadUserComponent,
     TimelineHolderDirective,
     TranslocoPipe,
+    AvatarComponent,
+    RwTooltipDirective,
   ],
 })
 export class TimelineComponent {
@@ -161,8 +175,15 @@ export class TimelineComponent {
 
   protected readonly settings = computed(() => this.settingsService.timelineSettings());
 
+  /** Table chrome width; 0 when the table is collapsed. */
+  protected readonly effectiveTableWidth = computed(() =>
+    this.settings().showTable ? this.settings().tableWidth : 0,
+  );
+
   protected readonly dateStart = signal<Date>(new Date());
   protected readonly dateEnd = signal<Date>(addMonthsUtc(new Date(), 1));
+  /** Cmd/Ctrl held — reveals create-related affordances on bars. */
+  protected readonly createModifierHeld = signal(false);
   protected readonly rulerLimit = computed(() => {
     const end = this.dateEnd();
     const scale = this.settings().scale;
@@ -326,7 +347,8 @@ export class TimelineComponent {
   });
 
   protected readonly loading = signal(false);
-  protected readonly workload = signal<UserWorkload | null>(null);
+  /** One workforce row per unique assignee on the visible timeline tree. */
+  protected readonly workforceRows = signal<TimelineWorkforceRow[]>([]);
   protected readonly links = signal<TimelineLink[]>([]);
 
   /** Bumped when expand/collapse changes visible rows (OnPush refresh). */
@@ -439,6 +461,10 @@ export class TimelineComponent {
   private resizeTableEndHandle: (() => void) | null = null;
   private prevTableScreenX = 0;
   private zoomPersistTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Container we last auto-centered on; same container reloads keep the camera. */
+  private centeredForContainerId: string | null = null;
+  /** Virtual-unix at graph viewport center — restored after hierarchy/grouping reloads. */
+  private preservedCenterVirtual: number | null = null;
   @ViewChild('graphScroll') private graphScroll?: ElementRef<HTMLDivElement>;
 
   private readonly queryParams = toSignal(
@@ -447,6 +473,10 @@ export class TimelineComponent {
         containerKey: qp.get('container_key') || '',
         queryHash: qp.get('query_hash') || '',
       })),
+      distinctUntilChanged(
+        (a, b) =>
+          a.containerKey === b.containerKey && a.queryHash === b.queryHash,
+      ),
     ),
     { initialValue: { containerKey: '', queryHash: '' } },
   );
@@ -456,6 +486,22 @@ export class TimelineComponent {
     this.issueDateTimeSvc.issueDateTime.show24HoursInDay
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((v) => this.hours24InDay.set(v));
+
+    const syncCreateModifier = (event: KeyboardEvent) => {
+      const held = event.metaKey || event.ctrlKey;
+      if (this.createModifierHeld() !== held) {
+        this.createModifierHeld.set(held);
+      }
+    };
+    const onBlur = () => this.createModifierHeld.set(false);
+    window.addEventListener('keydown', syncCreateModifier, true);
+    window.addEventListener('keyup', syncCreateModifier, true);
+    window.addEventListener('blur', onBlur);
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('keydown', syncCreateModifier, true);
+      window.removeEventListener('keyup', syncCreateModifier, true);
+      window.removeEventListener('blur', onBlur);
+    });
 
     this.route.paramMap
       .pipe(
@@ -484,7 +530,6 @@ export class TimelineComponent {
       const queryHash = this.queryHash() || params.queryHash;
       const grouping = this.settingsService.grouping() || 'none';
       const hierarchy = this.settingsService.hierarchyMode() || 'subtasks';
-      const user = this.currentUser();
       this.reloadCounter();
       this.loading.set(true);
       const sub = this.dataService
@@ -528,6 +573,14 @@ export class TimelineComponent {
         )
         .subscribe({
           next: ({ groups, milestones }: { groups: IssueGroup[]; milestones: Milestone[] }) => {
+            const containerId = this.activeContainerId();
+            const sameContainer =
+              containerId != null &&
+              this.centeredForContainerId === containerId;
+            if (sameContainer) {
+              this.captureCameraCenter();
+            }
+
             const apiGroups = groups ?? [];
             this.applyServerGroups(apiGroups);
             this.roadmapItems.set(milestones || []);
@@ -548,7 +601,14 @@ export class TimelineComponent {
             this.treeRevision.update((v) => v + 1);
             afterNextRender(
               () => {
-                requestAnimationFrame(() => this.centerNow());
+                requestAnimationFrame(() => {
+                  if (!sameContainer) {
+                    this.centeredForContainerId = containerId;
+                    this.centerNow();
+                  } else {
+                    this.restoreCameraCenter();
+                  }
+                });
               },
               { injector: this.injector },
             );
@@ -556,12 +616,32 @@ export class TimelineComponent {
           error: () => this.loading.set(false),
         });
       onCleanup(() => sub.unsubscribe());
+    });
 
-      if (user?.id) {
-        this.dataService
-          .loadUserWorkload(user.id, {})
-          .subscribe((value) => this.workload.set(value));
+    // Load per-assignee workload for everyone present on the current tree.
+    effect((onCleanup) => {
+      this.treeRevision();
+      const users = this.collectWorkforceUsers(this.rootChild().childs || []);
+      if (!users.length) {
+        this.workforceRows.set([]);
+        return;
       }
+      const sub = forkJoin(
+        users.map((assignee) =>
+          this.dataService.loadUserWorkload(assignee.id!, {}).pipe(
+            map(
+              (workload): TimelineWorkforceRow => ({
+                user: assignee,
+                workload,
+              }),
+            ),
+            catchError(() =>
+              of<TimelineWorkforceRow>({ user: assignee, workload: null }),
+            ),
+          ),
+        ),
+      ).subscribe((rows) => this.workforceRows.set(rows));
+      onCleanup(() => sub.unsubscribe());
     });
 
     this.websocketService.issue
@@ -613,10 +693,11 @@ export class TimelineComponent {
       }
     });
 
-    // Re-clamp X when track size or table chrome width changes.
+    // Re-clamp when track size, table chrome, or row height changes.
     effect(() => {
       this.timelineTrackWidthPx();
-      this.settings().tableWidth;
+      this.effectiveTableWidth();
+      this.contentHeightPx();
       untracked(() => this.clampPanToBounds());
     });
 
@@ -721,8 +802,18 @@ export class TimelineComponent {
   protected onScrollTo(item: TimelineIssue): void {
     this.onSelected(item);
     this.centerAtIssue(item);
+    this.openTaskSidebar(item, true);
+  }
+
+  /** Graph bar click: open task without panning the timeline or snapping the shell. */
+  protected onOpenTask(item: TimelineIssue): void {
+    this.onSelected(item);
+    this.openTaskSidebar(item, false);
+  }
+
+  private openTaskSidebar(item: TimelineIssue, scroll: boolean): void {
     if (String(item.type) !== 'group' && item?.key) {
-      this.sidebarService.currentTask.next(item as Issue);
+      this.sidebarService.setCurrentTask(item as Issue, { scroll });
     }
   }
 
@@ -843,6 +934,60 @@ export class TimelineComponent {
     return this.currentUser() ?? null;
   }
 
+  protected readonly userCardTooltipType: Type<UserCardComponent> =
+    UserCardComponent;
+
+  protected userCardTooltipDataFor(user: UserD | User | null): {
+    user: UserD | User | null;
+    asTooltip: boolean;
+  } {
+    return { user, asTooltip: true };
+  }
+
+  protected openUserProfile(user: UserD | User | null): void {
+    const username = user
+      ? this.userService.getUsername(user as User) || user.username || ''
+      : '';
+    if (!username) return;
+    void this.router
+      .navigate([{ outlets: { section: ['user', username, 'tasks'] } }])
+      .then(() => {
+        setTimeout(() => this.sidebarService.scrollToSection(), 200);
+      });
+  }
+
+  /** Unique assignees from the timeline tree (current user first, then name). */
+  private collectWorkforceUsers(nodes: TimelineIssue[]): UserD[] {
+    const byId = new Map<string, UserD>();
+    const walk = (items?: TimelineIssue[]) => {
+      for (const item of items || []) {
+        if (String(item.type) !== 'group') {
+          const list = item.assignes_calc?.length
+            ? item.assignes_calc
+            : item.assignes || [];
+          for (const u of list) {
+            if (u?.id && !byId.has(u.id)) {
+              byId.set(u.id, u);
+            }
+          }
+        }
+        if (item.childs?.length) {
+          walk(item.childs);
+        }
+      }
+    };
+    walk(nodes);
+
+    const me = this.currentUser()?.id;
+    return [...byId.values()].sort((a, b) => {
+      if (a.id === me) return -1;
+      if (b.id === me) return 1;
+      const an = (a.full_name || a.username || '').toLocaleLowerCase();
+      const bn = (b.full_name || b.username || '').toLocaleLowerCase();
+      return an.localeCompare(bn);
+    });
+  }
+
   protected onViewportWheel(event: WheelEvent): void {
     event.preventDefault();
     // Trackpad pinch (and ctrl/cmd+wheel) → zoom; plain wheel → pan.
@@ -868,7 +1013,7 @@ export class TimelineComponent {
     const graphW = this.graphViewportWidth();
     if (graphW <= 0) return;
 
-    const tableW = this.settings().tableWidth;
+    const tableW = this.effectiveTableWidth();
     const rect = viewport.getBoundingClientRect();
     const cursorGraphX = event.clientX - rect.left - tableW;
     const anchorX =
@@ -911,6 +1056,10 @@ export class TimelineComponent {
 
   protected onToggleWorkforce(): void {
     this.settingsService.setShowWorkforce(!this.settings().showWorkforce);
+  }
+
+  protected onToggleTable(): void {
+    this.settingsService.setShowTable(!this.settings().showTable);
   }
 
   protected onMilestoneListClick(m: Milestone): void {
@@ -1162,6 +1311,39 @@ export class TimelineComponent {
     this.setPan(nowOffset - graphW / 2, this.panY());
   }
 
+  /** Remember the date currently at the horizontal center of the viewport. */
+  private captureCameraCenter(): void {
+    const graphW = this.graphViewportWidth();
+    const scale = this.settings().scale;
+    if (graphW <= 0 || !scale) {
+      return;
+    }
+    const h24 = this.hours24InDay();
+    const startV = unixSecondsVirtual(this.dateStart(), h24, '');
+    this.preservedCenterVirtual =
+      startV + (this.panX() + graphW / 2) * scale;
+  }
+
+  /** Re-apply {@link preservedCenterVirtual} after date range / data changes. */
+  private restoreCameraCenter(attempt = 0): void {
+    const centerV = this.preservedCenterVirtual;
+    if (centerV == null) {
+      this.clampPanToBounds();
+      return;
+    }
+    const graphW = this.graphViewportWidth();
+    const scale = this.settings().scale;
+    if (graphW <= 0 || !scale) {
+      if (attempt < 24) {
+        requestAnimationFrame(() => this.restoreCameraCenter(attempt + 1));
+      }
+      return;
+    }
+    const h24 = this.hours24InDay();
+    const startV = unixSecondsVirtual(this.dateStart(), h24, '');
+    this.setPan((centerV - startV) / scale - graphW / 2, this.panY());
+  }
+
   private centerAtIssue(issue: TimelineIssue): void {
     const graphW = this.graphViewportWidth();
     if (graphW <= 0) return;
@@ -1179,7 +1361,7 @@ export class TimelineComponent {
   private graphViewportWidth(): number {
     const el = this.graphScroll?.nativeElement;
     if (!el) return 0;
-    return Math.max(0, el.clientWidth - this.settings().tableWidth);
+    return Math.max(0, el.clientWidth - this.effectiveTableWidth());
   }
 
   private applyPanDelta(deltaX: number, deltaY: number): void {

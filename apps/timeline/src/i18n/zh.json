@@ -7,6 +7,7 @@
   "grouping": "分组",
   "hierarchy": "任务",
   "scale": "刻度",
+  "rowHeight": "行高",
   "showMilestones": "里程碑",
   "showTitleRight": "标题在右侧",
   "currentTimeZone": "时区",
@@ -30,5 +31,7 @@
   "colAssignee": "负责人",
   "colCompletion": "%",
   "colStatus": "状态",
-  "workforce": "工作量"
+  "workforce": "工作量",
+  "hideTable": "隐藏表格",
+  "showTable": "显示表格"
 }

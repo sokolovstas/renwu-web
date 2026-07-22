@@ -2,7 +2,7 @@
   class="timeline-container"
   [style.--timeline-milestone-row-height.px]="settings().milestoneRowHeightPx"
   [style.--timeline-roadmap-band-height.px]="roadmapBandHeightPx()"
-  [style.--timeline-table-width.px]="settings().tableWidth"
+  [style.--timeline-table-width.px]="effectiveTableWidth()"
   [style.--timeline-header-height.px]="headerHeightPx"
 >
   @if (!isWorkload()) {
@@ -25,12 +25,34 @@
     (nowClicked)="onCenterNow()"
   />
 
-  <div class="timeline-layout">
-    <div
-      class="timeline-table-resize"
-      [style.left.px]="settings().tableWidth - 1"
-      (mousedown)="onResizeDown($event)"
-    ></div>
+  <div
+    class="timeline-layout"
+    [class.timeline-layout--table-collapsed]="!settings().showTable"
+  >
+    @if (settings().showTable) {
+      <div
+        class="timeline-table-resize"
+        [style.left.px]="effectiveTableWidth() - 1"
+        (mousedown)="onResizeDown($event)"
+      ></div>
+    }
+    <button
+      type="button"
+      class="timeline-table-toggle"
+      [class.timeline-table-toggle--collapsed]="!settings().showTable"
+      [style.left.px]="effectiveTableWidth()"
+      [attr.title]="
+        (settings().showTable ? 'timeline.hideTable' : 'timeline.showTable')
+          | transloco
+      "
+      [attr.aria-label]="
+        (settings().showTable ? 'timeline.hideTable' : 'timeline.showTable')
+          | transloco
+      "
+      (click)="onToggleTable()"
+    >
+      {{ settings().showTable ? '◂' : '▸' }}
+    </button>
 
     <!--
       Figma-like camera: world pans via transform; ruler/table/corner are
@@ -112,8 +134,10 @@
                 [issueRowHeightPx]="settings().issueRowHeightPx"
                 [selectMilestone]="selectMilestone()"
                 [treeRevision]="treeRevision()"
+                [createModifierHeld]="createModifierHeld()"
+                [showIssueCardOnHover]="!settings().showTable"
                 (selected)="onSelected($event)"
-                (scrollTo)="onScrollTo($event)"
+                (scrollTo)="onOpenTask($event)"
                 (createRelated)="onCreateRelated($event)"
               />
             }
@@ -200,6 +224,7 @@
           class="timeline-table-header"
           [style.width.px]="settings().tableWidth"
           [style.min-width.px]="settings().tableWidth"
+          [style.visibility]="settings().showTable ? 'visible' : 'hidden'"
         >
           <span class="th-col th-key">{{ 'timeline.colKey' | transloco }}</span>
           <span class="th-col th-type">{{ 'timeline.colType' | transloco }}</span>
@@ -221,26 +246,57 @@
         <div class="timeline-workload-content">
           <div
             class="timeline-workload-info"
-            [style.width.px]="settings().tableWidth"
-            [style.min-width.px]="settings().tableWidth"
+            [style.width.px]="effectiveTableWidth()"
+            [style.min-width.px]="effectiveTableWidth()"
           >
-            <div class="workforce-user-row">
-              <span class="workforce-user-name">
-                {{ currentUserValue()?.full_name || currentUserValue()?.username }}
-              </span>
-            </div>
+            @if (settings().showTable) {
+              @for (row of workforceRows(); track row.user.id) {
+                <div
+                  class="workforce-user-row"
+                  (click)="openUserProfile(row.user)"
+                >
+                  <span class="workforce-user-name">
+                    {{ row.user.full_name || row.user.username }}
+                  </span>
+                </div>
+              }
+            }
           </div>
           <div class="timeline-workload-bars">
+            @if (!settings().showTable) {
+              <div class="workforce-user-avatars">
+                @for (row of workforceRows(); track row.user.id) {
+                  <div
+                    class="workforce-user-avatar"
+                    rwTooltip
+                    [tooltipType]="userCardTooltipType"
+                    [tooltipData]="userCardTooltipDataFor(row.user)"
+                    [tooltipTimeout]="200"
+                    tooltipPlacement="right"
+                    (click)="openUserProfile(row.user)"
+                  >
+                    <renwu-avatar
+                      [user]="$any(row.user)"
+                      size="16px"
+                      [showOnline]="false"
+                      [showTooltip]="false"
+                    />
+                  </div>
+                }
+              </div>
+            }
             <div class="timeline-workload-bars-inner" [style.transform]="rulerTransform()">
-              <renwu-timeline-workload-user
-                [user]="currentUserValue()"
-                [workload]="workload()"
-                [scaleTick]="settings().scaleTick"
-                [hours24InDay]="hours24InDay()"
-                [dateStart]="dateStart()"
-                [dateEnd]="rulerLimit()"
-                [scale]="settings().scale"
-              />
+              @for (row of workforceRows(); track row.user.id) {
+                <renwu-timeline-workload-user
+                  [user]="row.user"
+                  [workload]="row.workload"
+                  [scaleTick]="settings().scaleTick"
+                  [hours24InDay]="hours24InDay()"
+                  [dateStart]="dateStart()"
+                  [dateEnd]="rulerLimit()"
+                  [scale]="settings().scale"
+                />
+              }
             </div>
           </div>
         </div>

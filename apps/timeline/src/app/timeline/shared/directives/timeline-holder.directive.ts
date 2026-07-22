@@ -54,7 +54,7 @@ export class TimelineHolderDirective {
     const target = event.target as HTMLElement | null;
     if (
       target?.closest(
-        'button, a, input, textarea, select, .bar, .bar-create-btn, .bar-create-actions, .timeline-overlay-corner, .timeline-table-resize',
+        'button, a, input, textarea, select, .bar, .bar-create-btn, .bar-create-actions, .timeline-overlay-corner, .timeline-table-resize, .timeline-table-toggle',
       )
     ) {
       return true;

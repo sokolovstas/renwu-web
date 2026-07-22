@@ -35,7 +35,12 @@ import {
 } from '@renwu/core';
 import { forkJoin, merge } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-import { TimelineSettingsService } from '../services/timeline-settings.service';
+import {
+  TIMELINE_ROW_HEIGHT_MAX_PX,
+  TIMELINE_ROW_HEIGHT_MIN_PX,
+  TIMELINE_ROW_HEIGHT_STEP_PX,
+  TimelineSettingsService,
+} from '../services/timeline-settings.service';
 
 const GROUPING_OPTIONS = [
   { id: 'none', key: 'groupingNone' },
@@ -162,6 +167,15 @@ export class TimelineScaleComponent implements OnInit {
 
   protected onSliderChange(value: number): void {
     this.settingsService.setScaleValue(value);
+    this.changed.emit();
+  }
+
+  protected readonly rowHeightMinPx = TIMELINE_ROW_HEIGHT_MIN_PX;
+  protected readonly rowHeightMaxPx = TIMELINE_ROW_HEIGHT_MAX_PX;
+  protected readonly rowHeightStepPx = TIMELINE_ROW_HEIGHT_STEP_PX;
+
+  protected onRowHeightChange(value: number): void {
+    this.settingsService.setIssueRowHeightPx(value);
     this.changed.emit();
   }
 

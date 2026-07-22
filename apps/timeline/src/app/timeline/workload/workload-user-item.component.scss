@@ -3,6 +3,8 @@
   top: 2px;
   height: 22px;
   border-radius: 3px;
+  /* Track = capacity; progress fill overlays by load ratio. */
+  background: var(--gray-300);
   /* Inset stroke: same look as hairline border without shifting inner fill vs timeline grid */
   box-shadow: inset 0 0 0 0.5px var(--gray-100);
   box-sizing: border-box;
@@ -28,29 +30,42 @@
   border-radius: 2px;
   overflow: hidden;
   flex-shrink: 0;
+  background: var(--gray-300);
+}
+
+.workload-bar-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  min-width: 0;
+  pointer-events: none;
+  border-radius: inherit;
 }
 
 .bar-empty {
-  background: var(--gray-300);
+  background: transparent;
 }
 
 .bar-low {
-  background: var(--gray-300);
-}
-
-.bar-medium {
   background: var(--gray-400);
 }
 
-.bar-high {
+.bar-medium {
   background: var(--gray-500);
 }
 
-.bar-overload {
+.bar-high {
   background: var(--gray-600);
 }
 
+.bar-overload {
+  background: var(--toast-error-color, #c44);
+}
+
 .workload-bar-label {
+  position: relative;
+  z-index: 1;
   font-weight: 600;
   color: var(--always-white);
   white-space: nowrap;

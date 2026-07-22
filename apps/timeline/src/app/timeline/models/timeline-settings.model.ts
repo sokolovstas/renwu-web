@@ -6,7 +6,7 @@ import {
 } from '@renwu/core';
 
 export interface TimelineSettings {
-  /** Table row label font (px); derived from `issueRowHeightPx` in code — not persisted. */
+  /** Table row label font (px); derived from `issueRowHeightPx`. */
   fontSize: number;
   grouping: string;
   /** `subtasks` keeps parent trees; `leaves` shows only terminal issues. */
@@ -18,12 +18,14 @@ export interface TimelineSettings {
   scaleValue: number;
 
   tableWidth: number;
-  /** Issue / graph row height (px); code default only — not persisted. */
+  /** Issue / graph row height (px); bars scale with this. */
   issueRowHeightPx: number;
   /** Roadmap milestone track height (px); code default only — not persisted. */
   milestoneRowHeightPx: number;
   showMilestones: boolean;
   showWorkforce: boolean;
+  /** When false, table column width is 0 (graph uses full width). */
+  showTable: boolean;
   showTitleRight: boolean;
 
   workforceHeight: { id: string; value: number } | null;

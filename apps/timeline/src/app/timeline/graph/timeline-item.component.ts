@@ -6,10 +6,11 @@ import {
   Input,
   OnChanges,
   Output,
+  Type,
   input,
 } from '@angular/core';
-import { RwIconComponent } from '@renwu/components';
-import { Status } from '@renwu/core';
+import { RwIconComponent, RwTooltipDirective } from '@renwu/components';
+import { Issue, IssueCardComponent, Status } from '@renwu/core';
 import { TimelineCreateDirection } from '../issue-to-link';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { visibleRowsBeforeChild } from '../row-striping';
@@ -26,7 +27,7 @@ const TIMELINE_BAR_HEIGHT_MIN_PX = 14;
   templateUrl: './timeline-item.component.html',
   styleUrl: './timeline-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TimelineItemComponent, RwIconComponent],
+  imports: [TimelineItemComponent, RwIconComponent, RwTooltipDirective],
 })
 export class TimelineItemComponent implements OnChanges {
   issueRowHeightPx = input.required<number>();
@@ -38,6 +39,11 @@ export class TimelineItemComponent implements OnChanges {
       Math.round(row * TIMELINE_BAR_TO_ROW_RATIO),
     );
   });
+
+  /** Bar label font tracks row height (10px at the original 37px row). */
+  protected readonly barTitleFontSizePx = computed(() =>
+    Math.max(9, Math.round((this.issueRowHeightPx() * 10) / 37)),
+  );
 
   @Input() item!: TimelineIssue;
   /** DFS index among visible rows (striping aligned with the table column). */
@@ -59,6 +65,10 @@ export class TimelineItemComponent implements OnChanges {
   @Input() inParentScope = false;
   /** Parent revision counter — changes force OnPush refresh after expand/collapse. */
   @Input() treeRevision = 0;
+  /** Show create +/- affordances only while Cmd/Ctrl is held (from timeline). */
+  @Input() createModifierHeld = false;
+  /** When the issue table is collapsed, show board-style card on bar hover. */
+  @Input() showIssueCardOnHover = false;
 
   @Output() selected = new EventEmitter<TimelineIssue>();
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
@@ -71,6 +81,9 @@ export class TimelineItemComponent implements OnChanges {
   @Output() scrollLeft = new EventEmitter<void>();
   @Output() increaseWidth = new EventEmitter<number>();
 
+  protected readonly issueCardTooltipType: Type<IssueCardComponent> =
+    IssueCardComponent;
+
   protected width = 0;
   protected offsetForItem = 0;
   protected widthProgress = 0;
@@ -81,6 +94,13 @@ export class TimelineItemComponent implements OnChanges {
   protected titleLabel = '';
   protected isGroup = false;
   protected hasChildIssues = false;
+
+  protected get issueCardTooltipData(): {
+    issue: Issue;
+    asTooltip: boolean;
+  } {
+    return { issue: this.item as Issue, asTooltip: true };
+  }
 
   ngOnChanges(): void {
     this.recalculate();

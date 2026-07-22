@@ -1,25 +1,38 @@
 <div
   class="workload-bar-segment"
-  [class]="bar.split ? 'workload-bar-split' : barColorClass"
+  [class.workload-bar-split]="!!bar.split"
   [style.left.px]="bar.position"
   [style.width.px]="bar.width"
 >
   @if (bar.split) {
     <div
       class="workload-bar-half"
-      [class]="segmentClass(bar.split.leftRatio)"
       [style.width.px]="bar.split.leftWidth"
     >
+      <div
+        class="workload-bar-progress"
+        [class]="segmentClass(bar.split.leftRatio)"
+        [style.width.%]="fillPercent(bar.split.leftRatio)"
+      ></div>
       <span class="workload-bar-label">{{ splitLeftText }}</span>
     </div>
     <div
       class="workload-bar-half"
-      [class]="segmentClass(bar.split.rightRatio)"
       [style.width.px]="bar.split.rightWidth"
     >
+      <div
+        class="workload-bar-progress"
+        [class]="segmentClass(bar.split.rightRatio)"
+        [style.width.%]="fillPercent(bar.split.rightRatio)"
+      ></div>
       <span class="workload-bar-label">{{ splitRightText }}</span>
     </div>
   } @else {
+    <div
+      class="workload-bar-progress"
+      [class]="barColorClass"
+      [style.width.%]="fillPercent(bar.ratio)"
+    ></div>
     <span class="workload-bar-label">{{ label }}</span>
   }
 </div>
