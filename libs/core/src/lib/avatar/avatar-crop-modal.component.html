@@ -1,0 +1,56 @@
+<rw-modal>
+  <div rwModalHeader>
+    <span>{{ 'core.avatar-crop-title' | transloco }}</span>
+  </div>
+  <div rwModalBody>
+    <div class="crop-hint">{{ 'core.avatar-crop-hint' | transloco }}</div>
+    <div
+      #viewport
+      class="crop-viewport"
+      (wheel)="onWheel($event)"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp()"
+      (pointercancel)="onPointerUp()"
+      >
+      @if (imageUrl) {
+        <img
+          #imageEl
+          class="crop-image"
+          [src]="imageUrl"
+          [style.width]="imageStyle['width']"
+          [style.height]="imageStyle['height']"
+          [style.left]="imageStyle['left']"
+          [style.top]="imageStyle['top']"
+          draggable="false"
+          (load)="onImageLoad($event)"
+          alt=""
+        />
+      }
+      <div class="crop-mask"></div>
+    </div>
+    <label class="crop-zoom">
+      <span class="crop-zoom-label">{{
+        'core.avatar-crop-zoom' | transloco
+      }}</span>
+      <input
+        class="crop-zoom-slider"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        [disabled]="!ready"
+        [value]="zoomPercent"
+        (input)="onZoomInput($event)"
+      />
+    </label>
+  </div>
+  <div rwModalFooter class="crop-footer">
+    <rw-button typeButton="secondary" (clicked)="close()">{{
+      'core.cancel' | transloco
+    }}</rw-button>
+    <rw-button class="ml-2" [disabled]="!ready" (clicked)="apply()">{{
+      'core.apply' | transloco
+    }}</rw-button>
+  </div>
+</rw-modal>

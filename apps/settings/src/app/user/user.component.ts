@@ -1,10 +1,11 @@
 import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
+  ViewChild,
   inject,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormGroup,
@@ -26,6 +27,7 @@ import {
 import {
   AppLangs,
   AvatarComponent,
+  AvatarEditorComponent,
   CheckUserValidator,
   HolidayCalendar,
   ProfileSettingsModel,
@@ -38,7 +40,16 @@ import {
   UserType,
 } from '@renwu/core';
 import { copyToClipboard } from '@renwu/utils';
-import { firstValueFrom, map, shareReplay, switchMap, tap } from 'rxjs';
+import {
+  firstValueFrom,
+  map,
+  merge,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 @Component({
   selector: 'renwu-settings-user',
@@ -50,6 +61,7 @@ import { firstValueFrom, map, shareReplay, switchMap, tap } from 'rxjs';
     RwSelectComponent,
     RwColorPickerComponent,
     AvatarComponent,
+    AvatarEditorComponent,
     AsyncPipe,
     RenwuPageComponent,
     ReactiveFormsModule,
@@ -63,14 +75,15 @@ export class UserComponent {
   private checkUser = inject(CheckUserValidator);
 
   UserStatus = UserStatus;
-  workHours = { 0: false, 1: false, 2: false, 3: false };
   userService = inject(RwUserService);
+
+  @ViewChild(AvatarEditorComponent)
+  avatarEditor?: AvatarEditorComponent;
   toastService = inject(RwToastService);
   stateService = inject(StateService);
   dataService = inject(RwDataService);
   transloco = inject(TranslocoService);
   coreSettings = inject(RW_CORE_SETTINGS);
-  cd = inject(ChangeDetectorRef);
   currentUser: User;
   userForm = new FormGroup(
     {
@@ -107,28 +120,47 @@ export class UserComponent {
       asyncValidators: [this.checkUser.validate.bind(this.checkUser)],
     },
   );
-  editedUser = this.userForm.valueChanges.pipe(
-    map((v) => v as User),
-    shareReplay({ bufferSize: 1, refCount: false }),
+  initialsText = toSignal(
+    this.userForm.controls.initials_text.valueChanges.pipe(
+      startWith(this.userForm.controls.initials_text.value),
+    ),
+    { initialValue: '' },
   );
 
-  constructor() {
-    inject(ActivatedRoute)
-      .paramMap.pipe(
-        map((p) => p.get('id')),
-        switchMap((p) => this.dataService.getUser(p)),
-      )
-      .subscribe((p) => {
-        console.log('tap');
-        this.userForm.patchValue(p);
-        this.currentUser = p;
-      });
+  initialsColor = toSignal(
+    this.userForm.controls.initials_color.valueChanges.pipe(
+      startWith(this.userForm.controls.initials_color.value),
+    ),
+    { initialValue: '' },
+  );
 
-    console.log('constr');
-    this.editedUser.subscribe((u) => console.log(u));
-    this.userForm.valueChanges.subscribe((u) => console.log(u));
-  }
+  private sourceUser = inject(ActivatedRoute).paramMap.pipe(
+    map((p) => p.get('id')),
+    switchMap((id) => this.dataService.getUser(id)),
+    tap((user) => {
+      this.userForm.patchValue(user);
+      this.userForm.markAsPristine();
+      this.currentUser = user;
+    }),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  editedUser = this.sourceUser.pipe(
+    switchMap((user) =>
+      merge(of(null), this.userForm.valueChanges).pipe(
+        map(
+          () =>
+            ({
+              ...user,
+              ...this.userForm.getRawValue(),
+            }) as User,
+        ),
+      ),
+    ),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
   async saveUser() {
+    await this.avatarEditor?.applyDraft();
     await firstValueFrom(
       this.userService.saveUser(this.userForm.value.id, {
         ...this.currentUser,

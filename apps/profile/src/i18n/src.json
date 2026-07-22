@@ -11,6 +11,8 @@
   "save": "profile.save",
   "notification-settings": "profile.notification-settings",
   "full-name": "profile.full-name",
+  "initials-text": "profile.initials-text",
+  "initials-color": "profile.initials-color",
   "phone": "profile.phone",
   "time-zone": "profile.time-zone",
   "language": "profile.language",

@@ -1,0 +1,34 @@
+<div class="avatar-editor">
+  <div class="avatar-wrap">
+    <renwu-avatar
+      [user]="user"
+      [size]="size"
+      [editable]="true"
+      [showOnline]="false"
+      [forceInitials]="!hasAvatarImage"
+      [imageUrl]="imageUrl"
+      [previewText]="previewText"
+      [previewColor]="previewColor"
+      (editClick)="openFilePicker()"
+    />
+    @if (canRemove) {
+      <div class="remove-btn">
+        <rw-button
+          typeButton="icon"
+          iconClass="close"
+          [double]="true"
+          [rwTooltip]="'core.remove-avatar' | transloco"
+          tooltipPlacement="top"
+          (clicked)="removeAvatar()"
+        />
+      </div>
+    }
+  </div>
+  <input
+    #fileInput
+    class="file-input"
+    type="file"
+    accept="image/*"
+    (change)="onFileSelected($event)"
+  />
+</div>

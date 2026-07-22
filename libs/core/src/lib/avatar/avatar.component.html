@@ -1,11 +1,14 @@
 <div
+  #avatarEl
   class="avatar"
   [style.width]="size"
   [style.height]="size"
   [class.add]="newUser"
-  [rwTooltip]="name"
+  [class.editable]="editable"
+  [rwTooltip]="editable ? '' : name"
   tooltipDirection="bottom"
-  [tooltipDisabled]="!showTooltip"
+  [tooltipDisabled]="!showTooltip || editable"
+  (click)="onAvatarClick()"
   >
   @if ((!newUser && !avatarUrl) || error) {
     <div
@@ -14,7 +17,7 @@
       [style.color]="textColor"
       >
       <div class="initials-text" [style.fontSize]="fontSize">
-        {{ getInitials() }}
+        {{ initials }}
       </div>
     </div>
   }
@@ -30,7 +33,12 @@
   @if (newUser) {
     <rw-icon icon="add" />
   }
-  @if (showOnline) {
+  @if (editable) {
+    <div class="edit-overlay">
+      <rw-icon icon="picture" size="small" />
+    </div>
+  }
+  @if (showOnline && !editable) {
     <div class="status" [class.online]="online"></div>
   }
 </div>

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { switchTap } from '@renwu/utils';
 import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { ResponseOk } from '../data/common.model';
 import { RwDataService } from '../data/data.service';
 import { IssueTodo } from '../issue/issue.model';
@@ -196,14 +196,10 @@ export class RwUserService {
     return this.avatarsMap.get(this.getUser(id)?.id) || '';
   }
   deleteAvatar(id?: string): Observable<User> {
-    if (!id) {
-      this.avatarsMap.delete(id);
-      this.currentUserValue.avatar_id = null;
-      return this.saveUser(this.currentUserValue.id, this.currentUserValue);
-    }
-    this.avatarsMap.delete(id);
-    this.getUserById(id).avatar_id = null;
-    return this.saveUser(id, this.getUserById(id));
+    const userId = id || this.currentUserValue?.id;
+    return this.dataService.deleteAvatar().pipe(
+      switchMap(() => this.updateUser(userId)),
+    );
   }
   getDisplayName(user?: User): string {
     return (

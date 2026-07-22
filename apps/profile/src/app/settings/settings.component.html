@@ -1,20 +1,26 @@
-@if (user | async; as user) {
+@if (previewUser | async; as user) {
   <renwu-page
     title="{{ user.full_name }} ({{ user.username }})"
     >
     <form [formGroup]="userForm" class="lg:grid-cols-2 grid grid-cols-1 gap-4">
       <div class="flex flex-row w-full lg:col-span-2">
         <div class="mr-4">
-          <renwu-avatar [user]="user" size="9em" />
+          <renwu-avatar-editor
+            [user]="user"
+            [previewText]="initialsText()"
+            [previewColor]="initialsColor()"
+            size="9em"
+          />
         </div>
         <div class="w-full">
           <label class="form-label">
             <rw-text-input formControlName="initials_text"
-              prompt="{{ 'settings.initials-text' | transloco }}"
+              [live]="true"
+              prompt="{{ 'profile.initials-text' | transloco }}"
              />
           </label>
           <div class="form-supporting-text">
-            {{ 'settings.initials-color' | transloco }}
+            {{ 'profile.initials-color' | transloco }}
           </div>
           <label class="form-label">
             <rw-color-picker formControlName="initials_color" />

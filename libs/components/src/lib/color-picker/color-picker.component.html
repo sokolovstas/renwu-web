@@ -1,10 +1,10 @@
 <div
   class="value"
   #valueElement
-  (click)="switchPopup(true)"
+  (click)="openPopup()"
   [class.value-active]="opened"
   >
-  <div class="value-color" [style.background-color]="color.getHex()">
+  <div class="value-color" [style.background-color]="displayHex">
     &nbsp;
     <rw-icon class="icon" icon="keyboard_arrow_down" size="small" />
   </div>
@@ -15,26 +15,27 @@
   [bindElement]="valueElement"
   [closeByClickElement]="false"
   [displayBackground]="true"
+  (closed)="opened = false"
   >
   <ng-template #dropdownContent>
-    <div class="color-items">
+    <div class="color-items" (click)="$event.stopPropagation()">
       <div class="color-items-line">
-        @for (color of baseColors; track color) {
+        @for (swatch of baseColors; track swatch.getHex()) {
           <div
             class="color-item"
-            [style.background-color]="color.getHex()"
-            (click)="selectColor(color)"
+            [style.background-color]="swatch.getHex()"
+            (click)="selectColor(swatch, $event)"
           ></div>
         }
       </div>
       <div class="color-horizontal-line"></div>
-      @for (colorLine of colors; track colorLine) {
+      @for (colorLine of colors; track $index) {
         <div class="color-items-line">
-          @for (color of colorLine; track color) {
+          @for (swatch of colorLine; track swatch.getHex()) {
             <div
               class="color-item"
-              [style.background-color]="color.getHex()"
-              (click)="selectColor(color)"
+              [style.background-color]="swatch.getHex()"
+              (click)="selectColor(swatch, $event)"
             ></div>
           }
         </div>
@@ -43,13 +44,8 @@
       <rw-text-input [ngModel]="textValue"
         (ngModelChange)="parseColor($event)"
         [borderless]="true"
-         />
+        [live]="true"
+       />
     </div>
-    <!-- <div class="recent-colors-title"><span>Recent colors</span>:</div>
-    <div class="color-items-line">
-      @for (color of recentLine; track color) {
-        <div class="color-item" [style.background-color]="color.getHex()"></div>
-      }
-    </div> -->
   </ng-template>
 </rw-dropdown>

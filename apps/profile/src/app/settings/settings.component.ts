@@ -1,5 +1,11 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormGroup,
@@ -19,14 +25,20 @@ import {
 import {
   AppLangs,
   AppThemes,
-  AvatarComponent,
-  CheckUserValidator,
+  AvatarEditorComponent,
   NotificationSettingsChannels,
   ProfileSettingsModel,
-  RwDataService,
-  StateService,
+  User,
 } from '@renwu/core';
-import { firstValueFrom, tap } from 'rxjs';
+import {
+  firstValueFrom,
+  map,
+  merge,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 import { UserService } from '../user.service';
 
 @Component({
@@ -34,7 +46,7 @@ import { UserService } from '../user.service';
   standalone: true,
   imports: [
     RwColorPickerComponent,
-    AvatarComponent,
+    AvatarEditorComponent,
     RwSelectComponent,
     RwTextInputComponent,
     RwCheckboxComponent,
@@ -49,55 +61,91 @@ import { UserService } from '../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
-  private checkUser = inject(CheckUserValidator);
-
-  workHours = { 0: false, 1: false, 2: false, 3: false };
   userService = inject(UserService);
-  stateService = inject(StateService);
-  dataService = inject(RwDataService);
   transloco = inject(TranslocoService);
 
-  user = this.userService.currentUser.pipe(
-    tap((t) => this.userForm.patchValue(t)),
-  );
+  @ViewChild(AvatarEditorComponent)
+  avatarEditor?: AvatarEditorComponent;
 
-  userForm = new FormGroup(
-    {
-      id: new FormControl(''),
-      full_name: new FormControl('', {
-        validators: [Validators.minLength(2)],
-      }),
-      phone: new FormControl(''),
-      initials_text: new FormControl(''),
-      initials_color: new FormControl(''),
-      settings: new FormGroup({
-        time_zone_name: new FormControl(''),
-        profile: new FormGroup({
-          language: new FormControl<ProfileSettingsModel['language']>(
-            AppLangs.EN,
-          ),
-          formats: new FormControl<ProfileSettingsModel['formats']>(
-            AppDateFormat.EN_US,
-          ),
-          relative_dates: new FormControl(true),
-          theme: new FormControl<ProfileSettingsModel['theme']>(AppThemes.AUTO),
-          send_with_modifier_key: new FormControl(false),
+  private formInitialized = false;
 
-          labs: new FormGroup({
-            global_milestones: new FormControl(false),
-          }),
-        }),
-        notifications: new FormGroup({
-          channels: new FormControl<NotificationSettingsChannels>({}),
+  userForm = new FormGroup({
+    id: new FormControl(''),
+    full_name: new FormControl('', {
+      validators: [Validators.minLength(2)],
+    }),
+    phone: new FormControl(''),
+    initials_text: new FormControl(''),
+    initials_color: new FormControl(''),
+    settings: new FormGroup({
+      time_zone_name: new FormControl(''),
+      profile: new FormGroup({
+        language: new FormControl<ProfileSettingsModel['language']>(AppLangs.EN),
+        formats: new FormControl<ProfileSettingsModel['formats']>(
+          AppDateFormat.EN_US,
+        ),
+        relative_dates: new FormControl(true),
+        theme: new FormControl<ProfileSettingsModel['theme']>(AppThemes.AUTO),
+        send_with_modifier_key: new FormControl(false),
+        labs: new FormGroup({
+          global_milestones: new FormControl(false),
         }),
       }),
-    },
-    {
-      asyncValidators: [this.checkUser.validate.bind(this.checkUser)],
-    },
+      notifications: new FormGroup({
+        channels: new FormControl<NotificationSettingsChannels>({}),
+      }),
+    }),
+  });
+
+  initialsText = toSignal(
+    this.userForm.controls.initials_text.valueChanges.pipe(
+      startWith(this.userForm.controls.initials_text.value),
+    ),
+    { initialValue: '' },
   );
+
+  initialsColor = toSignal(
+    this.userForm.controls.initials_color.valueChanges.pipe(
+      startWith(this.userForm.controls.initials_color.value),
+    ),
+    { initialValue: '' },
+  );
+
+  private sourceUser = this.userService.currentUser.pipe(
+    map((user) => {
+      if (user && (!this.formInitialized || !this.userForm.dirty)) {
+        this.userForm.patchValue(user);
+        this.userForm.markAsPristine();
+        this.formInitialized = true;
+      }
+      return user;
+    }),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  previewUser = this.sourceUser.pipe(
+    switchMap((user) =>
+      user
+        ? merge(of(null), this.userForm.valueChanges).pipe(
+            map(
+              () =>
+                ({
+                  ...user,
+                  ...this.userForm.getRawValue(),
+                }) as User,
+            ),
+          )
+        : of(null),
+    ),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
   async saveUser() {
-    firstValueFrom(this.userService.saveUser(this.userForm.value as any));
+    await this.avatarEditor?.applyDraft();
+    await firstValueFrom(
+      this.userService.saveUser(this.userForm.getRawValue() as any),
+    );
+    this.userForm.markAsPristine();
     this.transloco.setActiveLang(this.userForm.value.settings.profile.language);
   }
 }

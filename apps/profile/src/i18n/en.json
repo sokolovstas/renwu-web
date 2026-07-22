@@ -11,6 +11,8 @@
   "save": "Save",
   "notification-settings": "Notification settings",
   "full-name": "Full name",
+  "initials-text": "Avatar text (you can use emoji ⭐️)",
+  "initials-color": "Avatar color",
   "phone": "Phone",
   "time-zone": "Time zone",
   "language": "Language",

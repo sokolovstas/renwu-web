@@ -6,11 +6,26 @@
     <form [formGroup]="userForm" class="lg:grid-cols-2 grid gap-4">
       <div class="flex flex-row w-full">
         <div class="mr-4">
-          <renwu-avatar [user]="editedUser | async" size="9em" />
+          @if (user.id === userService.getId()) {
+            <renwu-avatar-editor
+              [user]="user"
+              [previewText]="initialsText()"
+              [previewColor]="initialsColor()"
+              size="9em"
+            />
+          } @else {
+            <renwu-avatar
+              [user]="user"
+              [forceInitials]="!user.avatar_id"
+              [showOnline]="false"
+              size="9em"
+            />
+          }
         </div>
         <div class="w-full">
           <label class="form-label">
             <rw-text-input formControlName="initials_text"
+              [live]="true"
               prompt="{{ 'settings.initials-text' | transloco }}"
              />
           </label>

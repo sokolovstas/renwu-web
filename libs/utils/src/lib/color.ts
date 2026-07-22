@@ -191,8 +191,11 @@ export class Color {
     this.blue = b * 255;
   }
   getHex(): string {
+    const r = Math.max(0, Math.min(255, Math.round(this.red)));
+    const g = Math.max(0, Math.min(255, Math.round(this.green)));
+    const b = Math.max(0, Math.min(255, Math.round(this.blue)));
     // eslint-disable-next-line no-bitwise
-    const hex = this.blue | (this.green << 8) | (this.red << 16);
+    const hex = b | (g << 8) | (r << 16);
     return `#${(0x1000000 + hex).toString(16).slice(1)}`;
   }
   getRGB(): string {

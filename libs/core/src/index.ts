@@ -2,6 +2,7 @@
  * Public API Surface of core
  */
 export * from './lib/attachment/attachment.component';
+export * from './lib/avatar/avatar-editor.component';
 export * from './lib/avatar/avatar.component';
 export * from './lib/badge/badge.service';
 export * from './lib/container/container.model';

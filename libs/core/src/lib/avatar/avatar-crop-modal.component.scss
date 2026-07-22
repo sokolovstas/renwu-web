@@ -1,0 +1,42 @@
+.crop-hint {
+  margin-bottom: 0.75rem;
+  opacity: 0.7;
+  font-size: 0.875rem;
+}
+
+.crop-viewport {
+  position: relative;
+  width: min(70vw, 280px);
+  height: min(70vw, 280px);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: #111;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.crop-image {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+}
+
+.crop-mask {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.crop-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}

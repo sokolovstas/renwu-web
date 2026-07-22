@@ -1,5 +1,14 @@
-
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, HostListener, Input, ViewChild, forwardRef, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  HostBinding,
+  HostListener,
+  Input,
+  ViewChild,
+  forwardRef,
+  inject,
+} from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -21,8 +30,8 @@ const noop = (): void => {
     RwDropDownComponent,
     RwTextInputComponent,
     RwIconComponent,
-    FormsModule
-],
+    FormsModule,
+  ],
   templateUrl: './color-picker.component.html',
   styleUrl: './color-picker.component.scss',
   providers: [
@@ -44,56 +53,46 @@ export class RwColorPickerComponent implements ControlValueAccessor {
   @HostBinding('class.required')
   required: boolean;
 
-  value: string;
-
-  textValue: string;
-
-  color: Color;
-
+  displayHex = '#000000';
+  textValue = '#000000';
   colors: Color[][];
-
   baseColors: Color[];
-
-  opened: boolean;
+  opened = false;
 
   private onTouchedCallback: () => void = noop;
-
   private onChangeCallback: (_: string) => void = noop;
 
-  @HostListener('keydown')
-  onKeyDown(): void {
-    this.switchPopup(false);
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.opened) {
+      this.closePopup();
+    }
   }
 
   constructor() {
-    this.opened = false;
-    this.color = new Color('#000000');
-
-    this.baseColors = [];
-    {
-      // FIXME inject this
-      this.baseColors.push(new Color('#e3635a'));
-      this.baseColors.push(new Color('#f6976d'));
-      this.baseColors.push(new Color('#faba64'));
-      this.baseColors.push(new Color('#d5ce26'));
-      this.baseColors.push(new Color('#8cc63e'));
-      this.baseColors.push(new Color('#38b449'));
-      this.baseColors.push(new Color('#54bfa1'));
-      this.baseColors.push(new Color('#47c5e2'));
-      this.baseColors.push(new Color('#1997c9'));
-      this.baseColors.push(new Color('#0179b5'));
-      this.baseColors.push(new Color('#4662a4'));
-      this.baseColors.push(new Color('#8463a5'));
-      this.baseColors.push(new Color('#da70ac'));
-      this.baseColors.push(new Color('#d46481'));
-      this.baseColors.push(new Color('#ef4957'));
-      this.baseColors.push(new Color('#555d69'));
-    }
+    this.baseColors = [
+      '#e3635a',
+      '#f6976d',
+      '#faba64',
+      '#d5ce26',
+      '#8cc63e',
+      '#38b449',
+      '#54bfa1',
+      '#47c5e2',
+      '#1997c9',
+      '#0179b5',
+      '#4662a4',
+      '#8463a5',
+      '#da70ac',
+      '#d46481',
+      '#ef4957',
+      '#555d69',
+    ].map((hex) => new Color(hex));
 
     this.colors = [];
 
-    const hueConut = 15;
-    const hueStep = 1 / hueConut;
+    const hueCount = 15;
+    const hueStep = 1 / hueCount;
     const lightnessCount = 6;
     const lightnessMin = 0.2;
     const lightnessMax = 0.9;
@@ -114,7 +113,6 @@ export class RwColorPickerComponent implements ControlValueAccessor {
         c.hslToRgb();
         line.push(c);
       }
-      ///
       const cb = new Color('');
       cb.saturation = 0;
       cb.lightness = l;
@@ -126,16 +124,7 @@ export class RwColorPickerComponent implements ControlValueAccessor {
   }
 
   writeValue(value: string): void {
-    if (value === undefined) {
-      value = null;
-    }
-    this.value = value;
-    if (!this.value) {
-      this.value = '#000000';
-    }
-    this.textValue = this.value;
-    this.color = new Color(this.value);
-    this.cd.markForCheck();
+    this.applyColor(value || '#000000', false);
   }
 
   registerOnChange(fn: (_: string) => void): void {
@@ -146,29 +135,37 @@ export class RwColorPickerComponent implements ControlValueAccessor {
     this.onTouchedCallback = fn;
   }
 
-  selectColor(color: Color): void {
-    this.color = color;
-    this.switchPopup(false);
+  openPopup(): void {
+    this.dropdown.show();
+    this.opened = true;
+    this.cd.markForCheck();
   }
 
-  switchPopup(value: boolean): void {
-    if (!value) {
-      this.opened = value;
-      this.dropdown.hide();
-      this.value = this.color.getHex();
-      this.textValue = this.value;
-      this.onChangeCallback(this.value);
-    } else {
-      this.dropdown.show();
-      this.opened = value;
-    }
+  closePopup(): void {
+    this.opened = false;
+    this.dropdown.hide();
     this.cd.markForCheck();
+  }
+
+  selectColor(swatch: Color, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    this.applyColor(swatch.getHex(), true);
+    this.closePopup();
   }
 
   parseColor(value: string): void {
-    this.color = new Color(value);
-    this.value = this.color.getHex();
-    this.switchPopup(false);
-    this.cd.markForCheck();
+    this.applyColor(value || '#000000', true);
+    this.closePopup();
+  }
+
+  private applyColor(hex: string, emit: boolean): void {
+    this.displayHex = new Color(hex).getHex();
+    this.textValue = this.displayHex;
+    if (emit) {
+      this.onChangeCallback(this.displayHex);
+      this.onTouchedCallback();
+    }
+    this.cd.detectChanges();
   }
 }

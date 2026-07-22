@@ -684,6 +684,10 @@ export class RwDataService {
     return this.postUpload(file, '/user/avatar');
   }
 
+  deleteAvatar(): Observable<ResponseOk> {
+    return this.sendToAPI('delete', '/user/avatar');
+  }
+
   // ATTACHMENT
   postUpload(file: FileWithName, url: string): Observable<FileUpload> {
     const loader: Loader = this.loaderService.setLoader();
