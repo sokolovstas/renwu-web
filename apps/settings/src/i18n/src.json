@@ -43,6 +43,7 @@
   "user-id": "settings.user-id",
   "phone": "settings.phone",
   "holiday-calendar": "settings.holiday-calendar",
+  "work-hours": "settings.work-hours",
   "time-zone": "settings.time-zone",
   "user-language": "settings.user-language",
   "user-type": "settings.user-type",

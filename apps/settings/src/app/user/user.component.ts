@@ -77,6 +77,9 @@ export class UserComponent {
   UserStatus = UserStatus;
   userService = inject(RwUserService);
 
+  /** Hour keys "0".."23" for work_hours toggles. */
+  readonly workHourKeys = Array.from({ length: 24 }, (_, hour) => String(hour));
+
   @ViewChild(AvatarEditorComponent)
   avatarEditor?: AvatarEditorComponent;
   toastService = inject(RwToastService);
@@ -104,6 +107,14 @@ export class UserComponent {
       type: new FormControl<UserType>(UserType.INTERNAL),
       status: new FormControl<UserStatus>(UserStatus.ACTIVE),
       is_admin: new FormControl<boolean>(false),
+      work_hours: new FormGroup(
+        Object.fromEntries(
+          this.workHourKeys.map((hour) => [
+            hour,
+            new FormControl(false, { nonNullable: true }),
+          ]),
+        ),
+      ),
       settings: new FormGroup({
         time_zone_name: new FormControl(''),
         profile: new FormGroup({
@@ -138,9 +149,7 @@ export class UserComponent {
     map((p) => p.get('id')),
     switchMap((id) => this.dataService.getUser(id)),
     tap((user) => {
-      this.userForm.patchValue(user);
-      this.userForm.markAsPristine();
-      this.currentUser = user;
+      this.applyUser(user);
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
@@ -153,6 +162,7 @@ export class UserComponent {
             ({
               ...user,
               ...this.userForm.getRawValue(),
+              work_hours: this.serializeWorkHours(),
             }) as User,
         ),
       ),
@@ -165,6 +175,7 @@ export class UserComponent {
       this.userService.saveUser(this.userForm.value.id, {
         ...this.currentUser,
         ...this.userForm.value,
+        work_hours: this.serializeWorkHours(),
         ...{
           settings: {
             ...this.currentUser.settings,
@@ -194,7 +205,7 @@ export class UserComponent {
           ),
         ),
     );
-    this.userForm.patchValue(
+    this.applyUser(
       await firstValueFrom(this.dataService.getUser(this.userForm.value.id)),
     );
   }
@@ -213,8 +224,47 @@ export class UserComponent {
   }
   async restore() {
     await firstValueFrom(this.dataService.restoreUser(this.userForm.value.id));
-    this.userForm.patchValue(
+    this.applyUser(
       await firstValueFrom(this.dataService.getUser(this.userForm.value.id)),
     );
+  }
+
+  toggleWorkHour(hour: string): void {
+    const control = this.userForm.controls.work_hours.get(hour);
+    if (!control) {
+      return;
+    }
+    control.setValue(!control.value);
+    control.markAsDirty();
+  }
+
+  private applyUser(user: User): void {
+    const { work_hours, ...rest } = user;
+    this.userForm.patchValue(rest);
+    this.patchWorkHours(work_hours);
+    this.userForm.markAsPristine();
+    this.currentUser = user;
+  }
+
+  private patchWorkHours(workHours?: User['work_hours']): void {
+    const patch: Record<string, boolean> = {};
+    for (const hour of this.workHourKeys) {
+      patch[hour] = !!workHours?.[hour];
+    }
+    this.userForm.controls.work_hours.patchValue(patch);
+  }
+
+  private serializeWorkHours(): User['work_hours'] {
+    const result: NonNullable<User['work_hours']> = {};
+    const value = this.userForm.controls.work_hours.getRawValue() as Record<
+      string,
+      boolean
+    >;
+    for (const [hour, enabled] of Object.entries(value)) {
+      if (enabled) {
+        result[hour] = {};
+      }
+    }
+    return result;
   }
 }

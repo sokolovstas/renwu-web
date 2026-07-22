@@ -105,17 +105,25 @@
         <div class="form-supporting-text">Is admin</div>
         <rw-checkbox formControlName="is_admin" />
       </label>
-      <!-- work_hours UI (disabled):
-      <label class="form-label">
-        <div class="form-supporting-text">work_hours</div>
-        @for (item of workHours; track $index) {
-          <div class="item">
-            <span class="label">{{ $index }}</span>
-            <rw-checkbox formControlName="is_admin"></rw-checkbox>
-          </div>
-        }
-      </label>
-      -->
+      <div class="form-label col-span-full">
+        <div class="form-supporting-text">
+          {{ 'settings.work-hours' | transloco }}
+        </div>
+        <div class="work-hours">
+          @for (hour of workHourKeys; track hour) {
+            <button
+              type="button"
+              class="work-hours__hour"
+              [class.work-hours__hour--active]="
+                userForm.controls.work_hours.get(hour)?.value
+              "
+              (click)="toggleWorkHour(hour)"
+            >
+              {{ hour }}
+            </button>
+          }
+        </div>
+      </div>
   </form>
   @switch (user.status) {
     @case (UserStatus.DELETED) {
@@ -140,23 +148,5 @@
   <rw-button action (clicked)="saveUser()">{{
     'settings.save' | transloco
   }}</rw-button>
-        <!--
-        work_hours: new FormControl<{ [key: string]: Record<string, never> }>({}),
-        settings: new FormGroup({
-        profile: new FormGroup({
-        language: new FormControl<ProfileSettingsModel['language']>('ru'),
-        formats: new FormControl<ProfileSettingsModel['formats']>('ru'),
-        relative_dates: new FormControl(true),
-        theme: new FormControl<ProfileSettingsModel['theme']>('auto'),
-        send_with_modifier_key: new FormControl(false),
-        time_zone_name: new FormControl(''),
-        labs: new FormGroup({
-        global_milestones: new FormControl(false),
-        }),
-        }),
-        notifications: new FormGroup({
-        channels: new FormControl<NotificationSettingsChannels>({}),
-        }),
-        }), -->
       </renwu-page>
     }
