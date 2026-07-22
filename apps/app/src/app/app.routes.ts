@@ -57,6 +57,12 @@ export const appRoutes: Route[] = [
           loadRemoteModule('task', './routes').then((m) => m.ROUTES),
       },
       {
+        path: 'user',
+        outlet: 'section',
+        loadChildren: () =>
+          loadRemoteModule('profile', './routes').then((m) => m.VIEW_ROUTES),
+      },
+      {
         path: 'task',
         loadChildren: () =>
           loadRemoteModule('tasks', './routes').then((m) => m.ROUTES),

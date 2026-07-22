@@ -1,12 +1,11 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
-import { MainComponent } from '../main/main.component';
-import { NotificationsComponent } from '../notifications/notifications.component';
-import { SettingsComponent } from '../settings/settings.component';
 import { UserService } from '../user.service';
-
-export { VIEW_ROUTES } from './view.routes';
+import { ViewChatComponent } from '../view/chat/chat.component';
+import { ViewInfoComponent } from '../view/info/info.component';
+import { ViewTasksComponent } from '../view/tasks/tasks.component';
+import { ViewMainComponent } from '../view/view-main.component';
 
 const createInlineLoader = (languages: Array<string>): InlineLoader => {
   const translocoInlineLoader: InlineLoader = {};
@@ -20,11 +19,12 @@ const createInlineLoader = (languages: Array<string>): InlineLoader => {
   return translocoInlineLoader;
 };
 
-const setCurrentProject = (route: ActivatedRouteSnapshot) => {
+const setCurrentUser = (route: ActivatedRouteSnapshot) => {
   inject(UserService).currentUserKey.next(route.paramMap.get('username'));
 };
 
-export const ROUTES: Route[] = [
+/** Public user profile for `section:user/:username` (info / tasks / chat). */
+export const VIEW_ROUTES: Route[] = [
   {
     path: ':username',
     providers: [
@@ -37,28 +37,26 @@ export const ROUTES: Route[] = [
         },
       },
     ],
-
-    resolve: [setCurrentProject],
-    component: MainComponent,
+    resolve: [setCurrentUser],
+    component: ViewMainComponent,
     children: [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'settings',
+        redirectTo: 'info',
       },
       {
-        path: 'settings',
-        component: SettingsComponent,
+        path: 'info',
+        component: ViewInfoComponent,
       },
       {
-        path: 'notifications',
-        component: NotificationsComponent,
+        path: 'tasks',
+        component: ViewTasksComponent,
+      },
+      {
+        path: 'chat',
+        component: ViewChatComponent,
       },
     ],
-  },
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'me/settings',
   },
 ];

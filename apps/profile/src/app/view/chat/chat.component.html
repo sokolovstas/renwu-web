@@ -1,0 +1,12 @@
+<div class="profile-chat">
+  <renwu-messaging-thread
+    class="profile-chat__thread"
+    [destination]="thread | async"
+    [autoload]="true"
+    [noScroll]="true"
+  />
+  <renwu-messaging-input
+    class="profile-chat__input"
+    [destination]="thread | async"
+  />
+</div>

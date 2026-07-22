@@ -98,7 +98,7 @@ export class RwMarkdownService {
     return this.markdown.render(text);
   }
   openPersonalPage(username: string): void {
-    this.router.navigate([{ outlets: { user: [username] } }]);
+    void this.router.navigate([{ outlets: { section: ['user', username] } }]);
   }
   prepareLinks(element: HTMLElement, caller: any, depth = 0): void {
     if (depth > 3) {

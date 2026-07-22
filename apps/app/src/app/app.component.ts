@@ -71,7 +71,7 @@ export class AppComponent implements AfterViewInit {
   );
   mainRouteExist = this.router.events.pipe(
     filter((e) => e instanceof NavigationEnd),
-    map((e) => (e as NavigationEnd).url.includes('section:task')),
+    map((e) => (e as NavigationEnd).url.includes('section:')),
   );
   checkUpdate = inject(CheckForUpdateService);
   tour = inject(RenwuTourService);

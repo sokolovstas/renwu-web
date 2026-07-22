@@ -1,0 +1,51 @@
+<div class="profile-tasks">
+  <div class="profile-tasks__heading">
+    <div class="profile-tasks__filter">
+      <span class="profile-tasks__filter-query">{{ queryString() }}</span>
+      @if (filterIsDirty()) {
+        <rw-button typeButton="link" (clicked)="resetFilter()">
+          {{ 'profile.reset-filter' | transloco }}
+        </rw-button>
+      }
+    </div>
+  </div>
+
+  @if (issues | async; as list) {
+    <renwu-issue-table
+      class="profile-tasks__table text-sm"
+      [issues]="issuesDisplay | async"
+      [listOptions]="listOptions()"
+      (listOptionsChange)="updateListOptions($event)"
+      (clicked)="issueClick($event)"
+    >
+      <renwu-issue-status-bar
+        header
+        class="profile-tasks__status-bar"
+        [issues]="list"
+        [groupBy]="[listOptions().group.field]"
+        (itemClick)="filterByBar($event)"
+      />
+      <div footer class="profile-tasks__footer">
+        @if (list.length) {
+          <rw-pager
+            [currentPage]="page | async"
+            [pagesCountLimit]="3"
+            [pageSize]="pageSize"
+            [rowsCount]="list.length"
+            [showPages]="true"
+            (pageChanged)="page.next($event)"
+          />
+        }
+      </div>
+    </renwu-issue-table>
+    @if (!list.length) {
+      <p class="profile-tasks__empty">
+        {{ 'profile.no-assigned-tasks' | transloco }}
+      </p>
+    }
+  } @else {
+    <p class="profile-tasks__empty">
+      {{ 'profile.loading-tasks' | transloco }}
+    </p>
+  }
+</div>

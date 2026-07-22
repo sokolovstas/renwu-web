@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.profile-info__row {
+  display: grid;
+  grid-template-columns: minmax(100px, 140px) 1fr;
+  gap: 8px 16px;
+  align-items: baseline;
+}
+
+.profile-info__label {
+  font-size: 0.8rem;
+  color: var(--gray-700);
+}
+
+.profile-info__value {
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}

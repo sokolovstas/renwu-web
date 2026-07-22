@@ -1,0 +1,43 @@
+@if (user | async; as u) {
+  <div class="profile-view">
+    <header class="profile-view__header">
+      <renwu-avatar [user]="u" size="64px" [showOnline]="true" [showTooltip]="false" />
+      <div class="profile-view__identity">
+        <div class="profile-view__name">{{ u.full_name || u.username }}</div>
+        @if (u.username) {
+          <div class="profile-view__username">@{{ u.username }}</div>
+        }
+        @if (u.email) {
+          <div class="profile-view__meta">{{ u.email }}</div>
+        }
+      </div>
+    </header>
+
+    <nav class="profile-view__tabs">
+      <a
+        class="profile-view__tab"
+        routerLink="info"
+        routerLinkActive="profile-view__tab--active"
+        >{{ 'profile.tab-info' | transloco }}</a
+      >
+      <a
+        class="profile-view__tab"
+        routerLink="tasks"
+        routerLinkActive="profile-view__tab--active"
+        >{{ 'profile.tab-tasks' | transloco }}</a
+      >
+      @if ((isSelf | async) === false) {
+        <a
+          class="profile-view__tab"
+          routerLink="chat"
+          routerLinkActive="profile-view__tab--active"
+          >{{ 'profile.tab-chat' | transloco }}</a
+        >
+      }
+    </nav>
+
+    <div class="profile-view__body">
+      <router-outlet />
+    </div>
+  </div>
+}
