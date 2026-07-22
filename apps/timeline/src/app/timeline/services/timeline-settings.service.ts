@@ -21,6 +21,13 @@ const TICKS: TimelineScaleTick[] = [
   { id: TimelineTicksId.QUARTER, title: 'Quarter', scale: 100000, min: 33000 },
 ];
 
+/** Zoom ladder fine → coarse (excludes Fit). */
+const ZOOM_TICKS: TimelineTicksId[] = [
+  TimelineTicksId.DAY,
+  TimelineTicksId.WEEK,
+  TimelineTicksId.QUARTER,
+];
+
 const DEFAULT_SORT: ListOptionsFilters['sort'] = {
   field: 'status',
   direction: 'down',
@@ -128,9 +135,9 @@ export class TimelineSettingsService {
     this.persist();
   }
 
-  setScaleValue(value: number): void {
+  setScaleValue(value: number, options?: { persist?: boolean }): void {
     this.settingsSignal.update((s) => {
-      const clamped = Math.max(50, Math.min(200, value));
+      const clamped = Math.max(50, Math.min(200, Math.round(value)));
       const nextScale = this.computeActualScale(s.scaleTick, clamped);
       return {
         ...s,
@@ -139,6 +146,67 @@ export class TimelineSettingsService {
         scale: nextScale,
       };
     });
+    if (options?.persist !== false) {
+      this.persist();
+    }
+  }
+
+  /**
+   * Pinch / ctrl+wheel zoom. Keeps integer percent; at 50%/200% switches Day↔Week↔Quarter.
+   * @returns false when nothing changed (already at hard limit).
+   */
+  applyGestureZoomFactor(
+    factor: number,
+    options?: { persist?: boolean },
+  ): boolean {
+    const s = this.settingsSignal();
+    let tick = s.scaleTick;
+    let value = Math.round(s.scaleValue);
+
+    let next = Math.round(value * factor);
+    if (next === value && Math.abs(factor - 1) > 0.001) {
+      next = factor > 1 ? value + 1 : value - 1;
+    }
+
+    let idx = ZOOM_TICKS.indexOf(tick);
+    if (idx < 0) idx = 0;
+
+    while (next > 200 && idx > 0) {
+      idx -= 1;
+      tick = ZOOM_TICKS[idx];
+      next = 50 + (next - 200);
+    }
+    if (next > 200) next = 200;
+
+    while (next < 50 && idx < ZOOM_TICKS.length - 1) {
+      idx += 1;
+      tick = ZOOM_TICKS[idx];
+      next = 200 - (50 - next);
+    }
+    if (next < 50) next = 50;
+
+    next = Math.max(50, Math.min(200, Math.round(next)));
+    tick = ZOOM_TICKS[idx] ?? tick;
+
+    if (tick === s.scaleTick && next === Math.round(s.scaleValue)) {
+      return false;
+    }
+
+    this.settingsSignal.update((cur) => ({
+      ...cur,
+      oldScale: cur.scale,
+      scaleTick: tick,
+      scaleValue: next,
+      scale: this.computeActualScale(tick, next),
+    }));
+    if (options?.persist !== false) {
+      this.persist();
+    }
+    return true;
+  }
+
+  /** Flush pending settings after a gesture zoom burst. */
+  persistScale(): void {
     this.persist();
   }
 

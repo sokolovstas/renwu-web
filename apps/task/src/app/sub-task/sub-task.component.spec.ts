@@ -122,6 +122,8 @@ describe('SubTaskComponent', () => {
       | 'patchIssue'
       | 'setPrevState'
       | 'updateFromTemplate'
+      | 'pendingSubtasks'
+      | 'removePendingSubtask'
     > = {
       newIssue: issue$.pipe(map((p) => p.id === 'new')),
       issue: issue$.asObservable(),
@@ -129,6 +131,8 @@ describe('SubTaskComponent', () => {
       patchIssue,
       setPrevState,
       updateFromTemplate,
+      pendingSubtasks: of([]),
+      removePendingSubtask: jest.fn(),
     };
 
     TestBed.configureTestingModule({

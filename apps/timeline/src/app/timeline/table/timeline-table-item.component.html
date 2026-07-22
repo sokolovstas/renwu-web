@@ -2,7 +2,6 @@
   @if (isGroup()) {
     <div
       class="timeline-table-row group-row"
-      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
       [style.height.px]="issueRowHeightPx()"
       [style.font-size.px]="tableFontSizePx()"
@@ -21,7 +20,6 @@
   } @else {
     <div
       class="timeline-table-row issue-row"
-      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
       [class.timeline-table-row-dimmed]="dimmed"
       [class.timeline-table-row-in-parent-scope]="inParentScope"
@@ -41,11 +39,17 @@
       <span class="td-col td-priority">
         <renwu-issue-priority [value]="item.priority" [tooltipDisabled]="true" />
       </span>
-      <span class="td-col td-title" [title]="item.title || ''">
+      <span
+        class="td-col td-title"
+        [title]="item.title || ''"
+        [style.paddingLeft.px]="depth > 1 ? (depth - 1) * 14 : 0"
+      >
         @if (item.childs?.length) {
           <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
             {{ (item._SHOWCHILDS ?? true) ? '▾' : '▸' }}
           </button>
+        } @else {
+          <span class="expand-spacer" aria-hidden="true"></span>
         }
         {{ item.title }}
       </span>

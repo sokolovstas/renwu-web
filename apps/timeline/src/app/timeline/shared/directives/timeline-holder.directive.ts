@@ -10,6 +10,12 @@ import {
   inject,
 } from '@angular/core';
 
+/** Canvas pan delta in scroll coordinates (positive = content moves left/up). */
+export interface TimelinePanDelta {
+  deltaX: number;
+  deltaY: number;
+}
+
 @Directive({
   selector: '[renwu-timeline-holder]',
   standalone: true,
@@ -22,13 +28,14 @@ export class TimelineHolderDirective {
   dragStart = new EventEmitter<void>();
 
   @Output()
-  dragDelta = new EventEmitter<number>();
+  dragDelta = new EventEmitter<TimelinePanDelta>();
 
   @Output()
   dragEnd = new EventEmitter<void>();
 
-  private dragging = false;
+  private panArmed = false;
   private prevScreenX = 0;
+  private prevScreenY = 0;
   private moveGlobal: (() => void) | null = null;
   private upGlobal: (() => void) | null = null;
   private dragTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -36,33 +43,44 @@ export class TimelineHolderDirective {
   private el = inject<ElementRef<HTMLElement>>(ElementRef);
   private renderer = inject(Renderer2);
 
-  @HostListener('mousedown', ['$event.layerX', '$event.screenX', '$event.which'])
-  onMouseDown(layerX: number, screenX: number, which: number): boolean {
-    if (which === 3) {
+  @HostListener('mousedown', ['$event'])
+  onMouseDown(event: MouseEvent): boolean {
+    if (event.which === 3 || event.button === 2) {
       // Disable right click drag
       return false;
     }
 
-    void layerX;
-    this.dragging = true;
-    this.prevScreenX = screenX;
+    // Don't steal interactions from bars / controls / table chrome actions.
+    const target = event.target as HTMLElement | null;
+    if (
+      target?.closest(
+        'button, a, input, textarea, select, .bar, .bar-create-btn, .bar-create-actions, .timeline-overlay-corner, .timeline-table-resize',
+      )
+    ) {
+      return true;
+    }
+
+    this.panArmed = false;
+    this.prevScreenX = event.screenX;
+    this.prevScreenY = event.screenY;
 
     this.dragTimeout = setTimeout(() => {
+      this.panArmed = true;
       this.dragStart.next();
-      this.dragging = true;
-      this.el.nativeElement.style.cursor = 'move';
-    }, 200);
+      this.el.nativeElement.style.cursor = 'grabbing';
+    }, 160);
 
     this.moveGlobal = this.renderer.listen(
       'window',
       'mousemove',
-      (event: MouseEvent) => {
-        const deltaX = this.prevScreenX - event.screenX;
-        this.prevScreenX = event.screenX;
-        if (this.dragging) {
-          this.el.nativeElement.style.cursor = 'move';
-          this.dragDelta.next(deltaX);
-        }
+      (moveEvent: MouseEvent) => {
+        const deltaX = this.prevScreenX - moveEvent.screenX;
+        const deltaY = this.prevScreenY - moveEvent.screenY;
+        this.prevScreenX = moveEvent.screenX;
+        this.prevScreenY = moveEvent.screenY;
+        if (!this.panArmed) return;
+        this.el.nativeElement.style.cursor = 'grabbing';
+        this.dragDelta.next({ deltaX, deltaY });
       },
     );
 
@@ -70,16 +88,17 @@ export class TimelineHolderDirective {
       'window',
       'mouseup',
       () => {
-        setTimeout(() => {
-          this.dragEnd.next();
-        }, 200);
-
-        this.dragging = false;
-        this.el.nativeElement.style.cursor = 'initial';
+        const wasArmed = this.panArmed;
+        this.panArmed = false;
+        this.el.nativeElement.style.cursor = '';
 
         if (this.dragTimeout) {
           clearTimeout(this.dragTimeout);
           this.dragTimeout = null;
+        }
+
+        if (wasArmed) {
+          this.dragEnd.next();
         }
 
         this.moveGlobal?.();
@@ -92,4 +111,3 @@ export class TimelineHolderDirective {
     return true;
   }
 }
-

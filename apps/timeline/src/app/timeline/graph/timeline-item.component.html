@@ -2,7 +2,6 @@
   @if (isGroup) {
     <div
       class="timeline-item-group"
-      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
       [style.height.px]="issueRowHeightPx()"
       (mouseenter)="onRowHover(true)"
@@ -13,7 +12,6 @@
   } @else if (width > 0) {
     <div
       class="timeline-item"
-      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
       [class.timeline-item-dimmed]="dimmed"
       [style.height.px]="issueRowHeightPx()"
@@ -39,6 +37,45 @@
         ></div>
         <span class="bar-title-inside">{{ titleLabel }}</span>
       </div>
+      <div
+        class="bar-create-actions"
+        [style.left.px]="offsetForItem"
+        [style.width.px]="width"
+        [style.height.px]="barHeightPx()"
+      >
+        <button
+          type="button"
+          class="bar-create-btn bar-create-btn--prev"
+          title="Previous"
+          (click)="onCreateClick($event, 'prev')"
+        >
+          <rw-icon icon="add-bold" size="small" />
+        </button>
+        <button
+          type="button"
+          class="bar-create-btn bar-create-btn--next"
+          title="Next"
+          (click)="onCreateClick($event, 'next')"
+        >
+          <rw-icon icon="add-bold" size="small" />
+        </button>
+        <button
+          type="button"
+          class="bar-create-btn bar-create-btn--parent"
+          title="Parent"
+          (click)="onCreateClick($event, 'parent')"
+        >
+          <rw-icon icon="add-bold" size="small" />
+        </button>
+        <button
+          type="button"
+          class="bar-create-btn bar-create-btn--child"
+          title="Child"
+          (click)="onCreateClick($event, 'child')"
+        >
+          <rw-icon icon="add-bold" size="small" />
+        </button>
+      </div>
       @if (showTitleRight) {
         <span class="bar-title-right">{{ titleLabel }}</span>
       }
@@ -46,7 +83,6 @@
   } @else {
     <div
       class="timeline-item-empty"
-      [class.timeline-row-alt]="stripeIndex % 2 === 1"
       [class.timeline-row-highlight]="rowHighlighted"
       [style.height.px]="issueRowHeightPx()"
       (mouseenter)="onRowHover(true)"
@@ -76,6 +112,7 @@
         [treeRevision]="treeRevision"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
+        (createRelated)="createRelated.emit($event)"
         (issueLaidOut)="issueLaidOut.emit($event)"
         (scrollRight)="scrollRight.emit()"
         (scrollLeft)="scrollLeft.emit()"

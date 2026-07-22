@@ -8,10 +8,12 @@ import {
   Output,
   input,
 } from '@angular/core';
+import { RwIconComponent } from '@renwu/components';
 import { Status } from '@renwu/core';
+import { TimelineCreateDirection } from '../issue-to-link';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { visibleRowsBeforeChild } from '../row-striping';
-import { parseUtcLike, unixSeconds } from '../date-helpers';
+import { parseUtcLike } from '../date-helpers';
 import { unixSecondsVirtual } from '../virtual-hours';
 
 /** Original UI: 18px bar height inside a 37px row — scale bar with `issueRowHeightPx`. */
@@ -24,7 +26,7 @@ const TIMELINE_BAR_HEIGHT_MIN_PX = 14;
   templateUrl: './timeline-item.component.html',
   styleUrl: './timeline-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TimelineItemComponent],
+  imports: [TimelineItemComponent, RwIconComponent],
 })
 export class TimelineItemComponent implements OnChanges {
   issueRowHeightPx = input.required<number>();
@@ -60,6 +62,10 @@ export class TimelineItemComponent implements OnChanges {
 
   @Output() selected = new EventEmitter<TimelineIssue>();
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
+  @Output() createRelated = new EventEmitter<{
+    issue: TimelineIssue;
+    direction: TimelineCreateDirection;
+  }>();
   @Output() issueLaidOut = new EventEmitter<TimelineIssue>();
   @Output() scrollRight = new EventEmitter<void>();
   @Output() scrollLeft = new EventEmitter<void>();
@@ -149,6 +155,16 @@ export class TimelineItemComponent implements OnChanges {
 
   protected onItemClick(): void {
     this.scrollTo.emit(this.item);
+  }
+
+  protected onCreateClick(
+    event: MouseEvent,
+    direction: TimelineCreateDirection,
+  ): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.item?.id) return;
+    this.createRelated.emit({ issue: this.item, direction });
   }
 
   private darkenColor(hex: string, percent: number): string {

@@ -11,6 +11,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -19,11 +20,13 @@ import { RenwuSidebarService } from '@renwu/app-ui';
 import {
   Issue,
   IssueGroup,
+  IssueLinks,
   ListOptions,
   Milestone,
   QueryBuilderComponent,
   RwDataService,
   RwIssueDateTimeService,
+  RwIssueService,
   RwQueryBuilderService,
   RwSearchService,
   RwShortcutService,
@@ -46,7 +49,12 @@ import { TimelineItemComponent } from './graph/timeline-item.component';
 import { TimelineLinkComponent } from './graph/timeline-link.component';
 import { TimelineParentScopeComponent } from './graph/timeline-parent-scope.component';
 import { buildTimelineParentScopeLayouts } from './graph/parent-scope-layout';
+import { clampTimelinePan } from './canvas-pan';
 import { addMonthsUtc, parseUtcLike, unixSeconds } from './date-helpers';
+import {
+  TimelineCreateDirection,
+  timelineIssueToLink,
+} from './issue-to-link';
 import {
   IssueTreeRoot,
   TimelineIssue,
@@ -66,7 +74,10 @@ import { TimelineScaleComponent } from './scale/timeline-scale.component';
 import { TimelineDataService } from './services/timeline-data.service';
 import { TimelineSettingsService } from './services/timeline-settings.service';
 import { TimelineStateService } from './services/timeline-state.service';
-import { TimelineHolderDirective } from './shared/directives/timeline-holder.directive';
+import {
+  TimelineHolderDirective,
+  TimelinePanDelta,
+} from './shared/directives/timeline-holder.directive';
 import { TimelineTableItemComponent } from './table/timeline-table-item.component';
 import { unixSecondsVirtual } from './virtual-hours';
 import { WorkloadUserComponent } from './workload/workload-user.component';
@@ -114,6 +125,7 @@ export class TimelineComponent {
   private readonly translocoService = inject(TranslocoService);
   private readonly searchService = inject(RwSearchService);
   private readonly rwDataService = inject(RwDataService);
+  private readonly issueService = inject(RwIssueService);
   private readonly websocketService = inject(RwWebsocketService);
   private readonly shortcutService = inject(RwShortcutService);
   private readonly settingsService = inject(TimelineSettingsService);
@@ -240,11 +252,26 @@ export class TimelineComponent {
     return Math.max(0, (endV - o) / scale);
   });
 
-  /** Total height of the sticky milestone strip (`milestones × milestoneRowHeightPx`). */
+  /** Total height of the milestone strip (`milestones × milestoneRowHeightPx`). */
   protected readonly roadmapBandHeightPx = computed(() => {
     const s = this.settings();
     if (!s.showMilestones) return 0;
     return this.roadmapItems().length * s.milestoneRowHeightPx;
+  });
+
+  /** Must match ruler chrome + `--timeline-header-height`. */
+  protected readonly headerHeightPx = 41;
+
+  /** Visible issue/group rows + roadmap band (world height for vertical clamp). */
+  protected readonly contentHeightPx = computed(() => {
+    this.treeRevision();
+    const s = this.settings();
+    const roots = this.rootChild().childs;
+    let rows = 0;
+    for (const root of roots || []) {
+      rows += countVisibleTimelineRows(root);
+    }
+    return this.roadmapBandHeightPx() + rows * s.issueRowHeightPx;
   });
 
   /**
@@ -351,8 +378,18 @@ export class TimelineComponent {
     });
   });
 
-  protected readonly scrollLeftGraph = signal(0);
-  protected readonly scrollTopGraph = signal(0);
+  /** Camera offset over the Gantt world (CSS transform, not native scroll). */
+  protected readonly panX = signal(0);
+  protected readonly panY = signal(0);
+  protected readonly worldTransform = computed(
+    () => `translate3d(${-this.panX()}px, ${-this.panY()}px, 0)`,
+  );
+  protected readonly rulerTransform = computed(
+    () => `translate3d(${-this.panX()}px, 0, 0)`,
+  );
+  protected readonly tableTransform = computed(
+    () => `translate3d(0, ${-this.panY()}px, 0)`,
+  );
   private readonly activeContainerId = signal<string | null>(null);
   private readonly pendingReload = signal(false);
   private selectedIssueId: string | null = null;
@@ -398,14 +435,11 @@ export class TimelineComponent {
   });
 
   private dragTimeline = false;
-  private scrollSource: 'graph' | 'table' | null = null;
   private resizeTableHandle: (() => void) | null = null;
   private resizeTableEndHandle: (() => void) | null = null;
   private prevTableScreenX = 0;
+  private zoomPersistTimer: ReturnType<typeof setTimeout> | null = null;
   @ViewChild('graphScroll') private graphScroll?: ElementRef<HTMLDivElement>;
-  @ViewChild('rulerWrapper') private rulerWrapper?: ElementRef<HTMLDivElement>;
-  @ViewChild('tableBody') private tableBody?: ElementRef<HTMLDivElement>;
-  @ViewChild('workloadBars') private workloadBars?: ElementRef<HTMLDivElement>;
 
   private readonly queryParams = toSignal(
     this.route.queryParamMap.pipe(
@@ -554,14 +588,22 @@ export class TimelineComponent {
       });
 
     const left = this.shortcutService.subscribe('ArrowLeft', () => {
-      this.scrollLeftGraph.update((v) => Math.max(0, v - 100));
+      this.applyPanDelta(-100, 0);
     });
     const right = this.shortcutService.subscribe('ArrowRight', () => {
-      this.scrollLeftGraph.update((v) => v + 100);
+      this.applyPanDelta(100, 0);
+    });
+    const up = this.shortcutService.subscribe('ArrowUp', () => {
+      this.applyPanDelta(0, -100);
+    });
+    const down = this.shortcutService.subscribe('ArrowDown', () => {
+      this.applyPanDelta(0, 100);
     });
     this.destroyRef.onDestroy(() => {
       left?.unsubscribe();
       right?.unsubscribe();
+      up?.unsubscribe();
+      down?.unsubscribe();
     });
 
     effect(() => {
@@ -571,18 +613,11 @@ export class TimelineComponent {
       }
     });
 
+    // Re-clamp X when track size or table chrome width changes.
     effect(() => {
-      const left = this.scrollLeftGraph();
-      const top = this.scrollTopGraph();
-      if (this.rulerWrapper?.nativeElement) {
-        this.rulerWrapper.nativeElement.scrollLeft = left;
-      }
-      if (this.tableBody?.nativeElement) {
-        this.tableBody.nativeElement.scrollTop = top;
-      }
-      if (this.workloadBars?.nativeElement) {
-        this.workloadBars.nativeElement.scrollLeft = left;
-      }
+      this.timelineTrackWidthPx();
+      this.settings().tableWidth;
+      untracked(() => this.clampPanToBounds());
     });
 
     // Keep local state in sync with route and resolve query string from hash.
@@ -616,28 +651,53 @@ export class TimelineComponent {
       60_000,
     );
     this.destroyRef.onDestroy(() => clearInterval(nowLineInterval));
+
+    afterNextRender(
+      () => {
+        const el = this.graphScroll?.nativeElement;
+        if (!el) return;
+
+        // Non-passive so pinch / ctrl+wheel can preventDefault (page zoom).
+        const onWheel = (event: WheelEvent) => this.onViewportWheel(event);
+        el.addEventListener('wheel', onWheel, { passive: false });
+
+        let ro: ResizeObserver | null = null;
+        if (typeof ResizeObserver !== 'undefined') {
+          ro = new ResizeObserver(() => this.clampPanToBounds());
+          ro.observe(el);
+        }
+
+        this.destroyRef.onDestroy(() => {
+          el.removeEventListener('wheel', onWheel);
+          ro?.disconnect();
+          if (this.zoomPersistTimer) {
+            clearTimeout(this.zoomPersistTimer);
+            this.zoomPersistTimer = null;
+          }
+        });
+      },
+      { injector: this.injector },
+    );
   }
 
   protected onScaleChanged(): void {
     this.hours24InDay.set(this.issueDateTimeSvc.issueDateTime.hours24InDay);
-    const graphEl = this.graphScroll?.nativeElement;
-    if (!graphEl) return;
+    const graphW = this.graphViewportWidth();
+    if (graphW <= 0) return;
     const h24 = this.hours24InDay();
     const startV = unixSecondsVirtual(this.dateStart(), h24, '');
-    const centerPx = this.scrollLeftGraph() + graphEl.clientWidth / 2;
+    const centerPx = this.panX() + graphW / 2;
     const centerVirtual = startV + centerPx * this.settings().oldScale;
     const nextLeft =
-      (centerVirtual - startV) / this.settings().scale - graphEl.clientWidth / 2;
-    this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
+      (centerVirtual - startV) / this.settings().scale - graphW / 2;
+    this.setPan(nextLeft, this.panY());
   }
 
   protected onFitToScreen(): void {
-    const graphEl = this.graphScroll?.nativeElement;
-    if (!graphEl) return;
-    const contentWidth = graphEl.clientWidth;
-    if (!contentWidth) return;
+    const graphW = this.graphViewportWidth();
+    if (graphW <= 0) return;
     const idealScale =
-      (unixSeconds(this.dateEnd()) - unixSeconds(this.dateStart())) / contentWidth;
+      (unixSeconds(this.dateEnd()) - unixSeconds(this.dateStart())) / graphW;
     const ticks = this.settingsService.ticks;
     for (const tick of ticks) {
       if (!tick.scale) continue;
@@ -646,7 +706,7 @@ export class TimelineComponent {
         pct = Math.max(50, Math.min(200, pct));
         this.settingsService.setScaleTick(tick.id);
         this.settingsService.setScaleValue(pct);
-        this.scrollLeftGraph.set(0);
+        this.setPan(0, this.panY());
         return;
       }
     }
@@ -654,7 +714,7 @@ export class TimelineComponent {
     if (lastTick) {
       this.settingsService.setScaleTick(lastTick.id);
       this.settingsService.setScaleValue(50);
-      this.scrollLeftGraph.set(0);
+      this.setPan(0, this.panY());
     }
   }
 
@@ -664,6 +724,58 @@ export class TimelineComponent {
     if (String(item.type) !== 'group' && item?.key) {
       this.sidebarService.currentTask.next(item as Issue);
     }
+  }
+
+  /**
+   * Open create-task form with relationship prefilled:
+   * left=prev, right=next, top=parent, bottom=child.
+   */
+  protected async onCreateRelated(event: {
+    issue: TimelineIssue;
+    direction: TimelineCreateDirection;
+  }): Promise<void> {
+    const issue = event.issue;
+    if (!issue?.id || String(issue.type) === 'group') return;
+    if (!issue.container?.id) return;
+
+    const empty: IssueLinks = {
+      parent: [],
+      prev_issue: [],
+      next_issue: [],
+      related: [],
+    };
+    const selfLink = timelineIssueToLink(issue);
+    let links: IssueLinks = empty;
+
+    switch (event.direction) {
+      case 'child':
+        links = { ...empty, parent: [selfLink] };
+        this.issueService.clearPendingSubtasks();
+        break;
+      case 'next':
+        links = { ...empty, prev_issue: [selfLink] };
+        this.issueService.clearPendingSubtasks();
+        break;
+      case 'prev':
+        links = { ...empty, next_issue: [selfLink] };
+        this.issueService.clearPendingSubtasks();
+        break;
+      case 'parent':
+        links = empty;
+        break;
+    }
+
+    await this.router.navigate([{ outlets: { section: ['task', 'new'] } }]);
+    setTimeout(() => {
+      this.issueService.updateFromTemplate({
+        container: issue.container,
+        links,
+      } as Issue);
+      if (event.direction === 'parent') {
+        // Show on create form Subtasks; linked for real in RwIssueService.create().
+        this.issueService.setPendingSubtasks([selfLink]);
+      }
+    });
   }
 
   protected onTreeExpanded(): void {
@@ -731,35 +843,66 @@ export class TimelineComponent {
     return this.currentUser() ?? null;
   }
 
-  protected onTableScroll(event: Event): void {
-    if (this.scrollSource === 'graph') return;
-    this.scrollSource = 'table';
-    const target = event.target as HTMLDivElement | null;
-    if (!target) return;
-    this.scrollTopGraph.set(target.scrollTop);
-    if (this.graphScroll?.nativeElement) {
-      this.graphScroll.nativeElement.scrollTop = target.scrollTop;
+  protected onViewportWheel(event: WheelEvent): void {
+    event.preventDefault();
+    // Trackpad pinch (and ctrl/cmd+wheel) → zoom; plain wheel → pan.
+    if (event.ctrlKey || event.metaKey) {
+      this.applyGestureZoom(event);
+      return;
     }
-    requestAnimationFrame(() => (this.scrollSource = null));
+    const dx =
+      event.shiftKey && event.deltaX === 0 ? event.deltaY : event.deltaX;
+    const dy =
+      event.shiftKey && event.deltaX === 0 ? 0 : event.deltaY;
+    this.applyPanDelta(dx, dy);
   }
 
-  protected onGraphScroll(event: Event): void {
-    if (this.scrollSource === 'table') return;
-    this.scrollSource = 'graph';
-    const target = event.target as HTMLDivElement | null;
-    if (!target) return;
-    this.scrollLeftGraph.set(target.scrollLeft);
-    this.scrollTopGraph.set(target.scrollTop);
-    if (this.rulerWrapper?.nativeElement) {
-      this.rulerWrapper.nativeElement.scrollLeft = target.scrollLeft;
+  /**
+   * Pinch / ctrl+wheel zoom toward the cursor (graph X), keeping that date fixed.
+   * Integer percent; at 50%/200% switches Day↔Week↔Quarter. Persists after settle.
+   */
+  private applyGestureZoom(event: WheelEvent): void {
+    const viewport = this.graphScroll?.nativeElement;
+    if (!viewport) return;
+
+    const graphW = this.graphViewportWidth();
+    if (graphW <= 0) return;
+
+    const tableW = this.settings().tableWidth;
+    const rect = viewport.getBoundingClientRect();
+    const cursorGraphX = event.clientX - rect.left - tableW;
+    const anchorX =
+      cursorGraphX >= 0 && cursorGraphX <= graphW ? cursorGraphX : graphW / 2;
+
+    const oldScale = this.settings().scale;
+    if (!oldScale) return;
+
+    const h24 = this.hours24InDay();
+    const startV = unixSecondsVirtual(this.dateStart(), h24, '');
+    const focusVirtual = startV + (this.panX() + anchorX) * oldScale;
+
+    let delta = event.deltaY;
+    if (event.deltaMode === 1) delta *= 16; // DOM_DELTA_LINE
+    if (event.deltaMode === 2) delta *= graphW; // DOM_DELTA_PAGE
+    const factor = Math.exp(-delta * 0.01);
+
+    if (!this.settingsService.applyGestureZoomFactor(factor, { persist: false })) {
+      return;
     }
-    if (this.tableBody?.nativeElement) {
-      this.tableBody.nativeElement.scrollTop = target.scrollTop;
-    }
-    if (this.workloadBars?.nativeElement) {
-      this.workloadBars.nativeElement.scrollLeft = target.scrollLeft;
-    }
-    requestAnimationFrame(() => (this.scrollSource = null));
+
+    const newScale = this.settings().scale;
+    if (!newScale) return;
+
+    this.setPan((focusVirtual - startV) / newScale - anchorX, this.panY());
+    this.scheduleZoomPersist();
+  }
+
+  private scheduleZoomPersist(): void {
+    if (this.zoomPersistTimer) clearTimeout(this.zoomPersistTimer);
+    this.zoomPersistTimer = setTimeout(() => {
+      this.zoomPersistTimer = null;
+      this.settingsService.persistScale();
+    }, 280);
   }
 
   protected onCenterNow(): void {
@@ -830,10 +973,10 @@ export class TimelineComponent {
     }
   }
 
-  /** Horizontally scrolls the graph so the milestone’s end date sits near the center. */
+  /** Pans so the milestone’s end date sits near the center of the graph window. */
   private scrollGraphToMilestoneEnd(m: Milestone): void {
-    const graphEl = this.graphScroll?.nativeElement;
-    if (!graphEl || graphEl.clientWidth <= 0) return;
+    const graphW = this.graphViewportWidth();
+    if (graphW <= 0) return;
     const g = milestoneBarGeometry(
       m,
       this.dateStart(),
@@ -841,11 +984,7 @@ export class TimelineComponent {
       this.hours24InDay(),
     );
     if (!g) return;
-    const nextLeft = Math.max(
-      0,
-      Math.floor(g.rightPx - graphEl.clientWidth / 2),
-    );
-    this.scrollLeftGraph.set(nextLeft);
+    this.setPan(g.rightPx - graphW / 2, this.panY());
   }
 
   /** Stripe index for the i-th root row (aligned with visible subtree sizes). */
@@ -880,10 +1019,9 @@ export class TimelineComponent {
     this.dragTimeline = true;
   }
 
-  protected onTimelineDrag(deltaX: number): void {
-    if (this.dragTimeline) {
-      this.scrollLeftGraph.update((v) => Math.max(0, v + deltaX));
-    }
+  protected onTimelineDrag(delta: TimelinePanDelta): void {
+    if (!this.dragTimeline) return;
+    this.applyPanDelta(delta.deltaX, delta.deltaY);
   }
 
   protected onTimelineDragEnd(): void {
@@ -1001,16 +1139,16 @@ export class TimelineComponent {
   }
 
   /**
-   * Scroll so "now" is centered. Uses the same virtual axis as the graph (`unixSecondsVirtual`).
-   * Retries briefly if the graph host is not in the DOM yet (first paint after load).
+   * Pan so "now" is centered. Uses the same virtual axis as the graph (`unixSecondsVirtual`).
+   * Retries briefly if the viewport is not measured yet (first paint after load).
    */
   private centerNow(): void {
     this.centerOnNow(0);
   }
 
   private centerOnNow(attempt: number): void {
-    const graphEl = this.graphScroll?.nativeElement;
-    if (!graphEl || graphEl.clientWidth <= 0) {
+    const graphW = this.graphViewportWidth();
+    if (graphW <= 0) {
       if (attempt < 24) {
         requestAnimationFrame(() => this.centerOnNow(attempt + 1));
       }
@@ -1021,20 +1159,53 @@ export class TimelineComponent {
     const startV = unixSecondsVirtual(this.dateStart(), h24, '');
     const scale = this.settings().scale;
     const nowOffset = (nowV - startV) / scale;
-    this.scrollLeftGraph.set(Math.max(0, Math.floor(nowOffset - graphEl.clientWidth / 2)));
+    this.setPan(nowOffset - graphW / 2, this.panY());
   }
 
   private centerAtIssue(issue: TimelineIssue): void {
-    const graphEl = this.graphScroll?.nativeElement;
-    if (!graphEl) return;
+    const graphW = this.graphViewportWidth();
+    if (graphW <= 0) return;
     const centerDate = parseUtcLike(issue.date_start_calc);
     if (!centerDate) return;
     const h24 = this.hours24InDay();
     const centerV = unixSecondsVirtual(centerDate, h24, 'start');
     const startV = unixSecondsVirtual(this.dateStart(), h24, '');
     const nextLeft =
-      (centerV - startV) / this.settings().scale - graphEl.clientWidth / 2;
-    this.scrollLeftGraph.set(Math.max(0, Math.floor(nextLeft)));
+      (centerV - startV) / this.settings().scale - graphW / 2;
+    this.setPan(nextLeft, this.panY());
+  }
+
+  /** Visible graph width (viewport minus sticky table chrome). */
+  private graphViewportWidth(): number {
+    const el = this.graphScroll?.nativeElement;
+    if (!el) return 0;
+    return Math.max(0, el.clientWidth - this.settings().tableWidth);
+  }
+
+  private applyPanDelta(deltaX: number, deltaY: number): void {
+    this.setPan(this.panX() + deltaX, this.panY() + deltaY);
+  }
+
+  private setPan(x: number, y: number): void {
+    const clamped = this.clampPanValues(x, y);
+    this.panX.set(clamped.x);
+    this.panY.set(clamped.y);
+  }
+
+  private clampPanToBounds(): void {
+    const clamped = this.clampPanValues(this.panX(), this.panY());
+    if (clamped.x !== this.panX()) this.panX.set(clamped.x);
+    if (clamped.y !== this.panY()) this.panY.set(clamped.y);
+  }
+
+  /** Clamp camera X to the date track; Y is unrestricted. */
+  private clampPanValues(x: number, y: number): { x: number; y: number } {
+    return clampTimelinePan(
+      x,
+      y,
+      this.timelineTrackWidthPx(),
+      this.graphViewportWidth(),
+    );
   }
 
   private requestReload(): void {

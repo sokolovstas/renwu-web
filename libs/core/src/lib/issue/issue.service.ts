@@ -6,6 +6,7 @@ import {
   Observable,
   Subject,
   firstValueFrom,
+  forkJoin,
   from,
   merge,
   of,
@@ -64,6 +65,13 @@ export class RwIssueService implements OnDestroy {
 
   public key = new Subject<string>();
 
+  /**
+   * Issues that will become children when the current `new` task is created
+   * (e.g. timeline “+ parent”). Shown in Subtasks on the create form.
+   */
+  private readonly pendingSubtasksSubject = new BehaviorSubject<IssueLink[]>([]);
+  readonly pendingSubtasks = this.pendingSubtasksSubject.asObservable();
+
   issueStorage: Issue;
 
   issueForm = new FormGroup({
@@ -114,6 +122,12 @@ export class RwIssueService implements OnDestroy {
   private template = new Subject<Issue>();
 
   private issueInt = this.key.pipe(
+    tap((key) => {
+      // Leaving the create form discards staged subtasks (create() clears after save).
+      if (key && key !== 'new') {
+        this.clearPendingSubtasks();
+      }
+    }),
     switchMap((key) =>
       merge(
         from(this.initIssue({ key })),
@@ -215,6 +229,25 @@ export class RwIssueService implements OnDestroy {
 
   updateFromTemplate(issue: Issue) {
     this.template.next(issue);
+  }
+
+  setPendingSubtasks(children: IssueLink[]): void {
+    this.pendingSubtasksSubject.next(
+      (children ?? []).filter((c) => !!c?.id).map((c) => ({ ...c })),
+    );
+  }
+
+  clearPendingSubtasks(): void {
+    if (this.pendingSubtasksSubject.value.length) {
+      this.pendingSubtasksSubject.next([]);
+    }
+  }
+
+  removePendingSubtask(id: string): void {
+    const next = this.pendingSubtasksSubject.value.filter(
+      (c) => String(c.id) !== String(id),
+    );
+    this.pendingSubtasksSubject.next(next);
   }
 
   async initIssue(issue: Issue) {
@@ -338,16 +371,61 @@ export class RwIssueService implements OnDestroy {
     }
     issue.id = null;
     issue.key = null;
+    const pendingChildren = [...this.pendingSubtasksSubject.value];
     return this.dataService.addIssue(issue).pipe(
-      switchMap((data) => {
-        // if (issue.favorite) {
-        //   return this.setFavorite(true).pipe(map(() => data));
-        // }
-        return of(data);
-      }),
+      switchMap((created) =>
+        this.attachPendingSubtasks(created, pendingChildren).pipe(
+          map(() => created),
+          catchError(() => of(created)),
+        ),
+      ),
       tap(() => {
+        this.clearPendingSubtasks();
         this.patchIssue(this.createAnother(issue));
       }),
+    );
+  }
+
+  /** After parent create: set each pending issue's `links.parent` to the new task. */
+  private attachPendingSubtasks(
+    parent: Issue,
+    children: IssueLink[],
+  ): Observable<unknown> {
+    if (!parent?.id || !children.length) {
+      return of(null);
+    }
+    const parentLink: IssueLink = {
+      id: String(parent.id),
+      title: parent.title ?? '',
+      key: parent.key ?? '',
+      have_childs: true,
+    } as IssueLink;
+    return forkJoin(
+      children.map((childRef) =>
+        this.dataService.getIssue(String(childRef.id)).pipe(
+          switchMap((child) => {
+            if (!child?.id) {
+              return of(null);
+            }
+            const existing = child.links?.parent ?? [];
+            if (
+              existing.some((p) => String(p.id) === String(parentLink.id))
+            ) {
+              return of(null);
+            }
+            const links: IssueLinks = {
+              parent: [...existing, parentLink],
+              related: child.links?.related ?? [],
+              prev_issue: child.links?.prev_issue ?? [],
+              next_issue: child.links?.next_issue ?? [],
+            };
+            return this.dataService.saveIssue(String(child.id), {
+              links,
+            } as Issue);
+          }),
+          catchError(() => of(null)),
+        ),
+      ),
     );
   }
   save(issuePrev: Issue, issue: Issue) {

@@ -8,9 +8,11 @@ import {
   Input,
   OnInit,
   Output,
+  effect,
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   TRANSLOCO_SCOPE,
@@ -54,6 +56,7 @@ const HIERARCHY_OPTIONS = [
   styleUrl: './timeline-scale.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     TranslocoPipe,
     FormsModule,
     RwButtonComponent,
@@ -86,6 +89,15 @@ export class TimelineScaleComponent implements OnInit {
 
   /** Reactive snapshot; use in template as `settings()` so OnPush updates when storage/slider changes. */
   protected readonly settings = computed(() => this.settingsService.timelineSettings());
+
+  constructor() {
+    // Keep tick select in sync when pinch-zoom crosses Day/Week/Quarter.
+    effect(() => {
+      const tick = this.settings().scaleTick;
+      void this.scaleTickModel.setData(tick);
+      this.cdr.markForCheck();
+    });
+  }
 
   ngOnInit(): void {
     this.refreshSelectLabels();

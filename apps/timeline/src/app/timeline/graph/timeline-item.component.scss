@@ -1,5 +1,4 @@
-/* Graph stacking: row bg (0) → row highlight (1) → parent scope (2) → bar (4). */
-$timeline-layer-row-bg: 0;
+/* Graph stacking: row highlight (1) → parent scope (2) → bar (4). */
 $timeline-layer-row-highlight: 1;
 $timeline-layer-bar: 4;
 
@@ -8,15 +7,6 @@ $timeline-layer-bar: 4;
   display: flex;
   align-items: center;
   background: transparent;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: $timeline-layer-row-bg;
-    pointer-events: none;
-    transition: background-color 0.12s ease;
-  }
 
   &.timeline-row-highlight::after {
     content: '';
@@ -31,84 +21,85 @@ $timeline-layer-bar: 4;
 .timeline-item-group {
   @include timeline-graph-row-shell;
 
-  &::before {
-    background: var(--gray-100);
-  }
-
-  &.timeline-row-alt::before {
-    background: var(--gray-200);
-  }
-
-  &:hover::before {
-    background: var(--gray-200);
-  }
-
-  &.timeline-row-alt:hover::before {
-    background: var(--gray-300);
-  }
-
   &.timeline-row-highlight::after {
     background: var(--gray-300);
-  }
-
-  &.timeline-row-highlight:hover::after {
-    background: var(--gray-400);
   }
 }
 
 .timeline-item {
   @include timeline-graph-row-shell;
 
-  &::before {
-    background: transparent;
-  }
-
-  &.timeline-row-alt::before {
-    background: var(--gray-100);
-  }
-
-  &:hover::before {
-    background: var(--gray-100);
-  }
-
-  &.timeline-row-alt:hover::before {
-    background: var(--gray-200);
-  }
-
   &.timeline-row-highlight::after {
     background: var(--gray-200);
   }
 
-  &.timeline-row-highlight:hover::after {
-    background: var(--gray-300);
+  &:hover .bar-create-actions,
+  .bar-create-actions:focus-within {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
 .timeline-item-empty {
   @include timeline-graph-row-shell;
 
-  &::before {
-    background: transparent;
-  }
-
-  &.timeline-row-alt::before {
-    background: var(--gray-100);
-  }
-
-  &:hover::before {
-    background: var(--gray-100);
-  }
-
-  &.timeline-row-alt:hover::before {
-    background: var(--gray-200);
-  }
-
   &.timeline-row-highlight::after {
     background: var(--gray-200);
   }
+}
 
-  &.timeline-row-highlight:hover::after {
-    background: var(--gray-300);
+.bar-create-actions {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: calc(#{$timeline-layer-bar} + 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.bar-create-btn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--gray-300);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--gray-600);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    color: var(--accent-secondary-color);
+    border-color: var(--accent-secondary-color);
+  }
+
+  &--prev {
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &--next {
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+  }
+
+  &--parent {
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  &--child {
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 50%);
   }
 }
 

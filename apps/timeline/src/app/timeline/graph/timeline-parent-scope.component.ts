@@ -37,7 +37,7 @@ export class TimelineParentScopeComponent {
   }
   @HostBinding('style.z-index')
   protected get hostZIndex(): number {
-    // Above row stripe (0) and row highlight (1), below bars (4).
+    // Above row highlight (1), below bars (4).
     const depth = this.layout?.depth ?? 0;
     return Math.min(2 + depth, 3);
   }

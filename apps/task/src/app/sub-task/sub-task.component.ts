@@ -55,6 +55,7 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
   template: `
     @let isNew = isNewIssue | async;
     @let canEdit = canEdit$ | async;
+    @let pending = pendingSubtasks$ | async;
     <div class="mt-4 mx-2">
       <div
         class="font-extralight text-2xl mb-2 flex flex-row flex-wrap items-center justify-between gap-2"
@@ -80,7 +81,28 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
         }
       </div>
       @if (isNew) {
-        <p class="text-sm opacity-70 mb-2">{{ 'task.subtask-save-first' | transloco }}</p>
+        @if (pending?.length) {
+          <div class="flex flex-col gap-1 px-1">
+            @for (c of pending; track c.id) {
+              <div class="flex flex-row items-center justify-between gap-2 text-sm">
+                <renwu-issue-href
+                  [issue]="c"
+                  [key]="c.key"
+                  [title]="c.title"
+                  [linkButton]="true"
+                />
+                <rw-button
+                  class="opacity-40 hover:opacity-100"
+                  typeButton="icon"
+                  iconClass="trash"
+                  (clicked)="removePendingSubtask(c.id)"
+                />
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-sm opacity-70 mb-2">{{ 'task.subtask-save-first' | transloco }}</p>
+        }
       }
       @if (isNew === false) {
         @if (childData$ | async; as data) {
@@ -164,6 +186,7 @@ export class SubTaskComponent {
   };
 
   isNewIssue = this.issueService.newIssue;
+  pendingSubtasks$ = this.issueService.pendingSubtasks;
 
   canEdit$ = merge(
     this.issueService.issue,
@@ -208,6 +231,11 @@ export class SubTaskComponent {
 
   hasProgress(data: IssueChilds): boolean {
     return (data.childs_total ?? 0) > 0;
+  }
+
+  removePendingSubtask(id: string): void {
+    this.issueService.removePendingSubtask(id);
+    this.cd.markForCheck();
   }
 
   /** Attach an existing issue as a child via its `links.parent`. */

@@ -2,6 +2,8 @@
   class="timeline-container"
   [style.--timeline-milestone-row-height.px]="settings().milestoneRowHeightPx"
   [style.--timeline-roadmap-band-height.px]="roadmapBandHeightPx()"
+  [style.--timeline-table-width.px]="settings().tableWidth"
+  [style.--timeline-header-height.px]="headerHeightPx"
 >
   @if (!isWorkload()) {
     <div class="timeline-filters">
@@ -30,101 +32,43 @@
       (mousedown)="onResizeDown($event)"
     ></div>
 
-    <div class="timeline-layout-header">
-      <div
-        class="timeline-table-header"
-        [style.width.px]="settings().tableWidth"
-        [style.min-width.px]="settings().tableWidth"
-      >
-        <span class="th-col th-key">{{ 'timeline.colKey' | transloco }}</span>
-        <span class="th-col th-type">{{ 'timeline.colType' | transloco }}</span>
-        <span class="th-col th-priority">{{ 'timeline.colPriority' | transloco }}</span>
-        <span class="th-col th-title">{{ 'timeline.colTitle' | transloco }}</span>
-        <span class="th-col th-assignee">{{ 'timeline.colAssignee' | transloco }}</span>
-        <span class="th-col th-pct">{{ 'timeline.colCompletion' | transloco }}</span>
-        <span class="th-col th-status">{{ 'timeline.colStatus' | transloco }}</span>
-      </div>
-      <div class="timeline-ruler-wrapper" #rulerWrapper>
-        <renwu-timeline-ruler
-          [scale]="settings().scale"
-          [scaleTick]="settings().scaleTick"
-          [dateStart]="dateStart()"
-          [dateEnd]="rulerLimit()"
-          [hours24InDay]="hours24InDay()"
-          [nowLinePx]="nowLinePx()"
-        />
-      </div>
-    </div>
-
-    <div class="timeline-layout-body">
-      <div
-        class="timeline-table"
-        #tableBody
-        [style.width.px]="settings().tableWidth"
-        [style.min-width.px]="settings().tableWidth"
-        (scroll)="onTableScroll($event)"
-      >
-        @if (settings().showMilestones && roadmapItems().length) {
-          <div
-            class="timeline-table-milestones"
-            [style.height.px]="roadmapBandHeightPx()"
-          >
-            @for (m of roadmapItems(); track m.id) {
-              @let dates = milestoneListDateLabel(m);
-              <div
-                class="timeline-milestone-list-row"
-                [style.height.px]="settings().milestoneRowHeightPx"
-              >
-                <button
-                  type="button"
-                  class="timeline-milestone-list-item"
-                  [class.timeline-milestone-list-item--selected]="selectMilestone()?.id === m.id"
-                  (click)="onMilestoneListClick(m)"
-                >
-                  <span class="timeline-milestone-list-item-title">{{ m.title }}</span>
-                  @if (dates) {
-                    <span class="timeline-milestone-list-item-dates">{{ dates }}</span>
-                  }
-                </button>
-              </div>
-            }
-          </div>
-        }
-        @for (row of rootChild().childs; track trackRootRow($index, row)) {
-          <renwu-timeline-table-item
-            [item]="row"
-            [stripeIndex]="stripeIndexForRoot($index)"
-            [highlightedId]="hoveredIssueId()"
-            [dimmed]="isIssueDimmed(row.id)"
-            [depth]="0"
-            [tableWidth]="settings().tableWidth"
-            [issueRowHeightPx]="settings().issueRowHeightPx"
-            [tableFontSizePx]="settings().fontSize"
-            [treeRevision]="treeRevision()"
-            (selected)="onSelected($event)"
-            (scrollTo)="onScrollTo($event)"
-            (expanded)="onTreeExpanded()"
-          />
-        }
-      </div>
-
-      <div
-        class="timeline-graph"
-        #graphScroll
-        renwu-timeline-holder
-        [scrollLeft]="scrollLeftGraph()"
-        [scrollTop]="scrollTopGraph()"
-        (scroll)="onGraphScroll($event)"
-        (dragStart)="onTimelineDragStart()"
-        (dragDelta)="onTimelineDrag($event)"
-        (dragEnd)="onTimelineDragEnd()"
-      >
+    <!--
+      Figma-like camera: world pans via transform; ruler/table/corner are
+      overlay chrome whose content shares the same panX/panY offsets.
+    -->
+    <div
+      class="timeline-viewport"
+      #graphScroll
+      renwu-timeline-holder
+      (dragStart)="onTimelineDragStart()"
+      (dragDelta)="onTimelineDrag($event)"
+      (dragEnd)="onTimelineDragEnd()"
+    >
+      <!-- Day grid + now: full viewport height, pans only on X (not with panY). -->
+      <div class="timeline-graph-grid">
         <div
-          class="timeline-graph-content"
-          [class.has-milestones]="settings().showMilestones && roadmapBandHeightPx() > 0"
+          class="timeline-graph-grid-inner"
+          [style.width.px]="timelineTrackWidthPx()"
+          [style.transform]="rulerTransform()"
         >
+          @if (nowLinePx() !== null) {
+            <div class="timeline-now-line" [style.left.px]="nowLinePx()!"></div>
+          }
+          @for (pos of gridLines(); track pos) {
+            <div class="timeline-grid-line" [style.left.px]="pos"></div>
+          }
+        </div>
+      </div>
+
+      <div
+        class="timeline-world"
+        [style.width.px]="timelineTrackWidthPx()"
+        [style.height.px]="contentHeightPx()"
+        [style.transform]="worldTransform()"
+      >
+        <div class="timeline-graph-content">
           @if (settings().showMilestones && roadmapItems().length) {
-            <div class="timeline-roadmap-sticky">
+            <div class="timeline-roadmap-band">
               <renwu-timeline-roadmap
                 [items]="roadmapItems()"
                 [dateStart]="dateStart()"
@@ -136,12 +80,6 @@
                 (selectedMilestoneChange)="selectMilestone.set($event)"
               />
             </div>
-          }
-          @if (nowLinePx() !== null) {
-            <div class="timeline-now-line" [style.left.px]="nowLinePx()!"></div>
-          }
-          @for (pos of gridLines(); track pos) {
-            <div class="timeline-grid-line" [style.left.px]="pos"></div>
           }
 
           @for (marker of milestoneEndMarkers(); track marker.id) {
@@ -160,24 +98,25 @@
             />
           }
 
-          @for (row of rootChild().childs; track trackRootRow($index, row)) {
-            <renwu-timeline-item
-              [item]="row"
-              [stripeIndex]="stripeIndexForRoot($index)"
-              [highlightedId]="hoveredIssueId()"
-              [dimmed]="isIssueDimmed(row.id)"
-              [scale]="settings().scale"
-              [dateStart]="dateStart()"
-              [dateEnd]="rulerLimit()"
-              [hours24InDay]="hours24InDay()"
-              [showTitleRight]="settings().showTitleRight"
-              [issueRowHeightPx]="settings().issueRowHeightPx"
-              [selectMilestone]="selectMilestone()"
-              [treeRevision]="treeRevision()"
-              (selected)="onSelected($event)"
-              (scrollTo)="onScrollTo($event)"
-            />
-          }
+            @for (row of rootChild().childs; track trackRootRow($index, row)) {
+              <renwu-timeline-item
+                [item]="row"
+                [stripeIndex]="stripeIndexForRoot($index)"
+                [highlightedId]="hoveredIssueId()"
+                [dimmed]="isIssueDimmed(row.id)"
+                [scale]="settings().scale"
+                [dateStart]="dateStart()"
+                [dateEnd]="rulerLimit()"
+                [hours24InDay]="hours24InDay()"
+                [showTitleRight]="settings().showTitleRight"
+                [issueRowHeightPx]="settings().issueRowHeightPx"
+                [selectMilestone]="selectMilestone()"
+                [treeRevision]="treeRevision()"
+                (selected)="onSelected($event)"
+                (scrollTo)="onScrollTo($event)"
+                (createRelated)="onCreateRelated($event)"
+              />
+            }
 
           @for (layout of linksLayout(); track layout.link.issue.id + '-' + layout.link.link.id + '-' + layout.link.type) {
             <renwu-timeline-link
@@ -193,6 +132,82 @@
               (linkHover)="onLinkHover(layout, $event)"
             />
           }
+        </div>
+      </div>
+
+      <div class="timeline-overlay-ruler">
+        <div class="timeline-overlay-ruler-inner" [style.transform]="rulerTransform()">
+          <renwu-timeline-ruler
+            [scale]="settings().scale"
+            [scaleTick]="settings().scaleTick"
+            [dateStart]="dateStart()"
+            [dateEnd]="rulerLimit()"
+            [hours24InDay]="hours24InDay()"
+            [nowLinePx]="nowLinePx()"
+          />
+        </div>
+      </div>
+
+      <div class="timeline-overlay-table">
+        <div class="timeline-overlay-table-inner" [style.transform]="tableTransform()">
+          @if (settings().showMilestones && roadmapItems().length) {
+            <div
+              class="timeline-table-milestones"
+              [style.height.px]="roadmapBandHeightPx()"
+            >
+              @for (m of roadmapItems(); track m.id) {
+                @let dates = milestoneListDateLabel(m);
+                <div
+                  class="timeline-milestone-list-row"
+                  [style.height.px]="settings().milestoneRowHeightPx"
+                >
+                  <button
+                    type="button"
+                    class="timeline-milestone-list-item"
+                    [class.timeline-milestone-list-item--selected]="selectMilestone()?.id === m.id"
+                    (click)="onMilestoneListClick(m)"
+                  >
+                    <span class="timeline-milestone-list-item-title">{{ m.title }}</span>
+                    @if (dates) {
+                      <span class="timeline-milestone-list-item-dates">{{ dates }}</span>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          }
+          @for (row of rootChild().childs; track trackRootRow($index, row)) {
+            <renwu-timeline-table-item
+              [item]="row"
+              [stripeIndex]="stripeIndexForRoot($index)"
+              [highlightedId]="hoveredIssueId()"
+              [dimmed]="isIssueDimmed(row.id)"
+              [depth]="0"
+              [tableWidth]="settings().tableWidth"
+              [issueRowHeightPx]="settings().issueRowHeightPx"
+              [tableFontSizePx]="settings().fontSize"
+              [treeRevision]="treeRevision()"
+              (selected)="onSelected($event)"
+              (scrollTo)="onScrollTo($event)"
+              (expanded)="onTreeExpanded()"
+            />
+          }
+        </div>
+      </div>
+
+      <div class="timeline-overlay-corner">
+        <div
+          class="timeline-table-header"
+          [style.width.px]="settings().tableWidth"
+          [style.min-width.px]="settings().tableWidth"
+        >
+          <span class="th-col th-key">{{ 'timeline.colKey' | transloco }}</span>
+          <span class="th-col th-type">{{ 'timeline.colType' | transloco }}</span>
+          <span class="th-col th-priority">{{ 'timeline.colPriority' | transloco }}</span>
+          <span class="th-col th-title">{{ 'timeline.colTitle' | transloco }}</span>
+          <span class="th-col th-assignee">{{ 'timeline.colAssignee' | transloco }}</span>
+          <span class="th-col th-pct">{{ 'timeline.colCompletion' | transloco }}</span>
+          <span class="th-col th-status">{{ 'timeline.colStatus' | transloco }}</span>
         </div>
       </div>
     </div>
@@ -215,16 +230,18 @@
               </span>
             </div>
           </div>
-          <div class="timeline-workload-bars" #workloadBars>
-          <renwu-timeline-workload-user
-            [user]="currentUserValue()"
-            [workload]="workload()"
-            [scaleTick]="settings().scaleTick"
-            [hours24InDay]="hours24InDay()"
-            [dateStart]="dateStart()"
-            [dateEnd]="rulerLimit()"
-            [scale]="settings().scale"
-          />
+          <div class="timeline-workload-bars">
+            <div class="timeline-workload-bars-inner" [style.transform]="rulerTransform()">
+              <renwu-timeline-workload-user
+                [user]="currentUserValue()"
+                [workload]="workload()"
+                [scaleTick]="settings().scaleTick"
+                [hours24InDay]="hours24InDay()"
+                [dateStart]="dateStart()"
+                [dateEnd]="rulerLimit()"
+                [scale]="settings().scale"
+              />
+            </div>
           </div>
         </div>
       }
