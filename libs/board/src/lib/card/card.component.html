@@ -46,26 +46,7 @@
       </div>
     }
     @default {
-      <div class="renwu-boards-card__default">
-        <div class="renwu-boards-card__title-line">
-          <span class="renwu-boards-card__key">{{ issue.key }}</span>
-          <span class="renwu-boards-card__title">{{ issue.title }}</span>
-        </div>
-        <div class="renwu-boards-card__meta">
-          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--icon">
-            <renwu-issue-type [value]="issue.type" />
-          </span>
-          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--icon">
-            <renwu-issue-priority [value]="issue.priority" />
-          </span>
-          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--status">
-            <renwu-issue-status [value]="issue.status" [fontSizePx]="11" />
-          </span>
-          <span class="renwu-boards-card__meta-slot renwu-boards-card__meta-slot--assignee">
-            <renwu-issue-assignees [issue]="issue" avatarSize="22px" />
-          </span>
-        </div>
-      </div>
+      <renwu-issue-card [issue]="issue" [density]="density" />
     }
   }
 }

@@ -1,0 +1,20 @@
+@if (issue) {
+  <div class="renwu-issue-card__title-line">
+    <span class="renwu-issue-card__key">{{ issue.key }}</span>
+    <span class="renwu-issue-card__title">{{ issue.title }}</span>
+  </div>
+  <div class="renwu-issue-card__meta">
+    <span class="renwu-issue-card__meta-slot renwu-issue-card__meta-slot--icon">
+      <renwu-issue-type [value]="issue.type" />
+    </span>
+    <span class="renwu-issue-card__meta-slot renwu-issue-card__meta-slot--icon">
+      <renwu-issue-priority [value]="issue.priority" />
+    </span>
+    <span class="renwu-issue-card__meta-slot renwu-issue-card__meta-slot--status">
+      <renwu-issue-status [value]="issue.status" [fontSizePx]="11" />
+    </span>
+    <span class="renwu-issue-card__meta-slot renwu-issue-card__meta-slot--assignee">
+      <renwu-issue-assignees [issue]="issue" avatarSize="22px" />
+    </span>
+  </div>
+}

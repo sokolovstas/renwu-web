@@ -14,6 +14,7 @@ import {
 import {
   Issue,
   IssueAssigneesComponent,
+  IssueCardComponent,
   IssuePriorityComponent,
   IssueStatusComponent,
   IssueTypeComponent,
@@ -25,6 +26,7 @@ import { ITaskCard, RW_BOARD_SETTINGS } from '../board.settings';
   standalone: true,
   imports: [
     IssueAssigneesComponent,
+    IssueCardComponent,
     IssuePriorityComponent,
     IssueStatusComponent,
     IssueTypeComponent,

@@ -1,0 +1,17 @@
+@if (user) {
+  <renwu-avatar
+    [user]="user"
+    size="40px"
+    [showTooltip]="false"
+    [showOnline]="true"
+  />
+  <div class="renwu-user-card__info">
+    <div class="renwu-user-card__name">{{ displayName }}</div>
+    @if (showUsername) {
+      <div class="renwu-user-card__username">@{{ username }}</div>
+    }
+    @if (user.email) {
+      <div class="renwu-user-card__email">{{ user.email }}</div>
+    }
+  </div>
+}

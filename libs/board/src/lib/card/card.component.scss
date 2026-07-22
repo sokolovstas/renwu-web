@@ -6,7 +6,12 @@
 }
 
 :host(.renwu-boards-card--card),
-:host(.renwu-boards-card--list),
+:host(.renwu-boards-card--list) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
 :host(.renwu-boards-card--table),
 :host(.renwu-boards-card--stripe) {
   padding: 8px 10px;
@@ -15,25 +20,8 @@
   background-color: $rw-card-background;
 }
 
-:host(.renwu-boards-card--list) {
-  padding: 5px 8px;
-}
-
 :host(.renwu-boards-card--compact) {
-  padding: 4px 6px;
   font-size: 12px;
-}
-
-:host(.renwu-boards-card--detailed) {
-  padding: 10px 12px;
-}
-
-:host(.renwu-boards-card--compact) .renwu-boards-card__meta {
-  display: none;
-}
-
-:host(.renwu-boards-card--detailed) .renwu-boards-card__meta {
-  margin-top: 2px;
 }
 
 :host(.renwu-boards-card--table) {
@@ -53,13 +41,6 @@
 }
 
 .renwu-boards-card {
-  &__default,
-  &__stripe {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
   &__title-line,
   &__stripe {
     display: flex;
@@ -77,14 +58,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  &__meta {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--gray-700);
-    font-size: 12px;
   }
 
   &__meta-slot {
