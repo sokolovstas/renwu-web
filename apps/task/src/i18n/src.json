@@ -22,5 +22,13 @@
   "layout-fields-hint": "task.layout-fields-hint",
   "layout-fields-no-project": "task.layout-fields-no-project",
   "layout-restore-defaults": "task.layout-restore-defaults",
-  "layout-block": "task.layout-block"
+  "layout-block": "task.layout-block",
+  "jira-open": "task.jira-open",
+  "jira-sync-from": "task.jira-sync-from",
+  "jira-sync-to": "task.jira-sync-to",
+  "jira-create-confirm-title": "task.jira-create-confirm-title",
+  "jira-create-confirm-text": "task.jira-create-confirm-text",
+  "jira-import-done": "task.jira-import-done",
+  "jira-export-done": "task.jira-export-done",
+  "jira-create-done": "task.jira-create-done"
 }

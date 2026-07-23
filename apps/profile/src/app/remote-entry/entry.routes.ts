@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
+import { JiraComponent } from '../jira/jira.component';
 import { MainComponent } from '../main/main.component';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { SettingsComponent } from '../settings/settings.component';
@@ -49,6 +50,10 @@ export const ROUTES: Route[] = [
       {
         path: 'settings',
         component: SettingsComponent,
+      },
+      {
+        path: 'jira',
+        component: JiraComponent,
       },
       {
         path: 'notifications',

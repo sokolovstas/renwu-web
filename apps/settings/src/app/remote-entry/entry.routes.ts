@@ -3,6 +3,7 @@ import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarsComponent } from '../calendars/calendars.component';
 import { DictionaryComponent } from '../dictionary/dictionary.component';
+import { JiraComponent } from '../jira/jira.component';
 import { SettingsComponent } from '../settings/settings.component';
 import { SystemComponent } from '../system/system.component';
 import { UserComponent } from '../user/user.component';
@@ -67,6 +68,10 @@ export const ROUTES: Route[] = [
       {
         path: 'workflows/:id',
         component: WorkflowComponent,
+      },
+      {
+        path: 'jira',
+        component: JiraComponent,
       },
     ],
   },

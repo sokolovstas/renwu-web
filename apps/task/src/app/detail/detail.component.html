@@ -2,6 +2,7 @@
   @let isNew = issueService.newIssue | async;
   @let isFavorite = issueService.favorite | async;
   @let watching = issueService.watchingSelf | async;
+  @let jiraUrl = jiraLink | async;
   <div class="w-full h-full overflow-x-hidden">
     <form
       [formGroup]="issueService.issueForm"
@@ -49,28 +50,50 @@
                    />
                 }
                 @if (isNew === false) {
-                  <button type="button"
-                    class="task-watch-btn"
-                    [class.task-watch-btn--active]="watching"
-                    [attr.aria-pressed]="watching"
-                    [rwTooltip]="
-                      watching
-                        ? ('task.watch-tooltip-off' | transloco)
-                        : ('task.watch-tooltip-on' | transloco)
-                    "
+                  @if (watching) {
+                    <rw-button
+                      typeButton="icon"
+                      iconClass="pulse"
+                      [rwTooltip]="'task.watch-tooltip-off' | transloco"
+                      tooltipPlacement="left"
+                      (clicked)="toggleWatch()"
+                    />
+                  } @else {
+                    <rw-button
+                      typeButton="icon"
+                      iconClass="pulse-low"
+                      [rwTooltip]="'task.watch-tooltip-on' | transloco"
+                      tooltipPlacement="left"
+                      (clicked)="toggleWatch()"
+                    />
+                  }
+                }
+                @if (isNew === false) {
+                  @if (jiraUrl) {
+                    <rw-button
+                      typeButton="icon"
+                      iconClass="jira"
+                      [rwTooltip]="'task.jira-open' | transloco"
+                      tooltipPlacement="left"
+                      (clicked)="openJiraLink(jiraUrl)"
+                    />
+                    <rw-button
+                      typeButton="icon"
+                      iconClass="jira-sync-from"
+                      [disabled]="jiraBusy()"
+                      [rwTooltip]="'task.jira-sync-from' | transloco"
+                      tooltipPlacement="left"
+                      (clicked)="syncFromJira()"
+                    />
+                  }
+                  <rw-button
+                    typeButton="icon"
+                    iconClass="jira-sync-to"
+                    [disabled]="jiraBusy()"
+                    [rwTooltip]="'task.jira-sync-to' | transloco"
                     tooltipPlacement="left"
-                    (click)="$event.stopPropagation(); toggleWatch()"
-                    >
-                    <rw-icon [icon]="watching ? 'pulse' : 'pulse-low'"
-                      size="small"
-                      cursor="pointer"
-                     />
-                    <span class="task-watch-btn__label">{{
-                      watching
-                      ? ('task.watching' | transloco)
-                      : ('task.watch' | transloco)
-                    }}</span>
-                  </button>
+                    (clicked)="syncToJira()"
+                  />
                 }
                 @if (isNew === false) {
                   <rw-button typeButton="icon"

@@ -11,6 +11,12 @@
           <div class="profile-view__meta">{{ u.email }}</div>
         }
       </div>
+      <rw-button
+        class="profile-view__close"
+        typeButton="icon"
+        iconClass="close"
+        (clicked)="close()"
+      />
     </header>
 
     <nav class="profile-view__tabs">

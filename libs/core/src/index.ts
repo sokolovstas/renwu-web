@@ -14,6 +14,7 @@ export * from './lib/counter/counter.component';
 export * from './lib/data/board.model';
 export * from './lib/data/common.model';
 export * from './lib/data/data.service';
+export * from './lib/data/jira.model';
 export * from './lib/data/site.model';
 export * from './lib/data/site.service';
 export * from './lib/data/upload';

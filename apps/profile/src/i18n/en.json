@@ -1,6 +1,7 @@
 {
   "profile": "Profile",
   "settings": "Settings",
+  "jira": "Jira",
   "notifications": "Notifications",
   "tab-info": "Info",
   "tab-tasks": "Tasks",
@@ -47,5 +48,21 @@
   "notification-channel-todos": "Todos",
   "notification-channel-watched_by_me": "Watched by me",
   "notification-channel-watchers": "Watchers",
-  "profile-saved": "Profile saved"
+  "profile-saved": "Profile saved",
+  "jira-token": "Jira token",
+  "jira-token-hint": "Personal Access Token bound to your user. Required for Jira sync and issue create.",
+  "jira-token-configured": "A token is already saved. Leave the field blank to keep it, or paste a new one.",
+  "jira-token-saved": "Jira token saved",
+  "jira-save-token": "Save token",
+  "jira-pat-leave-blank": "Leave blank to keep the existing saved token.",
+  "jira-auth-mode": "Authentication",
+  "jira-auth-pat": "Personal Access Token (Bearer)",
+  "jira-auth-basic": "Basic (user + password / API token)",
+  "jira-user": "User / email",
+  "jira-email": "Jira email",
+  "jira-email-hint": "Your corporate Jira login or email. Used to map you as assignee on sync.",
+  "jira-pat": "Personal Access Token",
+  "jira-token-field": "API token / password",
+  "jira-test": "Test connection",
+  "jira-test-ok": "Jira connection OK"
 }

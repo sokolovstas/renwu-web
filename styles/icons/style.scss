@@ -269,3 +269,34 @@
 .icon-warning:before {
   content: '\e93d';
 }
+
+/* SVG mask icons (not in icomoon.woff yet) */
+.icon-jira,
+.icon-jira-sync-from,
+.icon-jira-sync-to {
+  font-family: inherit !important;
+}
+
+.icon-jira:before,
+.icon-jira-sync-from:before,
+.icon-jira-sync-to:before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: var(--rw-icon-mask) no-repeat center / contain;
+  mask: var(--rw-icon-mask) no-repeat center / contain;
+}
+
+.icon-jira {
+  --rw-icon-mask: url('./svg/jira.svg');
+}
+
+.icon-jira-sync-from {
+  --rw-icon-mask: url('./svg/jira-sync-from.svg');
+}
+
+.icon-jira-sync-to {
+  --rw-icon-mask: url('./svg/jira-sync-to.svg');
+}

@@ -22,5 +22,13 @@
   "layout-fields-hint": "这些设置仅适用于所选项目；默认显示所有字段。",
   "layout-fields-no-project": "请选择项目后再保存要显示的字段。",
   "layout-restore-defaults": "显示全部字段",
-  "layout-block": "{{tag}}"
+  "layout-block": "{{tag}}",
+  "jira-open": "Open in Jira",
+  "jira-sync-from": "Sync from Jira",
+  "jira-sync-to": "Sync to Jira",
+  "jira-create-confirm-title": "Create in Jira?",
+  "jira-create-confirm-text": "This task is not linked to Jira. Create a Jira issue?",
+  "jira-import-done": "Synced from Jira",
+  "jira-export-done": "Synced to Jira",
+  "jira-create-done": "Created in Jira"
 }

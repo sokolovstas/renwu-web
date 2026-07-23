@@ -15,6 +15,12 @@ export class RwCoreSettings {
   publicApiUrl: string;
   wsMessagesApiUrl: string;
   messagesApiUrl: string;
+  /**
+   * Jira sync microservice REST base (`renwu.jira`).
+   * Backend must expose routes under `/v1/*` behind Caddy `handle /api/jira/*`
+   * with `uri strip_prefix /api/jira` (same pattern as core/messenger).
+   */
+  jiraApiUrl: string;
   maxSizeAttachment = 200 * 1024 * 1024;
 
   constructor() {
@@ -48,6 +54,7 @@ export class RwCoreSettings {
     this.publicApiUrl = `${http}://${this._root}/api/core/public/v1`;
     this.wsMessagesApiUrl = `${ws}://${this._root}/api/messenger/ws`;
     this.messagesApiUrl = `${http}://${this._root}/api/messenger/v1`;
+    this.jiraApiUrl = `${http}://${this._root}/api/jira/v1`;
   }
 }
 

@@ -1,0 +1,72 @@
+<renwu-page title="{{ 'profile.jira' | transloco }}">
+  <p class="form-supporting-text mb-4">
+    {{ 'profile.jira-token-hint' | transloco }}
+  </p>
+  @if (configured()) {
+    <p class="form-supporting-text mb-3">
+      {{ 'profile.jira-token-configured' | transloco }}
+    </p>
+  }
+  <form [formGroup]="form" class="lg:grid-cols-2 grid grid-cols-1 gap-4">
+    <div class="form-label col-span-full flex flex-col gap-2">
+      <span class="text-sm">{{ 'profile.jira-auth-mode' | transloco }}</span>
+      <div class="flex flex-col gap-2">
+        @for (mode of authModes; track mode.value) {
+          <label class="profile-jira__radio">
+            <input
+              type="radio"
+              formControlName="auth_mode"
+              [value]="mode.value"
+            />
+            <span>{{ mode.labelKey | transloco }}</span>
+          </label>
+        }
+      </div>
+    </div>
+    @if (form.controls.auth_mode.value === 'basic') {
+      <label class="form-label">
+        <rw-text-input
+          formControlName="rest_api_user"
+          prompt="{{ 'profile.jira-user' | transloco }}"
+        />
+      </label>
+    }
+    <label class="form-label">
+      <rw-text-input
+        formControlName="rest_api_password"
+        prompt="{{
+          (form.controls.auth_mode.value === 'pat'
+            ? 'profile.jira-pat'
+            : 'profile.jira-token-field'
+          ) | transloco
+        }}"
+      />
+      <div class="form-supporting-text">
+        {{ 'profile.jira-pat-leave-blank' | transloco }}
+      </div>
+    </label>
+    <label class="form-label col-span-full">
+      <rw-text-input
+        formControlName="jira_email"
+        prompt="{{ 'profile.jira-email' | transloco }}"
+      />
+      <div class="form-supporting-text">
+        {{ 'profile.jira-email-hint' | transloco }}
+      </div>
+    </label>
+  </form>
+  <div class="flex flex-row flex-wrap gap-2 mt-4">
+    <rw-button
+      typeButton="secondary"
+      [disabled]="busy()"
+      (clicked)="save()"
+      >{{ 'profile.jira-save-token' | transloco }}</rw-button
+    >
+    <rw-button
+      typeButton="secondary"
+      [disabled]="busy()"
+      (clicked)="test()"
+      >{{ 'profile.jira-test' | transloco }}</rw-button
+    >
+  </div>
+</renwu-page>

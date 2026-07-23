@@ -1,6 +1,7 @@
 {
   "profile": "profile.profile",
   "settings": "profile.settings",
+  "jira": "Jira",
   "notifications": "profile.notifications",
   "tab-info": "profile.tab-info",
   "tab-tasks": "profile.tab-tasks",
@@ -47,5 +48,21 @@
   "notification-channel-todos": "profile.notification-channel-todos",
   "notification-channel-watched_by_me": "profile.notification-channel-watched_by_me",
   "notification-channel-watchers": "profile.notification-channel-watchers",
-  "profile-saved": "profile.profile-saved"
+  "profile-saved": "profile.profile-saved",
+  "jira-token": "Jira 令牌",
+  "jira-token-hint": "个人访问令牌绑定到您的用户，用于 Jira 同步和创建任务。",
+  "jira-token-configured": "令牌已保存。留空则保持不变，或粘贴新令牌。",
+  "jira-token-saved": "Jira 令牌已保存",
+  "jira-save-token": "保存令牌",
+  "jira-pat-leave-blank": "已有令牌时可留空。",
+  "jira-auth-mode": "身份验证",
+  "jira-auth-pat": "Personal Access Token (Bearer)",
+  "jira-auth-basic": "Basic（用户 + 密码 / API 令牌）",
+  "jira-user": "用户 / 邮箱",
+  "jira-email": "Jira 邮箱",
+  "jira-email-hint": "公司 Jira 登录名或邮箱。用于 sync 时映射 assignee。",
+  "jira-pat": "Personal Access Token",
+  "jira-token-field": "API 令牌 / 密码",
+  "jira-test": "测试连接",
+  "jira-test-ok": "Jira 连接成功"
 }

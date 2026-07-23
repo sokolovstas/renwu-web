@@ -1,6 +1,7 @@
 {
   "profile": "Профиль",
   "settings": "Настройки",
+  "jira": "Jira",
   "notifications": "Уведомления",
   "tab-info": "Инфо",
   "tab-tasks": "Задачи",
@@ -47,5 +48,21 @@
   "notification-channel-todos": "ToDo's",
   "notification-channel-watched_by_me": "Добавили меня в наблюдатели",
   "notification-channel-watchers": "Наблюдатели",
-  "profile-saved": "Профиль сохранен"
+  "profile-saved": "Профиль сохранен",
+  "jira-token": "Токен Jira",
+  "jira-token-hint": "Personal Access Token привязан к вашему пользователю. Им пользуются sync и создание задач в Jira.",
+  "jira-token-configured": "Токен уже сохранён. Оставьте поле пустым, чтобы не менять его, или вставьте новый.",
+  "jira-token-saved": "Личный токен Jira сохранён",
+  "jira-save-token": "Сохранить токен",
+  "jira-pat-leave-blank": "При уже сохранённом токене можно оставить поле пустым.",
+  "jira-auth-mode": "Аутентификация",
+  "jira-auth-pat": "Personal Access Token (Bearer)",
+  "jira-auth-basic": "Basic (пользователь + пароль / API-токен)",
+  "jira-user": "Пользователь / email",
+  "jira-email": "Email в Jira",
+  "jira-email-hint": "Корпоративный логин или email в Jira. Используется для назначения assignee при sync.",
+  "jira-pat": "Personal Access Token",
+  "jira-token-field": "API-токен / пароль",
+  "jira-test": "Проверить соединение",
+  "jira-test-ok": "Соединение с Jira успешно"
 }

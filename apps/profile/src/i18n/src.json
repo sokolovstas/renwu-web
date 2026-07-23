@@ -1,6 +1,7 @@
 {
   "profile": "profile.profile",
   "settings": "profile.settings",
+  "jira": "profile.jira",
   "notifications": "profile.notifications",
   "notification-settings-text": "profile.notification-settings-text",
   "event": "profile.event",
@@ -38,5 +39,21 @@
   "notification-channel-todos": "profile.notification-channel-todos",
   "notification-channel-watched_by_me": "profile.notification-channel-watched_by_me",
   "notification-channel-watchers": "profile.notification-channel-watchers",
-  "profile-saved": "profile.profile-saved"
+  "profile-saved": "profile.profile-saved",
+  "jira-token": "profile.jira-token",
+  "jira-token-hint": "profile.jira-token-hint",
+  "jira-token-configured": "profile.jira-token-configured",
+  "jira-token-saved": "profile.jira-token-saved",
+  "jira-save-token": "profile.jira-save-token",
+  "jira-pat-leave-blank": "profile.jira-pat-leave-blank",
+  "jira-auth-mode": "profile.jira-auth-mode",
+  "jira-auth-pat": "profile.jira-auth-pat",
+  "jira-auth-basic": "profile.jira-auth-basic",
+  "jira-user": "profile.jira-user",
+  "jira-email": "profile.jira-email",
+  "jira-email-hint": "profile.jira-email-hint",
+  "jira-pat": "profile.jira-pat",
+  "jira-token-field": "profile.jira-token-field",
+  "jira-test": "profile.jira-test",
+  "jira-test-ok": "profile.jira-test-ok"
 }

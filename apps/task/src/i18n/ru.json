@@ -22,5 +22,13 @@
   "layout-fields-hint": "Настройки действуют только для выбранного проекта. По умолчанию показаны все поля.",
   "layout-fields-no-project": "Выберите проект, чтобы сохранить, какие поля показывать.",
   "layout-restore-defaults": "Показать все поля",
-  "layout-block": "{{tag}}"
+  "layout-block": "{{tag}}",
+  "jira-open": "Открыть в Jira",
+  "jira-sync-from": "Синхронизировать из Jira",
+  "jira-sync-to": "Синхронизировать в Jira",
+  "jira-create-confirm-title": "Создать в Jira?",
+  "jira-create-confirm-text": "Задача не связана с Jira. Создать задачу в Jira?",
+  "jira-import-done": "Синхронизировано из Jira",
+  "jira-export-done": "Синхронизировано в Jira",
+  "jira-create-done": "Создано в Jira"
 }

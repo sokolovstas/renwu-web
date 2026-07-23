@@ -22,5 +22,13 @@
   "layout-fields-hint": "These settings apply only to the selected project. By default, all fields are visible.",
   "layout-fields-no-project": "Select a project to save which fields are shown.",
   "layout-restore-defaults": "Show all fields",
-  "layout-block": "{{tag}}"
+  "layout-block": "{{tag}}",
+  "jira-open": "Open in Jira",
+  "jira-sync-from": "Sync from Jira",
+  "jira-sync-to": "Sync to Jira",
+  "jira-create-confirm-title": "Create in Jira?",
+  "jira-create-confirm-text": "This task is not linked to Jira. Create a Jira issue?",
+  "jira-import-done": "Synced from Jira",
+  "jira-export-done": "Synced to Jira",
+  "jira-create-done": "Created in Jira"
 }

@@ -75,6 +75,13 @@ import {
   StringResult,
   SystemSettings,
 } from './common.model';
+import {
+  JiraDiffRequest,
+  JiraIssueDiff,
+  JiraSettings,
+  JiraSyncBatchRequest,
+  JiraUserCredentials,
+} from './jira.model';
 import { FileUpload, FileWithName } from './upload';
 
 export type DataObject = Record<string, unknown> | Array<unknown> | unknown;
@@ -900,30 +907,123 @@ export class RwDataService {
     return this.sendToAPI<IssueChangeEvent[]>('get', `/issue/${id}/events`);
   }
 
-  // JIRA
+  /**
+   * Jira sync microservice HTTP helper.
+   * Base URL: `RW_CORE_SETTINGS.jiraApiUrl` → `/api/jira/v1`.
+   * Backend agent must match these paths (preferred). Transitional core
+   * routes under `/api/core/v1/jira/*` are not used by the UI.
+   */
+  sendToJiraAPI<T>(
+    method: 'get' | 'post',
+    url: string,
+    data: DataObject | ParamsObject = null,
+    background = false,
+  ): Observable<T> {
+    let loader: Loader;
+    if (!background) {
+      loader = this.loaderService.setLoader();
+    }
+    const options = {
+      headers: new HttpHeaders(this.headers),
+      withCredentials: true,
+      params: new HttpParams(),
+    };
 
-  // jiraLoadSetting(): Observable<any> {
-  //   return this.sendToAPI('get', '/jira/settings');
-  // }
-  // jiraSaveSetting(data: any): Observable<any> {
-  //   return this.sendToAPI('post', '/jira/settings', data);
-  // }
+    switch (method) {
+      case 'get':
+        options.params = new HttpParams({
+          fromObject: (data || {}) as ParamsObject,
+        });
+        return this.http.get<T>(this.settings.jiraApiUrl + url, options).pipe(
+          catchError((err: unknown) =>
+            this.catchHandler(err as HttpErrorResponse, loader, background),
+          ),
+          finalize(() => this.finallyHandler(loader)),
+        );
+      case 'post':
+        return this.http
+          .post<T>(this.settings.jiraApiUrl + url, data, options)
+          .pipe(
+            catchError((err: unknown) =>
+              this.catchHandler(err as HttpErrorResponse, loader, background),
+            ),
+            finalize(() => this.finallyHandler(loader)),
+          );
+    }
+    return EMPTY;
+  }
 
-  // jiraTestConnection(): Observable<any> {
-  //   return this.sendToAPI('get', '/jira/test');
-  // }
-  // jiraCheckJQL(): Observable<any> {
-  //   return this.sendToAPI('get', '/jira/check_jql');
-  // }
-  // jiraImportJQL(): Observable<any> {
-  //   return this.sendToAPI('get', '/jira/import_jql');
-  // }
-  // jiraCheckOQL(): Observable<any> {
-  //   return this.sendToAPI('get', '/jira/check_oql');
-  // }
-  // jiraUpdateDictionaries(): Observable<any> {
-  //   return this.sendToAPI('get', '/jira/update_dictionaries');
-  // }
+  // JIRA — org settings / sync (renwu.jira, base `/api/jira/v1`)
+
+  jiraLoadSettings(): Observable<JiraSettings> {
+    return this.sendToJiraAPI<JiraSettings>('get', '/settings');
+  }
+
+  jiraSaveSettings(data: JiraSettings): Observable<JiraSettings> {
+    return this.sendToJiraAPI<JiraSettings>('post', '/settings', data);
+  }
+
+  jiraLoadMyCredentials(): Observable<JiraUserCredentials> {
+    return this.sendToJiraAPI<JiraUserCredentials>('get', '/me/credentials');
+  }
+
+  jiraSaveMyCredentials(
+    data: JiraUserCredentials,
+  ): Observable<JiraUserCredentials> {
+    return this.sendToJiraAPI<JiraUserCredentials>(
+      'post',
+      '/me/credentials',
+      data,
+    );
+  }
+
+  jiraTestConnection(): Observable<unknown> {
+    return this.sendToJiraAPI<unknown>('get', '/me/test');
+  }
+
+  jiraCheckJQL(): Observable<unknown> {
+    return this.sendToJiraAPI<unknown>('get', '/check_jql');
+  }
+
+  jiraImportJQL(): Observable<unknown> {
+    return this.sendToJiraAPI<unknown>('get', '/import_jql');
+  }
+
+  jiraCheckOQL(): Observable<unknown> {
+    return this.sendToJiraAPI<unknown>('get', '/check_oql');
+  }
+
+  jiraUpdateDictionaries(): Observable<JiraSettings> {
+    return this.sendToJiraAPI<JiraSettings>('get', '/update_dictionaries');
+  }
+
+  jiraExportIssue(
+    id: string,
+    createIfMissing = false,
+  ): Observable<ResponseOk | unknown> {
+    const q = createIfMissing ? '?create_if_missing=true' : '';
+    return this.sendToJiraAPI<ResponseOk | unknown>(
+      'post',
+      `/issue/${id}/export${q}`,
+      {},
+    );
+  }
+
+  jiraImportIssue(id: string): Observable<ResponseOk | unknown> {
+    return this.sendToJiraAPI<ResponseOk | unknown>(
+      'post',
+      `/issue/${id}/import`,
+      {},
+    );
+  }
+
+  jiraPreviewDiff(body: JiraDiffRequest = {}): Observable<JiraIssueDiff[]> {
+    return this.sendToJiraAPI<JiraIssueDiff[]>('post', '/diff', body);
+  }
+
+  jiraSyncBatch(body: JiraSyncBatchRequest): Observable<ResponseOk | unknown> {
+    return this.sendToJiraAPI<ResponseOk | unknown>('post', '/sync-batch', body);
+  }
 
   // Search
 

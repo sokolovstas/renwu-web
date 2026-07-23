@@ -18,8 +18,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RenwuSidebarService } from '@renwu/app-ui';
 import {
+  RwAlertService,
   RwButtonComponent,
-  RwIconComponent,
   RwSelectComponent,
   RwTextInputComponent,
   RwTimePickerComponent,
@@ -27,6 +27,7 @@ import {
   RwTooltipDirective,
 } from '@renwu/components';
 import {
+  RwDataService,
   RwFormatUserPipe,
   RwIssueService,
   RwSettingsService,
@@ -43,6 +44,7 @@ import {
 } from '@renwu/messaging';
 import {
   combineLatest,
+  defaultIfEmpty,
   distinctUntilChanged,
   firstValueFrom,
   from,
@@ -74,7 +76,6 @@ import { SectionWrapperComponent } from '../section-wrapper/section-wrapper.comp
     MessageThreadComponent,
     MessageInputComponent,
     RwFormatUserPipe,
-    RwIconComponent,
     RwTooltipDirective,
     TranslocoPipe,
     SectionWrapperComponent,
@@ -93,6 +94,8 @@ export class DetailComponent implements OnDestroy {
   issueService = inject(RwIssueService);
   messageServce = inject(RwMessageService);
   toastService = inject(RwToastService);
+  alertService = inject(RwAlertService);
+  dataService = inject(RwDataService);
   stateService = inject(StateService);
   sidebarService = inject(RenwuSidebarService);
   destroy = inject(DestroyRef);
@@ -101,7 +104,13 @@ export class DetailComponent implements OnDestroy {
   taskLayout = inject(TaskDetailVisibilityService);
 
   fieldSettingsOpen = signal(false);
+  jiraBusy = signal(false);
   private creating = false;
+
+  jiraLink = this.issueService.issue.pipe(
+    map((issue) => issue?.external_links?.['jira'] || ''),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
 
   transitionSelectModel = new SelectModelTransition();
   milestoneSelectModel = new SelectModelMilestones();
@@ -298,5 +307,84 @@ export class DetailComponent implements OnDestroy {
 
   toggleFieldSettingsPanel(): void {
     this.fieldSettingsOpen.update((open) => !open);
+  }
+
+  openJiraLink(url: string): void {
+    if (!url) {
+      return;
+    }
+    globalThis.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  async syncFromJira(): Promise<void> {
+    const issue = await firstValueFrom(this.issueService.issue);
+    const id = issue?.id;
+    if (!id || id === 'new' || this.jiraBusy()) {
+      return;
+    }
+    if (!issue.external_links?.['jira']) {
+      return;
+    }
+    this.jiraBusy.set(true);
+    try {
+      const ok = await firstValueFrom(
+        this.dataService.jiraImportIssue(id).pipe(defaultIfEmpty(null)),
+      );
+      if (ok == null) {
+        return;
+      }
+      this.toastService.success(
+        this.transloco.translate('task.jira-import-done'),
+      );
+      this.issueService.key.next(issue.key || id);
+    } finally {
+      this.jiraBusy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  async syncToJira(): Promise<void> {
+    const issue = await firstValueFrom(this.issueService.issue);
+    const id = issue?.id;
+    if (!id || id === 'new' || this.jiraBusy()) {
+      return;
+    }
+    const mapped = !!issue.external_links?.['jira'];
+    let createIfMissing = false;
+    if (!mapped) {
+      const confirm = await firstValueFrom(
+        this.alertService.confirm(
+          this.transloco.translate('task.jira-create-confirm-title'),
+          this.transloco.translate('task.jira-create-confirm-text'),
+          true,
+          this.transloco.translate('task.create'),
+          this.transloco.translate('core.cancel'),
+        ),
+      );
+      if (!confirm?.affirmative) {
+        return;
+      }
+      createIfMissing = true;
+    }
+    this.jiraBusy.set(true);
+    try {
+      const ok = await firstValueFrom(
+        this.dataService
+          .jiraExportIssue(id, createIfMissing)
+          .pipe(defaultIfEmpty(null)),
+      );
+      if (ok == null) {
+        return;
+      }
+      this.toastService.success(
+        this.transloco.translate(
+          createIfMissing ? 'task.jira-create-done' : 'task.jira-export-done',
+        ),
+      );
+      this.issueService.key.next(issue.key || id);
+    } finally {
+      this.jiraBusy.set(false);
+      this.cd.markForCheck();
+    }
   }
 }
