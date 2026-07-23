@@ -50,6 +50,7 @@
         <rw-text-area #newTodoInput
           class="w-full flex"
           [live]="true"
+          [doneOnEnter]="true"
           (enter)="add()"
           [(ngModel)]="newTodo"
           prompt="{{ 'task.todo-add' | transloco }}"

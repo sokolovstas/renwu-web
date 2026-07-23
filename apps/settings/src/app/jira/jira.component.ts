@@ -153,6 +153,7 @@ export class JiraComponent {
     jql: new FormControl('', { nonNullable: true }),
     oql: new FormControl('', { nonNullable: true }),
     push_mode: new FormControl<JiraPushMode>('manual', { nonNullable: true }),
+    epic_link_field: new FormControl('', { nonNullable: true }),
     status_mapping: new FormArray<FormGroup>([]),
     priority_mapping: new FormArray<FormGroup>([]),
     type_mapping: new FormArray<FormGroup>([]),
@@ -199,6 +200,7 @@ export class JiraComponent {
       jql: settings.jql || '',
       oql: settings.oql || '',
       push_mode: (settings.push_mode as JiraPushMode) || 'manual',
+      epic_link_field: settings.epic_link_field || '',
     });
 
     this.jiraCatalog = settings.jira_catalog || {};
@@ -749,6 +751,7 @@ export class JiraComponent {
       jql: raw.jql,
       oql: raw.oql,
       push_mode: raw.push_mode,
+      epic_link_field: raw.epic_link_field,
       status_mapping: serializeDict(
         raw.status_mapping as {
           our_id: string;
@@ -809,6 +812,107 @@ export class JiraComponent {
       this.applySettings(saved);
       this.toastService.success(
         this.transloco.translate('settings.jira-saved'),
+      );
+    } finally {
+      this.busy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  /** Persist current form so JQL/OQL actions use the latest filters. */
+  private async saveQuiet(): Promise<boolean> {
+    const saved = await this.callApi(
+      this.dataService.jiraSaveSettings(this.serialize()),
+    );
+    if (!saved) {
+      return false;
+    }
+    this.applySettings(saved);
+    return true;
+  }
+
+  async checkJql(): Promise<void> {
+    this.busy.set(true);
+    try {
+      if (!(await this.saveQuiet())) {
+        return;
+      }
+      const res = await this.callApi(this.dataService.jiraCheckJQL());
+      if (!res) {
+        return;
+      }
+      this.toastService.info(
+        this.transloco.translate('settings.jira-check-jql-result', {
+          total: res.total ?? 0,
+        }),
+      );
+    } finally {
+      this.busy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  async importJql(): Promise<void> {
+    this.busy.set(true);
+    try {
+      if (!(await this.saveQuiet())) {
+        return;
+      }
+      const res = await this.callApi(this.dataService.jiraImportJQL());
+      if (!res) {
+        return;
+      }
+      this.toastService.success(
+        this.transloco.translate('settings.jira-import-jql-started', {
+          total: res.total ?? 0,
+        }),
+      );
+    } finally {
+      this.busy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  async checkOql(): Promise<void> {
+    this.busy.set(true);
+    try {
+      if (!(await this.saveQuiet())) {
+        return;
+      }
+      const res = await this.callApi(this.dataService.jiraCheckOQL());
+      if (!res) {
+        return;
+      }
+      this.toastService.info(
+        this.transloco.translate('settings.jira-check-oql-result', {
+          total: res.total ?? 0,
+        }),
+      );
+    } finally {
+      this.busy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  async exportOql(createIfMissing: boolean): Promise<void> {
+    this.busy.set(true);
+    try {
+      if (!(await this.saveQuiet())) {
+        return;
+      }
+      const res = await this.callApi(
+        this.dataService.jiraExportOQL(createIfMissing),
+      );
+      if (!res) {
+        return;
+      }
+      this.toastService.success(
+        this.transloco.translate(
+          createIfMissing
+            ? 'settings.jira-export-oql-create-started'
+            : 'settings.jira-export-oql-started',
+          { total: res.total ?? 0 },
+        ),
       );
     } finally {
       this.busy.set(false);
@@ -914,31 +1018,77 @@ export class JiraComponent {
   async showDiff(): Promise<void> {
     this.busy.set(true);
     try {
+      if (!(await this.saveQuiet())) {
+        return;
+      }
       const oql = this.form.controls.oql.value?.trim();
       const result = await this.callApi(
         this.dataService.jiraPreviewDiff(oql ? { oql } : {}),
       );
+      if (result === null) {
+        return;
+      }
       const list = Array.isArray(result) ? result : [];
       this.diffs.set(list);
       this.selectedDiffIds.set(new Set());
+      if (!list.length) {
+        this.toastService.info(
+          this.transloco.translate('settings.jira-diff-empty'),
+        );
+      }
     } finally {
       this.busy.set(false);
       this.cd.markForCheck();
     }
   }
 
-  toggleDiff(issueId: string, checked: boolean): void {
+  diffRowKey(diff: JiraIssueDiff): string {
+    if (diff.issue_id) {
+      return diff.issue_id;
+    }
+    if (diff.jira_key) {
+      return `jira:${diff.jira_key}`;
+    }
+    return '';
+  }
+
+  jiraBrowseUrl(jiraKey: string | undefined): string | null {
+    const key = (jiraKey || '').trim();
+    if (!key || key.includes('://')) {
+      // Already a URL in external_links, or empty.
+      if (key.includes('://')) {
+        return key;
+      }
+      return null;
+    }
+    const base = (this.form.controls.public_url.value || '')
+      .trim()
+      .replace(/\/+$/, '');
+    if (!base) {
+      return null;
+    }
+    return `${base}/browse/${key}`;
+  }
+
+  canSelectDiff(diff: JiraIssueDiff): boolean {
+    return !diff.error && (!!diff.issue_id || !!diff.jira_key);
+  }
+
+  toggleDiff(rowKey: string, checked: boolean): void {
+    if (!rowKey) {
+      return;
+    }
     const next = new Set(this.selectedDiffIds());
     if (checked) {
-      next.add(issueId);
+      next.add(rowKey);
     } else {
-      next.delete(issueId);
+      next.delete(rowKey);
     }
     this.selectedDiffIds.set(next);
   }
 
-  isDiffSelected(issueId: string): boolean {
-    return this.selectedDiffIds().has(issueId);
+  isDiffSelected(rowKey: string): boolean {
+    return !!rowKey && this.selectedDiffIds().has(rowKey);
   }
 
   toggleAllDiffs(checked: boolean): void {
@@ -949,13 +1099,29 @@ export class JiraComponent {
     this.selectedDiffIds.set(
       new Set(
         this.diffs()
-          .map((d) => d.issue_id)
-          .filter((id): id is string => !!id),
+          .filter((d) => this.canSelectDiff(d))
+          .map((d) => this.diffRowKey(d))
+          .filter(Boolean),
       ),
     );
   }
 
+  allSelectableDiffsChecked(): boolean {
+    const keys = this.diffs()
+      .filter((d) => this.canSelectDiff(d))
+      .map((d) => this.diffRowKey(d))
+      .filter(Boolean);
+    if (!keys.length) {
+      return false;
+    }
+    const selected = this.selectedDiffIds();
+    return keys.every((k) => selected.has(k));
+  }
+
   changedFields(diff: JiraIssueDiff): string {
+    if (diff.error) {
+      return diff.error;
+    }
     return (diff.fields || [])
       .filter((f) => f.changed)
       .map((f) => f.field)
@@ -963,22 +1129,30 @@ export class JiraComponent {
       .join(', ');
   }
 
-  private selectedIds(): string[] {
-    return [...this.selectedDiffIds()];
+  private selectedRows(): JiraIssueDiff[] {
+    const keys = this.selectedDiffIds();
+    return this.diffs().filter((d) => keys.has(this.diffRowKey(d)));
   }
 
   async pullSelected(): Promise<void> {
-    const issue_ids = this.selectedIds().filter((id) => {
-      const row = this.diffs().find((d) => d.issue_id === id);
-      return !!row?.mapped;
-    });
-    if (!issue_ids.length) {
+    const rows = this.selectedRows();
+    const issue_ids = rows
+      .filter((d) => d.mapped && d.issue_id)
+      .map((d) => d.issue_id as string);
+    const jira_keys = rows
+      .filter((d) => d.would_import && d.jira_key)
+      .map((d) => d.jira_key as string);
+    if (!issue_ids.length && !jira_keys.length) {
       return;
     }
     this.busy.set(true);
     try {
       const ok = await this.callApi(
-        this.dataService.jiraSyncBatch({ issue_ids, direction: 'import' }),
+        this.dataService.jiraSyncBatch({
+          issue_ids,
+          jira_keys,
+          direction: 'import',
+        }),
       );
       if (ok == null) {
         return;
@@ -993,10 +1167,9 @@ export class JiraComponent {
   }
 
   async pushSelected(): Promise<void> {
-    const issue_ids = this.selectedIds().filter((id) => {
-      const row = this.diffs().find((d) => d.issue_id === id);
-      return !!row?.mapped;
-    });
+    const issue_ids = this.selectedRows()
+      .filter((d) => d.mapped && d.issue_id)
+      .map((d) => d.issue_id as string);
     if (!issue_ids.length) {
       return;
     }
@@ -1018,10 +1191,9 @@ export class JiraComponent {
   }
 
   async createSelectedInJira(): Promise<void> {
-    const issue_ids = this.selectedIds().filter((id) => {
-      const row = this.diffs().find((d) => d.issue_id === id);
-      return row && !row.mapped;
-    });
+    const issue_ids = this.selectedRows()
+      .filter((d) => d.issue_id && !d.mapped && !d.would_import)
+      .map((d) => d.issue_id as string);
     if (!issue_ids.length) {
       return;
     }

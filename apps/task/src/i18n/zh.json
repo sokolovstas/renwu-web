@@ -30,5 +30,12 @@
   "jira-create-confirm-text": "This task is not linked to Jira. Create a Jira issue?",
   "jira-import-done": "Synced from Jira",
   "jira-export-done": "Synced to Jira",
-  "jira-create-done": "Created in Jira"
+  "jira-create-done": "Created in Jira",
+  "jira-key": "Jira 键",
+  "jira-key-hint": "VKVIDEO-123 或链接。留空可取消关联。",
+  "jira-key-create-hint": "VKVIDEO-123 或链接 — 将从 Jira 导入。标题可留空。",
+  "jira-import-created": "已从 Jira 创建任务",
+  "jira-import-existing": "任务已存在 — 已从 Jira 刷新",
+  "jira-link-saved": "已关联到 Jira",
+  "jira-link-cleared": "已取消 Jira 关联"
 }

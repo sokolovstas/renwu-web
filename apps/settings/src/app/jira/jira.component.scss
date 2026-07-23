@@ -159,11 +159,11 @@
 .jira-diff__head,
 .jira-diff__row {
   display: grid;
-  grid-template-columns: 2rem 1.2fr 0.8fr 1fr 1.6fr;
+  grid-template-columns: 2rem 0.9fr 1.6fr 0.8fr 0.9fr 1.4fr;
   gap: 0.5rem;
   align-items: center;
   padding: 0.5rem 0.65rem;
-  min-width: 36rem;
+  min-width: 48rem;
 }
 
 .jira-diff__head {
@@ -176,7 +176,24 @@
   border-top: 1px solid var(--gray-200, #e5e7eb);
 }
 
+.jira-diff__title,
 .jira-diff__fields {
   word-break: break-word;
   color: var(--gray-700, #374151);
+}
+
+.jira-diff__link {
+  color: var(--primary-600, #2563eb);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+
+  &:hover {
+    color: var(--primary-700, #1d4ed8);
+  }
+}
+
+.jira-diff__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

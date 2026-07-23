@@ -103,6 +103,8 @@ export interface JiraSettings {
   import_post_script?: string;
   /** Preferred push mode; default treated as manual when missing. */
   push_mode?: JiraPushMode | string;
+  /** Jira Epic Link custom field id, e.g. customfield_15500. Empty disables linking. */
+  epic_link_field?: string;
   templates?: JiraSyncTemplate[];
   /** Legacy flat field list; migrated into a default template when templates are empty. */
   fields?: JiraSyncField[];
@@ -126,9 +128,14 @@ export interface JiraDiffField {
 
 export interface JiraIssueDiff {
   issue_id?: string;
+  issue_key?: string;
+  title?: string;
   jira_key?: string;
+  jira_id?: string;
   mapped?: boolean;
   would_create?: boolean;
+  would_import?: boolean;
+  error?: string;
   fields?: JiraDiffField[];
 }
 
@@ -140,7 +147,30 @@ export interface JiraDiffRequest {
 export type JiraSyncBatchDirection = 'import' | 'export';
 
 export interface JiraSyncBatchRequest {
-  issue_ids: string[];
+  issue_ids?: string[];
+  jira_keys?: string[];
   direction: JiraSyncBatchDirection;
   create_if_missing?: boolean;
+}
+
+/** Manual Renwu ↔ Jira binding by issue key. */
+export interface JiraIssueLink {
+  jira_key?: string;
+  jira_id?: string;
+  jira_url?: string;
+}
+
+/** Result of creating/refreshing a Renwu issue from a Jira key. */
+export interface JiraImportByKeyResult {
+  id?: string;
+  key?: string;
+  jira_key?: string;
+  jira_id?: string;
+  created?: boolean;
+}
+
+/** Admin-editable Jira assignee mapping for a Renwu user. */
+export interface JiraUserEmail {
+  user_id?: string;
+  jira_email?: string;
 }

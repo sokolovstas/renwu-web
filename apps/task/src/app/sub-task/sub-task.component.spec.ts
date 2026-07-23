@@ -460,7 +460,7 @@ describe('SubTaskComponent', () => {
   });
 
   describe('hasProgress', () => {
-    it('is false when childs_total is zero', () => {
+    it('is false when there are no childs', () => {
       createComponent({ id: '1', key: 'P-1' });
       expect(component.hasProgress(emptyChilds())).toBe(false);
     });
@@ -468,6 +468,28 @@ describe('SubTaskComponent', () => {
     it('is true when childs_total is positive', () => {
       createComponent({ id: '1', key: 'P-1' });
       expect(component.hasProgress(sampleChilds)).toBe(true);
+    });
+
+    it('is true when childs_total is zero but childs list is present', () => {
+      createComponent({ id: '1', key: 'P-1' });
+      expect(
+        component.hasProgress({
+          ...sampleChilds,
+          childs_total: 0,
+        }),
+      ).toBe(true);
+    });
+  });
+
+  describe('subtaskCount', () => {
+    it('falls back to childs.length when childs_total is zero', () => {
+      createComponent({ id: '1', key: 'P-1' });
+      expect(
+        component.subtaskCount({
+          ...sampleChilds,
+          childs_total: 0,
+        }),
+      ).toBe(sampleChilds.childs.length);
     });
   });
 });

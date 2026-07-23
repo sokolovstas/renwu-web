@@ -239,9 +239,67 @@
                   [prompt]="'task.labels' | transloco"
                  />
               }
-              <div class="col-span-2">
-                @for (section of sections | async; track section.element) {
-                  <renwu-task-section-wrapper [section]="section" />
+              <label class="form-label col-span-2">
+                <rw-text-input
+                  [formControl]="jiraKeyControl"
+                  prompt="{{ 'task.jira-key' | transloco }}"
+                  [disabled]="jiraBusy() || creating()"
+                  (enter)="onJiraKeyEnter()"
+                  (blured)="onJiraKeyBlur()"
+                />
+                <div class="form-supporting-text">
+                  {{
+                    (isNew
+                      ? 'task.jira-key-create-hint'
+                      : 'task.jira-key-hint'
+                    ) | transloco
+                  }}
+                </div>
+              </label>
+              <div class="col-span-2 task-sections">
+                @let visibleSections = sections | async;
+                @let counts = sectionCounts | async;
+                @if (visibleSections?.length) {
+                  <div
+                    class="task-section-tabs"
+                    role="tablist"
+                    [attr.aria-label]="'task.layout-fields' | transloco"
+                  >
+                    @for (section of visibleSections; track section.element) {
+                      @let meta = resolveSectionMeta(section);
+                      @let count = sectionCount(counts, section.element);
+                      <div class="task-section-tab">
+                        <rw-button
+                          typeButton="tab"
+                          role="tab"
+                          color="var(--always-white, #fff)"
+                          borderColor="transparent"
+                          [attr.aria-selected]="
+                            activeSection() === section.element
+                          "
+                          [iconClass]="meta.icon"
+                          iconSize="normal"
+                          padding="0.45rem 0.65rem"
+                          [selected]="activeSection() === section.element"
+                          [rwTooltip]="meta.titleKey | transloco"
+                          tooltipPlacement="top"
+                          (clicked)="selectSection(section.element)"
+                        />
+                        @if (count > 0) {
+                          <span class="task-section-tab-badge">{{ count }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                  @for (section of visibleSections; track section.element) {
+                    <div
+                      class="task-section-panel"
+                      role="tabpanel"
+                      [hidden]="activeSection() !== section.element"
+                    >
+                      <renwu-task-section-wrapper [section]="section" />
+                    </div>
+                  }
                 }
               </div>
             </div>
@@ -266,7 +324,9 @@
                   <rw-button
                     class="mr-4"
                     [disabled]="
-                      (issueService.issueForm.statusChanges | async) !== 'VALID'
+                      creating() ||
+                      jiraBusy() ||
+                      (createEnabled | async) === false
                     "
                     (clicked)="create(false)"
                     >{{ 'task.create' | transloco }}</rw-button
@@ -275,7 +335,9 @@
                     class=""
                     (clicked)="create(true)"
                     [disabled]="
-                      (issueService.issueForm.statusChanges | async) !== 'VALID'
+                      creating() ||
+                      jiraBusy() ||
+                      (createEnabled | async) === false
                     "
                     >{{ 'task.create-and-add-another' | transloco }}</rw-button
                   >

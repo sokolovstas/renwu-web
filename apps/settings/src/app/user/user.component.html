@@ -57,6 +57,14 @@
          />
       </label>
       <label class="form-label">
+        <rw-text-input formControlName="jira_email"
+          prompt="{{ 'settings.jira-email' | transloco }}"
+         />
+        <div class="form-supporting-text">
+          {{ 'settings.jira-email-hint' | transloco }}
+        </div>
+      </label>
+      <label class="form-label">
         <rw-text-input formControlName="full_name"
           prompt="{{ 'settings.full-name' | transloco }}"
          />

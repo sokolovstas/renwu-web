@@ -1,12 +1,60 @@
 {
   "sections": [
-    { "element": "renwu-task-description", "order": 10, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-todo", "order": 20, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-links", "order": 25, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-related", "order": 30, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-sub-task", "order": 40, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-attachments", "order": 50, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-time-log", "order": 55, "wrapperClass": "col-span-2" },
-    { "element": "renwu-task-history", "order": 60, "wrapperClass": "col-span-2" }
+    {
+      "element": "renwu-task-description",
+      "order": 10,
+      "icon": "document",
+      "titleKey": "task.description",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-todo",
+      "order": 20,
+      "icon": "todo",
+      "titleKey": "task.todo",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-links",
+      "order": 25,
+      "icon": "link",
+      "titleKey": "task.links",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-related",
+      "order": 30,
+      "icon": "share",
+      "titleKey": "task.related",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-sub-task",
+      "order": 40,
+      "icon": "list",
+      "titleKey": "task.subtask",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-attachments",
+      "order": 50,
+      "icon": "picture",
+      "titleKey": "task.attachments",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-time-log",
+      "order": 55,
+      "icon": "timelapse",
+      "titleKey": "task.timelog",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-history",
+      "order": 60,
+      "icon": "history",
+      "titleKey": "task.history",
+      "wrapperClass": "col-span-2"
+    }
   ]
 }

@@ -77,10 +77,13 @@ import {
 } from './common.model';
 import {
   JiraDiffRequest,
+  JiraImportByKeyResult,
   JiraIssueDiff,
+  JiraIssueLink,
   JiraSettings,
   JiraSyncBatchRequest,
   JiraUserCredentials,
+  JiraUserEmail,
 } from './jira.model';
 import { FileUpload, FileWithName } from './upload';
 
@@ -151,11 +154,7 @@ export class RwDataService {
       if (!err.url) {
         this.toastService.error(this.transloco.translate('core.no-connection'));
       } else {
-        // captureException(err);
-        let error = `${err.status} - ${err.url}`;
-        if (err.error) {
-          error = `${err.error.message}`;
-        }
+        const error = this.formatHttpErrorMessage(err);
         if (!background) {
           this.toastService.error(error);
         }
@@ -163,6 +162,68 @@ export class RwDataService {
       return EMPTY;
     }
     return throwError(err);
+  }
+
+  /** Prefer Jira errorMessages/errors or Echo {message}; avoid dumping opaque bodies. */
+  formatHttpErrorMessage(err: HttpErrorResponse): string {
+    const formatted = this.formatJiraLikeError(err.error);
+    if (formatted) {
+      return formatted;
+    }
+    if (err.status) {
+      return `${err.status}${err.statusText ? ' ' + err.statusText : ''}`;
+    }
+    return `${err.status} - ${err.url}`;
+  }
+
+  private formatJiraLikeError(raw: unknown): string {
+    if (raw == null) {
+      return '';
+    }
+    if (typeof raw === 'string') {
+      const trimmed = raw.trim();
+      if (!trimmed) {
+        return '';
+      }
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        try {
+          return this.formatJiraLikeError(JSON.parse(trimmed));
+        } catch {
+          return trimmed.length > 400 ? trimmed.slice(0, 400) + '…' : trimmed;
+        }
+      }
+      return trimmed.length > 400 ? trimmed.slice(0, 400) + '…' : trimmed;
+    }
+    if (typeof raw !== 'object') {
+      return String(raw);
+    }
+    const body = raw as {
+      message?: unknown;
+      errorMessages?: unknown;
+      errors?: Record<string, unknown>;
+    };
+    const parts: string[] = [];
+    if (Array.isArray(body.errorMessages)) {
+      for (const m of body.errorMessages) {
+        if (typeof m === 'string' && m.trim()) {
+          parts.push(m.trim());
+        }
+      }
+    }
+    if (body.errors && typeof body.errors === 'object') {
+      for (const [field, msg] of Object.entries(body.errors)) {
+        if (typeof msg === 'string' && msg.trim()) {
+          parts.push(`${field}: ${msg.trim()}`);
+        }
+      }
+    }
+    if (parts.length) {
+      return parts.join('; ');
+    }
+    if (typeof body.message === 'string' && body.message.trim()) {
+      return this.formatJiraLikeError(body.message);
+    }
+    return '';
   }
 
   finallyHandler(loader: Loader): void {
@@ -914,7 +975,7 @@ export class RwDataService {
    * routes under `/api/core/v1/jira/*` are not used by the UI.
    */
   sendToJiraAPI<T>(
-    method: 'get' | 'post',
+    method: 'get' | 'post' | 'put',
     url: string,
     data: DataObject | ParamsObject = null,
     background = false,
@@ -943,6 +1004,15 @@ export class RwDataService {
       case 'post':
         return this.http
           .post<T>(this.settings.jiraApiUrl + url, data, options)
+          .pipe(
+            catchError((err: unknown) =>
+              this.catchHandler(err as HttpErrorResponse, loader, background),
+            ),
+            finalize(() => this.finallyHandler(loader)),
+          );
+      case 'put':
+        return this.http
+          .put<T>(this.settings.jiraApiUrl + url, data, options)
           .pipe(
             catchError((err: unknown) =>
               this.catchHandler(err as HttpErrorResponse, loader, background),
@@ -981,16 +1051,30 @@ export class RwDataService {
     return this.sendToJiraAPI<unknown>('get', '/me/test');
   }
 
-  jiraCheckJQL(): Observable<unknown> {
-    return this.sendToJiraAPI<unknown>('get', '/check_jql');
+  jiraCheckJQL(): Observable<{ total?: number }> {
+    return this.sendToJiraAPI<{ total?: number }>('get', '/check_jql');
   }
 
-  jiraImportJQL(): Observable<unknown> {
-    return this.sendToJiraAPI<unknown>('get', '/import_jql');
+  jiraImportJQL(): Observable<{ status?: string; total?: number }> {
+    return this.sendToJiraAPI<{ status?: string; total?: number }>(
+      'get',
+      '/import_jql',
+    );
   }
 
-  jiraCheckOQL(): Observable<unknown> {
-    return this.sendToJiraAPI<unknown>('get', '/check_oql');
+  jiraCheckOQL(): Observable<{ total?: number }> {
+    return this.sendToJiraAPI<{ total?: number }>('get', '/check_oql');
+  }
+
+  jiraExportOQL(
+    createIfMissing = false,
+  ): Observable<{ status?: string; total?: number }> {
+    const q = createIfMissing ? '?create_if_missing=true' : '';
+    return this.sendToJiraAPI<{ status?: string; total?: number }>(
+      'post',
+      `/export_oql${q}`,
+      {},
+    );
   }
 
   jiraUpdateDictionaries(): Observable<JiraSettings> {
@@ -1014,6 +1098,43 @@ export class RwDataService {
       'post',
       `/issue/${id}/import`,
       {},
+    );
+  }
+
+  jiraImportByKey(jiraKey: string): Observable<JiraImportByKeyResult> {
+    return this.sendToJiraAPI<JiraImportByKeyResult>(
+      'post',
+      '/issue/import-by-key',
+      { jira_key: jiraKey },
+    );
+  }
+
+  jiraGetIssueLink(id: string): Observable<JiraIssueLink> {
+    return this.sendToJiraAPI<JiraIssueLink>('get', `/issue/${id}/link`);
+  }
+
+  jiraSaveIssueLink(
+    id: string,
+    data: { jira_key?: string },
+  ): Observable<JiraIssueLink> {
+    return this.sendToJiraAPI<JiraIssueLink>('put', `/issue/${id}/link`, data);
+  }
+
+  jiraGetUserEmail(userId: string): Observable<JiraUserEmail> {
+    return this.sendToJiraAPI<JiraUserEmail>(
+      'get',
+      `/users/${userId}/jira-email`,
+    );
+  }
+
+  jiraSaveUserEmail(
+    userId: string,
+    data: { jira_email?: string },
+  ): Observable<JiraUserEmail> {
+    return this.sendToJiraAPI<JiraUserEmail>(
+      'put',
+      `/users/${userId}/jira-email`,
+      data,
     );
   }
 

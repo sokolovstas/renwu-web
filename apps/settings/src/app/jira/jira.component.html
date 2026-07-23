@@ -46,12 +46,52 @@
               formControlName="jql"
               prompt="{{ 'settings.jira-jql' | transloco }}"
             />
+            <div class="form-supporting-text">
+              {{ 'settings.jira-jql-hint' | transloco }}
+            </div>
+            <div class="flex flex-row flex-wrap gap-2 mt-2">
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy()"
+                (clicked)="checkJql()"
+                >{{ 'settings.jira-check-jql' | transloco }}</rw-button
+              >
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy()"
+                (clicked)="importJql()"
+                >{{ 'settings.jira-import-jql' | transloco }}</rw-button
+              >
+            </div>
           </label>
           <label class="form-label">
             <rw-text-input
               formControlName="oql"
               prompt="{{ 'settings.jira-oql' | transloco }}"
             />
+            <div class="form-supporting-text">
+              {{ 'settings.jira-oql-hint' | transloco }}
+            </div>
+            <div class="flex flex-row flex-wrap gap-2 mt-2">
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy()"
+                (clicked)="checkOql()"
+                >{{ 'settings.jira-check-oql' | transloco }}</rw-button
+              >
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy()"
+                (clicked)="exportOql(false)"
+                >{{ 'settings.jira-export-oql' | transloco }}</rw-button
+              >
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy()"
+                (clicked)="exportOql(true)"
+                >{{ 'settings.jira-export-oql-create' | transloco }}</rw-button
+              >
+            </div>
           </label>
         </div>
       </section>
@@ -76,6 +116,15 @@
             </label>
           }
         </div>
+        <label class="form-label mt-4 max-w-md">
+          <rw-text-input
+            formControlName="epic_link_field"
+            prompt="{{ 'settings.jira-epic-link-field' | transloco }}"
+          />
+          <div class="form-supporting-text">
+            {{ 'settings.jira-epic-link-field-hint' | transloco }}
+          </div>
+        </label>
       </section>
 
       <!-- Mappings -->
@@ -487,42 +536,65 @@
               <div>
                 <input
                   type="checkbox"
-                  [checked]="
-                    selectedDiffIds().size > 0 &&
-                    selectedDiffIds().size === diffs().length
-                  "
+                  [checked]="allSelectableDiffsChecked()"
                   (change)="
                     toggleAllDiffs($any($event.target).checked)
                   "
                 />
               </div>
               <div>{{ 'settings.jira-diff-issue' | transloco }}</div>
+              <div>{{ 'settings.jira-diff-title' | transloco }}</div>
               <div>{{ 'settings.jira-diff-key' | transloco }}</div>
               <div>{{ 'settings.jira-diff-mapped' | transloco }}</div>
               <div>{{ 'settings.jira-diff-fields' | transloco }}</div>
             </div>
-            @for (diff of diffs(); track diff.issue_id) {
+            @for (
+              diff of diffs();
+              track diff.issue_id || diff.jira_key || $index
+            ) {
               <div class="jira-diff__row">
                 <div>
                   <input
                     type="checkbox"
-                    [checked]="isDiffSelected(diff.issue_id || '')"
+                    [checked]="isDiffSelected(diffRowKey(diff))"
+                    [disabled]="!canSelectDiff(diff)"
                     (change)="
                       toggleDiff(
-                        diff.issue_id || '',
+                        diffRowKey(diff),
                         $any($event.target).checked
                       )
                     "
                   />
                 </div>
-                <div>{{ diff.issue_id }}</div>
-                <div>{{ diff.jira_key || '—' }}</div>
                 <div>
-                  @if (diff.mapped) {
+                  {{ diff.issue_key || diff.issue_id || '—' }}
+                </div>
+                <div class="jira-diff__title" [title]="diff.title || ''">
+                  {{ diff.title || '—' }}
+                </div>
+                <div>
+                  @if (jiraBrowseUrl(diff.jira_key); as jiraUrl) {
+                    <a
+                      class="jira-diff__link"
+                      [href]="jiraUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >{{ diff.jira_key }}</a
+                    >
+                  } @else {
+                    {{ diff.jira_key || '—' }}
+                  }
+                </div>
+                <div>
+                  @if (diff.error) {
+                    —
+                  } @else if (diff.mapped) {
                     {{ 'settings.jira-yes' | transloco }}
                   } @else {
                     {{ 'settings.jira-no' | transloco }}
-                    @if (diff.would_create) {
+                    @if (diff.would_import) {
+                      ({{ 'settings.jira-would-import' | transloco }})
+                    } @else if (diff.would_create) {
                       ({{ 'settings.jira-would-create' | transloco }})
                     }
                   }

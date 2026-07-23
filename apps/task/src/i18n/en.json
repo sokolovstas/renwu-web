@@ -30,5 +30,12 @@
   "jira-create-confirm-text": "This task is not linked to Jira. Create a Jira issue?",
   "jira-import-done": "Synced from Jira",
   "jira-export-done": "Synced to Jira",
-  "jira-create-done": "Created in Jira"
+  "jira-create-done": "Created in Jira",
+  "jira-key": "Jira key",
+  "jira-key-hint": "VKVIDEO-123 or browse URL. Leave empty to unlink.",
+  "jira-key-create-hint": "VKVIDEO-123 or browse URL — imports the issue from Jira. Title can be empty.",
+  "jira-import-created": "Issue created from Jira",
+  "jira-import-existing": "Issue already existed — refreshed from Jira",
+  "jira-link-saved": "Linked to Jira",
+  "jira-link-cleared": "Jira link removed"
 }

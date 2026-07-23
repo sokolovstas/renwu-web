@@ -13,7 +13,7 @@ import {
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RenwuSidebarService } from '@renwu/app-ui';
@@ -27,6 +27,7 @@ import {
   RwTooltipDirective,
 } from '@renwu/components';
 import {
+  Issue,
   RwDataService,
   RwFormatUserPipe,
   RwIssueService,
@@ -43,6 +44,7 @@ import {
   RwMessageService
 } from '@renwu/messaging';
 import {
+  catchError,
   combineLatest,
   defaultIfEmpty,
   distinctUntilChanged,
@@ -60,7 +62,15 @@ import { fromFetch } from 'rxjs/fetch';
 import { TaskDetailFieldSettingsComponent } from '../task-detail-layout/task-detail-field-settings.component';
 import { TaskDetailVisibilityService } from '../task-detail-layout/task-detail-visibility.service';
 import { registerTaskSectionElements } from '../task-sections/register-task-section-elements';
-import { TaskLayoutConfig, TaskSectionConfig } from '../task-sections/task-section.model';
+import {
+  computeTaskSectionCounts,
+  TaskSectionCounts,
+} from '../task-sections/task-section-counts';
+import {
+  resolveSectionMeta,
+  TaskLayoutConfig,
+  TaskSectionConfig,
+} from '../task-sections/task-section.model';
 import { SectionWrapperComponent } from '../section-wrapper/section-wrapper.component';
 
 @Component({
@@ -105,7 +115,35 @@ export class DetailComponent implements OnDestroy {
 
   fieldSettingsOpen = signal(false);
   jiraBusy = signal(false);
-  private creating = false;
+  creating = signal(false);
+  /** Active section tab element tag; null = panel collapsed. */
+  activeSection = signal<string | null>(null);
+  private savedJiraKey = '';
+  private jiraLinkIssueId = '';
+  private activeSectionBootstrapped = false;
+
+  jiraKeyControl = new FormControl('', { nonNullable: true });
+
+  /** Enables Create when form is valid or a Jira key is provided for import. */
+  createEnabled = merge(
+    this.issueService.issueForm.statusChanges.pipe(
+      startWith(this.issueService.issueForm.status),
+    ),
+    this.jiraKeyControl.valueChanges.pipe(
+      startWith(this.jiraKeyControl.value),
+    ),
+  ).pipe(
+    map(() => {
+      const jiraKey = (this.jiraKeyControl.value || '').trim();
+      if (jiraKey) {
+        return true;
+      }
+      return this.issueService.issueForm.valid;
+    }),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  readonly resolveSectionMeta = resolveSectionMeta;
 
   jiraLink = this.issueService.issue.pipe(
     map((issue) => issue?.external_links?.['jira'] || ''),
@@ -153,10 +191,77 @@ export class DetailComponent implements OnDestroy {
 
   sections = combineLatest([this.sectionsConfig, this.layoutRefresh$]).pipe(
     map(([sorted]) => this.taskLayout.filterSections(sorted)),
+    tap((visible) => this.syncActiveSection(visible)),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  private loadedChildsTotal = merge(
+    this.issueService.issue.pipe(
+      map((issue) => issue?.id),
+      distinctUntilChanged(),
+    ),
+    this.issueService.pendingSubtasks,
+  ).pipe(
+    switchMap(() => {
+      const id = this.issueService.issueForm.getRawValue()?.id;
+      if (!id || id === 'new') {
+        return of(0);
+      }
+      return this.dataService.getChildIssues(String(id)).pipe(
+        map((d) => d.childs_total ?? d.childs?.length ?? 0),
+        catchError(() => of(0)),
+      );
+    }),
+    startWith(0),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  sectionCounts = combineLatest([
+    this.issueService.issueForm.valueChanges.pipe(
+      startWith(this.issueService.issueForm.getRawValue()),
+    ),
+    this.issueService.issue,
+    this.issueService.pendingSubtasks.pipe(startWith([])),
+    this.loadedChildsTotal,
+  ]).pipe(
+    map(([form, issue, pending, childsTotal]) =>
+      computeTaskSectionCounts(form, issue, pending?.length ?? 0, childsTotal),
+    ),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   sectionElementTags(sections: TaskSectionConfig[]): string[] {
     return sections.map((s) => s.element);
+  }
+
+  sectionCount(
+    counts: TaskSectionCounts | null | undefined,
+    element: string,
+  ): number {
+    return counts?.[element] ?? 0;
+  }
+
+  selectSection(element: string): void {
+    this.activeSection.update((current) =>
+      current === element ? null : element,
+    );
+  }
+
+  private syncActiveSection(visible: TaskSectionConfig[]): void {
+    const tags = visible.map((s) => s.element);
+    const current = this.activeSection();
+    if (!tags.length) {
+      this.activeSection.set(null);
+      return;
+    }
+    if (!this.activeSectionBootstrapped) {
+      this.activeSectionBootstrapped = true;
+      this.activeSection.set(tags[0]);
+      return;
+    }
+    if (current && !tags.includes(current)) {
+      this.activeSection.set(tags[0]);
+    }
   }
 
   constructor() {
@@ -181,7 +286,10 @@ export class DetailComponent implements OnDestroy {
 
     this.issueService.issue
       .pipe(takeUntilDestroyed(this.destroy))
-      .subscribe((t) => this.sidebarService.currentTask.next(t));
+      .subscribe((t) => {
+        this.sidebarService.currentTask.next(t);
+        this.applyJiraKeyFromIssue(t);
+      });
 
     this.route.paramMap
       .pipe(
@@ -190,8 +298,62 @@ export class DetailComponent implements OnDestroy {
         takeUntilDestroyed(this.destroy),
       )
       .subscribe((key) => {
+        this.activeSectionBootstrapped = false;
         this.issueService.key.next(key);
       });
+  }
+
+  private applyJiraKeyFromIssue(issue: Issue | null | undefined): void {
+    const id = issue?.id || '';
+    if (!id || id === 'new') {
+      this.jiraLinkIssueId = '';
+      this.savedJiraKey = '';
+      this.jiraKeyControl.setValue('', { emitEvent: false });
+      this.jiraKeyControl.markAsPristine();
+      return;
+    }
+    if (id !== this.jiraLinkIssueId) {
+      this.jiraLinkIssueId = id;
+      this.jiraKeyControl.markAsPristine();
+    }
+    const local = this.jiraKeyFromIssue(issue);
+    if (!this.jiraKeyControl.dirty) {
+      this.savedJiraKey = local;
+      this.jiraKeyControl.setValue(local, { emitEvent: false });
+      this.cd.markForCheck();
+    }
+    void this.refreshJiraLink(id);
+  }
+
+  private async refreshJiraLink(issueId: string): Promise<void> {
+    try {
+      const link = await firstValueFrom(
+        this.dataService.jiraGetIssueLink(issueId).pipe(defaultIfEmpty(null)),
+      );
+      if (!link || this.jiraLinkIssueId !== issueId || this.jiraKeyControl.dirty) {
+        return;
+      }
+      const key = (link.jira_key || '').trim();
+      this.savedJiraKey = key;
+      this.jiraKeyControl.setValue(key, { emitEvent: false });
+      this.jiraKeyControl.markAsPristine();
+      this.cd.markForCheck();
+    } catch {
+      // Keep value from issue.keys / external_links.
+    }
+  }
+
+  private jiraKeyFromIssue(issue: Issue | null | undefined): string {
+    const keys = issue?.keys || [];
+    const found = keys.find(
+      (k) => typeof k === 'string' && k.startsWith('jira:'),
+    );
+    if (found) {
+      return found.slice('jira:'.length);
+    }
+    const url = issue?.external_links?.['jira'] || '';
+    const m = url.match(/\/browse\/([A-Z][A-Z0-9_]+-\d+)/i);
+    return m?.[1]?.toUpperCase() || '';
   }
   ngOnDestroy(): void {
     return;
@@ -210,7 +372,7 @@ export class DetailComponent implements OnDestroy {
     if (this.issueService.issueForm.getRawValue().id !== 'new') {
       return;
     }
-    if (this.creating || this.issueService.issueForm.invalid) {
+    if (!this.canCreate()) {
       return;
     }
 
@@ -237,11 +399,45 @@ export class DetailComponent implements OnDestroy {
     void this.create(false);
   }
 
-  async create(another: boolean) {
-    if (this.creating || this.issueService.issueForm.invalid) {
+  canCreate(): boolean {
+    if (this.creating() || this.jiraBusy()) {
+      return false;
+    }
+    const jiraKey = (this.jiraKeyControl.value || '').trim();
+    if (jiraKey) {
+      return true;
+    }
+    return this.issueService.issueForm.valid;
+  }
+
+  onJiraKeyEnter(): void {
+    if (this.issueService.issueForm.getRawValue().id === 'new') {
+      void this.create(false);
       return;
     }
-    this.creating = true;
+    void this.saveJiraLink();
+  }
+
+  onJiraKeyBlur(): void {
+    if (this.issueService.issueForm.getRawValue().id === 'new') {
+      return;
+    }
+    void this.saveJiraLink();
+  }
+
+  async create(another: boolean) {
+    if (!this.canCreate()) {
+      return;
+    }
+    const jiraKey = (this.jiraKeyControl.value || '').trim();
+    if (jiraKey) {
+      await this.createFromJiraKey(jiraKey, another);
+      return;
+    }
+    if (this.issueService.issueForm.invalid) {
+      return;
+    }
+    this.creating.set(true);
     try {
       const issue = await firstValueFrom(this.issueService.create());
       if (!another) {
@@ -253,7 +449,42 @@ export class DetailComponent implements OnDestroy {
         this.transloco.translate('task.issue-%issue.key%-created-successfully'),
       );
     } finally {
-      this.creating = false;
+      this.creating.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  private async createFromJiraKey(
+    jiraKey: string,
+    another: boolean,
+  ): Promise<void> {
+    this.creating.set(true);
+    this.jiraBusy.set(true);
+    try {
+      const result = await firstValueFrom(
+        this.dataService.jiraImportByKey(jiraKey).pipe(defaultIfEmpty(null)),
+      );
+      if (!result?.key) {
+        return;
+      }
+      this.toastService.success(
+        this.transloco.translate(
+          result.created
+            ? 'task.jira-import-created'
+            : 'task.jira-import-existing',
+        ),
+      );
+      if (!another) {
+        this.router.navigate(['..', result.key], { relativeTo: this.route });
+      } else {
+        this.jiraKeyControl.setValue('', { emitEvent: false });
+        this.jiraKeyControl.markAsPristine();
+        this.titleInput?.setFocus();
+      }
+    } finally {
+      this.creating.set(false);
+      this.jiraBusy.set(false);
+      this.cd.markForCheck();
     }
   }
 
@@ -316,6 +547,45 @@ export class DetailComponent implements OnDestroy {
     globalThis.open(url, '_blank', 'noopener,noreferrer');
   }
 
+  async saveJiraLink(): Promise<void> {
+    if (!this.jiraKeyControl.dirty) {
+      return;
+    }
+    const issue = await firstValueFrom(this.issueService.issue);
+    const id = issue?.id;
+    if (!id || id === 'new' || this.jiraBusy()) {
+      return;
+    }
+    const next = (this.jiraKeyControl.value || '').trim();
+    if (next === this.savedJiraKey) {
+      this.jiraKeyControl.markAsPristine();
+      return;
+    }
+    this.jiraBusy.set(true);
+    try {
+      const link = await firstValueFrom(
+        this.dataService
+          .jiraSaveIssueLink(id, { jira_key: next })
+          .pipe(defaultIfEmpty(null)),
+      );
+      if (link == null) {
+        return;
+      }
+      this.savedJiraKey = link.jira_key || '';
+      this.jiraKeyControl.setValue(this.savedJiraKey, { emitEvent: false });
+      this.jiraKeyControl.markAsPristine();
+      this.toastService.success(
+        this.transloco.translate(
+          this.savedJiraKey ? 'task.jira-link-saved' : 'task.jira-link-cleared',
+        ),
+      );
+      this.issueService.key.next(issue.key || id);
+    } finally {
+      this.jiraBusy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
   async syncFromJira(): Promise<void> {
     const issue = await firstValueFrom(this.issueService.issue);
     const id = issue?.id;
@@ -375,6 +645,14 @@ export class DetailComponent implements OnDestroy {
       );
       if (ok == null) {
         return;
+      }
+      const warnings = (ok as { warnings?: string[] })?.warnings;
+      if (Array.isArray(warnings)) {
+        for (const w of warnings) {
+          if (w) {
+            this.toastService.warn(w);
+          }
+        }
       }
       this.toastService.success(
         this.transloco.translate(

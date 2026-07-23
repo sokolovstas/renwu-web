@@ -30,5 +30,12 @@
   "jira-create-confirm-text": "Задача не связана с Jira. Создать задачу в Jira?",
   "jira-import-done": "Синхронизировано из Jira",
   "jira-export-done": "Синхронизировано в Jira",
-  "jira-create-done": "Создано в Jira"
+  "jira-create-done": "Создано в Jira",
+  "jira-key": "Ключ Jira",
+  "jira-key-hint": "VKVIDEO-123 или ссылка. Оставьте пустым, чтобы отвязать.",
+  "jira-key-create-hint": "VKVIDEO-123 или ссылка — задача будет импортирована из Jira. Можно не заполнять заголовок.",
+  "jira-import-created": "Задача создана из Jira",
+  "jira-import-existing": "Задача уже была в Renwu — обновлена из Jira",
+  "jira-link-saved": "Задача связана с Jira",
+  "jira-link-cleared": "Связь с Jira снята"
 }

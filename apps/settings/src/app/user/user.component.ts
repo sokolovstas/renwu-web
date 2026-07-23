@@ -97,6 +97,7 @@ export class UserComponent {
       email: new FormControl('', {
         validators: [Validators.minLength(2), Validators.email],
       }),
+      jira_email: new FormControl('', { nonNullable: true }),
       full_name: new FormControl('', {
         validators: [Validators.minLength(2)],
       }),
@@ -150,6 +151,7 @@ export class UserComponent {
     switchMap((id) => this.dataService.getUser(id)),
     tap((user) => {
       this.applyUser(user);
+      void this.loadJiraEmail(user.id);
     }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
@@ -157,41 +159,65 @@ export class UserComponent {
   editedUser = this.sourceUser.pipe(
     switchMap((user) =>
       merge(of(null), this.userForm.valueChanges).pipe(
-        map(
-          () =>
-            ({
-              ...user,
-              ...this.userForm.getRawValue(),
-              work_hours: this.serializeWorkHours(),
-            }) as User,
-        ),
+        map(() => {
+          const { jira_email: _jiraEmail, ...form } =
+            this.userForm.getRawValue();
+          return {
+            ...user,
+            ...form,
+            work_hours: this.serializeWorkHours(),
+          } as User;
+        }),
       ),
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
   async saveUser() {
     await this.avatarEditor?.applyDraft();
+    const userId = this.userForm.value.id;
+    const { jira_email, ...userFields } = this.userForm.getRawValue();
     await firstValueFrom(
-      this.userService.saveUser(this.userForm.value.id, {
+      this.userService.saveUser(userId, {
         ...this.currentUser,
-        ...this.userForm.value,
+        ...userFields,
         work_hours: this.serializeWorkHours(),
         ...{
           settings: {
             ...this.currentUser.settings,
-            time_zone_name: this.userForm.value.settings.time_zone_name,
+            time_zone_name: userFields.settings.time_zone_name,
             profile: {
               ...this.currentUser.settings.profile,
-              language: this.userForm.value.settings.profile.language,
+              language: userFields.settings.profile.language,
             },
           },
         },
       } as User),
     );
+    await firstValueFrom(
+      this.dataService.jiraSaveUserEmail(userId, {
+        jira_email: jira_email || '',
+      }),
+    );
     this.stateService.setFromProfile(
       this.userService.getUser().settings.profile,
     );
     this.toastService.success(this.transloco.translate('settings.user-saved'));
+  }
+
+  private async loadJiraEmail(userId: string): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    try {
+      const link = await firstValueFrom(
+        this.dataService.jiraGetUserEmail(userId),
+      );
+      this.userForm.controls.jira_email.setValue(link?.jira_email || '', {
+        emitEvent: false,
+      });
+    } catch {
+      this.userForm.controls.jira_email.setValue('', { emitEvent: false });
+    }
   }
   async deleteUser() {
     await firstValueFrom(

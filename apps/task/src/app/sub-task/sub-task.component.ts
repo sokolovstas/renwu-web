@@ -60,7 +60,20 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
       <div
         class="font-extralight text-2xl mb-2 flex flex-row flex-wrap items-center justify-between gap-2"
         >
-        <span>{{ 'task.subtask' | transloco }}</span>
+        <span class="flex flex-row items-baseline gap-2">
+          {{ 'task.subtask' | transloco }}
+          @if (isNew === false) {
+            @if (childData$ | async; as headData) {
+              @if (subtaskCount(headData) > 0) {
+                <span class="text-base opacity-60">{{
+                  subtaskCount(headData)
+                }}</span>
+              }
+            }
+          } @else if (pending?.length) {
+            <span class="text-base opacity-60">{{ pending.length }}</span>
+          }
+        </span>
         @if (isNew === false && canEdit) {
           <div class="flex flex-row gap-1 shrink-0">
             <rw-button
@@ -106,7 +119,7 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
       }
       @if (isNew === false) {
         @if (childData$ | async; as data) {
-          @if (data.childs.length > 0) {
+          @if ((data.childs?.length ?? 0) > 0) {
             <renwu-issue-status-bar [childs]="data" />
           }
           @if (hasProgress(data)) {
@@ -115,14 +128,14 @@ import { TaskDecompositeModalComponent } from './task-decomposite-modal.componen
                 'task.subtask-progress'
                   | transloco
                     : {
-                        resolved: data.childs_resolved,
-                        total: data.childs_total,
+                        resolved: data.childs_resolved ?? 0,
+                        total: subtaskCount(data),
                       }
               }}
             </div>
           }
           <div class="flex flex-col gap-1 px-1">
-            @for (c of data.childs; track c.id) {
+            @for (c of data.childs ?? []; track c.id) {
               <div class="flex flex-row items-center justify-between gap-2 text-sm">
                 <renwu-issue-href
                   [issue]="c"
@@ -230,7 +243,17 @@ export class SubTaskComponent {
   );
 
   hasProgress(data: IssueChilds): boolean {
-    return (data.childs_total ?? 0) > 0;
+    return this.subtaskCount(data) > 0;
+  }
+
+  subtaskCount(data: IssueChilds | null | undefined): number {
+    if (!data) {
+      return 0;
+    }
+    if (data.childs_total != null && data.childs_total > 0) {
+      return data.childs_total;
+    }
+    return data.childs?.length ?? 0;
   }
 
   removePendingSubtask(id: string): void {

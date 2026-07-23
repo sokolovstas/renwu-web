@@ -115,7 +115,7 @@ rw-text-area.focus {
     right: -1px;
     border: 1px solid $rw-control-border-color;
     border-radius: $rw-control-border-radius;
-    background-color: $white;
+    background-color: $rw-control-bg-color;
     position: absolute;
     z-index: 11;
     display: flex;
@@ -131,10 +131,12 @@ rw-text-area.focus {
   }
 }
 
-/* Add space around the hr to make clicking it easier */
+/* ---- ProseMirror editor (theme tokens) ---- */
 .ProseMirror {
   outline: none;
+  color: $rw-control-text-color;
 }
+
 .ProseMirror-example-setup-style hr {
   padding: 2px 10px;
   border: none;
@@ -145,20 +147,46 @@ rw-text-area.focus {
   content: '';
   display: block;
   height: 1px;
-  background-color: silver;
+  background-color: $rw-control-border-color;
   line-height: 2px;
 }
 
-.ProseMirror ul,
+/* Tailwind preflight sets list-style: none — restore markers in the editor */
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin: 0.4em 0;
+}
+
 .ProseMirror ol {
-  padding-left: 30px;
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin: 0.4em 0;
+}
+
+.ProseMirror ul ul {
+  list-style-type: circle;
+}
+
+.ProseMirror ul ul ul {
+  list-style-type: square;
+}
+
+.ProseMirror li {
+  display: list-item;
+  list-style-position: outside;
+}
+
+.ProseMirror li > p {
+  margin: 0;
 }
 
 .ProseMirror blockquote {
   padding-left: 1em;
-  border-left: 3px solid #eee;
+  border-left: 3px solid $rw-control-border-color;
   margin-left: 0;
   margin-right: 0;
+  color: $gray-500;
 }
 
 .ProseMirror-example-setup-style img {
@@ -166,25 +194,26 @@ rw-text-area.focus {
 }
 
 .ProseMirror-prompt {
-  background: white;
+  background: $rw-control-bg-color;
+  color: $rw-control-text-color;
   padding: 5px 10px 5px 15px;
-  border: 1px solid silver;
+  border: 1px solid $rw-control-border-color;
   position: fixed;
-  border-radius: 3px;
-  z-index: 11;
-  box-shadow: -0.5px 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: $rw-control-border-radius;
+  z-index: $rw-control-popup-z-index;
 }
 
 .ProseMirror-prompt h5 {
   margin: 0;
   font-weight: normal;
   font-size: 100%;
-  color: #444;
+  color: $gray-500;
 }
 
 .ProseMirror-prompt input[type='text'],
 .ProseMirror-prompt textarea {
-  background: #eee;
+  background: $gray-100;
+  color: $rw-control-text-color;
   border: none;
   outline: none;
 }
@@ -197,7 +226,7 @@ rw-text-area.focus {
   position: absolute;
   left: 2px;
   top: 1px;
-  color: #666;
+  color: $gray-500;
   border: none;
   background: transparent;
   padding: 0;
@@ -209,9 +238,10 @@ rw-text-area.focus {
 }
 
 .ProseMirror-invalid {
-  background: #ffc;
-  border: 1px solid #cc7;
-  border-radius: 4px;
+  background: $warn-color;
+  color: $always-black;
+  border: 1px solid $rw-control-border-color;
+  border-radius: $rw-control-border-radius;
   padding: 5px 10px;
   position: absolute;
   min-width: 10em;
@@ -243,7 +273,7 @@ rw-text-area.focus {
 }
 
 .ProseMirror-menuseparator {
-  border-right: 1px solid #ddd;
+  border-right: 1px solid $rw-control-border-color;
   margin-right: 3px;
 }
 
@@ -258,6 +288,7 @@ rw-text-area.focus {
   cursor: pointer;
   position: relative;
   padding-right: 15px;
+  color: $rw-control-text-color;
 }
 
 .ProseMirror-menu-dropdown-wrap {
@@ -280,9 +311,10 @@ rw-text-area.focus {
 .ProseMirror-menu-dropdown-menu,
 .ProseMirror-menu-submenu {
   position: absolute;
-  background: white;
-  color: #666;
-  border: 1px solid #aaa;
+  background: $rw-control-bg-color;
+  color: $rw-control-text-color;
+  border: 1px solid $rw-control-border-color;
+  border-radius: $rw-control-border-radius;
   padding: 2px;
 }
 
@@ -294,10 +326,11 @@ rw-text-area.focus {
 .ProseMirror-menu-dropdown-item {
   cursor: pointer;
   padding: 2px 8px 2px 4px;
+  border-radius: $rw-control-border-radius;
 }
 
 .ProseMirror-menu-dropdown-item:hover {
-  background: #f2f2f2;
+  background: $rw-control-hover-color;
 }
 
 .ProseMirror-menu-submenu-wrap {
@@ -324,8 +357,9 @@ rw-text-area.focus {
 }
 
 .ProseMirror-menu-active {
-  background: #eee;
-  border-radius: 4px;
+  background: $accent-lighter-color;
+  color: $rw-control-text-interactive-color;
+  border-radius: $rw-control-border-radius;
 }
 
 .ProseMirror-menu-disabled {
@@ -342,29 +376,109 @@ rw-text-area.focus {
   border-top-right-radius: inherit;
   position: relative;
   min-height: 1em;
-  color: #666;
+  color: $rw-control-text-color;
   padding: 1px 6px;
   top: 0;
   left: 0;
   right: 0;
-  border-bottom: 1px solid silver;
-  background: white;
+  border-bottom: 1px solid $rw-control-border-color;
+  background: $rw-control-bg-color;
   z-index: 10;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   overflow: visible;
+}
+
+/* Show formatting toolbar only while editing */
+rw-text-area:not(.focus) .ProseMirror-menubar {
+  display: none;
+}
+
+rw-text-area.borderless .ProseMirror-menubar {
+  display: none;
+}
+
+.ProseMirror-example-setup-style {
+  p {
+    margin: 0.4em 0;
+  }
+
+  code {
+    font-family: monospace;
+    background: $gray-100;
+    color: $rw-control-text-color;
+    padding: 0.1em 0.3em;
+    border-radius: $rw-control-border-radius;
+  }
+
+  pre {
+    background: $gray-100;
+    color: $rw-control-text-color;
+    padding: 0.5em;
+    border-radius: $rw-control-border-radius;
+    overflow: auto;
+
+    code {
+      background: transparent;
+      padding: 0;
+    }
+  }
+
+  strong {
+    font-weight: $global-weight-bolder;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  a {
+    color: $rw-control-text-interactive-color;
+    text-decoration: underline;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0.6em 0 0.3em;
+    font-weight: $global-weight-bolder;
+    line-height: 1.25;
+    color: $rw-control-text-color;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+  h2 {
+    font-size: 1.3em;
+  }
+  h3 {
+    font-size: 1.15em;
+  }
 }
 
 .ProseMirror-icon {
   display: inline-block;
   line-height: 0.8;
-  vertical-align: -2px; /* Compensate for padding */
+  vertical-align: -2px;
   padding: 2px 8px;
   cursor: pointer;
+  color: $rw-control-text-color;
+  border-radius: $rw-control-border-radius;
+
+  &:hover {
+    background: $rw-control-hover-color;
+  }
 }
 
 .ProseMirror-menu-disabled.ProseMirror-icon {
   cursor: default;
+
+  &:hover {
+    background: transparent;
+  }
 }
 
 .ProseMirror-icon svg {

@@ -96,6 +96,7 @@ export function createRwIssueServiceShellMock(issuePatch: Partial<Issue> = {}): 
     favorite: of(false),
     watchingSelf: of(false),
     transitions: of([]),
+    pendingSubtasks: of([]),
     create: jest.fn().mockReturnValue(of({ key: 'NEW-1' })),
     delete: jest.fn().mockReturnValue(of(false)),
     changeIssueStatus: jest.fn(),

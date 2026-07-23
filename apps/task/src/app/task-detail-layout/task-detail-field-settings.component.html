@@ -30,7 +30,7 @@
           [ngModel]="isVisible(sectionFieldKey(el))"
           (ngModelChange)="setVisible(sectionFieldKey(el), $event)"
          />
-        <span>{{ 'task.layout-block' | transloco: { tag: el } }}</span>
+        <span>{{ sectionLabelKey(el) | transloco }}</span>
       </label>
     }
   </div>

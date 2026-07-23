@@ -14,6 +14,7 @@ import {
   TaskDetailLayoutFieldKey,
   taskDetailSectionFieldKey,
 } from '@renwu/core';
+import { TASK_SECTION_META } from '../task-sections/task-section.model';
 import { TaskDetailVisibilityService } from './task-detail-visibility.service';
 
 const FORM_FIELD_LABEL: Record<TaskDetailFormFieldKey, string> = {
@@ -51,6 +52,10 @@ export class TaskDetailFieldSettingsComponent {
 
   sectionFieldKey(el: string): TaskDetailLayoutFieldKey {
     return taskDetailSectionFieldKey(el);
+  }
+
+  sectionLabelKey(el: string): string {
+    return TASK_SECTION_META[el]?.titleKey ?? 'task.layout-block';
   }
 
   isVisible(field: TaskDetailLayoutFieldKey): boolean {

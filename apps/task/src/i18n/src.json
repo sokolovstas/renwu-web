@@ -30,5 +30,12 @@
   "jira-create-confirm-text": "task.jira-create-confirm-text",
   "jira-import-done": "task.jira-import-done",
   "jira-export-done": "task.jira-export-done",
-  "jira-create-done": "task.jira-create-done"
+  "jira-create-done": "task.jira-create-done",
+  "jira-key": "task.jira-key",
+  "jira-key-hint": "task.jira-key-hint",
+  "jira-key-create-hint": "task.jira-key-create-hint",
+  "jira-import-created": "task.jira-import-created",
+  "jira-import-existing": "task.jira-import-existing",
+  "jira-link-saved": "task.jira-link-saved",
+  "jira-link-cleared": "task.jira-link-cleared"
 }
