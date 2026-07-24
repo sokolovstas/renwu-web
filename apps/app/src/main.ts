@@ -9,6 +9,11 @@ declare global {
 
 window.global = window;
 
-initFederation('assets/federation.manifest.json')
+// Root-absolute against <base href> so deep links (/settings/jira) don't resolve
+// host remoteEntry/shared bundles as /settings/remoteEntry.json (NF default is ./).
+const deployUrl = document.baseURI;
+initFederation(new URL('assets/federation.manifest.json', deployUrl).href, {
+  deployUrl,
+})
   .catch((err) => console.error(err))
   .then(() => import('./bootstrap').catch((err) => console.error(err)));
