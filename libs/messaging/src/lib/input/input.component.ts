@@ -24,6 +24,7 @@ import {
 import {
   Attachment,
   AttachmentComponent,
+  createMentionEditorExtras,
   RwSettingsService,
   RwUserService,
   StateService,
@@ -92,6 +93,12 @@ export class MessageInputComponent implements OnInit {
 
   @ViewChild('textarea', { static: false })
   textarea: RwTextAreaComponent;
+
+  mentionEditor = createMentionEditorExtras({
+    onActiveChange: (active) => {
+      this.messageService.mention = active;
+    },
+  });
 
   isExternal: boolean;
   sendWithMod: boolean;
@@ -238,7 +245,8 @@ export class MessageInputComponent implements OnInit {
     if (!this.editMessage) {
       this.messageService.setTempMessage(this.destination, this.text);
     }
-    if (this.messageService.mention) {
+    // Mention autocomplete handles Enter/Tab/arrows; also ignore if already consumed.
+    if (event.defaultPrevented || this.messageService.mention) {
       return;
     }
     if (event.key === 'ArrowUp' && (!this.text || this.text.length === 0)) {

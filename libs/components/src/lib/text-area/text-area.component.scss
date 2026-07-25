@@ -489,3 +489,39 @@ rw-text-area.borderless .ProseMirror-menubar {
 .ProseMirror-icon span {
   vertical-align: text-top;
 }
+
+/* ProseMirror caret hack after contenteditable=false atoms */
+img.ProseMirror-separator {
+  display: none !important;
+}
+
+.rw-mention-host {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  vertical-align: text-bottom;
+  line-height: 1;
+  height: 1rem;
+  max-height: 1rem;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  > * {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    height: 1rem;
+    max-height: 1rem;
+    vertical-align: text-bottom;
+    box-sizing: border-box;
+  }
+}
+
+.ProseMirror-selectednode.rw-mention-host,
+.rw-mention-host.ProseMirror-selectednode {
+  outline: 2px solid $accent-color;
+  outline-offset: 1px;
+  border-radius: $rw-control-border-radius;
+}

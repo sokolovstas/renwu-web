@@ -1,0 +1,40 @@
+@use '../../../styles/variables' as *;
+
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: block;
+  min-width: 220px;
+  max-width: 360px;
+  max-height: 240px;
+  overflow: auto;
+  background: $rw-control-bg-color;
+  color: $rw-control-text-color;
+  border: 1px solid $rw-control-border-color;
+  border-radius: $rw-control-border-radius;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  z-index: $rw-control-popup-z-index;
+  /* Avoid being clipped by transformed/overflow ancestors */
+  isolation: isolate;
+}
+
+.rw-mention-ac-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25em 0;
+}
+
+.rw-mention-ac-item {
+  cursor: pointer;
+}
+
+.rw-mention-ac-item.active,
+.rw-mention-ac-item:hover {
+  background: $rw-control-hover-color;
+}
+
+.rw-mention-ac-empty {
+  padding: 0.6em 1em;
+  color: $gray-500;
+}

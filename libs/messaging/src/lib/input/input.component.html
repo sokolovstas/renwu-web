@@ -29,6 +29,8 @@
         [live]="true"
         [disabled]="(messageService.connected | async) === false"
         [borderless]="true"
+        [editorPlugins]="mentionEditor.plugins"
+        [editorNodeViews]="mentionEditor.nodeViews"
         [(ngModel)]="text"
         (keydown)="onKeyDown($event)"
         [prompt]="prompt | async"

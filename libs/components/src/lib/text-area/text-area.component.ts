@@ -27,16 +27,18 @@ import {
 } from 'prosemirror-commands';
 import { exampleSetup } from 'prosemirror-example-setup';
 import { keymap } from 'prosemirror-keymap';
-import {
-  defaultMarkdownParser,
-  defaultMarkdownSerializer,
-  schema,
-} from 'prosemirror-markdown';
 import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { EditorState, Plugin, Transaction } from 'prosemirror-state';
-import { EditorView } from 'prosemirror-view';
+import { EditorView, NodeViewConstructor } from 'prosemirror-view';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { RwButtonComponent } from '../button/button.component';
+import {
+  markdownParser,
+  markdownSerializer,
+  mySchema,
+} from './prosemirror-schema';
+
+export { markdownParser, markdownSerializer, mySchema } from './prosemirror-schema';
 
 const noop = () => {
   return;
@@ -47,9 +49,6 @@ export const TEXTAREA_VALUE_ACCESSOR = {
   useExisting: forwardRef(() => RwTextAreaComponent),
   multi: true,
 };
-
-/** Markdown schema shared with messaging render path. */
-export const mySchema = schema;
 
 @Component({
   selector: 'rw-text-area',
@@ -82,6 +81,10 @@ export class RwTextAreaComponent
 
   @Output()
   blurChange = new EventEmitter<void>();
+
+  /** True while mention autocomplete popup is open (blocks Enter-to-send). */
+  @Output()
+  mentionActiveChange = new EventEmitter<boolean>();
 
   @Input()
   @HostBinding()
@@ -128,6 +131,14 @@ export class RwTextAreaComponent
   @Input()
   markdownToolbar: boolean | null = null;
 
+  /** Extra ProseMirror plugins (e.g. mention autocomplete). */
+  @Input()
+  editorPlugins: Plugin[] = [];
+
+  /** NodeViews for mention atoms etc. */
+  @Input()
+  editorNodeViews: Record<string, NodeViewConstructor> = {};
+
   destroy = inject(DestroyRef);
 
   _value = '';
@@ -170,32 +181,70 @@ export class RwTextAreaComponent
   }
 
   ngOnInit() {
-    this.editor = new EditorView(this.textarea.nativeElement, {
-      dispatchTransaction: (transaction: Transaction) => {
-        const newState = this.editor.state.apply(transaction);
-        this.editor.updateState(newState);
-        this.value = defaultMarkdownSerializer.serialize(this.editor.state.doc);
-        if (this.live) {
-          if (this.liveDebounce > 0) {
-            this.onModelChanged.next(this.value);
-          } else {
+    let state: EditorState;
+    try {
+      state = this.createEditorState();
+    } catch (err) {
+      console.error('rw-text-area: failed to create editor state', err);
+      state = EditorState.create({
+        doc: mySchema.node('doc', null, [mySchema.node('paragraph')]),
+        plugins: [],
+      });
+    }
+    try {
+      this.editor = new EditorView(this.textarea.nativeElement, {
+        dispatchTransaction: (transaction: Transaction) => {
+          if (!this.editor) {
+            return;
+          }
+          const newState = this.editor.state.apply(transaction);
+          this.editor.updateState(newState);
+          try {
+            this.value = markdownSerializer.serialize(this.editor.state.doc);
+          } catch (err) {
+            console.error('rw-text-area: serialize failed', err);
+          }
+          if (this.live) {
+            if (this.liveDebounce > 0) {
+              this.onModelChanged.next(this.value);
+            } else {
+              this.onChangeCallback(this.value);
+            }
+          }
+          this.cd.markForCheck();
+        },
+        handleDOMEvents: {
+          blur: () => {
+            this.onFocusOut();
+            return false;
+          },
+          focus: () => {
+            this.onFocusIn();
+            return false;
+          },
+        },
+        nodeViews: this.editorNodeViews || {},
+        state,
+      });
+    } catch (err) {
+      console.error('rw-text-area: EditorView failed, retry without nodeViews', err);
+      this.editor = new EditorView(this.textarea.nativeElement, {
+        dispatchTransaction: (transaction: Transaction) => {
+          const newState = this.editor.state.apply(transaction);
+          this.editor.updateState(newState);
+          try {
+            this.value = markdownSerializer.serialize(this.editor.state.doc);
+          } catch {
+            /* ignore */
+          }
+          if (this.live) {
             this.onChangeCallback(this.value);
           }
-        }
-        this.cd.markForCheck();
-      },
-      handleDOMEvents: {
-        blur: () => {
-          this.onFocusOut();
-          return false;
+          this.cd.markForCheck();
         },
-        focus: () => {
-          this.onFocusIn();
-          return false;
-        },
-      },
-      state: this.createEditorState(),
-    });
+        state,
+      });
+    }
     this.editor.editable = false;
     this.onModelChanged
       .pipe(
@@ -291,7 +340,7 @@ export class RwTextAreaComponent
   private createEditorState(): EditorState {
     let doc: ProseMirrorNode;
     try {
-      doc = defaultMarkdownParser.parse(this.value || '');
+      doc = markdownParser.parse(this.value || '');
     } catch {
       doc = mySchema.node('doc', null, [mySchema.node('paragraph')]);
     }
@@ -314,6 +363,7 @@ export class RwTextAreaComponent
     }
 
     const plugins: Plugin[] = [
+      ...(this.editorPlugins || []),
       keymap({
         Escape: () => {
           this.switchPopup(false, true);

@@ -10,6 +10,33 @@ renwu-messaging-item {
     border-radius: 10px;
     margin: 10px 0px;
   }
+  img.ProseMirror-separator {
+    display: none !important;
+  }
+
+  .rw-mention-host {
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
+    vertical-align: text-bottom;
+    line-height: 1;
+    height: 1rem;
+    max-height: 1rem;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    > * {
+      display: inline-flex;
+      width: fit-content;
+      max-width: 100%;
+      height: 1rem;
+      max-height: 1rem;
+      vertical-align: text-bottom;
+      box-sizing: border-box;
+    }
+  }
 }
 
 .renwu-messaging-item__pulse {

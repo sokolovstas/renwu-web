@@ -9,11 +9,11 @@ import {
   Input,
   OnDestroy,
   Output,
+  ViewChild,
   ViewEncapsulation,
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   RwAlertService,
@@ -21,10 +21,11 @@ import {
   RwIconComponent,
   RwToastService,
   RwTooltipDirective,
-  mySchema,
+  markdownParser,
 } from '@renwu/components';
 import {
   AvatarComponent,
+  createMentionEditorExtras,
   IssueHistoryItemComponent,
   MessageCounterComponent,
   RwFormatUserPipe,
@@ -33,15 +34,15 @@ import {
   StateService,
 } from '@renwu/core';
 import { copyToClipboard } from '@renwu/utils';
-import { defaultMarkdownParser } from 'prosemirror-markdown';
-import { DOMSerializer } from 'prosemirror-model';
+import { EditorState } from 'prosemirror-state';
+import { EditorView, NodeViewConstructor } from 'prosemirror-view';
 import { Subscription, filter, first } from 'rxjs';
 import { ScrollMonitorContainer, Watcher } from 'scrollmonitor';
 import { MessageType } from '../data/messages.model';
 import { MessageDestination } from '../message-destination';
 import { MessageItem } from '../message-item';
 import { RwMessageService } from '../message.service';
-// import { PersonalPageHrefComponent } from '../../user/personal-page-href/personal-page-href.component';
+
 @Component({
   selector: 'renwu-messaging-item',
   standalone: true,
@@ -68,12 +69,25 @@ export class MessageItemComponent implements OnDestroy {
   private toastService = inject(RwToastService);
   messageService = inject(RwMessageService);
   private stateService = inject(StateService);
-  private sanitizer = inject(DomSanitizer);
   private cd = inject(ChangeDetectorRef);
 
   protected settingsService = inject(RwSettingsService);
   destroy = inject(DestroyRef);
   MessageType = MessageType;
+
+  @ViewChild('messageBody', { static: false })
+  messageBody?: ElementRef<HTMLElement>;
+
+  private mentionViews: Record<string, NodeViewConstructor> = {};
+  private proseView?: EditorView;
+
+  constructor() {
+    try {
+      this.mentionViews = createMentionEditorExtras().nodeViews;
+    } catch (err) {
+      console.error('messaging-item: mention views init failed', err);
+    }
+  }
 
   @Input()
   set destination(value: MessageDestination) {
@@ -129,15 +143,14 @@ export class MessageItemComponent implements OnDestroy {
   deleting: boolean;
   displayChilds: boolean;
 
-  formatted: SafeHtml;
   monitor: Watcher;
   readSubscribe: Subscription;
 
   currentUserId = inject(RwUserService).getId();
-  // ngOnInit() {
-  //   // this.state = 'in';
-  // }
+
   ngOnDestroy() {
+    this.proseView?.destroy();
+    this.proseView = undefined;
     if (this.monitor) {
       this.monitor.destroy();
     }
@@ -211,26 +224,39 @@ export class MessageItemComponent implements OnDestroy {
       this.scrollMonitorContainer.recalculateLocations();
     }
   }
-  prepareLinks() {
-    // this.markdownService.prepareLinks(this.el.nativeElement, this);
-  }
-  cleanupLinks() {
-    // this.markdownService.cleanupLinks(this);
-  }
   updateFormatted(text: string) {
-    this.cleanupLinks();
+    // Wait for #messageBody after change detection when message first arrives.
+    queueMicrotask(() => this.renderProse(text));
+  }
 
-    const div = document.createElement('div');
-    const fragment = DOMSerializer.fromSchema(mySchema).serializeFragment(
-      defaultMarkdownParser.parse(text || '').content,
-    );
-
-    div.appendChild(fragment);
-
-    this.formatted = this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
-    this.cd.detectChanges();
+  private renderProse(text: string) {
+    const mount = this.messageBody?.nativeElement;
+    if (!mount) {
+      this.cd.detectChanges();
+      queueMicrotask(() => {
+        if (this.messageBody?.nativeElement) {
+          this.renderProse(text);
+        }
+      });
+      return;
+    }
+    let doc;
+    try {
+      doc = markdownParser.parse(text || '');
+    } catch {
+      doc = markdownParser.parse('');
+    }
+    const state = EditorState.create({ doc });
+    if (this.proseView) {
+      this.proseView.updateState(state);
+    } else {
+      this.proseView = new EditorView(mount, {
+        state,
+        editable: () => false,
+        nodeViews: this.mentionViews,
+      });
+    }
     this.cd.markForCheck();
-    this.prepareLinks();
   }
   getHref(): string {
     return `${document.baseURI}message/${this.message.destination.id}/${this.message.destination.type}/${this.message.id}`;

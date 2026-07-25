@@ -125,7 +125,7 @@
             &nbsp;
           </div>
         }
-        <div [innerHTML]="formatted"></div>
+        <div #messageBody class="renwu-messaging-item__prose"></div>
       </div>
       @if (message.sendError) {
         <div
@@ -262,8 +262,8 @@
   </div>
   @if (message.message && !message.newsData) {
     <div
-      class="renwu-messaging-item__pulse__text"
-      [innerHTML]="formatted"
+      #messageBody
+      class="renwu-messaging-item__pulse__text renwu-messaging-item__prose"
     ></div>
   }
   <div class="renwu-messaging-item__pulse__time">

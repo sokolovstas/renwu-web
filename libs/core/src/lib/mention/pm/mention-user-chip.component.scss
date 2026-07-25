@@ -1,0 +1,49 @@
+@use '../../../styles/variables' as *;
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  width: fit-content;
+  max-width: 100%;
+  vertical-align: text-bottom;
+  padding: 0 0.25em 0 0.1em;
+  margin: 0 0.05em;
+  border-radius: 0.25em;
+  background: $gray-100;
+  color: $rw-control-text-interactive-color;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+  height: 1rem;
+  max-height: 1rem;
+  white-space: nowrap;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+:host:hover {
+  background: $rw-control-hover-color;
+}
+
+.chip-avatar {
+  flex-shrink: 0;
+  width: 0.85rem;
+  height: 0.85rem;
+  line-height: 0;
+  overflow: hidden;
+
+  ::ng-deep .avatar {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+  }
+}
+
+.chip-name {
+  font-size: inherit;
+  font-weight: $global-weight-bolder;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
