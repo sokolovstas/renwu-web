@@ -29,7 +29,7 @@
         [live]="true"
         [disabled]="(messageService.connected | async) === false"
         [borderless]="true"
-        [editorPlugins]="mentionEditor.plugins"
+        [editorPlugins]="editorPlugins"
         [editorNodeViews]="mentionEditor.nodeViews"
         [(ngModel)]="text"
         (keydown)="onKeyDown($event)"

@@ -30,6 +30,7 @@ import {
   StateService,
 } from '@renwu/core';
 import { destroyObservable } from '@renwu/utils';
+import { Plugin } from 'prosemirror-state';
 import { Subject, merge } from 'rxjs';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { DestinationType } from '../data/messages.model';
@@ -99,6 +100,16 @@ export class MessageInputComponent implements OnInit {
       this.messageService.mention = active;
     },
   });
+
+  /** Runs before exampleSetup keymaps so Mod-Enter is not eaten by hard_break. */
+  private sendEnterPlugin = new Plugin({
+    props: {
+      handleKeyDown: (_view, event: KeyboardEvent) =>
+        this.trySendOnEnter(event),
+    },
+  });
+
+  editorPlugins = [...this.mentionEditor.plugins, this.sendEnterPlugin];
 
   isExternal: boolean;
   sendWithMod: boolean;
@@ -245,7 +256,8 @@ export class MessageInputComponent implements OnInit {
     if (!this.editMessage) {
       this.messageService.setTempMessage(this.destination, this.text);
     }
-    // Mention autocomplete handles Enter/Tab/arrows; also ignore if already consumed.
+    // Enter-to-send is handled in sendEnterPlugin (before PM hard_break).
+    // Mention autocomplete stopPropagates while open; ignore if already consumed.
     if (event.defaultPrevented || this.messageService.mention) {
       return;
     }
@@ -263,18 +275,24 @@ export class MessageInputComponent implements OnInit {
       event.preventDefault();
       event.stopPropagation();
       return;
-    } else if (event.key === 'Enter') {
-      const modifier =
-        event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
-      if (this.sendWithModifier !== modifier) {
-        // event.stopImmediatePropagation();
-        // event.preventDefault();
-      } else {
-        event.stopImmediatePropagation();
-        event.preventDefault();
-        this.sendMessage();
-      }
     }
+  }
+
+  /** @returns true when the event was consumed as send. */
+  trySendOnEnter(event: KeyboardEvent): boolean {
+    if (event.key !== 'Enter') {
+      return false;
+    }
+    if (this.messageService.mention) {
+      return false;
+    }
+    const modifier =
+      event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
+    if (this.sendWithModifier !== modifier) {
+      return false;
+    }
+    this.sendMessage();
+    return true;
   }
   sendMessage() {
     if (this.editMessage) {
