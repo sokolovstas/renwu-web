@@ -1,0 +1,122 @@
+<div class="grid gap-6 lg:grid-cols-[minmax(16rem,1fr)_minmax(24rem,2fr)]">
+  <section>
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl font-light">
+        {{ 'settings.ai-workflows' | transloco }}
+      </h2>
+      <rw-button typeButton="secondary" (clicked)="edit()">{{
+        'settings.ai-add' | transloco
+      }}</rw-button>
+    </div>
+    @if (items()?.length) {
+      <div class="flex flex-col gap-2">
+        @for (item of items(); track item.id) {
+          <div
+            class="flex items-center justify-between gap-2 p-3 border rounded"
+          >
+            <button type="button" class="text-left flex-1" (click)="edit(item)">
+              {{ item.name }}</button
+            ><rw-button
+              iconClass="trash"
+              typeButton="icon"
+              [double]="true"
+              (clicked)="remove(item)"
+            />
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="form-supporting-text">
+        {{ 'settings.ai-empty-workflows' | transloco }}
+      </p>
+    }
+  </section>
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    <rw-text-input
+      [live]="true"
+      formControlName="name"
+      prompt="{{ 'settings.ai-name' | transloco }}"
+    />
+    <div class="grid gap-4 md:grid-cols-2">
+      <rw-select
+        formControlName="container_id"
+        [model]="containerModel"
+        prompt="{{ 'settings.ai-container' | transloco }}"
+      />
+      <rw-select
+        formControlName="workspace_id"
+        [model]="workspaceModel"
+        prompt="{{ 'settings.ai-workspace' | transloco }}"
+      />
+    </div>
+    <label class="flex items-center gap-2"
+      ><input type="checkbox" formControlName="enabled" />{{
+        'settings.ai-enabled' | transloco
+      }}</label
+    >
+    <div formArrayName="steps" class="flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-light">
+          {{ 'settings.ai-steps' | transloco }}
+        </h3>
+        <rw-button typeButton="secondary" (clicked)="addStep()">{{
+          'settings.ai-add-step' | transloco
+        }}</rw-button>
+      </div>
+      @for (step of steps.controls; track step; let i = $index) {
+        <div [formGroup]="step" class="border rounded p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-center">
+            <span>{{ 'settings.ai-step' | transloco }} {{ i + 1 }}</span
+            ><rw-button
+              iconClass="trash"
+              typeButton="icon"
+              [double]="true"
+              (clicked)="removeStep(i)"
+            />
+          </div>
+          <div class="grid gap-3 md:grid-cols-2">
+            <rw-select
+              formControlName="on_enter_status_id"
+              [model]="stepStatusModel(i, 'enter')"
+              prompt="{{ 'settings.ai-on-enter-status' | transloco }}"
+            />
+            <rw-select
+              formControlName="skill_id"
+              [model]="stepSkillModel(i)"
+              prompt="{{ 'settings.ai-skill' | transloco }}"
+            />
+            <rw-select
+              formControlName="on_success_status_id"
+              [model]="stepStatusModel(i, 'success')"
+              prompt="{{ 'settings.ai-on-success-status' | transloco }}"
+            />
+            <rw-select
+              formControlName="on_need_info_status_id"
+              [model]="stepStatusModel(i, 'need_info')"
+              prompt="{{ 'settings.ai-on-need-info-status' | transloco }}"
+            />
+            <rw-select
+              formControlName="on_failure_status_id"
+              [model]="stepStatusModel(i, 'failure')"
+              prompt="{{ 'settings.ai-on-failure-status' | transloco }}"
+            />
+          </div>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2"
+              ><input type="checkbox" formControlName="auto_transit" />{{
+                'settings.ai-auto-transit' | transloco
+              }}</label
+            ><label class="flex items-center gap-2"
+              ><input type="checkbox" formControlName="retrigger" />{{
+                'settings.ai-retrigger' | transloco
+              }}</label
+            >
+          </div>
+        </div>
+      }
+    </div>
+    <rw-button action (clicked)="save()">{{
+      'settings.save' | transloco
+    }}</rw-button>
+  </form>
+</div>

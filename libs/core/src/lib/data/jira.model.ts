@@ -87,6 +87,13 @@ export interface JiraUserCredentials {
   configured?: boolean;
 }
 
+/** Portable dump of org Jira settings (no secrets / issue mappings). */
+export interface JiraConfigBundle {
+  kind?: string;
+  version?: number;
+  settings?: JiraSettings;
+}
+
 export interface JiraSettings {
   jql?: string;
   oql?: string;

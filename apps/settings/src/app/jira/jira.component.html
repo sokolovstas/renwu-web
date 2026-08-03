@@ -1,193 +1,297 @@
 @if (settings$ | async; as _settings) {
   <renwu-page title="{{ 'settings.jira' | transloco }}">
-    <form [formGroup]="form" class="jira-settings flex flex-col gap-8 w-full">
-      <!-- Org connection (URL / filters — no shared PAT) -->
-      <section class="jira-section">
-        <h2 class="text-xl font-light mb-2">
-          {{ 'settings.jira-connection' | transloco }}
-        </h2>
-        <p class="form-supporting-text mb-4">
-          {{ 'settings.jira-connection-hint' | transloco }}
-        </p>
-        <p class="form-supporting-text mb-4">
-          {{ 'settings.jira-token-in-profile-hint' | transloco }}
-          <a routerLink="/profile/me/jira" class="jira-profile-link">{{
-            'settings.jira-token-in-profile-link' | transloco
-          }}</a
-          >.
-        </p>
-        <div class="lg:grid-cols-2 grid gap-4">
-          <label class="form-label">
-            <rw-text-input
-              formControlName="rest_api_url"
-              prompt="{{ 'settings.jira-rest-url' | transloco }}"
-            />
-            <div class="form-supporting-text">
-              {{ 'settings.jira-rest-url-hint' | transloco }}
-            </div>
-          </label>
-          <label class="form-label">
-            <rw-text-input
-              formControlName="public_url"
-              prompt="{{ 'settings.jira-public-url' | transloco }}"
-            />
-          </label>
-          <label class="form-label col-span-full">
-            <rw-text-input
-              formControlName="hook_address"
-              prompt="{{ 'settings.jira-hook' | transloco }}"
-            />
-            <div class="form-supporting-text">
-              {{ 'settings.jira-hook-hint' | transloco }}
-            </div>
-          </label>
-          <label class="form-label">
-            <rw-text-input
-              formControlName="jql"
-              prompt="{{ 'settings.jira-jql' | transloco }}"
-            />
-            <div class="form-supporting-text">
-              {{ 'settings.jira-jql-hint' | transloco }}
-            </div>
-            <div class="flex flex-row flex-wrap gap-2 mt-2">
-              <rw-button
-                typeButton="secondary"
-                [disabled]="busy()"
-                (clicked)="checkJql()"
-                >{{ 'settings.jira-check-jql' | transloco }}</rw-button
-              >
-              <rw-button
-                typeButton="secondary"
-                [disabled]="busy()"
-                (clicked)="importJql()"
-                >{{ 'settings.jira-import-jql' | transloco }}</rw-button
-              >
-            </div>
-          </label>
-          <label class="form-label">
-            <rw-text-input
-              formControlName="oql"
-              prompt="{{ 'settings.jira-oql' | transloco }}"
-            />
-            <div class="form-supporting-text">
-              {{ 'settings.jira-oql-hint' | transloco }}
-            </div>
-            <div class="flex flex-row flex-wrap gap-2 mt-2">
-              <rw-button
-                typeButton="secondary"
-                [disabled]="busy()"
-                (clicked)="checkOql()"
-                >{{ 'settings.jira-check-oql' | transloco }}</rw-button
-              >
-              <rw-button
-                typeButton="secondary"
-                [disabled]="busy()"
-                (clicked)="exportOql(false)"
-                >{{ 'settings.jira-export-oql' | transloco }}</rw-button
-              >
-              <rw-button
-                typeButton="secondary"
-                [disabled]="busy()"
-                (clicked)="exportOql(true)"
-                >{{ 'settings.jira-export-oql-create' | transloco }}</rw-button
-              >
-            </div>
-          </label>
-        </div>
-      </section>
-
-      <!-- Push mode -->
-      <section class="jira-section">
-        <h2 class="text-xl font-light mb-2">
-          {{ 'settings.jira-push-mode' | transloco }}
-        </h2>
-        <p class="form-supporting-text mb-4">
-          {{ 'settings.jira-push-mode-hint' | transloco }}
-        </p>
-        <div class="flex flex-col gap-2">
-          @for (mode of pushModes; track mode.value) {
-            <label class="jira-radio">
-              <input
-                type="radio"
-                formControlName="push_mode"
-                [value]="mode.value"
-              />
-              <span>{{ mode.labelKey | transloco }}</span>
-            </label>
-          }
-        </div>
-        <label class="form-label mt-4 max-w-md">
-          <rw-text-input
-            formControlName="epic_link_field"
-            prompt="{{ 'settings.jira-epic-link-field' | transloco }}"
-          />
-          <div class="form-supporting-text">
-            {{ 'settings.jira-epic-link-field-hint' | transloco }}
-          </div>
-        </label>
-      </section>
-
-      <!-- Mappings -->
-      <section class="jira-section">
-        <div class="flex flex-row items-center justify-between gap-2 mb-2">
-          <h2 class="text-xl font-light">
-            {{ 'settings.jira-mappings' | transloco }}
-          </h2>
+    <form [formGroup]="form" class="jira-settings flex flex-col gap-4 w-full">
+      <div
+        class="jira-tabs"
+        role="tablist"
+        [attr.aria-label]="'settings.jira' | transloco"
+      >
+        @for (tab of tabs; track tab.id) {
           <rw-button
-            typeButton="secondary"
-            [disabled]="busy()"
-            (clicked)="updateDictionaries()"
-            >{{ 'settings.jira-update-dictionaries' | transloco }}</rw-button
+            typeButton="tab"
+            role="tab"
+            [attr.aria-selected]="activeTab() === tab.id"
+            [selected]="activeTab() === tab.id"
+            (clicked)="selectTab(tab.id)"
+            >{{ tab.labelKey | transloco }}</rw-button
           >
-        </div>
-        <p class="form-supporting-text mb-4">
-          {{ 'settings.jira-mappings-hint' | transloco }}
-        </p>
+        }
+      </div>
 
-        @for (map of dictMappings; track map.key) {
-          <div class="mb-6">
+      @if (activeTab() === 'connection') {
+        <!-- Org connection (URL / filters — no shared PAT) -->
+        <section class="jira-section" role="tabpanel">
+          <h2 class="text-xl font-light mb-2">
+            {{ 'settings.jira-connection' | transloco }}
+          </h2>
+          <p class="form-supporting-text mb-4">
+            {{ 'settings.jira-connection-hint' | transloco }}
+          </p>
+          <p class="form-supporting-text mb-4">
+            {{ 'settings.jira-token-in-profile-hint' | transloco }}
+            <a routerLink="/profile/me/jira" class="jira-profile-link">{{
+              'settings.jira-token-in-profile-link' | transloco
+            }}</a
+            >.
+          </p>
+          <div class="lg:grid-cols-2 grid gap-4">
+            <label class="form-label">
+              <rw-text-input
+                formControlName="rest_api_url"
+                prompt="{{ 'settings.jira-rest-url' | transloco }}"
+              />
+              <div class="form-supporting-text">
+                {{ 'settings.jira-rest-url-hint' | transloco }}
+              </div>
+            </label>
+            <label class="form-label">
+              <rw-text-input
+                formControlName="public_url"
+                prompt="{{ 'settings.jira-public-url' | transloco }}"
+              />
+            </label>
+            <label class="form-label col-span-full">
+              <rw-text-input
+                formControlName="hook_address"
+                prompt="{{ 'settings.jira-hook' | transloco }}"
+              />
+              <div class="form-supporting-text">
+                {{ 'settings.jira-hook-hint' | transloco }}
+              </div>
+            </label>
+            <label class="form-label">
+              <rw-text-input
+                formControlName="jql"
+                prompt="{{ 'settings.jira-jql' | transloco }}"
+              />
+              <div class="form-supporting-text">
+                {{ 'settings.jira-jql-hint' | transloco }}
+              </div>
+              <div class="flex flex-row flex-wrap gap-2 mt-2">
+                <rw-button
+                  typeButton="secondary"
+                  [disabled]="busy()"
+                  (clicked)="checkJql()"
+                  >{{ 'settings.jira-check-jql' | transloco }}</rw-button
+                >
+                <rw-button
+                  typeButton="secondary"
+                  [disabled]="busy()"
+                  (clicked)="importJql()"
+                  >{{ 'settings.jira-import-jql' | transloco }}</rw-button
+                >
+              </div>
+            </label>
+            <label class="form-label">
+              <rw-text-input
+                formControlName="oql"
+                prompt="{{ 'settings.jira-oql' | transloco }}"
+              />
+              <div class="form-supporting-text">
+                {{ 'settings.jira-oql-hint' | transloco }}
+              </div>
+              <div class="flex flex-row flex-wrap gap-2 mt-2">
+                <rw-button
+                  typeButton="secondary"
+                  [disabled]="busy()"
+                  (clicked)="checkOql()"
+                  >{{ 'settings.jira-check-oql' | transloco }}</rw-button
+                >
+                <rw-button
+                  typeButton="secondary"
+                  [disabled]="busy()"
+                  (clicked)="exportOql(false)"
+                  >{{ 'settings.jira-export-oql' | transloco }}</rw-button
+                >
+                <rw-button
+                  typeButton="secondary"
+                  [disabled]="busy()"
+                  (clicked)="exportOql(true)"
+                  >{{ 'settings.jira-export-oql-create' | transloco }}</rw-button
+                >
+              </div>
+            </label>
+          </div>
+        </section>
+      }
+
+      @if (activeTab() === 'push') {
+        <!-- Push mode -->
+        <section class="jira-section" role="tabpanel">
+          <h2 class="text-xl font-light mb-2">
+            {{ 'settings.jira-push-mode' | transloco }}
+          </h2>
+          <p class="form-supporting-text mb-4">
+            {{ 'settings.jira-push-mode-hint' | transloco }}
+          </p>
+          <div class="flex flex-col gap-2">
+            @for (mode of pushModes; track mode.value) {
+              <label class="jira-radio">
+                <input
+                  type="radio"
+                  formControlName="push_mode"
+                  [value]="mode.value"
+                />
+                <span>{{ mode.labelKey | transloco }}</span>
+              </label>
+            }
+          </div>
+          <label class="form-label mt-4 max-w-md">
+            <rw-text-input
+              formControlName="epic_link_field"
+              prompt="{{ 'settings.jira-epic-link-field' | transloco }}"
+            />
+            <div class="form-supporting-text">
+              {{ 'settings.jira-epic-link-field-hint' | transloco }}
+            </div>
+          </label>
+        </section>
+      }
+
+      @if (activeTab() === 'mappings') {
+        <!-- Mappings -->
+        <section class="jira-section" role="tabpanel">
+          <div class="flex flex-row items-center justify-between gap-2 mb-2">
+            <h2 class="text-xl font-light">
+              {{ 'settings.jira-mappings' | transloco }}
+            </h2>
+            <rw-button
+              typeButton="secondary"
+              [disabled]="busy()"
+              (clicked)="updateDictionaries()"
+              >{{ 'settings.jira-update-dictionaries' | transloco }}</rw-button
+            >
+          </div>
+          <p class="form-supporting-text mb-4">
+            {{ 'settings.jira-mappings-hint' | transloco }}
+          </p>
+
+          @for (map of dictMappings; track map.key) {
+            <div class="mb-6">
+              <div class="flex flex-row items-center justify-between gap-2 mb-2">
+                <h3 class="text-base font-normal">
+                  {{ map.titleKey | transloco }}
+                </h3>
+                <rw-button
+                  iconClass="add-bold"
+                  typeButton="icon"
+                  (clicked)="addDictRow(map.key)"
+                />
+              </div>
+              <label class="form-label mb-2">
+                <rw-text-input
+                  [ngModel]="mappingFilter()[map.key]"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="setMappingFilter(map.key, $event)"
+                  prompt="{{ 'settings.jira-filter-our' | transloco }}"
+                />
+              </label>
+              <div class="jira-table text-sm" [formArrayName]="map.key">
+                <div class="jira-table__head jira-table__head--map">
+                  <div>{{ 'settings.jira-our-name' | transloco }}</div>
+                  <div>{{ 'settings.jira-jira-value' | transloco }}</div>
+                  <div></div>
+                </div>
+                @for (item of filteredDictRows(map.key); track item.index) {
+                  <div
+                    class="jira-table__row jira-table__row--map"
+                    [formGroup]="item.row"
+                  >
+                    @if (isDraftMappingRow(item.row)) {
+                      <rw-select
+                        class="w-full"
+                        [model]="ourModelFor(map.key, item.index)"
+                        [ngModel]="rowValue(item.row, 'our_id')"
+                        [ngModelOptions]="{ standalone: true }"
+                        (ngModelChange)="
+                          onOurDictPicked(map.key, item.row, $event)
+                        "
+                        prompt="{{ 'settings.jira-our-name' | transloco }}"
+                        [borderless]="true"
+                      />
+                    } @else {
+                      <div class="jira-our-cell">
+                        <div class="jira-our-cell__name">
+                          {{ rowValue(item.row, 'our_name') }}
+                        </div>
+                        <div class="jira-our-cell__id">
+                          {{ rowValue(item.row, 'our_id') }}
+                        </div>
+                      </div>
+                    }
+                    <rw-select
+                      class="w-full"
+                      [model]="
+                        jiraModelFor(
+                          map.key,
+                          rowValue(item.row, 'our_id'),
+                          item.index
+                        )
+                      "
+                      [ngModel]="rowValue(item.row, 'jira_id')"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="
+                        onJiraDictPicked(map.key, item.row, $event)
+                      "
+                      prompt="{{ 'settings.jira-search-jira' | transloco }}"
+                      [borderless]="true"
+                    />
+                    <rw-button
+                      iconClass="trash"
+                      typeButton="icon"
+                      [double]="true"
+                      (clicked)="removeDictRow(map.key, item.index)"
+                    />
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="mb-2">
             <div class="flex flex-row items-center justify-between gap-2 mb-2">
               <h3 class="text-base font-normal">
-                {{ map.titleKey | transloco }}
+                {{ 'settings.jira-mapping-project_mapping' | transloco }}
               </h3>
               <rw-button
                 iconClass="add-bold"
                 typeButton="icon"
-                (clicked)="addDictRow(map.key)"
+                (clicked)="addProjectRow()"
               />
             </div>
             <label class="form-label mb-2">
               <rw-text-input
-                [ngModel]="mappingFilter()[map.key]"
+                [ngModel]="mappingFilter()['project_mapping']"
                 [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="setMappingFilter(map.key, $event)"
+                (ngModelChange)="setMappingFilter('project_mapping', $event)"
                 prompt="{{ 'settings.jira-filter-our' | transloco }}"
               />
             </label>
-            <div class="jira-table text-sm" [formArrayName]="map.key">
+            <div class="jira-table text-sm" formArrayName="project_mapping">
               <div class="jira-table__head jira-table__head--map">
-                <div>{{ 'settings.jira-our-name' | transloco }}</div>
+                <div>{{ 'settings.jira-our-key' | transloco }}</div>
                 <div>{{ 'settings.jira-jira-value' | transloco }}</div>
                 <div></div>
               </div>
-              @for (item of filteredDictRows(map.key); track item.index) {
-                <div class="jira-table__row jira-table__row--map" [formGroup]="item.row">
+              @for (item of filteredProjectRows(); track item.index) {
+                <div
+                  class="jira-table__row jira-table__row--map"
+                  [formGroup]="item.row"
+                >
                   @if (isDraftMappingRow(item.row)) {
                     <rw-select
                       class="w-full"
-                      [model]="ourModelFor(map.key, item.index)"
+                      [model]="ourModelFor('project_mapping', item.index)"
                       [ngModel]="rowValue(item.row, 'our_id')"
                       [ngModelOptions]="{ standalone: true }"
-                      (ngModelChange)="
-                        onOurDictPicked(map.key, item.row, $event)
-                      "
-                      prompt="{{ 'settings.jira-our-name' | transloco }}"
+                      (ngModelChange)="onOurProjectPicked(item.row, $event)"
+                      prompt="{{ 'settings.jira-our-key' | transloco }}"
                       [borderless]="true"
                     />
                   } @else {
                     <div class="jira-our-cell">
                       <div class="jira-our-cell__name">
-                        {{ rowValue(item.row, 'our_name') }}
+                        {{ rowValue(item.row, 'our_key') }}
                       </div>
                       <div class="jira-our-cell__id">
                         {{ rowValue(item.row, 'our_id') }}
@@ -198,16 +302,14 @@
                     class="w-full"
                     [model]="
                       jiraModelFor(
-                        map.key,
+                        'project_mapping',
                         rowValue(item.row, 'our_id'),
                         item.index
                       )
                     "
                     [ngModel]="rowValue(item.row, 'jira_id')"
                     [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="
-                      onJiraDictPicked(map.key, item.row, $event)
-                    "
+                    (ngModelChange)="onJiraProjectPicked(item.row, $event)"
                     prompt="{{ 'settings.jira-search-jira' | transloco }}"
                     [borderless]="true"
                   />
@@ -215,404 +317,369 @@
                     iconClass="trash"
                     typeButton="icon"
                     [double]="true"
-                    (clicked)="removeDictRow(map.key, item.index)"
+                    (clicked)="removeProjectRow(item.index)"
                   />
                 </div>
               }
             </div>
           </div>
-        }
+        </section>
+      }
 
-        <div class="mb-2">
+      @if (activeTab() === 'templates') {
+        <!-- Templates -->
+        <section class="jira-section" role="tabpanel">
           <div class="flex flex-row items-center justify-between gap-2 mb-2">
-            <h3 class="text-base font-normal">
-              {{ 'settings.jira-mapping-project_mapping' | transloco }}
-            </h3>
+            <h2 class="text-xl font-light">
+              {{ 'settings.jira-templates' | transloco }}
+            </h2>
             <rw-button
               iconClass="add-bold"
-              typeButton="icon"
-              (clicked)="addProjectRow()"
-            />
+              typeButton="secondary"
+              (clicked)="addTemplate()"
+              >{{ 'settings.jira-add-template' | transloco }}</rw-button
+            >
           </div>
-          <label class="form-label mb-2">
-            <rw-text-input
-              [ngModel]="mappingFilter()['project_mapping']"
-              [ngModelOptions]="{ standalone: true }"
-              (ngModelChange)="setMappingFilter('project_mapping', $event)"
-              prompt="{{ 'settings.jira-filter-our' | transloco }}"
-            />
-          </label>
-          <div class="jira-table text-sm" formArrayName="project_mapping">
-            <div class="jira-table__head jira-table__head--map">
-              <div>{{ 'settings.jira-our-key' | transloco }}</div>
-              <div>{{ 'settings.jira-jira-value' | transloco }}</div>
-              <div></div>
-            </div>
-            @for (item of filteredProjectRows(); track item.index) {
-              <div
-                class="jira-table__row jira-table__row--map"
-                [formGroup]="item.row"
+          <p class="form-supporting-text mb-4">
+            {{ 'settings.jira-templates-hint' | transloco }}
+          </p>
+
+          <div class="flex flex-row flex-wrap gap-2 mb-4">
+            @for (tpl of templates.controls; track tpl; let i = $index) {
+              <button
+                type="button"
+                class="jira-tpl-tab"
+                [class.jira-tpl-tab--active]="selectedTemplateIndex() === i"
+                (click)="selectTemplate(i)"
               >
-                @if (isDraftMappingRow(item.row)) {
-                  <rw-select
-                    class="w-full"
-                    [model]="ourModelFor('project_mapping', item.index)"
-                    [ngModel]="rowValue(item.row, 'our_id')"
-                    [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="onOurProjectPicked(item.row, $event)"
-                    prompt="{{ 'settings.jira-our-key' | transloco }}"
-                    [borderless]="true"
-                  />
-                } @else {
-                  <div class="jira-our-cell">
-                    <div class="jira-our-cell__name">
-                      {{ rowValue(item.row, 'our_key') }}
-                    </div>
-                    <div class="jira-our-cell__id">
-                      {{ rowValue(item.row, 'our_id') }}
-                    </div>
-                  </div>
-                }
-                <rw-select
-                  class="w-full"
-                  [model]="
-                    jiraModelFor(
-                      'project_mapping',
-                      rowValue(item.row, 'our_id'),
-                      item.index
-                    )
-                  "
-                  [ngModel]="rowValue(item.row, 'jira_id')"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="onJiraProjectPicked(item.row, $event)"
-                  prompt="{{ 'settings.jira-search-jira' | transloco }}"
-                  [borderless]="true"
-                />
-                <rw-button
-                  iconClass="trash"
-                  typeButton="icon"
-                  [double]="true"
-                  (clicked)="removeProjectRow(item.index)"
-                />
-              </div>
+                {{
+                  tpl.get('name')?.value ||
+                    ('settings.jira-template' | transloco)
+                }}
+              </button>
             }
           </div>
-        </div>
-      </section>
 
-      <!-- Templates -->
-      <section class="jira-section">
-        <div class="flex flex-row items-center justify-between gap-2 mb-2">
-          <h2 class="text-xl font-light">
-            {{ 'settings.jira-templates' | transloco }}
-          </h2>
-          <rw-button
-            iconClass="add-bold"
-            typeButton="secondary"
-            (clicked)="addTemplate()"
-            >{{ 'settings.jira-add-template' | transloco }}</rw-button
-          >
-        </div>
-        <p class="form-supporting-text mb-4">
-          {{ 'settings.jira-templates-hint' | transloco }}
-        </p>
-
-        <div class="flex flex-row flex-wrap gap-2 mb-4">
-          @for (tpl of templates.controls; track tpl; let i = $index) {
-            <button
-              type="button"
-              class="jira-tpl-tab"
-              [class.jira-tpl-tab--active]="selectedTemplateIndex() === i"
-              (click)="selectTemplate(i)"
-            >
-              {{
-                tpl.get('name')?.value ||
-                  ('settings.jira-template' | transloco)
-              }}
-            </button>
-          }
-        </div>
-
-        @if (selectedTemplate(); as tpl) {
-          <div [formGroup]="tpl" class="flex flex-col gap-4">
-            <div class="flex flex-row gap-2 items-end">
-              <label class="form-label flex-1">
-                <rw-text-input
-                  formControlName="name"
-                  prompt="{{ 'settings.jira-template-name' | transloco }}"
-                />
-              </label>
-              @if (templates.length > 1) {
-                <rw-button
-                  iconClass="trash"
-                  typeButton="icon"
-                  [double]="true"
-                  [isAttention]="true"
-                  (clicked)="removeTemplate(selectedTemplateIndex())"
-                />
-              }
-            </div>
-
-            <div>
-              <div class="flex flex-row items-center justify-between mb-2">
-                <h3 class="text-base font-normal">
-                  {{ 'settings.jira-when' | transloco }}
-                </h3>
-                <rw-button
-                  iconClass="add-bold"
-                  typeButton="icon"
-                  (clicked)="addWhen()"
-                />
-              </div>
-              <p class="form-supporting-text mb-2">
-                {{ 'settings.jira-when-hint' | transloco }}
-              </p>
-              <div class="jira-table jira-table--when text-sm" formArrayName="when">
-                <div class="jira-table__head jira-table__head--when">
-                  <div>{{ 'settings.jira-when-field' | transloco }}</div>
-                  <div>{{ 'settings.jira-when-op' | transloco }}</div>
-                  <div>{{ 'settings.jira-when-value' | transloco }}</div>
-                  <div></div>
-                </div>
-                @for (
-                  cond of selectedTemplateWhen()?.controls || [];
-                  track cond;
-                  let i = $index
-                ) {
-                  <div
-                    class="jira-table__row jira-table__row--when"
-                    [formGroup]="cond"
-                  >
-                    <rw-text-input formControlName="field" [borderless]="true" />
-                    <rw-select
-                      class="w-full"
-                      formControlName="op"
-                      [model]="conditionOpModelFor(i)"
-                      prompt="{{ 'settings.jira-when-op' | transloco }}"
-                      [borderless]="true"
-                    />
-                    <rw-text-input formControlName="value" [borderless]="true" />
-                    <rw-button
-                      iconClass="trash"
-                      typeButton="icon"
-                      [double]="true"
-                      (clicked)="removeWhen(i)"
-                    />
-                  </div>
+          @if (selectedTemplate(); as tpl) {
+            <div [formGroup]="tpl" class="flex flex-col gap-4">
+              <div class="flex flex-row gap-2 items-end">
+                <label class="form-label flex-1">
+                  <rw-text-input
+                    formControlName="name"
+                    prompt="{{ 'settings.jira-template-name' | transloco }}"
+                  />
+                </label>
+                @if (templates.length > 1) {
+                  <rw-button
+                    iconClass="trash"
+                    typeButton="icon"
+                    [double]="true"
+                    [isAttention]="true"
+                    (clicked)="removeTemplate(selectedTemplateIndex())"
+                  />
                 }
               </div>
-            </div>
 
-            <div>
-              <div class="flex flex-row items-center justify-between mb-2">
-                <h3 class="text-base font-normal">
-                  {{ 'settings.jira-fields' | transloco }}
-                </h3>
-                <rw-button
-                  iconClass="add-bold"
-                  typeButton="icon"
-                  (clicked)="addField()"
-                />
-              </div>
-              <div class="flex flex-col gap-3" formArrayName="fields">
-                @for (
-                  field of selectedTemplateFields()?.controls || [];
-                  track field;
-                  let i = $index
-                ) {
-                  <div class="jira-field-card" [formGroup]="field">
-                    <div class="jira-field-card__top">
-                      <label class="form-label">
-                        <rw-text-input
-                          formControlName="source_field"
-                          prompt="{{ 'settings.jira-source-field' | transloco }}"
-                        />
-                      </label>
-                      <label class="form-label">
-                        <rw-text-input
-                          formControlName="source_label"
-                          prompt="{{ 'settings.jira-source-label' | transloco }}"
-                        />
-                      </label>
-                      <label class="form-label">
-                        <rw-text-input
-                          formControlName="target_field"
-                          prompt="{{ 'settings.jira-target-field' | transloco }}"
-                        />
-                      </label>
-                      <label class="form-label">
-                        <rw-text-input
-                          formControlName="target_label"
-                          prompt="{{ 'settings.jira-target-label' | transloco }}"
-                        />
-                      </label>
-                      <label class="form-label">
-                        <rw-select
-                          class="w-full"
-                          formControlName="direction"
-                          [model]="directionModelFor(i)"
-                          prompt="{{ 'settings.jira-direction' | transloco }}"
-                          [borderless]="true"
-                        />
-                      </label>
+              <div>
+                <div class="flex flex-row items-center justify-between mb-2">
+                  <h3 class="text-base font-normal">
+                    {{ 'settings.jira-when' | transloco }}
+                  </h3>
+                  <rw-button
+                    iconClass="add-bold"
+                    typeButton="icon"
+                    (clicked)="addWhen()"
+                  />
+                </div>
+                <p class="form-supporting-text mb-2">
+                  {{ 'settings.jira-when-hint' | transloco }}
+                </p>
+                <div class="jira-table jira-table--when text-sm" formArrayName="when">
+                  <div class="jira-table__head jira-table__head--when">
+                    <div>{{ 'settings.jira-when-field' | transloco }}</div>
+                    <div>{{ 'settings.jira-when-op' | transloco }}</div>
+                    <div>{{ 'settings.jira-when-value' | transloco }}</div>
+                    <div></div>
+                  </div>
+                  @for (
+                    cond of selectedTemplateWhen()?.controls || [];
+                    track cond;
+                    let i = $index
+                  ) {
+                    <div
+                      class="jira-table__row jira-table__row--when"
+                      [formGroup]="cond"
+                    >
+                      <rw-text-input formControlName="field" [borderless]="true" />
+                      <rw-select
+                        class="w-full"
+                        formControlName="op"
+                        [model]="conditionOpModelFor(i)"
+                        prompt="{{ 'settings.jira-when-op' | transloco }}"
+                        [borderless]="true"
+                      />
+                      <rw-text-input formControlName="value" [borderless]="true" />
                       <rw-button
                         iconClass="trash"
                         typeButton="icon"
                         [double]="true"
-                        (clicked)="removeField(i)"
+                        (clicked)="removeWhen(i)"
                       />
                     </div>
-                    @if (rowValue(field, 'direction') !== '<') {
-                      <label class="form-label">
-                        <rw-text-input
-                          formControlName="source_script"
-                          [multiline]="true"
-                          prompt="{{
-                            'settings.jira-source-script' | transloco
-                          }}"
-                        />
-                      </label>
-                    }
-                    @if (rowValue(field, 'direction') !== '>') {
-                      <label class="form-label">
-                        <rw-text-input
-                          formControlName="target_script"
-                          [multiline]="true"
-                          prompt="{{
-                            'settings.jira-target-script' | transloco
-                          }}"
-                        />
-                      </label>
-                    }
-                  </div>
-                }
+                  }
+                </div>
               </div>
-            </div>
-          </div>
-        }
-      </section>
 
-      <!-- Bulk drift -->
-      <section class="jira-section">
-        <div class="flex flex-row items-center justify-between gap-2 mb-2">
-          <h2 class="text-xl font-light">
-            {{ 'settings.jira-bulk-drift' | transloco }}
-          </h2>
-          <rw-button
-            typeButton="secondary"
-            [disabled]="busy()"
-            (clicked)="showDiff()"
-            >{{ 'settings.jira-show-diff' | transloco }}</rw-button
-          >
-        </div>
-        <p class="form-supporting-text mb-4">
-          {{ 'settings.jira-bulk-drift-hint' | transloco }}
-        </p>
-
-        @if (diffs().length) {
-          <div class="flex flex-row flex-wrap gap-2 mb-3">
-            <rw-button
-              typeButton="secondary"
-              [disabled]="busy() || !selectedDiffIds().size"
-              (clicked)="pullSelected()"
-              >{{ 'settings.jira-pull-selected' | transloco }}</rw-button
-            >
-            <rw-button
-              typeButton="secondary"
-              [disabled]="busy() || !selectedDiffIds().size"
-              (clicked)="pushSelected()"
-              >{{ 'settings.jira-push-selected' | transloco }}</rw-button
-            >
-            <rw-button
-              typeButton="secondary"
-              [disabled]="busy() || !selectedDiffIds().size"
-              (clicked)="createSelectedInJira()"
-              >{{ 'settings.jira-create-selected' | transloco }}</rw-button
-            >
-          </div>
-
-          <div class="jira-diff text-sm">
-            <div class="jira-diff__head">
               <div>
-                <input
-                  type="checkbox"
-                  [checked]="allSelectableDiffsChecked()"
-                  (change)="
-                    toggleAllDiffs($any($event.target).checked)
-                  "
-                />
+                <div class="flex flex-row items-center justify-between mb-2">
+                  <h3 class="text-base font-normal">
+                    {{ 'settings.jira-fields' | transloco }}
+                  </h3>
+                  <rw-button
+                    iconClass="add-bold"
+                    typeButton="icon"
+                    (clicked)="addField()"
+                  />
+                </div>
+                <div class="flex flex-col gap-3" formArrayName="fields">
+                  @for (
+                    field of selectedTemplateFields()?.controls || [];
+                    track field;
+                    let i = $index
+                  ) {
+                    <div class="jira-field-card" [formGroup]="field">
+                      <div class="jira-field-card__top">
+                        <label class="form-label">
+                          <rw-text-input
+                            formControlName="source_field"
+                            prompt="{{ 'settings.jira-source-field' | transloco }}"
+                          />
+                        </label>
+                        <label class="form-label">
+                          <rw-text-input
+                            formControlName="source_label"
+                            prompt="{{ 'settings.jira-source-label' | transloco }}"
+                          />
+                        </label>
+                        <label class="form-label">
+                          <rw-text-input
+                            formControlName="target_field"
+                            prompt="{{ 'settings.jira-target-field' | transloco }}"
+                          />
+                        </label>
+                        <label class="form-label">
+                          <rw-text-input
+                            formControlName="target_label"
+                            prompt="{{ 'settings.jira-target-label' | transloco }}"
+                          />
+                        </label>
+                        <label class="form-label">
+                          <rw-select
+                            class="w-full"
+                            formControlName="direction"
+                            [model]="directionModelFor(i)"
+                            prompt="{{ 'settings.jira-direction' | transloco }}"
+                            [borderless]="true"
+                          />
+                        </label>
+                        <rw-button
+                          iconClass="trash"
+                          typeButton="icon"
+                          [double]="true"
+                          (clicked)="removeField(i)"
+                        />
+                      </div>
+                      @if (rowValue(field, 'direction') !== '<') {
+                        <label class="form-label">
+                          <rw-text-input
+                            formControlName="source_script"
+                            [multiline]="true"
+                            prompt="{{
+                              'settings.jira-source-script' | transloco
+                            }}"
+                          />
+                        </label>
+                      }
+                      @if (rowValue(field, 'direction') !== '>') {
+                        <label class="form-label">
+                          <rw-text-input
+                            formControlName="target_script"
+                            [multiline]="true"
+                            prompt="{{
+                              'settings.jira-target-script' | transloco
+                            }}"
+                          />
+                        </label>
+                      }
+                    </div>
+                  }
+                </div>
               </div>
-              <div>{{ 'settings.jira-diff-issue' | transloco }}</div>
-              <div>{{ 'settings.jira-diff-title' | transloco }}</div>
-              <div>{{ 'settings.jira-diff-key' | transloco }}</div>
-              <div>{{ 'settings.jira-diff-mapped' | transloco }}</div>
-              <div>{{ 'settings.jira-diff-fields' | transloco }}</div>
             </div>
-            @for (
-              diff of diffs();
-              track diff.issue_id || diff.jira_key || $index
-            ) {
-              <div class="jira-diff__row">
+          }
+        </section>
+      }
+
+      @if (activeTab() === 'drift') {
+        <!-- Bulk drift -->
+        <section class="jira-section" role="tabpanel">
+          <div class="flex flex-row items-center justify-between gap-2 mb-2">
+            <h2 class="text-xl font-light">
+              {{ 'settings.jira-bulk-drift' | transloco }}
+            </h2>
+            <rw-button
+              typeButton="secondary"
+              [disabled]="busy()"
+              (clicked)="showDiff()"
+              >{{ 'settings.jira-show-diff' | transloco }}</rw-button
+            >
+          </div>
+          <p class="form-supporting-text mb-4">
+            {{ 'settings.jira-bulk-drift-hint' | transloco }}
+          </p>
+
+          @if (diffs().length) {
+            <div class="flex flex-row flex-wrap gap-2 mb-3">
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy() || !selectedDiffIds().size"
+                (clicked)="pullSelected()"
+                >{{ 'settings.jira-pull-selected' | transloco }}</rw-button
+              >
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy() || !selectedDiffIds().size"
+                (clicked)="pushSelected()"
+                >{{ 'settings.jira-push-selected' | transloco }}</rw-button
+              >
+              <rw-button
+                typeButton="secondary"
+                [disabled]="busy() || !selectedDiffIds().size"
+                (clicked)="createSelectedInJira()"
+                >{{ 'settings.jira-create-selected' | transloco }}</rw-button
+              >
+            </div>
+
+            <div class="jira-diff text-sm">
+              <div class="jira-diff__head">
                 <div>
                   <input
                     type="checkbox"
-                    [checked]="isDiffSelected(diffRowKey(diff))"
-                    [disabled]="!canSelectDiff(diff)"
+                    [checked]="allSelectableDiffsChecked()"
                     (change)="
-                      toggleDiff(
-                        diffRowKey(diff),
-                        $any($event.target).checked
-                      )
+                      toggleAllDiffs($any($event.target).checked)
                     "
                   />
                 </div>
-                <div>
-                  {{ diff.issue_key || diff.issue_id || '—' }}
-                </div>
-                <div class="jira-diff__title" [title]="diff.title || ''">
-                  {{ diff.title || '—' }}
-                </div>
-                <div>
-                  @if (jiraBrowseUrl(diff.jira_key); as jiraUrl) {
-                    <a
-                      class="jira-diff__link"
-                      [href]="jiraUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      >{{ diff.jira_key }}</a
-                    >
-                  } @else {
-                    {{ diff.jira_key || '—' }}
-                  }
-                </div>
-                <div>
-                  @if (diff.error) {
-                    —
-                  } @else if (diff.mapped) {
-                    {{ 'settings.jira-yes' | transloco }}
-                  } @else {
-                    {{ 'settings.jira-no' | transloco }}
-                    @if (diff.would_import) {
-                      ({{ 'settings.jira-would-import' | transloco }})
-                    } @else if (diff.would_create) {
-                      ({{ 'settings.jira-would-create' | transloco }})
-                    }
-                  }
-                </div>
-                <div class="jira-diff__fields">{{ changedFields(diff) }}</div>
+                <div>{{ 'settings.jira-diff-issue' | transloco }}</div>
+                <div>{{ 'settings.jira-diff-title' | transloco }}</div>
+                <div>{{ 'settings.jira-diff-key' | transloco }}</div>
+                <div>{{ 'settings.jira-diff-mapped' | transloco }}</div>
+                <div>{{ 'settings.jira-diff-fields' | transloco }}</div>
               </div>
-            }
-          </div>
-        } @else {
-          <div class="form-supporting-text">
-            {{ 'settings.jira-no-diff' | transloco }}
-          </div>
-        }
-      </section>
+              @for (
+                diff of diffs();
+                track diff.issue_id || diff.jira_key || $index
+              ) {
+                <div class="jira-diff__row">
+                  <div>
+                    <input
+                      type="checkbox"
+                      [checked]="isDiffSelected(diffRowKey(diff))"
+                      [disabled]="!canSelectDiff(diff)"
+                      (change)="
+                        toggleDiff(
+                          diffRowKey(diff),
+                          $any($event.target).checked
+                        )
+                      "
+                    />
+                  </div>
+                  <div>
+                    @if (diff.issue_id || diff.issue_key) {
+                      <renwu-issue-href
+                        [issue]="{
+                          id: diff.issue_id,
+                          key: diff.issue_key || '',
+                        }"
+                        [key]="diff.issue_key || diff.issue_id || ''"
+                        [linkButton]="true"
+                      />
+                    } @else {
+                      —
+                    }
+                  </div>
+                  <div class="jira-diff__title" [title]="diff.title || ''">
+                    {{ diff.title || '—' }}
+                  </div>
+                  <div>
+                    @if (jiraBrowseUrl(diff.jira_key); as jiraUrl) {
+                      <a
+                        class="jira-diff__link"
+                        [href]="jiraUrl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ diff.jira_key }}</a
+                      >
+                    } @else {
+                      {{ diff.jira_key || '—' }}
+                    }
+                  </div>
+                  <div>
+                    @if (diff.error) {
+                      —
+                    } @else if (diff.mapped) {
+                      {{ 'settings.jira-yes' | transloco }}
+                    } @else {
+                      {{ 'settings.jira-no' | transloco }}
+                      @if (diff.would_import) {
+                        ({{ 'settings.jira-would-import' | transloco }})
+                      } @else if (diff.would_create) {
+                        ({{ 'settings.jira-would-create' | transloco }})
+                      }
+                    }
+                  </div>
+                  <div class="jira-diff__fields">{{ changedFields(diff) }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="form-supporting-text">
+              {{ 'settings.jira-no-diff' | transloco }}
+            </div>
+          }
+        </section>
+      }
     </form>
 
-    <rw-button action [disabled]="busy()" (clicked)="save()">{{
-      'settings.save' | transloco
-    }}</rw-button>
+    <div class="flex flex-wrap gap-2 items-center">
+      <rw-button action [disabled]="busy()" (clicked)="save()">{{
+        'settings.save' | transloco
+      }}</rw-button>
+      <rw-button
+        typeButton="secondary"
+        [disabled]="busy()"
+        (clicked)="exportConfig()"
+      >
+        {{ 'settings.jira-export' | transloco }}
+      </rw-button>
+      <rw-button
+        typeButton="secondary"
+        [disabled]="busy()"
+        (clicked)="pickImportFile()"
+      >
+        {{ 'settings.jira-import' | transloco }}
+      </rw-button>
+      <input
+        #importInput
+        type="file"
+        accept="application/json,.json"
+        class="hidden"
+        (change)="onImportFile($event)"
+      />
+    </div>
+    <p class="form-supporting-text mt-2">
+      {{ 'settings.jira-config-io-hint' | transloco }}
+    </p>
   </renwu-page>
 }

@@ -1,0 +1,67 @@
+<renwu-page title="{{ 'settings.ai' | transloco }}">
+  <div class="ai-toolbar flex flex-wrap items-center gap-2 mb-4">
+    <div
+      class="ai-tabs"
+      role="tablist"
+      [attr.aria-label]="'settings.ai' | transloco"
+    >
+      @for (tab of tabs; track tab.id) {
+        <rw-button
+          typeButton="tab"
+          role="tab"
+          [attr.aria-selected]="activeTab() === tab.id"
+          [selected]="activeTab() === tab.id"
+          (clicked)="selectTab(tab.id)"
+        >
+          {{ tab.labelKey | transloco }}
+        </rw-button>
+      }
+    </div>
+    <div class="flex flex-wrap gap-2 ml-auto">
+      <rw-button
+        typeButton="secondary"
+        [disabled]="busy()"
+        (clicked)="exportConfig()"
+      >
+        {{ 'settings.ai-export' | transloco }}
+      </rw-button>
+      <rw-button
+        typeButton="secondary"
+        [disabled]="busy()"
+        (clicked)="pickImportFile()"
+      >
+        {{ 'settings.ai-import' | transloco }}
+      </rw-button>
+      <input
+        #importInput
+        type="file"
+        accept="application/json,.json"
+        class="hidden"
+        (change)="onImportFile($event)"
+      />
+    </div>
+  </div>
+  <p class="form-supporting-text mb-4">
+    {{ 'settings.ai-config-io-hint' | transloco }}
+  </p>
+
+  @for (_ of [configEpoch()]; track _) {
+    @switch (activeTab()) {
+      @case ('settings') {
+        <renwu-settings-ai-settings role="tabpanel" />
+      }
+      @case ('workspaces') {
+        <renwu-settings-ai-workspaces role="tabpanel" />
+      }
+      @case ('skills') {
+        <renwu-settings-ai-skills role="tabpanel" />
+      }
+      @case ('workflows') {
+        <renwu-settings-ai-workflows role="tabpanel" />
+      }
+      @case ('jobs') {
+        <renwu-settings-ai-jobs role="tabpanel" />
+      }
+    }
+  }
+</renwu-page>

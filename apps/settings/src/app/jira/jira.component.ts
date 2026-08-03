@@ -3,8 +3,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import {
   FormArray,
@@ -26,6 +28,8 @@ import {
   SelectModelBase,
 } from '@renwu/components';
 import {
+  IssueHrefComponent,
+  JiraConfigBundle,
   JiraDictCatalog,
   JiraDictMatch,
   JiraFieldCondition,
@@ -54,6 +58,13 @@ type DictMappingKey =
 
 type MappingKey = DictMappingKey | 'project_mapping';
 
+type JiraSettingsTab =
+  | 'connection'
+  | 'push'
+  | 'mappings'
+  | 'templates'
+  | 'drift';
+
 @Component({
   selector: 'renwu-settings-jira',
   standalone: true,
@@ -66,6 +77,7 @@ type MappingKey = DictMappingKey | 'project_mapping';
     RwButtonComponent,
     RwSelectComponent,
     RwTextInputComponent,
+    IssueHrefComponent,
     TranslocoPipe,
   ],
   templateUrl: './jira.component.html',
@@ -112,11 +124,25 @@ export class JiraComponent {
   };
   private ourRowModels = new Map<string, SelectModelBase<string>>();
 
+  readonly tabs: { id: JiraSettingsTab; labelKey: string }[] = [
+    { id: 'connection', labelKey: 'settings.jira-connection' },
+    { id: 'push', labelKey: 'settings.jira-push-mode' },
+    { id: 'mappings', labelKey: 'settings.jira-mappings' },
+    { id: 'templates', labelKey: 'settings.jira-templates' },
+    { id: 'drift', labelKey: 'settings.jira-bulk-drift' },
+  ];
+
+  activeTab = signal<JiraSettingsTab>('connection');
+
   readonly pushModes: { value: JiraPushMode; labelKey: string }[] = [
     { value: 'manual', labelKey: 'settings.jira-push-manual' },
     { value: 'auto_mapped', labelKey: 'settings.jira-push-auto-mapped' },
     { value: 'auto_all', labelKey: 'settings.jira-push-auto-all' },
   ];
+
+  selectTab(tab: JiraSettingsTab): void {
+    this.activeTab.set(tab);
+  }
 
   readonly dictMappings: { key: DictMappingKey; titleKey: string }[] = [
     {
@@ -145,6 +171,7 @@ export class JiraComponent {
   diffs = signal<JiraIssueDiff[]>([]);
   selectedDiffIds = signal<Set<string>>(new Set());
   busy = signal(false);
+  readonly importInput = viewChild<ElementRef<HTMLInputElement>>('importInput');
 
   form = new FormGroup({
     rest_api_url: new FormControl('', { nonNullable: true }),
@@ -812,6 +839,81 @@ export class JiraComponent {
       this.applySettings(saved);
       this.toastService.success(
         this.transloco.translate('settings.jira-saved'),
+      );
+    } finally {
+      this.busy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  async exportConfig(): Promise<void> {
+    this.busy.set(true);
+    try {
+      const bundle = await this.callApi(this.dataService.jiraExportConfig());
+      if (!bundle) {
+        return;
+      }
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'renwu-jira-config.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      this.toastService.success(
+        this.transloco.translate('settings.jira-export-done'),
+      );
+    } finally {
+      this.busy.set(false);
+      this.cd.markForCheck();
+    }
+  }
+
+  pickImportFile(): void {
+    this.importInput()?.nativeElement.click();
+  }
+
+  async onImportFile(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) {
+      return;
+    }
+    const confirmed = await firstValueFrom(
+      this.alertService.confirm(
+        this.transloco.translate('settings.jira-import-title'),
+        this.transloco.translate('settings.jira-import-text'),
+        true,
+        this.transloco.translate('settings.jira-import'),
+        this.transloco.translate('core.cancel'),
+      ),
+    );
+    if (!confirmed?.affirmative) {
+      return;
+    }
+    this.busy.set(true);
+    try {
+      const text = await file.text();
+      const bundle = JSON.parse(text) as JiraConfigBundle;
+      const imported = await this.callApi(
+        this.dataService.jiraImportConfig(bundle),
+      );
+      if (!imported?.settings) {
+        this.toastService.error(
+          this.transloco.translate('settings.jira-import-failed'),
+        );
+        return;
+      }
+      this.applySettings(imported.settings);
+      this.toastService.success(
+        this.transloco.translate('settings.jira-import-done'),
+      );
+    } catch {
+      this.toastService.error(
+        this.transloco.translate('settings.jira-import-failed'),
       );
     } finally {
       this.busy.set(false);

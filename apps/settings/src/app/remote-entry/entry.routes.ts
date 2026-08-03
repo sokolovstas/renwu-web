@@ -4,6 +4,7 @@ import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarsComponent } from '../calendars/calendars.component';
 import { DictionaryComponent } from '../dictionary/dictionary.component';
 import { JiraComponent } from '../jira/jira.component';
+import { AiComponent } from '../ai/ai.component';
 import { SettingsComponent } from '../settings/settings.component';
 import { SystemComponent } from '../system/system.component';
 import { UserComponent } from '../user/user.component';
@@ -73,6 +74,14 @@ export const ROUTES: Route[] = [
         path: 'jira',
         component: JiraComponent,
       },
+      { path: 'ai', component: AiComponent },
+      { path: 'ai/settings', redirectTo: 'ai', pathMatch: 'full' },
+      { path: 'ai/workspaces', redirectTo: 'ai', pathMatch: 'full' },
+      { path: 'ai/skills', redirectTo: 'ai', pathMatch: 'full' },
+      { path: 'ai/skills/:id', redirectTo: 'ai', pathMatch: 'full' },
+      { path: 'ai/workflows', redirectTo: 'ai', pathMatch: 'full' },
+      { path: 'ai/workflows/:id', redirectTo: 'ai', pathMatch: 'full' },
+      { path: 'ai/jobs', redirectTo: 'ai', pathMatch: 'full' },
     ],
   },
   {

@@ -1,0 +1,89 @@
+<div class="grid gap-6 lg:grid-cols-[minmax(16rem,1fr)_minmax(20rem,2fr)]">
+  <section>
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl font-light">
+        {{ 'settings.ai-workspaces' | transloco }}
+      </h2>
+      <rw-button typeButton="secondary" (clicked)="edit()">{{
+        'settings.ai-add' | transloco
+      }}</rw-button>
+    </div>
+    @if (items()?.length) {
+      <div class="flex flex-col gap-2">
+        @for (item of items(); track item.id) {
+          <div
+            class="flex items-center justify-between gap-2 p-3 border rounded"
+          >
+            <button type="button" class="text-left flex-1" (click)="edit(item)">
+              {{ item.name || item.workdir || item.id }}
+            </button>
+            <rw-button
+              iconClass="trash"
+              typeButton="icon"
+              [double]="true"
+              (clicked)="remove(item)"
+            />
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="form-supporting-text">
+        {{ 'settings.ai-empty-workspaces' | transloco }}
+      </p>
+    }
+  </section>
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    <rw-text-input
+      [live]="true"
+      formControlName="name"
+      prompt="{{ 'settings.ai-name' | transloco }}"
+    />
+    <rw-select
+      formControlName="container_id"
+      [model]="containerModel"
+      prompt="{{ 'settings.ai-container' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="workdir"
+      prompt="{{ 'settings.ai-workdir' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="default_branch"
+      prompt="{{ 'settings.ai-branch' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="verify_commands"
+      [multiline]="true"
+      prompt="{{ 'settings.ai-verify-commands' | transloco }}"
+    />
+    <p class="form-supporting-text">
+      {{ 'settings.ai-workspace-provider-hint' | transloco }}
+    </p>
+    <rw-select
+      formControlName="agent_provider"
+      [model]="providerModel"
+      prompt="{{ 'settings.ai-provider' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="agent_base_url"
+      prompt="{{ 'settings.ai-agent-url' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="agent_web_base_url"
+      prompt="{{ 'settings.ai-agent-web-url' | transloco }}"
+    />
+    <label class="flex items-center gap-2"
+      ><input type="checkbox" formControlName="enabled" />{{
+        'settings.ai-enabled' | transloco
+      }}</label
+    >
+    <rw-button action (clicked)="save()">{{
+      'settings.save' | transloco
+    }}</rw-button>
+  </form>
+</div>

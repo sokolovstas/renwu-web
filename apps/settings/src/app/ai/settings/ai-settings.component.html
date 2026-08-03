@@ -1,0 +1,87 @@
+<form [formGroup]="form" class="flex flex-col gap-4 max-w-3xl">
+  <label class="flex items-center gap-2">
+    <input type="checkbox" formControlName="enabled" />
+    {{ 'settings.ai-enabled' | transloco }}
+  </label>
+  <p class="form-supporting-text">{{ 'settings.ai-bot-hint' | transloco }}</p>
+  <div class="grid gap-4 lg:grid-cols-2">
+    <rw-select
+      formControlName="agent_provider"
+      [model]="providerModel"
+      prompt="{{ 'settings.ai-provider' | transloco }}"
+    />
+    @if (selectedProvider?.needs_base_url !== false) {
+      <rw-text-input
+        [live]="true"
+        formControlName="agent_base_url"
+        prompt="{{ 'settings.ai-agent-url' | transloco }}"
+      />
+    }
+    @if (selectedProvider?.needs_web_url !== false) {
+      <rw-text-input
+        [live]="true"
+        formControlName="agent_web_base_url"
+        prompt="{{ 'settings.ai-agent-web-url' | transloco }}"
+      />
+    }
+    <rw-select
+      formControlName="actor_user_id"
+      [model]="actorModel"
+      prompt="{{ 'settings.ai-actor' | transloco }}"
+    />
+    <div class="flex flex-col gap-2">
+      <rw-select
+        formControlName="default_model"
+        [model]="modelModel"
+        prompt="{{ 'settings.ai-model' | transloco }}"
+      />
+      <rw-button typeButton="secondary" (clicked)="loadModels()">{{
+        'settings.ai-refresh-models' | transloco
+      }}</rw-button>
+    </div>
+    <rw-text-input
+      [live]="true"
+      formControlName="max_concurrent_jobs"
+      type="number"
+      prompt="{{ 'settings.ai-concurrency' | transloco }}"
+    />
+  </div>
+  @if (selectedProvider?.description) {
+    <p class="form-supporting-text">{{ selectedProvider?.description }}</p>
+  }
+
+  <section class="flex flex-col gap-4">
+    <div class="flex flex-wrap items-center gap-2 justify-between">
+      <h2 class="text-xl font-light">
+        {{ 'settings.ai-prompts' | transloco }}
+      </h2>
+      <rw-button typeButton="secondary" (clicked)="resetAllPrompts()">{{
+        'settings.ai-prompts-reset-all' | transloco
+      }}</rw-button>
+    </div>
+    <p class="form-supporting-text">
+      {{ 'settings.ai-prompts-hint' | transloco }}
+    </p>
+
+    @for (item of promptFields; track item.field) {
+      <div class="flex flex-col gap-2">
+        <rw-text-input
+          [live]="true"
+          [multiline]="true"
+          [formControlName]="item.field"
+          prompt="{{ item.labelKey | transloco }}"
+        />
+        <p class="form-supporting-text">
+          {{ item.hintKey | transloco }}
+        </p>
+        <rw-button typeButton="secondary" (clicked)="resetPrompt(item.field)">{{
+          'settings.ai-prompt-template-reset' | transloco
+        }}</rw-button>
+      </div>
+    }
+  </section>
+
+  <rw-button action (clicked)="save()">{{
+    'settings.save' | transloco
+  }}</rw-button>
+</form>

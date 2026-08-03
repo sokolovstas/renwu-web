@@ -76,6 +76,17 @@ import {
   SystemSettings,
 } from './common.model';
 import {
+  AIConfigBundle,
+  AIJob,
+  AIOpenCodeModel,
+  AIProviderInfo,
+  AISettings,
+  AISkill,
+  AIWorkflow,
+  AIWorkspace,
+} from './ai.model';
+import {
+  JiraConfigBundle,
   JiraDiffRequest,
   JiraImportByKeyResult,
   JiraIssueDiff,
@@ -115,12 +126,11 @@ export class RwDataService {
     this.headers = {
       'Content-Type': 'application/json',
     };
-    const token = localStorage.getItem('renwu_auth') || ''
+    const token = localStorage.getItem('renwu_auth') || '';
 
-    if(token) {
-      this.headers['Authorization']=`Bearer ${token}`
+    if (token) {
+      this.headers['Authorization'] = `Bearer ${token}`;
     }
-
   }
 
   private redirectToLogin(): void {
@@ -1023,6 +1033,153 @@ export class RwDataService {
     return EMPTY;
   }
 
+  sendToAiAPI<T>(
+    method: 'get' | 'post' | 'put' | 'delete',
+    url: string,
+    data: DataObject | ParamsObject = null,
+  ): Observable<T> {
+    const loader = this.loaderService.setLoader();
+    const options = {
+      headers: new HttpHeaders(this.headers),
+      withCredentials: true,
+      params: new HttpParams(),
+    };
+    // Mirror sendToJiraAPI: query params only for GET; body for POST/PUT.
+    // Putting the JSON body into HttpParams breaks POST (booleans/numbers) and
+    // swallows failures via catchHandler → EMPTY with no usable UI feedback.
+    if (method === 'get') {
+      options.params = new HttpParams({
+        fromObject: (data || {}) as ParamsObject,
+      });
+      return this.http.get<T>(this.settings.aiApiUrl + url, options).pipe(
+        catchError((err: unknown) =>
+          this.catchHandler(err as HttpErrorResponse, loader, false),
+        ),
+        finalize(() => this.finallyHandler(loader)),
+      );
+    }
+    if (method === 'post') {
+      return this.http
+        .post<T>(this.settings.aiApiUrl + url, data, options)
+        .pipe(
+          catchError((err: unknown) =>
+            this.catchHandler(err as HttpErrorResponse, loader, false),
+          ),
+          finalize(() => this.finallyHandler(loader)),
+        );
+    }
+    if (method === 'put') {
+      return this.http.put<T>(this.settings.aiApiUrl + url, data, options).pipe(
+        catchError((err: unknown) =>
+          this.catchHandler(err as HttpErrorResponse, loader, false),
+        ),
+        finalize(() => this.finallyHandler(loader)),
+      );
+    }
+    return this.http.delete<T>(this.settings.aiApiUrl + url, options).pipe(
+      catchError((err: unknown) =>
+        this.catchHandler(err as HttpErrorResponse, loader, false),
+      ),
+      finalize(() => this.finallyHandler(loader)),
+    );
+  }
+
+  aiLoadSettings(): Observable<AISettings> {
+    return this.sendToAiAPI('get', '/settings');
+  }
+  aiSaveSettings(data: AISettings): Observable<AISettings> {
+    return this.sendToAiAPI('post', '/settings', data);
+  }
+  aiExportConfig(): Observable<AIConfigBundle> {
+    return this.sendToAiAPI('get', '/config/export');
+  }
+  aiImportConfig(data: AIConfigBundle): Observable<AIConfigBundle> {
+    return this.sendToAiAPI('post', '/config/import', data);
+  }
+  aiListProviders(): Observable<{ providers: AIProviderInfo[] }> {
+    return this.sendToAiAPI('get', '/providers');
+  }
+  aiListAgentModels(
+    baseUrl?: string,
+    provider?: string,
+  ): Observable<{ models: AIOpenCodeModel[]; provider?: string }> {
+    const params: Record<string, string> = {};
+    if (baseUrl) {
+      params['base_url'] = baseUrl;
+    }
+    if (provider) {
+      params['provider'] = provider;
+    }
+    return this.sendToAiAPI('get', '/agent/models', params);
+  }
+  /** @deprecated Prefer aiListAgentModels. */
+  aiListOpenCodeModels(
+    baseUrl?: string,
+  ): Observable<{ models: AIOpenCodeModel[] }> {
+    return this.aiListAgentModels(baseUrl);
+  }
+  aiListWorkspaces(): Observable<AIWorkspace[]> {
+    return this.sendToAiAPI('get', '/workspaces');
+  }
+  aiGetWorkspace(id: string): Observable<AIWorkspace> {
+    return this.sendToAiAPI('get', `/workspaces/${id}`);
+  }
+  aiSaveWorkspace(data: AIWorkspace): Observable<AIWorkspace> {
+    return data.id
+      ? this.sendToAiAPI('put', `/workspaces/${data.id}`, data)
+      : this.sendToAiAPI('post', '/workspaces', data);
+  }
+  aiDeleteWorkspace(id: string): Observable<unknown> {
+    return this.sendToAiAPI('delete', `/workspaces/${id}`);
+  }
+  aiListSkills(): Observable<AISkill[]> {
+    return this.sendToAiAPI('get', '/skills');
+  }
+  aiGetSkill(id: string): Observable<AISkill> {
+    return this.sendToAiAPI('get', `/skills/${id}`);
+  }
+  aiSaveSkill(data: AISkill): Observable<AISkill> {
+    return data.id
+      ? this.sendToAiAPI('put', `/skills/${data.id}`, data)
+      : this.sendToAiAPI('post', '/skills', data);
+  }
+  aiDeleteSkill(id: string): Observable<unknown> {
+    return this.sendToAiAPI('delete', `/skills/${id}`);
+  }
+  aiListWorkflows(): Observable<AIWorkflow[]> {
+    return this.sendToAiAPI('get', '/workflows');
+  }
+  aiGetWorkflow(id: string): Observable<AIWorkflow> {
+    return this.sendToAiAPI('get', `/workflows/${id}`);
+  }
+  aiSaveWorkflow(data: AIWorkflow): Observable<AIWorkflow> {
+    return data.id
+      ? this.sendToAiAPI('put', `/workflows/${data.id}`, data)
+      : this.sendToAiAPI('post', '/workflows', data);
+  }
+  aiDeleteWorkflow(id: string): Observable<unknown> {
+    return this.sendToAiAPI('delete', `/workflows/${id}`);
+  }
+  aiListJobs(): Observable<AIJob[]> {
+    return this.sendToAiAPI('get', '/jobs');
+  }
+  aiGetJob(id: string): Observable<AIJob> {
+    return this.sendToAiAPI('get', `/jobs/${id}`);
+  }
+  aiRetryJob(id: string): Observable<AIJob> {
+    return this.sendToAiAPI('post', `/jobs/${id}/retry`, {});
+  }
+  aiCancelJob(id: string): Observable<AIJob> {
+    return this.sendToAiAPI('post', `/jobs/${id}/cancel`, {});
+  }
+  aiCleanupJobWorktree(id: string): Observable<AIJob> {
+    return this.sendToAiAPI('post', `/jobs/${id}/cleanup-worktree`, {});
+  }
+  /** Re-apply last OpenCode assistant message without starting a new LLM turn. */
+  aiApplySessionJob(id: string): Observable<AIJob> {
+    return this.sendToAiAPI('post', `/jobs/${id}/apply-session`, {});
+  }
+
   // JIRA — org settings / sync (renwu.jira, base `/api/jira/v1`)
 
   jiraLoadSettings(): Observable<JiraSettings> {
@@ -1031,6 +1188,14 @@ export class RwDataService {
 
   jiraSaveSettings(data: JiraSettings): Observable<JiraSettings> {
     return this.sendToJiraAPI<JiraSettings>('post', '/settings', data);
+  }
+
+  jiraExportConfig(): Observable<JiraConfigBundle> {
+    return this.sendToJiraAPI<JiraConfigBundle>('get', '/config/export');
+  }
+
+  jiraImportConfig(data: JiraConfigBundle): Observable<JiraConfigBundle> {
+    return this.sendToJiraAPI<JiraConfigBundle>('post', '/config/import', data);
   }
 
   jiraLoadMyCredentials(): Observable<JiraUserCredentials> {
@@ -1143,7 +1308,11 @@ export class RwDataService {
   }
 
   jiraSyncBatch(body: JiraSyncBatchRequest): Observable<ResponseOk | unknown> {
-    return this.sendToJiraAPI<ResponseOk | unknown>('post', '/sync-batch', body);
+    return this.sendToJiraAPI<ResponseOk | unknown>(
+      'post',
+      '/sync-batch',
+      body,
+    );
   }
 
   // Search
@@ -1191,7 +1360,9 @@ export class RwDataService {
     );
   }
 
-  getBoardBuckets(query: BoardBucketsRequest): Observable<BoardBucketsResponse> {
+  getBoardBuckets(
+    query: BoardBucketsRequest,
+  ): Observable<BoardBucketsResponse> {
     return this.sendToAPI<BoardBucketsResponse>(
       'post',
       '/board/buckets',

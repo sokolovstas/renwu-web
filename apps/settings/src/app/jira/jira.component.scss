@@ -4,13 +4,26 @@
   height: 100%;
 }
 
-.jira-section {
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--gray-200, #e5e7eb);
+.hidden {
+  display: none;
+}
 
-  &:last-of-type {
-    border-bottom: none;
-  }
+.jira-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.25rem 0 0.75rem;
+  margin-bottom: 0.25rem;
+  // Theme surface (--white flips in dark mode; --always-white stays #fff).
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.jira-section {
+  padding-bottom: 0.5rem;
 }
 
 .jira-profile-link {

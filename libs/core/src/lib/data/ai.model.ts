@@ -1,0 +1,117 @@
+export type AIJobState =
+  | 'queued'
+  | 'running'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled';
+export type AISkillKind = 'grooming' | 'flow_delivery';
+
+export interface AIOpenCodeModel {
+  id: string;
+  label: string;
+  provider_id?: string;
+  model_id?: string;
+}
+
+export interface AIProviderInfo {
+  id: string;
+  label: string;
+  description?: string;
+  needs_base_url?: boolean;
+  needs_web_url?: boolean;
+}
+
+export interface AISettings {
+  enabled?: boolean;
+  /** Agent harness id (default: opencode). */
+  agent_provider?: string;
+  agent_base_url?: string;
+  agent_web_base_url?: string;
+  /** @deprecated Prefer agent_base_url; kept for backward compatibility. */
+  opencode_base_url?: string;
+  /** @deprecated Prefer agent_web_base_url; kept for backward compatibility. */
+  opencode_web_base_url?: string;
+  actor_user_id?: string;
+  max_concurrent_jobs?: number;
+  default_model?: string;
+  /** Grooming first turn. Placeholders: {{skill_body}}, {{issue_*}}, {{workdir}}. */
+  prompt_template?: string;
+  /** Grooming continue turn. */
+  grooming_followup_template?: string;
+  /** Flow delivery first turn. */
+  delivery_template?: string;
+  /** Flow delivery continue turn. */
+  delivery_followup_template?: string;
+  /** Choose git repo under workspace root. */
+  resolve_repository_template?: string;
+}
+export interface AIWorkspace {
+  id?: string;
+  container_id?: string;
+  name?: string;
+  workdir?: string;
+  default_branch?: string;
+  verify_commands?: string;
+  enabled?: boolean;
+  /** Optional override; empty inherits tenant AI settings. */
+  agent_provider?: string;
+  agent_base_url?: string;
+  agent_web_base_url?: string;
+}
+export interface AISkill {
+  id?: string;
+  name?: string;
+  slug?: string;
+  kind?: AISkillKind;
+  body?: string;
+  model?: string;
+  timeout_sec?: number;
+  enabled?: boolean;
+}
+export interface AIWorkflowStep {
+  id?: string;
+  on_enter_status_id?: string;
+  skill_id?: string;
+  auto_transit?: boolean;
+  on_success_status_id?: string;
+  on_need_info_status_id?: string;
+  on_failure_status_id?: string;
+  retrigger?: boolean;
+}
+export interface AIWorkflow {
+  id?: string;
+  container_id?: string;
+  workspace_id?: string;
+  name?: string;
+  enabled?: boolean;
+  steps?: AIWorkflowStep[];
+}
+/** Portable dump of tenant AI config (no jobs/sessions). */
+export interface AIConfigBundle {
+  kind?: string;
+  version?: number;
+  settings?: AISettings;
+  workspaces?: AIWorkspace[];
+  skills?: AISkill[];
+  workflows?: AIWorkflow[];
+}
+
+export interface AIJob {
+  id?: string;
+  issue_id?: string;
+  workflow_id?: string;
+  step_id?: string;
+  skill_id?: string;
+  state?: AIJobState;
+  summary?: string;
+  opencode_session?: string;
+  repository_path?: string;
+  branch_name?: string;
+  worktree_path?: string;
+  worktree_state?: string;
+  merge_request_url?: string;
+  review_verdict?: string;
+  error?: string;
+  created_at?: string;
+  updated_at?: string;
+}

@@ -1,0 +1,133 @@
+<section>
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-xl font-light">{{ 'settings.ai-jobs' | transloco }}</h2>
+    <rw-button typeButton="secondary" (clicked)="load()">{{
+      'settings.ai-refresh' | transloco
+    }}</rw-button>
+  </div>
+  @if (items()?.length) {
+    <div class="overflow-auto border rounded">
+      <table class="w-full text-sm">
+        <thead>
+          <tr>
+            <th class="text-left p-3">
+              {{ 'settings.ai-job-issue' | transloco }}
+            </th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-job-state' | transloco }}
+            </th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-job-summary' | transloco }}
+            </th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-job-delivery' | transloco }}
+            </th>
+            <th class="p-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.id) {
+            <tr class="border-t">
+              <td class="p-3">{{ item.issue_id || '—' }}</td>
+              <td class="p-3">{{ item.state }}</td>
+              <td class="p-3">
+                <div>{{ item.summary || item.error || '—' }}</div>
+                @if (sessionUrl(item); as url) {
+                  <a
+                    class="text-sm underline"
+                    [href]="url"
+                    target="_blank"
+                    rel="noopener"
+                    >{{ 'settings.ai-open-session' | transloco }}</a
+                  >
+                }
+              </td>
+              <td class="p-3">
+                @if (item.repository_path) {
+                  <div class="break-all">
+                    <span class="form-supporting-text"
+                      >{{ 'settings.ai-job-repository' | transloco }}:</span
+                    >
+                    {{ item.repository_path }}
+                  </div>
+                }
+                <div>
+                  <span class="form-supporting-text"
+                    >{{ 'settings.ai-job-branch' | transloco }}:</span
+                  >
+                  {{ item.branch_name || '—' }}
+                </div>
+                @if (item.merge_request_url) {
+                  <div>
+                    <a
+                      class="underline"
+                      [href]="item.merge_request_url"
+                      target="_blank"
+                      rel="noopener"
+                      >{{ 'settings.ai-job-merge-request' | transloco }}</a
+                    >
+                  </div>
+                }
+                @if (item.review_verdict) {
+                  <div>
+                    <span class="form-supporting-text"
+                      >{{ 'settings.ai-job-review' | transloco }}:</span
+                    >
+                    {{ item.review_verdict }}
+                  </div>
+                }
+                @if (item.worktree_path || item.worktree_state) {
+                  <div class="break-all">
+                    <span class="form-supporting-text"
+                      >{{ 'settings.ai-job-worktree' | transloco }}:</span
+                    >
+                    {{ item.worktree_path || '—' }}
+                    @if (item.worktree_state) {
+                      ({{ item.worktree_state }})
+                    }
+                  </div>
+                }
+              </td>
+              <td class="p-3">
+                <div class="flex gap-2 justify-end flex-wrap">
+                  @if (canCancel(item)) {
+                    <rw-button
+                      typeButton="secondary"
+                      (clicked)="cancel(item)"
+                      >{{ 'settings.ai-cancel' | transloco }}</rw-button
+                    >
+                  }
+                  @if (canApplySession(item)) {
+                    <rw-button
+                      typeButton="secondary"
+                      (clicked)="applySession(item)"
+                      >{{ 'settings.ai-apply-session' | transloco }}</rw-button
+                    >
+                  }
+                  @if (canRetry(item)) {
+                    <rw-button typeButton="secondary" (clicked)="retry(item)">{{
+                      'settings.ai-retry' | transloco
+                    }}</rw-button>
+                  }
+                  @if (canCleanupWorktree(item)) {
+                    <rw-button
+                      typeButton="secondary"
+                      (clicked)="cleanupWorktree(item)"
+                      >{{
+                        'settings.ai-cleanup-worktree' | transloco
+                      }}</rw-button
+                    >
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="form-supporting-text">
+      {{ 'settings.ai-empty-jobs' | transloco }}
+    </p>
+  }
+</section>
