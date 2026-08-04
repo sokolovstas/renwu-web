@@ -10,10 +10,10 @@ export class RwCoreSettings {
   siteBillingUrl: string;
   siteApiUrl: string;
   mediaUrl: string;
+  /** Live gateway (`renwu.websocket`) for issue view + chat subscribe_chat. */
   wsServerUrl: string;
   rootApiUrl: string;
   publicApiUrl: string;
-  wsMessagesApiUrl: string;
   messagesApiUrl: string;
   /**
    * Jira sync microservice REST base (`renwu.jira`).
@@ -50,10 +50,9 @@ export class RwCoreSettings {
     this.siteBillingUrl = `${http}://${this._root}/profile`;
     this.siteApiUrl = `${http}://${this._root}/api/v1`;
     this.mediaUrl = `${http}://${this._root}/api/core/media`;
-    this.wsServerUrl = `${ws}://${this._root}/api/core/ws`;
+    this.wsServerUrl = `${ws}://${this._root}/api/websocket/ws`;
     this.rootApiUrl = `${http}://${this._root}/api/core/v1`;
     this.publicApiUrl = `${http}://${this._root}/api/core/public/v1`;
-    this.wsMessagesApiUrl = `${ws}://${this._root}/api/messenger/ws`;
     this.messagesApiUrl = `${http}://${this._root}/api/messenger/v1`;
     this.jiraApiUrl = `${http}://${this._root}/api/jira/v1`;
     this.aiApiUrl = `${http}://${this._root}/api/ai/v1`;

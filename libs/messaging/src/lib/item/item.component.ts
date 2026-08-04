@@ -206,8 +206,12 @@ export class MessageItemComponent implements OnDestroy {
     }
 
     if (this.scrollMonitorContainer && !this.message.isRead) {
-      this.monitor = this.scrollMonitorContainer.create(this.el.nativeElement);
-      this.monitor.fullyEnterViewport(() => {
+      // Trigger before the message is fully in view — last items often never
+      // fullyEnterViewport (composer / padding), so "new messages" sticks.
+      this.monitor = this.scrollMonitorContainer.create(this.el.nativeElement, {
+        bottom: 80,
+      });
+      this.monitor.enterViewport(() => {
         if (this.readSubscribe) {
           this.readSubscribe.unsubscribe();
           this.readSubscribe = undefined;

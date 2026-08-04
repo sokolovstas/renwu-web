@@ -14,6 +14,7 @@ import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import {
   buffer,
   catchError,
+  concatMap,
   debounceTime,
   map,
   switchMap,
@@ -109,8 +110,11 @@ export class RwMessageService {
     this.markreadBuffer
       .pipe(
         buffer(this.markreadBuffer.pipe(debounceTime(100))),
-        switchMap((result) => {
-          const ids = result.map((message) => message.id);
+        concatMap((result) => {
+          const ids = [...new Set(result.map((message) => message.id).filter(Boolean))];
+          if (ids.length === 0) {
+            return of(undefined);
+          }
           return this.messagingDataService.markreadMessages(ids);
         }),
       )
@@ -132,7 +136,7 @@ export class RwMessageService {
     }
 
     this.subject = new RxWebsocketSubject(
-      `${this.settings.wsMessagesApiUrl}?renwu-token=${this.token}`,
+      `${this.settings.wsServerUrl}?renwu-token=${this.token}`,
     );
 
     if (this.settings.isDebug) {
@@ -218,12 +222,20 @@ export class RwMessageService {
   markreadAllUnreadInDestination(destination: MessageDestination) {
     this.messagingDataService
       .markreadDestination(destination.info.destination, MessageType.REGULAR)
-      .subscribe();
+      .subscribe(() => {
+        destination.info.unreadCount = 0;
+        destination.unreadCount.next(0);
+        this.updateCountMessages();
+      });
   }
   markreadAllPulseInDestination(destination: MessageDestination) {
     this.messagingDataService
       .markreadDestination(destination.info.destination, MessageType.PULSE)
-      .subscribe();
+      .subscribe(() => {
+        destination.info.pulseCount = 0;
+        destination.pulseCount.next(0);
+        this.updateCountMessages();
+      });
   }
   // Subscribe for live updates
   subscribeDestination(destination: Destination) {

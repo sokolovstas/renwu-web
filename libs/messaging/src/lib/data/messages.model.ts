@@ -23,7 +23,7 @@ export enum MessageEventType {
 }
 
 export enum MessageType {
-  REGULAR = 'REGULAR ',
+  REGULAR = 'REGULAR',
   PULSE = 'PULSE',
 }
 
