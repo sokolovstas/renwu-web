@@ -135,6 +135,17 @@ rw-text-area.focus {
 .ProseMirror {
   outline: none;
   color: $rw-control-text-color;
+
+  /* Tailwind preflight sets a { color/text-decoration: inherit } — restore links */
+  a {
+    color: $accent-color;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: $accent-primary-color;
+    }
+  }
 }
 
 .ProseMirror-example-setup-style hr {
@@ -431,11 +442,6 @@ rw-text-area.borderless .ProseMirror-menubar {
     font-style: italic;
   }
 
-  a {
-    color: $rw-control-text-interactive-color;
-    text-decoration: underline;
-  }
-
   h1,
   h2,
   h3,
@@ -457,6 +463,7 @@ rw-text-area.borderless .ProseMirror-menubar {
   h3 {
     font-size: 1.15em;
   }
+
 }
 
 .ProseMirror-icon {
@@ -488,6 +495,37 @@ rw-text-area.borderless .ProseMirror-menubar {
 
 .ProseMirror-icon span {
   vertical-align: text-top;
+}
+
+/* GFM tables (also used by messaging prose views) */
+.ProseMirror table.rw-md-table,
+.ProseMirror table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  overflow-x: auto;
+  font-size: 0.95em;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid $rw-control-border-color;
+  padding: 0.35em 0.65em;
+  text-align: left;
+  vertical-align: top;
+  min-width: 4em;
+}
+
+.ProseMirror th {
+  background: $gray-100;
+  font-weight: $global-weight-bolder;
+  color: $rw-control-text-color;
+}
+
+.ProseMirror tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 /* ProseMirror caret hack after contenteditable=false atoms */
