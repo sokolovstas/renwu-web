@@ -52,7 +52,7 @@ export class TeamComponent {
   managerModelUser = new SelectModelUser();
   constructor() {
     this.internalModelUser.filterFunction = (u: User) =>
-      u.type === UserType.INTERNAL &&
+      (u.type === UserType.INTERNAL || u.type === UserType.DUMMY) &&
       this.currentProject
         .getValue()
         .team.findIndex((t) => t.user.id === u.id) === -1;
