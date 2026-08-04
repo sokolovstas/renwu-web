@@ -90,11 +90,13 @@ export class RwLoaderService {
       if (progress === 100) {
         this.loaders = [];
         this.setLoading(false);
-        this.loadingProgress.next(100);
       } else {
         this.setLoading(true);
-        this.loadingProgress.next(progress);
       }
+      // Defer binding update so AppComponent width does not change mid-CD (NG0100).
+      globalThis.setTimeout(() => {
+        this.loadingProgress.next(progress);
+      }, 0);
     }
   }
 
