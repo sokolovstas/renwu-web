@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import {
+  RwDataService,
   RwMentionsProviderService,
   RwSettingsService,
   RwUserService,
@@ -11,6 +12,7 @@ import {
 import { BehaviorSubject, of } from 'rxjs';
 import { RwMessageService } from '../message.service';
 import { MessageInputComponent } from './input.component';
+import { RwToastService } from '@renwu/components';
 
 function enterEvent(
   init: Partial<KeyboardEvent> & { key?: string } = {},
@@ -57,9 +59,23 @@ describe('MessageInputComponent', () => {
         {
           provide: RwMentionsProviderService,
           useValue: {
-            getUser: () => ({}),
-            getIssue: () => ({}),
+            getUser: () => ({ triggerChars: ['@'], getItems: () => of([]) }),
+            getIssue: () => ({ triggerChars: ['#'], getItems: () => of([]) }),
+            getCommands: () => ({
+              triggerChars: ['/'],
+              getItems: () => of([]),
+            }),
           },
+        },
+        {
+          provide: RwDataService,
+          useValue: {
+            aiRefreshIssueSession: () => of({ alive: true, extended: true }),
+          },
+        },
+        {
+          provide: RwToastService,
+          useValue: { success: () => undefined, error: () => undefined },
         },
         {
           provide: TranslocoService,

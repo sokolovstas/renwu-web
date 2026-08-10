@@ -14,7 +14,8 @@
   border: 1px solid $rw-control-border-color;
   border-radius: $rw-control-border-radius;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-  z-index: $rw-control-popup-z-index;
+  /* Above chat/task chrome (input buttons use z-index 100). */
+  z-index: 10000;
   /* Avoid being clipped by transformed/overflow ancestors */
   isolation: isolate;
 }

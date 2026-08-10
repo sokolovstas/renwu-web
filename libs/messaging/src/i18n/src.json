@@ -23,5 +23,12 @@
   "%leftMessagesBefore%-previous-messages": "messaging.%leftMessagesBefore%-previous-messages",
   "%leftMessagesAfter%-next-messages": "messaging.%leftMessagesAfter%-next-messages",
   "write-a-message": "messaging.write-a-message",
-  "no-connection": "messaging.no-connection"
+  "no-connection": "messaging.no-connection",
+  "command-refresh": "messaging.command-refresh",
+  "command-refresh-hint": "messaging.command-refresh-hint",
+  "command-refresh-ok": "messaging.command-refresh-ok",
+  "command-refresh-alive": "messaging.command-refresh-alive",
+  "command-refresh-dead": "messaging.command-refresh-dead",
+  "command-refresh-need-issue": "messaging.command-refresh-need-issue",
+  "command-unknown": "messaging.command-unknown"
 }

@@ -59,8 +59,13 @@ export class MentionAutocompleteComponent {
   pick = new EventEmitter<unknown>();
 
   trackItem(index: number, item: unknown): unknown {
-    const rec = item as { id?: string; key?: string; username?: string };
-    return rec?.id || rec?.key || rec?.username || index;
+    const rec = item as {
+      id?: string;
+      key?: string;
+      username?: string;
+      command?: string;
+    };
+    return rec?.id || rec?.key || rec?.username || rec?.command || index;
   }
 
   move(delta: number): void {

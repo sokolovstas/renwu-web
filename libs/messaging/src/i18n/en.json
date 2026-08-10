@@ -23,5 +23,12 @@
   "%leftMessagesBefore%-previous-messages": "{{leftMessagesBefore}} previous messages",
   "%leftMessagesAfter%-next-messages": "{{leftMessagesAfter}} next messages",
   "write-a-message": "write message",
-  "no-connection": "No connection"
+  "no-connection": "No connection",
+  "command-refresh": "Refresh AI session",
+  "command-refresh-hint": "Check that the session is alive and extend the wait for a reply",
+  "command-refresh-ok": "Session is alive; wait budget extended",
+  "command-refresh-alive": "Session is alive",
+  "command-refresh-dead": "No running AI job or live session for this issue",
+  "command-refresh-need-issue": "/refresh is only available in an issue chat",
+  "command-unknown": "Unknown command: {{command}}"
 }

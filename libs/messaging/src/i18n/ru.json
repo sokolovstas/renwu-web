@@ -23,5 +23,12 @@
   "%leftMessagesBefore%-previous-messages": "{{leftMessagesBefore}} предыдущих сообщений",
   "%leftMessagesAfter%-next-messages": "{{leftMessagesAfter}} следующих сообщений",
   "write-a-message": "написать сообщение",
-  "no-connection": "Нет соединения"
+  "no-connection": "Нет соединения",
+  "command-refresh": "Обновить сессию AI",
+  "command-refresh-hint": "Проверить, что сессия жива, и продлить ожидание ответа",
+  "command-refresh-ok": "Сессия жива, ожидание ответа продлено",
+  "command-refresh-alive": "Сессия жива",
+  "command-refresh-dead": "Нет running AI job / живой сессии для этой задачи",
+  "command-refresh-need-issue": "Команда /refresh доступна только в чате задачи",
+  "command-unknown": "Неизвестная команда: {{command}}"
 }

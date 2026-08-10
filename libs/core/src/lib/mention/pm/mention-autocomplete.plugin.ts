@@ -21,6 +21,7 @@ import { EditorView } from 'prosemirror-view';
 import { Subscription } from 'rxjs';
 import { Issue } from '../../issue/issue.model';
 import { User } from '../../user/user.model';
+import { ChatCommand } from '../chat-command.model';
 import { MentionAutocompleteComponent } from './mention-autocomplete.component';
 
 export interface MentionAutocompleteOptions {
@@ -28,9 +29,11 @@ export interface MentionAutocompleteOptions {
   environmentInjector: EnvironmentInjector;
   applicationRef: ApplicationRef;
   onActiveChange?: (active: boolean) => void;
+  /** When set, picking a `/` command clears the trigger and calls this (no text insert). */
+  onCommandSelect?: (command: ChatCommand) => void;
 }
 
-interface MentionRange {
+export interface MentionRange {
   from: number;
   to: number;
   trigger: string;
@@ -45,9 +48,19 @@ interface PluginState {
 
 const key = new PluginKey<PluginState>('rwMentionAutocomplete');
 
-const QUERY_RE = /^([^\s@#]*)$/;
+/** Query after trigger; forbid nested triggers / whitespace. */
+const QUERY_RE = /^([^\s@#/]*)$/;
 
-function resolveRange(
+function isTriggerBoundary(textBefore: string, index: number): boolean {
+  if (index <= 0) {
+    return true;
+  }
+  // Space / newline / ZWSP / BOM — common before caret in contenteditable.
+  return /[\s\u200b\uFEFF]/.test(textBefore[index - 1]);
+}
+
+/** Exported for unit tests. */
+export function resolveMentionRange(
   state: EditorState,
   providers: Mentions<unknown>[],
 ): MentionRange | null {
@@ -64,7 +77,7 @@ function resolveRange(
   let best = -1;
   let trigger = '';
   for (const p of providers) {
-    for (const ch of p.triggerChars) {
+    for (const ch of p.triggerChars || []) {
       const idx = textBefore.lastIndexOf(ch);
       if (idx > best) {
         best = idx;
@@ -72,17 +85,16 @@ function resolveRange(
       }
     }
   }
-  if (best < 0) {
-    return null;
-  }
-  if (best > 0 && !/\s/.test(textBefore[best - 1])) {
+  if (best < 0 || !isTriggerBoundary(textBefore, best)) {
     return null;
   }
   const query = textBefore.slice(best + 1);
   if (!QUERY_RE.test(query)) {
     return null;
   }
-  const provider = providers.find((p) => p.triggerChars.includes(trigger));
+  const provider = providers.find((p) =>
+    (p.triggerChars || []).includes(trigger),
+  );
   if (!provider) {
     return null;
   }
@@ -95,7 +107,32 @@ function insertMention(
   view: EditorView,
   range: MentionRange,
   item: unknown,
+  onCommandSelect?: (command: ChatCommand) => void,
 ): void {
+  // Slash commands: execute via callback or insert plain text.
+  if (range.trigger === '/') {
+    const cmd = item as ChatCommand;
+    if (!cmd?.command && !cmd?.id) {
+      return;
+    }
+    if (onCommandSelect) {
+      view.dispatch(view.state.tr.delete(range.from, range.to).scrollIntoView());
+      queueMicrotask(() => onCommandSelect(cmd));
+      queueMicrotask(() => view.focus());
+      return;
+    }
+    const text =
+      range.provider.mentionSelect?.(cmd, range.provider.triggerChars) ||
+      cmd.command ||
+      `/${cmd.id}`;
+    let tr = view.state.tr.insertText(text + ' ', range.from, range.to);
+    const caret = range.from + text.length + 1;
+    tr = tr.setSelection(TextSelection.create(tr.doc, caret)).scrollIntoView();
+    view.dispatch(tr);
+    queueMicrotask(() => view.focus());
+    return;
+  }
+
   let node: ProseMirrorNode | null = null;
   if (range.trigger === '@') {
     const user = item as User;
@@ -127,7 +164,10 @@ function insertMention(
       return;
     }
     const max = view.state.doc.content.size;
-    const sel = TextSelection.near(view.state.doc.resolve(Math.min(caret, max)), 1);
+    const sel = TextSelection.near(
+      view.state.doc.resolve(Math.min(caret, max)),
+      1,
+    );
     if (!view.state.selection.eq(sel)) {
       view.dispatch(view.state.tr.setSelection(sel));
     }
@@ -160,8 +200,13 @@ function caretVirtualElement(view: EditorView, from: number): VirtualElement {
 export function createMentionAutocompletePlugin(
   options: MentionAutocompleteOptions,
 ): Plugin {
-  const { providers, environmentInjector, applicationRef, onActiveChange } =
-    options;
+  const {
+    providers,
+    environmentInjector,
+    applicationRef,
+    onActiveChange,
+    onCommandSelect,
+  } = options;
 
   let popupRef: ComponentRef<MentionAutocompleteComponent> | null = null;
   let popupHost: HTMLElement | null = null;
@@ -191,6 +236,15 @@ export function createMentionAutocompletePlugin(
     onActiveChange?.(false);
   };
 
+  const pickItem = (view: EditorView, item: unknown) => {
+    const st = key.getState(view.state);
+    if (!st?.range) {
+      return;
+    }
+    insertMention(view, st.range, item, onCommandSelect);
+    destroyPopup();
+  };
+
   const ensurePopup = (view: EditorView) => {
     if (popupRef && popupHost) {
       return popupRef;
@@ -203,12 +257,7 @@ export function createMentionAutocompletePlugin(
     document.body.appendChild(popupHost);
 
     popupRef.instance.pick.subscribe((item) => {
-      const st = key.getState(view.state);
-      if (st?.range) {
-        insertMention(view, st.range, item);
-      }
-      destroyPopup();
-      view.dispatch(view.state.tr.setMeta(key, { close: true }));
+      pickItem(view, item);
     });
     applicationRef.attachView(popupRef.hostView);
     onActiveChange?.(true);
@@ -229,17 +278,25 @@ export function createMentionAutocompletePlugin(
 
     const compute = () =>
       computePosition(reference, floating, {
-        placement: 'bottom-start',
+        // Chat input sits at the bottom — prefer opening upward.
+        placement: 'top-start',
         strategy: 'fixed',
         middleware: [
-          offset(4),
-          flip({ fallbackPlacements: ['top-start', 'bottom-end', 'top-end'] }),
+          offset(6),
+          flip({
+            fallbackPlacements: [
+              'bottom-start',
+              'top-end',
+              'bottom-end',
+            ],
+          }),
           shift({ padding: 8 }),
           size({
             padding: 8,
             apply({ availableHeight, elements }) {
+              const h = Math.min(240, Math.max(80, availableHeight || 240));
               Object.assign(elements.floating.style, {
-                maxHeight: `${Math.min(240, Math.max(120, availableHeight))}px`,
+                maxHeight: `${h}px`,
               });
             },
           }),
@@ -249,6 +306,7 @@ export function createMentionAutocompletePlugin(
           position: 'fixed',
           left: `${x}px`,
           top: `${y}px`,
+          zIndex: '10000',
         });
       });
 
@@ -290,7 +348,7 @@ export function createMentionAutocompletePlugin(
         if (!tr.docChanged && !tr.selectionSet) {
           return value;
         }
-        const range = resolveRange(state, providers);
+        const range = resolveMentionRange(state, providers);
         return { active: !!range, range };
       },
     },
@@ -320,10 +378,7 @@ export function createMentionAutocompletePlugin(
           // While the popup is open, never let Enter fall through to send.
           const item = popupRef.instance.activeItem();
           if (item && st.range) {
-            insertMention(view, st.range, item);
-            destroyPopup();
-            // Don't dispatch an extra tr here — insertMention already
-            // updated the doc; another tr can disturb the restored caret.
+            pickItem(view, item);
           }
           return consume();
         }

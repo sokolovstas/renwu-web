@@ -1,6 +1,8 @@
 import { ApplicationRef, EnvironmentInjector, inject } from '@angular/core';
 import { Plugin } from 'prosemirror-state';
 import { NodeViewConstructor } from 'prosemirror-view';
+import { Mentions } from '@renwu/mentions';
+import { ChatCommand } from '../chat-command.model';
 import { RwMentionsProviderService } from '../mentions.service';
 import { createAngularNodeView } from './angular-node-view';
 import { createMentionAutocompletePlugin } from './mention-autocomplete.plugin';
@@ -13,11 +15,16 @@ export interface MentionEditorExtras {
 }
 
 /**
- * Build ProseMirror plugins + NodeViews for @user / #issue mentions.
+ * Build ProseMirror plugins + NodeViews for @user / #issue mentions
+ * (and optional `/` slash commands for chat).
  * Call from an injection context (component constructor / field initializer).
  */
 export function createMentionEditorExtras(options?: {
   onActiveChange?: (active: boolean) => void;
+  /** Include `/` slash-command provider (issue chat). */
+  includeSlashCommands?: boolean;
+  /** Run slash command immediately when picked from the autocomplete. */
+  onCommandSelect?: (command: ChatCommand) => void;
 }): MentionEditorExtras {
   const environmentInjector = inject(EnvironmentInjector);
   const applicationRef = inject(ApplicationRef);
@@ -38,12 +45,23 @@ export function createMentionEditorExtras(options?: {
     }),
   };
 
+  const includeSlash =
+    options?.includeSlashCommands || !!options?.onCommandSelect;
+  const mentionProviders: Mentions<unknown>[] = [
+    providers.getUser(),
+    providers.getIssue(),
+  ];
+  if (includeSlash) {
+    mentionProviders.push(providers.getCommands() as Mentions<unknown>);
+  }
+
   const plugins = [
     createMentionAutocompletePlugin({
-      providers: [providers.getUser(), providers.getIssue()],
+      providers: mentionProviders,
       environmentInjector,
       applicationRef,
       onActiveChange: options?.onActiveChange,
+      onCommandSelect: options?.onCommandSelect,
     }),
   ];
 
