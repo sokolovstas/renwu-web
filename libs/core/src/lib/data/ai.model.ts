@@ -45,7 +45,31 @@ export interface AISettings {
   delivery_followup_template?: string;
   /** Choose git repo under workspace root. */
   resolve_repository_template?: string;
+  /** Global gate mode: shadow (advisory) | enforce. */
+  gates_mode?: 'shadow' | 'enforce';
+  max_fix_iterations?: number;
+  max_total_budget_usd?: number;
+  lock_wait_timeout_sec?: number;
+  gate_timeout_sec?: number;
 }
+
+export interface AIGate {
+  name?: string;
+  cmd?: string;
+  cwd_strategy?: string;
+  cleanup_cmd?: string;
+  cleanup_timeout_sec?: number;
+  lock_scope?: 'project' | 'workspace';
+}
+
+export interface AIProjectArchetype {
+  name?: string;
+  match?: string[];
+  /** Fast cycle for {{verify_commands}} (not hermetic component). */
+  dev_commands?: string;
+  gate_names?: string[];
+}
+
 export interface AIWorkspace {
   id?: string;
   container_id?: string;
@@ -58,6 +82,11 @@ export interface AIWorkspace {
   agent_provider?: string;
   agent_base_url?: string;
   agent_web_base_url?: string;
+  project_boundary?: string;
+  default_archetype?: string;
+  lock_scope?: 'project' | 'workspace';
+  gates?: AIGate[];
+  archetypes?: AIProjectArchetype[];
 }
 export interface AISkill {
   id?: string;
@@ -68,6 +97,13 @@ export interface AISkill {
   model?: string;
   timeout_sec?: number;
   enabled?: boolean;
+  /** JSON Schema for RENWU_RESULT; grooming should require affected_projects[]. */
+  result_schema?: Record<string, unknown>;
+  result_marker?: string;
+  allowed_tools?: string[];
+  permission_mode?: string;
+  max_budget_usd?: number;
+  max_turns?: number;
 }
 export interface AIWorkflowStep {
   id?: string;
@@ -84,6 +120,15 @@ export interface AIWorkflowStep {
   prompt_template?: string;
   /** Continue-session prompt for this step. Empty → tenant defaults by delivery flag. */
   followup_template?: string;
+  run_gates_after?: boolean;
+  /**
+   * Under gates_mode=enforce: omit/true → block on red gates;
+   * explicit false → advisory opt-out for this step.
+   */
+  require_gates_pass?: boolean;
+  max_retrigger?: number;
+  on_retrigger_exhausted_status_id?: string;
+  on_blocking_status_id?: string;
 }
 export interface AIWorkflow {
   id?: string;
@@ -113,6 +158,13 @@ export interface AISessionRefreshResult {
   message?: string;
 }
 
+export interface AIResolveMismatch {
+  mismatched?: boolean;
+  promised?: string[];
+  actual?: string[];
+  detail?: string;
+}
+
 export interface AIJob {
   id?: string;
   issue_id?: string;
@@ -131,4 +183,9 @@ export interface AIJob {
   error?: string;
   created_at?: string;
   updated_at?: string;
+  /** Shadow / gate telemetry. */
+  agent_claim?: string;
+  gate_outcome?: 'green' | 'red' | 'skipped' | 'unavailable' | string;
+  failure_class?: 'test_failure' | 'infra_failure' | string;
+  resolve_mismatch?: AIResolveMismatch;
 }
