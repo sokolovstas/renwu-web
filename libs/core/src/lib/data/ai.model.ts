@@ -35,16 +35,6 @@ export interface AISettings {
   actor_user_id?: string;
   max_concurrent_jobs?: number;
   default_model?: string;
-  /** Grooming first turn. Placeholders: {{skill_body}}, {{issue_*}}, {{workdir}}. */
-  prompt_template?: string;
-  /** Grooming continue turn. */
-  grooming_followup_template?: string;
-  /** Flow delivery first turn. */
-  delivery_template?: string;
-  /** Flow delivery continue turn. */
-  delivery_followup_template?: string;
-  /** Choose git repo under workspace root. */
-  resolve_repository_template?: string;
   /** Global gate mode: shadow (advisory) | enforce. */
   gates_mode?: 'shadow' | 'enforce';
   max_fix_iterations?: number;
@@ -116,10 +106,12 @@ export interface AIWorkflowStep {
   retrigger?: boolean;
   /** Worktree + delivery result parsing + delivery prompt fallbacks. */
   delivery?: boolean;
-  /** First-turn prompt for this step. Empty → tenant defaults by delivery flag. */
+  /** First-turn prompt for this step (required at runtime). */
   prompt_template?: string;
-  /** Continue-session prompt for this step. Empty → tenant defaults by delivery flag. */
+  /** Continue-session prompt. Empty → reuse prompt_template. */
   followup_template?: string;
+  /** Delivery: ask agent which git repo under workspace. */
+  resolve_repository_template?: string;
   run_gates_after?: boolean;
   /**
    * Under gates_mode=enforce: omit/true → block on red gates;

@@ -44,6 +44,7 @@ export class AiWorkflowsComponent {
   private readonly transloco = inject(TranslocoService);
   private readonly cd = inject(ChangeDetectorRef);
   private readonly stepModels = new Map<string, SelectModelBase<string>>();
+  private promptPresets: Record<string, string> = {};
 
   readonly items = signal<AIWorkflow[]>([]);
   readonly containerModel = this.createModel();
@@ -72,14 +73,18 @@ export class AiWorkflowsComponent {
 
   async load(): Promise<void> {
     try {
-      const [workflows, containers, workspaces, skills, statuses] =
+      const [workflows, containers, workspaces, skills, statuses, presets] =
         await Promise.all([
           firstValueFrom(this.data.aiListWorkflows().pipe(defaultIfEmpty([]))),
           firstValueFrom(this.data.getContainers({}).pipe(defaultIfEmpty([]))),
           firstValueFrom(this.data.aiListWorkspaces().pipe(defaultIfEmpty([]))),
           firstValueFrom(this.data.aiListSkills().pipe(defaultIfEmpty([]))),
           firstValueFrom(this.data.getIssueStatus({}).pipe(defaultIfEmpty([]))),
+          firstValueFrom(
+            this.data.aiPromptPresets().pipe(defaultIfEmpty({})),
+          ),
         ]);
+      this.promptPresets = presets ?? {};
       this.items.set(workflows ?? []);
       this.containerOptions = (containers ?? []).map((x) =>
         this.option(
@@ -131,6 +136,43 @@ export class AiWorkflowsComponent {
     this.steps.removeAt(index);
     this.stepModels.clear();
     this.syncStepModels();
+    this.cd.markForCheck();
+  }
+
+  insertStepPromptPreset(index: number): void {
+    const step = this.steps.at(index);
+    const delivery = !!step.controls['delivery'].value;
+    const key = delivery ? 'delivery' : 'grooming';
+    const text = this.promptPresets[key] || '';
+    if (!text) {
+      return;
+    }
+    step.controls['prompt_template'].setValue(text);
+    step.controls['prompt_template'].markAsDirty();
+    this.cd.markForCheck();
+  }
+
+  insertStepFollowupPreset(index: number): void {
+    const step = this.steps.at(index);
+    const delivery = !!step.controls['delivery'].value;
+    const key = delivery ? 'delivery_followup' : 'grooming_followup';
+    const text = this.promptPresets[key] || '';
+    if (!text) {
+      return;
+    }
+    step.controls['followup_template'].setValue(text);
+    step.controls['followup_template'].markAsDirty();
+    this.cd.markForCheck();
+  }
+
+  insertStepResolvePreset(index: number): void {
+    const step = this.steps.at(index);
+    const text = this.promptPresets['resolve_repository'] || '';
+    if (!text) {
+      return;
+    }
+    step.controls['resolve_repository_template'].setValue(text);
+    step.controls['resolve_repository_template'].markAsDirty();
     this.cd.markForCheck();
   }
 
@@ -254,6 +296,10 @@ export class AiWorkflowsComponent {
       followup_template: new FormControl(value?.followup_template || '', {
         nonNullable: true,
       }),
+      resolve_repository_template: new FormControl(
+        value?.resolve_repository_template || '',
+        { nonNullable: true },
+      ),
     });
   }
 

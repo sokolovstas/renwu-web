@@ -1100,6 +1100,9 @@ export class RwDataService {
   aiListProviders(): Observable<{ providers: AIProviderInfo[] }> {
     return this.sendToAiAPI('get', '/providers');
   }
+  aiPromptPresets(): Observable<Record<string, string>> {
+    return this.sendToAiAPI('get', '/prompt-presets');
+  }
   aiListAgentModels(
     baseUrl?: string,
     provider?: string,

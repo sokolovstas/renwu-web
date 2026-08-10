@@ -76,37 +76,6 @@
     <p class="form-supporting-text">{{ selectedProvider?.description }}</p>
   }
 
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center gap-2 justify-between">
-      <h2 class="text-xl font-light">
-        {{ 'settings.ai-prompts' | transloco }}
-      </h2>
-      <rw-button typeButton="secondary" (clicked)="resetAllPrompts()">{{
-        'settings.ai-prompts-reset-all' | transloco
-      }}</rw-button>
-    </div>
-    <p class="form-supporting-text">
-      {{ 'settings.ai-prompts-hint' | transloco }}
-    </p>
-
-    @for (item of promptFields; track item.field) {
-      <div class="flex flex-col gap-2">
-        <rw-text-input
-          [live]="true"
-          [multiline]="true"
-          [formControlName]="item.field"
-          prompt="{{ item.labelKey | transloco }}"
-        />
-        <p class="form-supporting-text">
-          {{ item.hintKey | transloco }}
-        </p>
-        <rw-button typeButton="secondary" (clicked)="resetPrompt(item.field)">{{
-          'settings.ai-prompt-template-reset' | transloco
-        }}</rw-button>
-      </div>
-    }
-  </section>
-
   <rw-button action (clicked)="save()">{{
     'settings.save' | transloco
   }}</rw-button>

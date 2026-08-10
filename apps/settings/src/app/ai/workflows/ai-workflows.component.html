@@ -156,6 +156,11 @@
             <p class="form-supporting-text">
               {{ 'settings.ai-step-prompt-hint' | transloco }}
             </p>
+            <rw-button
+              typeButton="secondary"
+              (clicked)="insertStepPromptPreset(i)"
+              >{{ 'settings.ai-step-prompt-preset' | transloco }}</rw-button
+            >
             <rw-text-input
               [live]="true"
               [multiline]="true"
@@ -165,6 +170,29 @@
             <p class="form-supporting-text">
               {{ 'settings.ai-step-followup-hint' | transloco }}
             </p>
+            <rw-button
+              typeButton="secondary"
+              (clicked)="insertStepFollowupPreset(i)"
+              >{{ 'settings.ai-step-followup-preset' | transloco }}</rw-button
+            >
+            @if (step.get('delivery')?.value) {
+              <rw-text-input
+                [live]="true"
+                [multiline]="true"
+                formControlName="resolve_repository_template"
+                prompt="{{ 'settings.ai-step-resolve-repo' | transloco }}"
+              />
+              <p class="form-supporting-text">
+                {{ 'settings.ai-step-resolve-repo-hint' | transloco }}
+              </p>
+              <rw-button
+                typeButton="secondary"
+                (clicked)="insertStepResolvePreset(i)"
+                >{{
+                  'settings.ai-step-resolve-repo-preset' | transloco
+                }}</rw-button
+              >
+            }
           </div>
         </div>
       }

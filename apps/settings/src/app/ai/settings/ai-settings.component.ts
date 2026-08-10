@@ -17,13 +17,6 @@ import {
 import { AIProviderInfo, AISettings, RwDataService, UserType } from '@renwu/core';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 
-type PromptField =
-  | 'prompt_template'
-  | 'grooming_followup_template'
-  | 'delivery_template'
-  | 'delivery_followup_template'
-  | 'resolve_repository_template';
-
 @Component({
   selector: 'renwu-settings-ai-settings',
   standalone: true,
@@ -47,48 +40,6 @@ export class AiSettingsComponent {
   readonly providerModel = new SelectModelBase<string>();
   providers: AIProviderInfo[] = [];
 
-  /** Filled from API ApplyPromptDefaults on first load — used by Reset. */
-  private resetBaselines: Record<PromptField, string> = {
-    prompt_template: '',
-    grooming_followup_template: '',
-    delivery_template: '',
-    delivery_followup_template: '',
-    resolve_repository_template: '',
-  };
-  private baselinesReady = false;
-
-  readonly promptFields: {
-    field: PromptField;
-    labelKey: string;
-    hintKey: string;
-  }[] = [
-    {
-      field: 'prompt_template',
-      labelKey: 'settings.ai-prompt-grooming',
-      hintKey: 'settings.ai-prompt-grooming-hint',
-    },
-    {
-      field: 'grooming_followup_template',
-      labelKey: 'settings.ai-prompt-grooming-followup',
-      hintKey: 'settings.ai-prompt-grooming-followup-hint',
-    },
-    {
-      field: 'delivery_template',
-      labelKey: 'settings.ai-prompt-delivery',
-      hintKey: 'settings.ai-prompt-delivery-hint',
-    },
-    {
-      field: 'delivery_followup_template',
-      labelKey: 'settings.ai-prompt-delivery-followup',
-      hintKey: 'settings.ai-prompt-delivery-followup-hint',
-    },
-    {
-      field: 'resolve_repository_template',
-      labelKey: 'settings.ai-prompt-resolve-repo',
-      hintKey: 'settings.ai-prompt-resolve-repo-hint',
-    },
-  ];
-
   readonly gatesModeModel = new SelectModelBase<string>();
   readonly form = new FormGroup({
     enabled: new FormControl(false, { nonNullable: true }),
@@ -104,11 +55,6 @@ export class AiSettingsComponent {
     max_fix_iterations: new FormControl(0, { nonNullable: true }),
     lock_wait_timeout_sec: new FormControl(0, { nonNullable: true }),
     gate_timeout_sec: new FormControl(0, { nonNullable: true }),
-    prompt_template: new FormControl('', { nonNullable: true }),
-    grooming_followup_template: new FormControl('', { nonNullable: true }),
-    delivery_template: new FormControl('', { nonNullable: true }),
-    delivery_followup_template: new FormControl('', { nonNullable: true }),
-    resolve_repository_template: new FormControl('', { nonNullable: true }),
   });
 
   constructor() {
@@ -158,26 +104,12 @@ export class AiSettingsComponent {
       this.actorModel.staticData = (users || []).map((u) =>
         this.option(u.id || '', u.full_name || u.username || u.id || ''),
       );
-      this.patchPromptSettings(settings || {}, true);
+      this.patchSettings(settings || {});
       await this.loadModels();
       this.form.markAsPristine();
     } finally {
       this.cd.markForCheck();
     }
-  }
-
-  resetPrompt(field: PromptField): void {
-    this.form.controls[field].setValue(this.resetBaselines[field] || '');
-    this.form.controls[field].markAsDirty();
-    this.cd.markForCheck();
-  }
-
-  resetAllPrompts(): void {
-    for (const field of this.promptFields.map((p) => p.field)) {
-      this.form.controls[field].setValue(this.resetBaselines[field] || '');
-      this.form.controls[field].markAsDirty();
-    }
-    this.cd.markForCheck();
   }
 
   async loadModels(): Promise<void> {
@@ -210,7 +142,6 @@ export class AiSettingsComponent {
       const raw = this.form.getRawValue();
       const payload: AISettings = {
         ...raw,
-        // Keep legacy fields in sync for older clients / jobs UI.
         opencode_base_url: raw.agent_base_url,
         opencode_web_base_url: raw.agent_web_base_url,
       };
@@ -220,7 +151,7 @@ export class AiSettingsComponent {
       if (!settings) {
         return;
       }
-      this.patchPromptSettings(settings, false);
+      this.patchSettings(settings);
       this.form.markAsPristine();
       this.toast.success(this.transloco.translate('settings.ai-saved'));
     } finally {
@@ -228,35 +159,19 @@ export class AiSettingsComponent {
     }
   }
 
-  private patchPromptSettings(
-    settings: AISettings,
-    captureBaselines: boolean,
-  ): void {
-    const prompts: Record<PromptField, string> = {
-      prompt_template: settings.prompt_template?.trim() || '',
-      grooming_followup_template:
-        settings.grooming_followup_template?.trim() || '',
-      delivery_template: settings.delivery_template?.trim() || '',
-      delivery_followup_template:
-        settings.delivery_followup_template?.trim() || '',
-      resolve_repository_template:
-        settings.resolve_repository_template?.trim() || '',
-    };
-    if (captureBaselines && !this.baselinesReady) {
-      // API fills built-in defaults for empty fields — keep as Reset targets.
-      this.resetBaselines = { ...prompts };
-      this.baselinesReady = true;
-    }
+  private patchSettings(settings: AISettings): void {
     const baseUrl =
       settings.agent_base_url || settings.opencode_base_url || '';
     const webUrl =
       settings.agent_web_base_url || settings.opencode_web_base_url || '';
     this.form.patchValue({
-      ...settings,
-      ...prompts,
+      enabled: !!settings.enabled,
       agent_provider: settings.agent_provider || 'opencode',
       agent_base_url: baseUrl,
       agent_web_base_url: webUrl,
+      actor_user_id: settings.actor_user_id || '',
+      default_model: settings.default_model || '',
+      max_concurrent_jobs: settings.max_concurrent_jobs || 1,
       gates_mode: settings.gates_mode === 'enforce' ? 'enforce' : 'shadow',
       max_fix_iterations: settings.max_fix_iterations || 0,
       lock_wait_timeout_sec: settings.lock_wait_timeout_sec || 0,
