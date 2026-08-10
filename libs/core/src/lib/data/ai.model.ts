@@ -4,6 +4,7 @@ export type AIJobState =
   | 'succeeded'
   | 'failed'
   | 'cancelled';
+/** @deprecated delivery mode is on AIWorkflowStep.delivery */
 export type AISkillKind = 'grooming' | 'flow_delivery';
 
 export interface AIOpenCodeModel {
@@ -77,6 +78,12 @@ export interface AIWorkflowStep {
   on_need_info_status_id?: string;
   on_failure_status_id?: string;
   retrigger?: boolean;
+  /** Worktree + delivery result parsing + delivery prompt fallbacks. */
+  delivery?: boolean;
+  /** First-turn prompt for this step. Empty → tenant defaults by delivery flag. */
+  prompt_template?: string;
+  /** Continue-session prompt for this step. Empty → tenant defaults by delivery flag. */
+  followup_template?: string;
 }
 export interface AIWorkflow {
   id?: string;
@@ -94,6 +101,16 @@ export interface AIConfigBundle {
   workspaces?: AIWorkspace[];
   skills?: AISkill[];
   workflows?: AIWorkflow[];
+}
+
+/** Result of chat `/refresh` (POST /issues/:id/session/refresh). */
+export interface AISessionRefreshResult {
+  alive?: boolean;
+  busy?: boolean;
+  extended?: boolean;
+  job_id?: string;
+  session_id?: string;
+  message?: string;
 }
 
 export interface AIJob {

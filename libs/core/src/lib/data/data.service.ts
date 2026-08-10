@@ -80,6 +80,7 @@ import {
   AIJob,
   AIOpenCodeModel,
   AIProviderInfo,
+  AISessionRefreshResult,
   AISettings,
   AISkill,
   AIWorkflow,
@@ -1178,6 +1179,14 @@ export class RwDataService {
   /** Re-apply last OpenCode assistant message without starting a new LLM turn. */
   aiApplySessionJob(id: string): Observable<AIJob> {
     return this.sendToAiAPI('post', `/jobs/${id}/apply-session`, {});
+  }
+  /** Chat `/refresh`: probe running agent session and extend wait budget. */
+  aiRefreshIssueSession(issueId: string): Observable<AISessionRefreshResult> {
+    return this.sendToAiAPI(
+      'post',
+      `/issues/${encodeURIComponent(issueId)}/session/refresh`,
+      {},
+    );
   }
 
   // JIRA — org settings / sync (renwu.jira, base `/api/jira/v1`)

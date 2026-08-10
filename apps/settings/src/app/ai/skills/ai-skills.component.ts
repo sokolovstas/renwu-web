@@ -16,7 +16,7 @@ import {
   RwToastService,
   SelectModelBase,
 } from '@renwu/components';
-import { AISkill, AISkillKind, RwDataService } from '@renwu/core';
+import { AISkill, RwDataService } from '@renwu/core';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 
 @Component({
@@ -40,12 +40,10 @@ export class AiSkillsComponent {
   private readonly cd = inject(ChangeDetectorRef);
   readonly items = signal<AISkill[]>([]);
   readonly modelModel = new SelectModelBase<string>();
-  readonly kindModel = new SelectModelBase<AISkillKind>();
   readonly form = new FormGroup({
     id: new FormControl<string | undefined>(undefined),
     name: new FormControl('', { nonNullable: true }),
     slug: new FormControl('', { nonNullable: true }),
-    kind: new FormControl<AISkillKind>('grooming', { nonNullable: true }),
     body: new FormControl('', { nonNullable: true }),
     model: new FormControl('', { nonNullable: true }),
     timeout_sec: new FormControl(300, { nonNullable: true }),
@@ -55,16 +53,6 @@ export class AiSkillsComponent {
   constructor() {
     this.modelModel.allowNull = true;
     this.modelModel.loadSelected = true;
-    this.kindModel.staticData = [
-      {
-        id: 'grooming',
-        label: this.transloco.translate('settings.ai-skill-kind-grooming'),
-      },
-      {
-        id: 'flow_delivery',
-        label: this.transloco.translate('settings.ai-skill-kind-flow-delivery'),
-      },
-    ];
     void this.load();
   }
 
@@ -87,7 +75,6 @@ export class AiSkillsComponent {
 
   edit(item?: AISkill): void {
     this.form.reset({
-      kind: 'grooming',
       timeout_sec: 300,
       enabled: true,
       ...(item || {}),

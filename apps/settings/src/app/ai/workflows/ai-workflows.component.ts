@@ -191,6 +191,15 @@ export class AiWorkflowsComponent {
       retrigger: new FormControl(value?.retrigger || false, {
         nonNullable: true,
       }),
+      delivery: new FormControl(value?.delivery || false, {
+        nonNullable: true,
+      }),
+      prompt_template: new FormControl(value?.prompt_template || '', {
+        nonNullable: true,
+      }),
+      followup_template: new FormControl(value?.followup_template || '', {
+        nonNullable: true,
+      }),
     });
   }
 

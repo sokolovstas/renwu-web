@@ -101,7 +101,7 @@
               prompt="{{ 'settings.ai-on-failure-status' | transloco }}"
             />
           </div>
-          <div class="flex gap-4">
+          <div class="flex flex-wrap gap-4">
             <label class="flex items-center gap-2"
               ><input type="checkbox" formControlName="auto_transit" />{{
                 'settings.ai-auto-transit' | transloco
@@ -110,7 +110,34 @@
               ><input type="checkbox" formControlName="retrigger" />{{
                 'settings.ai-retrigger' | transloco
               }}</label
+            ><label class="flex items-center gap-2"
+              ><input type="checkbox" formControlName="delivery" />{{
+                'settings.ai-step-delivery' | transloco
+              }}</label
             >
+          </div>
+          <p class="form-supporting-text">
+            {{ 'settings.ai-step-delivery-hint' | transloco }}
+          </p>
+          <div class="flex flex-col gap-2">
+            <rw-text-input
+              [live]="true"
+              [multiline]="true"
+              formControlName="prompt_template"
+              prompt="{{ 'settings.ai-step-prompt' | transloco }}"
+            />
+            <p class="form-supporting-text">
+              {{ 'settings.ai-step-prompt-hint' | transloco }}
+            </p>
+            <rw-text-input
+              [live]="true"
+              [multiline]="true"
+              formControlName="followup_template"
+              prompt="{{ 'settings.ai-step-followup' | transloco }}"
+            />
+            <p class="form-supporting-text">
+              {{ 'settings.ai-step-followup-hint' | transloco }}
+            </p>
           </div>
         </div>
       }
