@@ -63,8 +63,10 @@
 }
 
 .td-key {
-  width: 64px;
-  min-width: 64px;
+  box-sizing: border-box;
+  width: var(--timeline-key-col-width, 64px);
+  min-width: var(--timeline-key-col-width, 64px);
+  flex-shrink: 0;
   font-weight: 500;
   color: var(--gray-500);
 }

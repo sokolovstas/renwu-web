@@ -1,4 +1,7 @@
-import { parseUtcLike } from '../date-helpers';
+import {
+  timelineIssueBarEnd,
+  timelineIssueBarStart,
+} from './timeline-bar-dates';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import {
   countVisibleTimelineRows,
@@ -61,8 +64,8 @@ function collectVisibleScopeDateBounds(
       return;
     }
 
-    const start = parseUtcLike(n.date_start_calc);
-    const end = parseUtcLike(n.date_end_calc);
+    const start = timelineIssueBarStart(n);
+    const end = timelineIssueBarEnd(n);
     if (start) {
       const v = unixSecondsVirtual(start, hours24InDay, 'start');
       minUnix = minUnix === null ? v : Math.min(minUnix, v);

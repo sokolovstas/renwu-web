@@ -14,7 +14,10 @@ import { Issue, IssueCardComponent, Status } from '@renwu/core';
 import { TimelineCreateDirection } from '../issue-to-link';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { visibleRowsBeforeChild } from '../row-striping';
-import { parseUtcLike } from '../date-helpers';
+import {
+  timelineIssueBarEnd,
+  timelineIssueBarStart,
+} from './timeline-bar-dates';
 import { unixSecondsVirtual } from '../virtual-hours';
 
 /** Original UI: 18px bar height inside a 37px row — scale bar with `issueRowHeightPx`. */
@@ -138,8 +141,8 @@ export class TimelineItemComponent implements OnChanges {
 
     this.isAutoScheduled = Boolean(this.item.auto_scheduling);
 
-    const start = parseUtcLike(this.item.date_start_calc);
-    const end = parseUtcLike(this.item.date_end_calc);
+    const start = timelineIssueBarStart(this.item);
+    const end = timelineIssueBarEnd(this.item);
     if (!start || !end) {
       this.width = 0;
       return;

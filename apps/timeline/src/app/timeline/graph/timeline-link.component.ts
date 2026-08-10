@@ -8,7 +8,10 @@ import {
   Output,
 } from '@angular/core';
 import { TimelineLink } from '../models/timeline-issue.model';
-import { parseUtcLike } from '../date-helpers';
+import {
+  timelineIssueBarEnd,
+  timelineIssueBarStart,
+} from './timeline-bar-dates';
 import { unixSecondsVirtual } from '../virtual-hours';
 
 const ELBOW_STUB_PX = 8;
@@ -127,15 +130,15 @@ export class TimelineLinkComponent implements OnChanges {
 
     if (this.data.type === 'after') {
       // prev_issue → current: prev ends, then current starts
-      fromDate = parseUtcLike(linked.date_end_calc);
+      fromDate = timelineIssueBarEnd(linked);
       fromEdge = 'end';
-      toDate = parseUtcLike(issue.date_start_calc);
+      toDate = timelineIssueBarStart(issue);
       toEdge = 'start';
     } else {
       // current → next_issue: current ends, then next starts
-      fromDate = parseUtcLike(issue.date_end_calc);
+      fromDate = timelineIssueBarEnd(issue);
       fromEdge = 'end';
-      toDate = parseUtcLike(linked.date_start_calc);
+      toDate = timelineIssueBarStart(linked);
       toEdge = 'start';
     }
 

@@ -29,8 +29,10 @@ type TimelineIssueNodeLike = Pick<
   Issue,
   | 'id'
   | 'type'
+  | 'status'
   | 'date_start'
   | 'date_end'
+  | 'date_start_progress'
   | 'date_start_calc'
   | 'date_end_calc'
   | 'time_logs'
@@ -109,7 +111,14 @@ export class TimelineService {
             issuesMap[String(child.id)] = child as unknown as Issue;
           }
 
-          const start = parseMomentLocal(child.date_start_calc);
+          const inProgress =
+            !!child.status &&
+            typeof child.status === 'object' &&
+            !!(child.status as { in_progress?: boolean }).in_progress;
+          const start = inProgress
+            ? parseMomentLocal(child.date_start_progress) ||
+              parseMomentLocal(child.date_start_calc)
+            : parseMomentLocal(child.date_start_calc);
           const end = parseMomentLocal(child.date_end_calc);
 
           if (start) {

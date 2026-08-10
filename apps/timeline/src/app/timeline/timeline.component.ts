@@ -85,6 +85,10 @@ import {
   TimelineHolderDirective,
   TimelinePanDelta,
 } from './shared/directives/timeline-holder.directive';
+import {
+  collectTimelineIssueKeys,
+  measureTimelineKeyColumnWidthPx,
+} from './table/timeline-key-column-width';
 import { TimelineTableItemComponent } from './table/timeline-table-item.component';
 import { unixSecondsVirtual } from './virtual-hours';
 import { WorkloadUserComponent } from './workload/workload-user.component';
@@ -178,6 +182,14 @@ export class TimelineComponent {
   /** Table chrome width; 0 when the table is collapsed. */
   protected readonly effectiveTableWidth = computed(() =>
     this.settings().showTable ? this.settings().tableWidth : 0,
+  );
+
+  /** Key column width so the longest issue key fits at the current table font size. */
+  protected readonly keyColumnWidthPx = computed(() =>
+    measureTimelineKeyColumnWidthPx(
+      collectTimelineIssueKeys(this.rootChild().childs),
+      this.settings().fontSize,
+    ),
   );
 
   protected readonly dateStart = signal<Date>(new Date());
@@ -1347,7 +1359,12 @@ export class TimelineComponent {
   private centerAtIssue(issue: TimelineIssue): void {
     const graphW = this.graphViewportWidth();
     if (graphW <= 0) return;
-    const centerDate = parseUtcLike(issue.date_start_calc);
+    const centerDate =
+      (issue.status &&
+      typeof issue.status === 'object' &&
+      issue.status.in_progress
+        ? parseUtcLike(issue.date_start_progress)
+        : null) ?? parseUtcLike(issue.date_start_calc);
     if (!centerDate) return;
     const h24 = this.hours24InDay();
     const centerV = unixSecondsVirtual(centerDate, h24, 'start');
