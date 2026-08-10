@@ -110,8 +110,22 @@ export interface JiraSettings {
   import_post_script?: string;
   /** Preferred push mode; default treated as manual when missing. */
   push_mode?: JiraPushMode | string;
-  /** Jira Epic Link custom field id, e.g. customfield_15500. Empty disables linking. */
+  /** Auto pull from Jira by JQL on an interval (separate from push_mode). */
+  import_auto_enabled?: boolean;
+  /** Minutes between auto imports: 5 | 15 | 30 | 60 | 180 | 360 | 720 | 1440. */
+  import_auto_interval_minutes?: number;
+  /** Renwu user whose personal PAT is used for background import. */
+  import_auto_user_id?: string;
+  /** Unix seconds of last claimed auto-import run. */
+  import_auto_last_run_at?: number;
+  /** @deprecated Migrated into sync templates (JIRA_ISSUE_KEY → key). */
+  sync_issue_keys?: boolean;
+  /** @deprecated Migrated into sync templates (PARENT_EPIC_JIRA_KEY). */
   epic_link_field?: string;
+  /** Renwu type ids treated as Epic for parent Epic Link resolution (Mongo). */
+  epic_our_type_ids?: string[];
+  /** @deprecated Migrated into sync templates (STORY_POINTS_TO_ESTIMATE). */
+  story_points_field?: string;
   templates?: JiraSyncTemplate[];
   /** Legacy flat field list; migrated into a default template when templates are empty. */
   fields?: JiraSyncField[];

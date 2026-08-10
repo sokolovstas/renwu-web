@@ -22,6 +22,7 @@ import {
   ISelectItem,
   RwAlertService,
   RwButtonComponent,
+  RwCheckboxComponent,
   RwSelectComponent,
   RwTextInputComponent,
   RwToastService,
@@ -75,6 +76,7 @@ type JiraSettingsTab =
     RouterLink,
     RenwuPageComponent,
     RwButtonComponent,
+    RwCheckboxComponent,
     RwSelectComponent,
     RwTextInputComponent,
     IssueHrefComponent,
@@ -167,6 +169,17 @@ export class JiraComponent {
     { value: 'in', labelKey: 'settings.jira-op-in' },
   ];
 
+  readonly importAutoIntervals = [
+    { value: 5, labelKey: 'settings.jira-import-auto-interval-5m' },
+    { value: 15, labelKey: 'settings.jira-import-auto-interval-15m' },
+    { value: 30, labelKey: 'settings.jira-import-auto-interval-30m' },
+    { value: 60, labelKey: 'settings.jira-import-auto-interval-1h' },
+    { value: 180, labelKey: 'settings.jira-import-auto-interval-3h' },
+    { value: 360, labelKey: 'settings.jira-import-auto-interval-6h' },
+    { value: 720, labelKey: 'settings.jira-import-auto-interval-12h' },
+    { value: 1440, labelKey: 'settings.jira-import-auto-interval-1d' },
+  ];
+
   selectedTemplateIndex = signal(0);
   diffs = signal<JiraIssueDiff[]>([]);
   selectedDiffIds = signal<Set<string>>(new Set());
@@ -180,13 +193,18 @@ export class JiraComponent {
     jql: new FormControl('', { nonNullable: true }),
     oql: new FormControl('', { nonNullable: true }),
     push_mode: new FormControl<JiraPushMode>('manual', { nonNullable: true }),
-    epic_link_field: new FormControl('', { nonNullable: true }),
+    import_auto_enabled: new FormControl(false, { nonNullable: true }),
+    import_auto_interval_minutes: new FormControl(60, { nonNullable: true }),
+    epic_our_type_ids: new FormArray<FormControl<string>>([]),
     status_mapping: new FormArray<FormGroup>([]),
     priority_mapping: new FormArray<FormGroup>([]),
     type_mapping: new FormArray<FormGroup>([]),
     project_mapping: new FormArray<FormGroup>([]),
     templates: new FormArray<FormGroup>([]),
   });
+
+  epicTypeAddId = '';
+  epicTypeAddModel = this.createJiraSelectModel([]);
 
   settings$ = this.dataService.jiraLoadSettings().pipe(
     // catchHandler returns EMPTY on HTTP errors — still render an empty form.
@@ -198,6 +216,10 @@ export class JiraComponent {
 
   get templates(): FormArray<FormGroup> {
     return this.form.controls.templates;
+  }
+
+  get epicOurTypeIds(): FormArray<FormControl<string>> {
+    return this.form.controls.epic_our_type_ids;
   }
 
   mappingArray(key: DictMappingKey | 'project_mapping'): FormArray<FormGroup> {
@@ -227,10 +249,13 @@ export class JiraComponent {
       jql: settings.jql || '',
       oql: settings.oql || '',
       push_mode: (settings.push_mode as JiraPushMode) || 'manual',
-      epic_link_field: settings.epic_link_field || '',
+      import_auto_enabled: !!settings.import_auto_enabled,
+      import_auto_interval_minutes:
+        settings.import_auto_interval_minutes || 60,
     });
 
     this.jiraCatalog = settings.jira_catalog || {};
+    this.replaceEpicOurTypeIds(settings.epic_our_type_ids);
     this.replaceDictMapping('status_mapping', settings.status_mapping);
     this.replaceDictMapping('priority_mapping', settings.priority_mapping);
     this.replaceDictMapping('type_mapping', settings.type_mapping);
@@ -381,6 +406,7 @@ export class JiraComponent {
           : String(c.id),
       }));
       this.ourRowModels.clear();
+      this.refreshEpicTypeAddModel();
       this.cd.markForCheck();
     } catch {
       // Keep existing mapping rows usable even if catalogs fail to load.
@@ -778,7 +804,10 @@ export class JiraComponent {
       jql: raw.jql,
       oql: raw.oql,
       push_mode: raw.push_mode,
-      epic_link_field: raw.epic_link_field,
+      import_auto_enabled: !!raw.import_auto_enabled,
+      import_auto_interval_minutes:
+        Number(raw.import_auto_interval_minutes) || 60,
+      epic_our_type_ids: (raw.epic_our_type_ids as string[]).filter(Boolean),
       status_mapping: serializeDict(
         raw.status_mapping as {
           our_id: string;
@@ -1113,8 +1142,103 @@ export class JiraComponent {
     );
   }
 
+  /** Preset: Jira Story Points ↔ Renwu estimated_time (1 SP = 8h). */
+  addStoryPointsField(): void {
+    this.selectedTemplateFields()?.push(
+      this.createFieldGroup({
+        source_field: 'customfield_10052',
+        source_label: 'Story Points',
+        target_field: 'estimated_time',
+        target_label: 'Estimate',
+        direction: '<>',
+        source_script:
+          'if (IN == null || IN === "" || +IN <= 0) { SKIP = true; } else { OUT = STORY_POINTS_TO_ESTIMATE(IN); }',
+        target_script:
+          'if (IN == null || +IN <= 0) { SKIP = true; } else { OUT = ESTIMATE_TO_STORY_POINTS(IN); }',
+      }),
+    );
+  }
+
+  /** Preset: Jira issue key → Renwu primary key (old key stays in keys[]). */
+  addIssueKeyField(): void {
+    this.selectedTemplateFields()?.push(
+      this.createFieldGroup({
+        source_field: 'key',
+        source_label: 'Jira Key',
+        target_field: 'key',
+        target_label: 'Key',
+        direction: '>',
+        source_script: 'OUT = JIRA_ISSUE_KEY(); if (!OUT) { SKIP = true; }',
+      }),
+    );
+  }
+
+  /** Preset: parent Renwu Epic → Jira Epic Link (export only). */
+  addEpicLinkField(): void {
+    this.selectedTemplateFields()?.push(
+      this.createFieldGroup({
+        source_field: 'customfield_15500',
+        source_label: 'Epic Link',
+        target_field: 'id',
+        target_label: 'Parent Epic',
+        direction: '<',
+        target_script:
+          'var k = PARENT_EPIC_JIRA_KEY(); if (!k) { SKIP = true; } else { OUT = k; }',
+      }),
+    );
+  }
+
   removeField(index: number): void {
     this.selectedTemplateFields()?.removeAt(index);
+  }
+
+  private replaceEpicOurTypeIds(ids: string[] | undefined): void {
+    const arr = this.epicOurTypeIds;
+    while (arr.length) {
+      arr.removeAt(0);
+    }
+    for (const id of ids || []) {
+      if (id) {
+        arr.push(new FormControl(id, { nonNullable: true }));
+      }
+    }
+  }
+
+  epicTypeLabel(id: string): string {
+    const found = (this.ourOptionLists.type_mapping || []).find(
+      (o) => String(o.id) === String(id),
+    );
+    return found?.label || id;
+  }
+
+  private refreshEpicTypeAddModel(): void {
+    const used = new Set(this.epicOurTypeIds.controls.map((c) => c.value));
+    this.epicTypeAddModel.staticData = (
+      this.ourOptionLists.type_mapping || []
+    )
+      .filter((o) => !used.has(String(o.id)))
+      .map((o) => ({ id: String(o.id), label: o.label || String(o.id) }));
+  }
+
+  addEpicType(id: string): void {
+    const value = String(id || '').trim();
+    this.epicTypeAddId = '';
+    if (!value) {
+      return;
+    }
+    if (this.epicOurTypeIds.controls.some((c) => c.value === value)) {
+      return;
+    }
+    this.epicOurTypeIds.push(new FormControl(value, { nonNullable: true }));
+    this.refreshEpicTypeAddModel();
+    this.form.markAsDirty();
+    this.cd.markForCheck();
+  }
+
+  removeEpicType(index: number): void {
+    this.epicOurTypeIds.removeAt(index);
+    this.refreshEpicTypeAddModel();
+    this.form.markAsDirty();
   }
 
   async showDiff(): Promise<void> {

@@ -82,6 +82,33 @@
                 >
               </div>
             </label>
+            <div class="form-label col-span-full jira-import-auto">
+              <h3 class="text-base font-normal mb-1">
+                {{ 'settings.jira-import-auto' | transloco }}
+              </h3>
+              <p class="form-supporting-text mb-3">
+                {{ 'settings.jira-import-auto-hint' | transloco }}
+              </p>
+              <label class="jira-checkbox mb-3">
+                <rw-checkbox formControlName="import_auto_enabled" />
+                <span>{{ 'settings.jira-import-auto-enabled' | transloco }}</span>
+              </label>
+              <label class="form-label max-w-xs">
+                <span class="form-supporting-text mb-1 block">{{
+                  'settings.jira-import-auto-interval' | transloco
+                }}</span>
+                <select
+                  class="jira-native-select"
+                  formControlName="import_auto_interval_minutes"
+                >
+                  @for (opt of importAutoIntervals; track opt.value) {
+                    <option [ngValue]="opt.value">
+                      {{ opt.labelKey | transloco }}
+                    </option>
+                  }
+                </select>
+              </label>
+            </div>
             <label class="form-label">
               <rw-text-input
                 formControlName="oql"
@@ -136,15 +163,6 @@
               </label>
             }
           </div>
-          <label class="form-label mt-4 max-w-md">
-            <rw-text-input
-              formControlName="epic_link_field"
-              prompt="{{ 'settings.jira-epic-link-field' | transloco }}"
-            />
-            <div class="form-supporting-text">
-              {{ 'settings.jira-epic-link-field-hint' | transloco }}
-            </div>
-          </label>
         </section>
       }
 
@@ -165,6 +183,37 @@
           <p class="form-supporting-text mb-4">
             {{ 'settings.jira-mappings-hint' | transloco }}
           </p>
+
+          <div class="mb-6">
+            <h3 class="text-base font-normal mb-2">
+              {{ 'settings.jira-epic-types' | transloco }}
+            </h3>
+            <p class="form-supporting-text mb-2">
+              {{ 'settings.jira-epic-types-hint' | transloco }}
+            </p>
+            <div class="flex flex-row flex-wrap gap-2 items-center mb-2">
+              @for (id of epicOurTypeIds.controls; track id; let i = $index) {
+                <div class="jira-epic-type-chip">
+                  <span>{{ epicTypeLabel(id.value) }}</span>
+                  <rw-button
+                    iconClass="trash"
+                    typeButton="icon"
+                    (clicked)="removeEpicType(i)"
+                  />
+                </div>
+              }
+            </div>
+            <label class="form-label max-w-md">
+              <rw-select
+                class="w-full"
+                [model]="epicTypeAddModel"
+                [ngModel]="epicTypeAddId"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="addEpicType($event)"
+                prompt="{{ 'settings.jira-epic-types-add' | transloco }}"
+              />
+            </label>
+          </div>
 
           @for (map of dictMappings; track map.key) {
             <div class="mb-6">
@@ -431,15 +480,38 @@
               </div>
 
               <div>
-                <div class="flex flex-row items-center justify-between mb-2">
+                <div class="flex flex-row items-center justify-between mb-2 gap-2">
                   <h3 class="text-base font-normal">
                     {{ 'settings.jira-fields' | transloco }}
                   </h3>
-                  <rw-button
-                    iconClass="add-bold"
-                    typeButton="icon"
-                    (clicked)="addField()"
-                  />
+                  <div class="flex flex-row items-center gap-2">
+                    <rw-button
+                      typeButton="secondary"
+                      (clicked)="addIssueKeyField()"
+                      >{{
+                        'settings.jira-add-issue-key' | transloco
+                      }}</rw-button
+                    >
+                    <rw-button
+                      typeButton="secondary"
+                      (clicked)="addEpicLinkField()"
+                      >{{
+                        'settings.jira-add-epic-link' | transloco
+                      }}</rw-button
+                    >
+                    <rw-button
+                      typeButton="secondary"
+                      (clicked)="addStoryPointsField()"
+                      >{{
+                        'settings.jira-add-story-points' | transloco
+                      }}</rw-button
+                    >
+                    <rw-button
+                      iconClass="add-bold"
+                      typeButton="icon"
+                      (clicked)="addField()"
+                    />
+                  </div>
                 </div>
                 <div class="flex flex-col gap-3" formArrayName="fields">
                   @for (
