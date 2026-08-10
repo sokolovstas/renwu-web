@@ -66,7 +66,7 @@ export class AiSkillsComponent {
       const [skills, modelsResponse] = await Promise.all([
         firstValueFrom(this.data.aiListSkills().pipe(defaultIfEmpty([]))),
         firstValueFrom(
-          this.data.aiListOpenCodeModels().pipe(defaultIfEmpty({ models: [] })),
+          this.data.aiListAgentModels().pipe(defaultIfEmpty({ models: [] })),
         ),
       ]);
       this.items.set(skills || []);

@@ -76,7 +76,15 @@ export class AiSettingsComponent {
         label: this.transloco.translate('settings.ai-gates-mode-enforce'),
       },
     ];
+    this.form.controls.agent_provider.valueChanges.subscribe(() => {
+      void this.onProviderChanged();
+    });
     void this.load();
+  }
+
+  private async onProviderChanged(): Promise<void> {
+    await this.loadModels({ dropUnknown: true });
+    this.cd.markForCheck();
   }
 
   get selectedProvider(): AIProviderInfo | undefined {
@@ -105,14 +113,17 @@ export class AiSettingsComponent {
         this.option(u.id || '', u.full_name || u.username || u.id || ''),
       );
       this.patchSettings(settings || {});
-      await this.loadModels();
-      this.form.markAsPristine();
+      await this.loadModels({ dropUnknown: true });
+      // dropUnknown may dirty default_model when clearing a stale OpenCode id.
+      if (!this.form.dirty) {
+        this.form.markAsPristine();
+      }
     } finally {
       this.cd.markForCheck();
     }
   }
 
-  async loadModels(): Promise<void> {
+  async loadModels(opts?: { dropUnknown?: boolean }): Promise<void> {
     const baseUrl =
       this.form.controls.agent_base_url.value?.trim() || undefined;
     const provider =
@@ -126,12 +137,21 @@ export class AiSettingsComponent {
     this.modelModel.staticData = models.map((m) =>
       this.option(m.id, m.label || m.id),
     );
-    const current = this.form.controls.default_model.value;
-    if (current && !this.modelModel.staticData.some((x) => x.id === current)) {
-      this.modelModel.staticData = [
-        this.option(current, current),
-        ...this.modelModel.staticData,
-      ];
+    const current = this.form.controls.default_model.value?.trim() || '';
+    const known = this.modelModel.staticData.some((x) => x.id === current);
+    if (current && !known) {
+      if (opts?.dropUnknown || provider === 'claude_code') {
+        // OpenCode catalog ids (llm-proxy-…/…) must not stick after switching to Claude.
+        this.form.controls.default_model.setValue(
+          this.modelModel.staticData[0]?.id || '',
+        );
+        this.form.controls.default_model.markAsDirty();
+      } else {
+        this.modelModel.staticData = [
+          this.option(current, current),
+          ...this.modelModel.staticData,
+        ];
+      }
     }
     this.cd.markForCheck();
   }
