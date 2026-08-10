@@ -35,6 +35,9 @@ export class AiSettingsComponent {
   private readonly toast = inject(RwToastService);
   private readonly transloco = inject(TranslocoService);
   private readonly cd = inject(ChangeDetectorRef);
+  /** Suppress provider→models reload while patching form from API. */
+  private suppressProviderReload = false;
+
   readonly actorModel = new SelectModelBase<string>();
   readonly modelModel = new SelectModelBase<string>();
   readonly providerModel = new SelectModelBase<string>();
@@ -77,13 +80,19 @@ export class AiSettingsComponent {
       },
     ];
     this.form.controls.agent_provider.valueChanges.subscribe(() => {
+      if (this.suppressProviderReload) {
+        return;
+      }
       void this.onProviderChanged();
     });
     void this.load();
   }
 
   private async onProviderChanged(): Promise<void> {
-    await this.loadModels({ dropUnknown: true });
+    await this.loadModels({
+      dropUnknown: true,
+      preferredModel: this.form.controls.default_model.value,
+    });
     this.cd.markForCheck();
   }
 
@@ -112,9 +121,21 @@ export class AiSettingsComponent {
       this.actorModel.staticData = (users || []).map((u) =>
         this.option(u.id || '', u.full_name || u.username || u.id || ''),
       );
+
+      const provider = settings?.agent_provider || 'opencode';
+      const baseUrl =
+        settings?.agent_base_url || settings?.opencode_base_url || '';
+      const savedModel = settings?.default_model?.trim() || '';
+
+      // Catalog first, then form value — otherwise rw-select keeps an empty label.
+      await this.loadModels({
+        provider,
+        baseUrl,
+        preferredModel: savedModel,
+        dropUnknown: true,
+      });
       this.patchSettings(settings || {});
-      await this.loadModels({ dropUnknown: true });
-      // dropUnknown may dirty default_model when clearing a stale OpenCode id.
+      this.rebindSelects();
       if (!this.form.dirty) {
         this.form.markAsPristine();
       }
@@ -123,11 +144,20 @@ export class AiSettingsComponent {
     }
   }
 
-  async loadModels(opts?: { dropUnknown?: boolean }): Promise<void> {
+  async loadModels(opts?: {
+    dropUnknown?: boolean;
+    preferredModel?: string;
+    provider?: string;
+    baseUrl?: string;
+  }): Promise<void> {
     const baseUrl =
-      this.form.controls.agent_base_url.value?.trim() || undefined;
+      opts?.baseUrl?.trim() ||
+      this.form.controls.agent_base_url.value?.trim() ||
+      undefined;
     const provider =
-      this.form.controls.agent_provider.value?.trim() || undefined;
+      opts?.provider?.trim() ||
+      this.form.controls.agent_provider.value?.trim() ||
+      undefined;
     const response = await firstValueFrom(
       this.data
         .aiListAgentModels(baseUrl, provider)
@@ -137,22 +167,27 @@ export class AiSettingsComponent {
     this.modelModel.staticData = models.map((m) =>
       this.option(m.id, m.label || m.id),
     );
-    const current = this.form.controls.default_model.value?.trim() || '';
-    const known = this.modelModel.staticData.some((x) => x.id === current);
-    if (current && !known) {
+
+    let next =
+      opts?.preferredModel?.trim() ||
+      this.form.controls.default_model.value?.trim() ||
+      '';
+    const known = this.modelModel.staticData.some((x) => x.id === next);
+    if (next && !known) {
       if (opts?.dropUnknown || provider === 'claude_code') {
-        // OpenCode catalog ids (llm-proxy-…/…) must not stick after switching to Claude.
-        this.form.controls.default_model.setValue(
-          this.modelModel.staticData[0]?.id || '',
-        );
+        next = this.modelModel.staticData[0]?.id || '';
+        this.form.controls.default_model.setValue(next);
         this.form.controls.default_model.markAsDirty();
       } else {
         this.modelModel.staticData = [
-          this.option(current, current),
+          this.option(next, next),
           ...this.modelModel.staticData,
         ];
       }
     }
+
+    // Force rw-select to resolve label from the new staticData.
+    this.form.controls.default_model.setValue(next || '');
     this.cd.markForCheck();
   }
 
@@ -171,7 +206,14 @@ export class AiSettingsComponent {
       if (!settings) {
         return;
       }
+      await this.loadModels({
+        preferredModel: settings.default_model,
+        provider: settings.agent_provider,
+        baseUrl: settings.agent_base_url || settings.opencode_base_url,
+        dropUnknown: true,
+      });
       this.patchSettings(settings);
+      this.rebindSelects();
       this.form.markAsPristine();
       this.toast.success(this.transloco.translate('settings.ai-saved'));
     } finally {
@@ -184,18 +226,33 @@ export class AiSettingsComponent {
       settings.agent_base_url || settings.opencode_base_url || '';
     const webUrl =
       settings.agent_web_base_url || settings.opencode_web_base_url || '';
+    this.suppressProviderReload = true;
+    try {
+      this.form.patchValue({
+        enabled: !!settings.enabled,
+        agent_provider: settings.agent_provider || 'opencode',
+        agent_base_url: baseUrl,
+        agent_web_base_url: webUrl,
+        actor_user_id: settings.actor_user_id || '',
+        default_model: settings.default_model || '',
+        max_concurrent_jobs: settings.max_concurrent_jobs || 1,
+        gates_mode: settings.gates_mode === 'enforce' ? 'enforce' : 'shadow',
+        max_fix_iterations: settings.max_fix_iterations || 0,
+        lock_wait_timeout_sec: settings.lock_wait_timeout_sec || 0,
+        gate_timeout_sec: settings.gate_timeout_sec || 0,
+      });
+    } finally {
+      this.suppressProviderReload = false;
+    }
+  }
+
+  /** Re-apply select values so labels resolve after staticData updates. */
+  private rebindSelects(): void {
     this.form.patchValue({
-      enabled: !!settings.enabled,
-      agent_provider: settings.agent_provider || 'opencode',
-      agent_base_url: baseUrl,
-      agent_web_base_url: webUrl,
-      actor_user_id: settings.actor_user_id || '',
-      default_model: settings.default_model || '',
-      max_concurrent_jobs: settings.max_concurrent_jobs || 1,
-      gates_mode: settings.gates_mode === 'enforce' ? 'enforce' : 'shadow',
-      max_fix_iterations: settings.max_fix_iterations || 0,
-      lock_wait_timeout_sec: settings.lock_wait_timeout_sec || 0,
-      gate_timeout_sec: settings.gate_timeout_sec || 0,
+      agent_provider: this.form.controls.agent_provider.value,
+      actor_user_id: this.form.controls.actor_user_id.value,
+      default_model: this.form.controls.default_model.value,
+      gates_mode: this.form.controls.gates_mode.value,
     });
   }
 
