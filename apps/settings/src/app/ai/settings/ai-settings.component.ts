@@ -89,6 +89,7 @@ export class AiSettingsComponent {
     },
   ];
 
+  readonly gatesModeModel = new SelectModelBase<string>();
   readonly form = new FormGroup({
     enabled: new FormControl(false, { nonNullable: true }),
     agent_provider: new FormControl('opencode', { nonNullable: true }),
@@ -97,6 +98,12 @@ export class AiSettingsComponent {
     actor_user_id: new FormControl('', { nonNullable: true }),
     default_model: new FormControl('', { nonNullable: true }),
     max_concurrent_jobs: new FormControl(1, { nonNullable: true }),
+    gates_mode: new FormControl<'shadow' | 'enforce'>('shadow', {
+      nonNullable: true,
+    }),
+    max_fix_iterations: new FormControl(0, { nonNullable: true }),
+    lock_wait_timeout_sec: new FormControl(0, { nonNullable: true }),
+    gate_timeout_sec: new FormControl(0, { nonNullable: true }),
     prompt_template: new FormControl('', { nonNullable: true }),
     grooming_followup_template: new FormControl('', { nonNullable: true }),
     delivery_template: new FormControl('', { nonNullable: true }),
@@ -111,6 +118,18 @@ export class AiSettingsComponent {
     this.modelModel.loadSelected = true;
     this.providerModel.allowNull = false;
     this.providerModel.loadSelected = true;
+    this.gatesModeModel.allowNull = false;
+    this.gatesModeModel.loadSelected = true;
+    this.gatesModeModel.staticData = [
+      {
+        id: 'shadow',
+        label: this.transloco.translate('settings.ai-gates-mode-shadow'),
+      },
+      {
+        id: 'enforce',
+        label: this.transloco.translate('settings.ai-gates-mode-enforce'),
+      },
+    ];
     void this.load();
   }
 
@@ -238,6 +257,10 @@ export class AiSettingsComponent {
       agent_provider: settings.agent_provider || 'opencode',
       agent_base_url: baseUrl,
       agent_web_base_url: webUrl,
+      gates_mode: settings.gates_mode === 'enforce' ? 'enforce' : 'shadow',
+      max_fix_iterations: settings.max_fix_iterations || 0,
+      lock_wait_timeout_sec: settings.lock_wait_timeout_sec || 0,
+      gate_timeout_sec: settings.gate_timeout_sec || 0,
     });
   }
 

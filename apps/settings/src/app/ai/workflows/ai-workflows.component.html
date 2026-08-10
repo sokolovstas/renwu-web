@@ -114,11 +114,38 @@
               ><input type="checkbox" formControlName="delivery" />{{
                 'settings.ai-step-delivery' | transloco
               }}</label
+            ><label class="flex items-center gap-2"
+              ><input type="checkbox" formControlName="run_gates_after" />{{
+                'settings.ai-run-gates-after' | transloco
+              }}</label
             >
           </div>
           <p class="form-supporting-text">
             {{ 'settings.ai-step-delivery-hint' | transloco }}
           </p>
+          <div class="grid gap-4 md:grid-cols-2">
+            <rw-select
+              formControlName="require_gates_pass"
+              [model]="requireGatesPassModelFor(i)"
+              prompt="{{ 'settings.ai-require-gates-pass' | transloco }}"
+            />
+            <rw-text-input
+              [live]="true"
+              formControlName="max_retrigger"
+              type="number"
+              prompt="{{ 'settings.ai-max-retrigger' | transloco }}"
+            />
+            <rw-select
+              formControlName="on_retrigger_exhausted_status_id"
+              [model]="stepStatusModel(i, 'retrigger_exhausted')"
+              prompt="{{ 'settings.ai-on-retrigger-exhausted' | transloco }}"
+            />
+            <rw-select
+              formControlName="on_blocking_status_id"
+              [model]="stepStatusModel(i, 'blocking')"
+              prompt="{{ 'settings.ai-on-blocking-status' | transloco }}"
+            />
+          </div>
           <div class="flex flex-col gap-2">
             <rw-text-input
               [live]="true"

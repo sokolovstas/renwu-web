@@ -142,12 +142,43 @@ export class AiWorkflowsComponent {
     return this.stepModel(`${field}:${index}`, this.statusOptions);
   }
 
+  readonly requireGatesPassModel = (() => {
+    const m = new SelectModelBase<string>();
+    m.allowNull = true;
+    m.loadSelected = true;
+    return m;
+  })();
+
+  requireGatesPassModelFor(_index: number): SelectModelBase<string> {
+    this.requireGatesPassModel.staticData = [
+      {
+        id: '',
+        label: this.transloco.translate('settings.ai-require-gates-default'),
+      },
+      {
+        id: 'true',
+        label: this.transloco.translate('settings.ai-require-gates-true'),
+      },
+      {
+        id: 'false',
+        label: this.transloco.translate('settings.ai-require-gates-false'),
+      },
+    ];
+    return this.requireGatesPassModel;
+  }
+
   async save(): Promise<void> {
     (document.activeElement as HTMLElement | null)?.blur?.();
     const raw = this.form.getRawValue();
+    const steps = (raw.steps as Array<Record<string, unknown>>).map((s) => {
+      const flag = s['require_gates_pass'];
+      const require_gates_pass =
+        flag === 'true' ? true : flag === 'false' ? false : undefined;
+      return { ...s, require_gates_pass } as AIWorkflowStep;
+    });
     const saved = await firstValueFrom(
       this.data
-        .aiSaveWorkflow({ ...raw, steps: raw.steps as AIWorkflowStep[] })
+        .aiSaveWorkflow({ ...raw, steps })
         .pipe(defaultIfEmpty(null)),
     );
     if (!saved) {
@@ -194,6 +225,29 @@ export class AiWorkflowsComponent {
       delivery: new FormControl(value?.delivery || false, {
         nonNullable: true,
       }),
+      run_gates_after: new FormControl(value?.run_gates_after || false, {
+        nonNullable: true,
+      }),
+      // '' = default (block under enforce), 'true', 'false' = opt-out
+      require_gates_pass: new FormControl(
+        value?.require_gates_pass === true
+          ? 'true'
+          : value?.require_gates_pass === false
+            ? 'false'
+            : '',
+        { nonNullable: true },
+      ),
+      max_retrigger: new FormControl(value?.max_retrigger || 0, {
+        nonNullable: true,
+      }),
+      on_retrigger_exhausted_status_id: new FormControl(
+        value?.on_retrigger_exhausted_status_id || '',
+        { nonNullable: true },
+      ),
+      on_blocking_status_id: new FormControl(
+        value?.on_blocking_status_id || '',
+        { nonNullable: true },
+      ),
       prompt_template: new FormControl(value?.prompt_template || '', {
         nonNullable: true,
       }),
@@ -230,6 +284,8 @@ export class AiWorkflowsComponent {
       this.stepStatusModel(i, 'success');
       this.stepStatusModel(i, 'need_info');
       this.stepStatusModel(i, 'failure');
+      this.stepStatusModel(i, 'blocking');
+      this.stepStatusModel(i, 'retrigger_exhausted');
     }
   }
 

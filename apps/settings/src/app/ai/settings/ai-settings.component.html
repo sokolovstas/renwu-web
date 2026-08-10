@@ -45,7 +45,33 @@
       type="number"
       prompt="{{ 'settings.ai-concurrency' | transloco }}"
     />
+    <rw-select
+      formControlName="gates_mode"
+      [model]="gatesModeModel"
+      prompt="{{ 'settings.ai-gates-mode' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="max_fix_iterations"
+      type="number"
+      prompt="{{ 'settings.ai-max-fix-iterations' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="lock_wait_timeout_sec"
+      type="number"
+      prompt="{{ 'settings.ai-lock-wait-timeout' | transloco }}"
+    />
+    <rw-text-input
+      [live]="true"
+      formControlName="gate_timeout_sec"
+      type="number"
+      prompt="{{ 'settings.ai-gate-timeout' | transloco }}"
+    />
   </div>
+  <p class="form-supporting-text">
+    {{ 'settings.ai-gates-mode-hint' | transloco }}
+  </p>
   @if (selectedProvider?.description) {
     <p class="form-supporting-text">{{ selectedProvider?.description }}</p>
   }

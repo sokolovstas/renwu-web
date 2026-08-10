@@ -59,7 +59,41 @@
         type="number"
         prompt="{{ 'settings.ai-timeout' | transloco }}"
       />
+      <rw-text-input
+        [live]="true"
+        formControlName="permission_mode"
+        prompt="{{ 'settings.ai-permission-mode' | transloco }}"
+      />
+      <rw-text-input
+        [live]="true"
+        formControlName="allowed_tools"
+        prompt="{{ 'settings.ai-allowed-tools' | transloco }}"
+      />
+      <rw-text-input
+        [live]="true"
+        formControlName="max_turns"
+        type="number"
+        prompt="{{ 'settings.ai-max-turns' | transloco }}"
+      />
+      <rw-text-input
+        [live]="true"
+        formControlName="max_budget_usd"
+        type="number"
+        prompt="{{ 'settings.ai-max-budget-usd' | transloco }}"
+      />
     </div>
+    <p class="form-supporting-text">
+      {{ 'settings.ai-allowed-tools-hint' | transloco }}
+    </p>
+    <rw-text-input
+      [live]="true"
+      [multiline]="true"
+      formControlName="result_schema_json"
+      prompt="{{ 'settings.ai-result-schema' | transloco }}"
+    />
+    <p class="form-supporting-text">
+      {{ 'settings.ai-result-schema-hint' | transloco }}
+    </p>
     <label class="flex items-center gap-2"
       ><input type="checkbox" formControlName="enabled" />{{
         'settings.ai-enabled' | transloco

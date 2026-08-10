@@ -48,6 +48,11 @@ export class AiSkillsComponent {
     model: new FormControl('', { nonNullable: true }),
     timeout_sec: new FormControl(300, { nonNullable: true }),
     enabled: new FormControl(true, { nonNullable: true }),
+    permission_mode: new FormControl('', { nonNullable: true }),
+    allowed_tools: new FormControl('', { nonNullable: true }),
+    max_turns: new FormControl(0, { nonNullable: true }),
+    max_budget_usd: new FormControl(0, { nonNullable: true }),
+    result_schema_json: new FormControl('', { nonNullable: true }),
   });
 
   constructor() {
@@ -77,7 +82,20 @@ export class AiSkillsComponent {
     this.form.reset({
       timeout_sec: 300,
       enabled: true,
-      ...(item || {}),
+      permission_mode: '',
+      allowed_tools: '',
+      max_turns: 0,
+      max_budget_usd: 0,
+      result_schema_json: '',
+      ...(item
+        ? {
+            ...item,
+            allowed_tools: (item.allowed_tools || []).join(', '),
+            result_schema_json: item.result_schema
+              ? JSON.stringify(item.result_schema, null, 2)
+              : '',
+          }
+        : {}),
     });
     const current = this.form.controls.model.value;
     if (current && !this.modelModel.staticData?.some((x) => x.id === current)) {
@@ -91,8 +109,40 @@ export class AiSkillsComponent {
 
   async save(): Promise<void> {
     (document.activeElement as HTMLElement | null)?.blur?.();
+    const raw = this.form.getRawValue();
+    let result_schema: Record<string, unknown> | undefined;
+    const schemaText = (raw.result_schema_json || '').trim();
+    if (schemaText) {
+      try {
+        result_schema = JSON.parse(schemaText) as Record<string, unknown>;
+      } catch {
+        this.toast.error(
+          this.transloco.translate('settings.ai-result-schema-invalid'),
+        );
+        return;
+      }
+    }
+    const allowed_tools = (raw.allowed_tools || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     const saved = await firstValueFrom(
-      this.data.aiSaveSkill(this.form.getRawValue()).pipe(defaultIfEmpty(null)),
+      this.data
+        .aiSaveSkill({
+          id: raw.id,
+          name: raw.name,
+          slug: raw.slug,
+          body: raw.body,
+          model: raw.model,
+          timeout_sec: raw.timeout_sec,
+          enabled: raw.enabled,
+          allowed_tools,
+          result_schema,
+          max_turns: raw.max_turns || undefined,
+          max_budget_usd: raw.max_budget_usd || undefined,
+          permission_mode: raw.permission_mode || undefined,
+        })
+        .pipe(defaultIfEmpty(null)),
     );
     if (!saved) {
       return;
