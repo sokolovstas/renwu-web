@@ -1,0 +1,115 @@
+{
+  "name": "search",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/search/src",
+  "prefix": "renwu-search",
+  "tags": [],
+  "targets": {
+    "esbuild": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/search",
+        "index": "apps/search/src/index.html",
+        "browser": "apps/search/src/main.ts",
+        "polyfills": ["zone.js", "es-module-shims", "@angular/localize/init"],
+        "tsConfig": "apps/search/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/search/src/assets"],
+        "styles": ["apps/search/src/styles.scss"],
+        "scripts": [],
+        "allowedCommonJsDependencies": ["duration-fns"]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "10kb",
+              "maximumError": "500kb"
+            }
+          ],
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "environments/environment.ts",
+              "with": "environments/environment.prod.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "build": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {},
+      "configurations": {
+        "production": {
+          "target": "search:esbuild:production"
+        },
+        "development": {
+          "target": "search:esbuild:development",
+          "dev": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "target": "search:serve-original:development",
+        "rebuildDelay": 0,
+        "dev": true,
+        "port": 4212
+      }
+    },
+    "serve-original": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "search:esbuild:production"
+        },
+        "development": {
+          "buildTarget": "search:esbuild:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "command": "npm run i18n:extract -- --project apps/search"
+    },
+    "extract-scoped-i18n": {
+      "command": "npm run i18n:extract-scoped-libs -- --skip-gitignore --dist apps/search/src/i18n"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "apps/search/**/*.ts",
+          "apps/search/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/search/jest.config.ts",
+        "tsConfig": "apps/search/tsconfig.spec.json"
+      }
+    }
+  }
+}

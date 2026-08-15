@@ -155,6 +155,7 @@
     "timeline": "renwu.timeline",
     "add-task": "renwu.add-task",
     "settings": "renwu.settings",
-    "profile": "renwu.profile"
+    "profile": "renwu.profile",
+    "search": "renwu.search"
   }
 }

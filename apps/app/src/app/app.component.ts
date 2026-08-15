@@ -17,6 +17,7 @@ import {
 import { RwLoaderService, RwTitleService, StateService } from '@renwu/core';
 import { filter, map } from 'rxjs';
 import { CheckForUpdateService } from './sw-check.service';
+import { SearchSpotlightHostComponent } from './search-spotlight-host/search-spotlight-host.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import {
   RouterOutlet,
@@ -35,6 +36,7 @@ import {
     AsyncPipe,
     RouterOutlet,
     SidebarComponent,
+    SearchSpotlightHostComponent,
     RwAlertComponent,
     RwModalContainerDirective,
     RwToastContainerComponent,

@@ -1,0 +1,13 @@
+{
+  "title": "search.title",
+  "placeholder": "search.placeholder",
+  "empty": "search.empty",
+  "no-results": "search.no-results",
+  "people": "search.people",
+  "projects": "search.projects",
+  "recent": "search.recent",
+  "close": "search.close",
+  "hint-nav": "search.hint-nav",
+  "hint-open": "search.hint-open",
+  "unavailable": "search.unavailable"
+}

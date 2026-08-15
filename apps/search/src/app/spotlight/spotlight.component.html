@@ -1,0 +1,120 @@
+@if (variant === 'page' || (overlay.open$ | async)) {
+  <div
+    class="search-spotlight"
+    [class.search-spotlight--page]="variant === 'page'"
+    [class.search-spotlight--overlay]="variant === 'overlay'"
+    (keydown)="onPanelKeydown($event)"
+  >
+    @if (variant === 'overlay') {
+      <button
+        type="button"
+        class="search-spotlight__backdrop"
+        (click)="closeOverlay()"
+        [attr.aria-label]="'search.close' | transloco"
+      ></button>
+    }
+    <div
+      class="search-spotlight__panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'search.title' | transloco"
+    >
+      <div class="search-spotlight__input-row">
+        <rw-icon icon="search" size="1.25em" />
+        <input
+          #queryInput
+          class="search-spotlight__input"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+          [value]="query | async"
+          [placeholder]="'search.placeholder' | transloco"
+          (input)="onQueryInput($event)"
+        />
+        @if (variant === 'overlay') {
+          <kbd class="search-spotlight__kbd">esc</kbd>
+        }
+      </div>
+      @if (view$ | async; as view) {
+        <div class="search-spotlight__results" role="listbox">
+          @if (view.items.length === 0) {
+            <div class="search-spotlight__empty">
+              {{
+                ((query | async) || '').trim()
+                  ? ('search.no-results' | transloco)
+                  : ('search.empty' | transloco)
+              }}
+            </div>
+          }
+          @for (group of view.groups; track group.id) {
+            <section class="search-spotlight__group">
+              <h3 class="search-spotlight__group-title">
+                {{
+                  groupTranslateKey(group)
+                    ? (groupTranslateKey(group) | transloco)
+                    : group.label
+                }}
+              </h3>
+              @for (item of group.items; track item.id) {
+                <button
+                  type="button"
+                  class="search-spotlight__item"
+                  role="option"
+                  [class.search-spotlight__item--active]="
+                    view.items.indexOf(item) === (activeIndex | async)
+                  "
+                  (mouseenter)="activeIndex.next(view.items.indexOf(item))"
+                  (click)="openItem(item)"
+                >
+                  <div class="search-spotlight__item-icon">
+                    @if (item.kind === 'user') {
+                      <renwu-avatar
+                        [user]="item.user"
+                        [showOnline]="false"
+                        [showTooltip]="false"
+                        size="1.75em"
+                      />
+                    } @else if (item.kind === 'issue' && item.issue?.type) {
+                      <renwu-issue-type [value]="item.issue.type" />
+                    } @else if (item.kind === 'project') {
+                      <rw-icon icon="s-project" size="1.1em" />
+                    } @else {
+                      <rw-icon icon="history" size="1.1em" />
+                    }
+                  </div>
+                  <div class="search-spotlight__item-body">
+                    <div class="search-spotlight__item-title">
+                      {{ item.title }}
+                      @if (item.subtitle) {
+                        <span class="search-spotlight__item-key">{{
+                          item.subtitle
+                        }}</span>
+                      }
+                    </div>
+                    @if (item.snippet) {
+                      <div class="search-spotlight__item-snippet">
+                        {{ item.snippet }}
+                      </div>
+                    }
+                  </div>
+                  @if (item.badge) {
+                    <span
+                      class="search-spotlight__badge"
+                      [style.background]="item.badgeColor || '#e5e7eb'"
+                      >{{ item.badge }}</span
+                    >
+                  }
+                </button>
+              }
+            </section>
+          }
+        </div>
+      }
+      <div class="search-spotlight__hint">
+        <span><kbd class="search-spotlight__kbd">↑</kbd><kbd class="search-spotlight__kbd">↓</kbd> {{ 'search.hint-nav' | transloco }}</span>
+        <span><kbd class="search-spotlight__kbd">↵</kbd> {{ 'search.hint-open' | transloco }}</span>
+        <span><kbd class="search-spotlight__kbd">⌘K</kbd></span>
+      </div>
+    </div>
+  </div>
+}

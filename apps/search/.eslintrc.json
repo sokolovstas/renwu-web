@@ -1,0 +1,46 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "renwu-search",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "renwu-search",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/prefer-standalone": "error",
+        "@angular-eslint/prefer-inject": "warn"
+      },
+      "extends": [
+        "plugin:@nx/angular",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ]
+    },
+    {
+      "files": ["**/bootstrap.ts"],
+      "rules": {
+        "@nx/enforce-module-boundaries": "off"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["plugin:@nx/angular-template"],
+      "rules": {
+        "@angular-eslint/template/prefer-self-closing-tags": "error"
+      }
+    }
+  ]
+}

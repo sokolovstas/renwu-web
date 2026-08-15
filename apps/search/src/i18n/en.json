@@ -1,0 +1,13 @@
+{
+  "title": "Search",
+  "placeholder": "Search tasks, people and projects",
+  "empty": "Type to search. Recent queries appear here.",
+  "no-results": "Nothing found",
+  "people": "People",
+  "projects": "Projects",
+  "recent": "Recent",
+  "close": "Close search",
+  "hint-nav": "to navigate",
+  "hint-open": "to open",
+  "unavailable": "Search is unavailable"
+}

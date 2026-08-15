@@ -155,7 +155,8 @@
     "timeline": "renwu.timeline",
     "add-task": "renwu.add-task",
     "settings": "renwu.settings",
-    "profile": "renwu.profile"
+    "profile": "renwu.profile",
+    "search": "搜索"
   },
   "task": {
     "related": "关联任务",

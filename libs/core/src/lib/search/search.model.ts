@@ -55,6 +55,7 @@ export interface SearchHit {
   sort: string;
   fields: { [key: string]: string };
   locations: { [key: string]: { [key: string]: Location } };
+  fragments?: { [key: string]: string[] };
 }
 
 export interface SearchStatus {

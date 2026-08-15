@@ -4,6 +4,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { IconName } from '@renwu/components';
 import { Issue, RwPolicyService } from '@renwu/core';
 import { JSONUtils } from '@renwu/utils';
+import { RenwuSearchOverlayService } from './search-overlay.service';
 import {
   BehaviorSubject,
   Observable,
@@ -24,6 +25,7 @@ export interface SidebarSection {
   scrollTo?: 'sidebar' | 'main' | 'section';
   outlet?: string;
   place: 'sidebar' | 'profile';
+  action?: 'spotlight';
 }
 
 @Injectable({
@@ -34,6 +36,7 @@ export class RenwuSidebarService {
   transloco = inject(TranslocoService);
   policyService = inject(RwPolicyService);
   router = inject(Router);
+  private searchOverlay = inject(RenwuSearchOverlayService);
   currentTask = new BehaviorSubject<Issue>(null);
   currentSection = new BehaviorSubject<SidebarSection>(null);
   lastRoutes: Record<string, string> = JSONUtils.parseLocalStorage(
@@ -68,6 +71,13 @@ export class RenwuSidebarService {
       icon: 's-task',
       hint: this.transloco.selectTranslate('renwu.tasks'),
       path: 'task',
+      place: 'sidebar',
+    },
+    {
+      icon: 'search',
+      hint: this.transloco.selectTranslate('renwu.search'),
+      path: 'search',
+      action: 'spotlight',
       place: 'sidebar',
     },
     // {
@@ -176,6 +186,10 @@ export class RenwuSidebarService {
     this.scrollContainer = scrollContainer;
   }
   setSection(section: SidebarSection) {
+    if (section?.action === 'spotlight') {
+      this.searchOverlay.show();
+      return Promise.resolve(true);
+    }
     // Find and change current section lastURL
     const currentSection = this.sections
       .getValue()

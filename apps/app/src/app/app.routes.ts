@@ -107,6 +107,11 @@ export const appRoutes: Route[] = [
         loadChildren: () =>
           loadRemoteModule('timeline', './routes').then((m) => m.ROUTES),
       },
+      {
+        path: 'search',
+        loadChildren: () =>
+          loadRemoteModule('search', './routes').then((m) => m.ROUTES),
+      },
     ],
   },
 ];

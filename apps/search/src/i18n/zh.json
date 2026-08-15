@@ -1,0 +1,13 @@
+{
+  "title": "搜索",
+  "placeholder": "搜索任务、人员和项目",
+  "empty": "输入以搜索。最近的查询会显示在这里。",
+  "no-results": "未找到结果",
+  "people": "人员",
+  "projects": "项目",
+  "recent": "最近",
+  "close": "关闭搜索",
+  "hint-nav": "导航",
+  "hint-open": "打开",
+  "unavailable": "搜索不可用"
+}

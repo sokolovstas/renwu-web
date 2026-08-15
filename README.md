@@ -70,6 +70,7 @@ npm run locales
 - /apps/messenger - мессенджер
 - /apps/profile - настройки профиля
 - /apps/projects - список и настройки проектов
+- /apps/search - полнотекстовый поиск (Spotlight)
 - /apps/settings - настройки инстанца
 - /apps/task - карточка задачи
 - /apps/tasks - список задач с поискои и фильтрацией

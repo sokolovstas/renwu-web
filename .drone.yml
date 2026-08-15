@@ -63,6 +63,7 @@ steps:
       - npx nx build settings --bundle=true --baseHref /app/modules/settings/
       - npx nx build messenger --bundle=true --baseHref /app/modules/messenger/
       - npx nx build timeline --bundle=true --baseHref /app/modules/timeline/
+      - npx nx build search --bundle=true --baseHref /app/modules/search/
       - npx nx build todos --baseHref /app/modules/todos/
       - npx nx build boards --baseHref /app/modules/boards/
       - npx nx build documents --baseHref /app/modules/documents/
@@ -93,6 +94,7 @@ steps:
       - npx nx build settings --bundle=true --baseHref /app/modules/settings/
       - npx nx build messenger --bundle=true --baseHref /app/modules/messenger/
       - npx nx build timeline --bundle=true --baseHref /app/modules/timeline/
+      - npx nx build search --bundle=true --baseHref /app/modules/search/
       - npx nx build todos --baseHref /app/modules/todos/
       - npx nx build boards --baseHref /app/modules/boards/
       - npx nx build documents --baseHref /app/modules/documents/

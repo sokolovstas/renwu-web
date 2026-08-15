@@ -1,0 +1,13 @@
+<ng-container #anchor />
+@if (failed && (overlay.open$ | async)) {
+  <div class="search-spotlight-fallback">
+    <button
+      type="button"
+      class="search-spotlight-fallback__backdrop"
+      (click)="overlay.hide()"
+    ></button>
+    <div class="search-spotlight-fallback__panel" role="dialog">
+      Search is unavailable
+    </div>
+  </div>
+}

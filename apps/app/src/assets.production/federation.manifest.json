@@ -9,5 +9,6 @@
   "messenger": "/app/modules/messenger/browser/remoteEntry.json",
   "todos": "/app/modules/todos/browser/remoteEntry.json",
   "dashboard": "/app/modules/dashboard/browser/remoteEntry.json",
-  "timeline": "/app/modules/timeline/browser/remoteEntry.json"
+  "timeline": "/app/modules/timeline/browser/remoteEntry.json",
+  "search": "/app/modules/search/browser/remoteEntry.json"
 }

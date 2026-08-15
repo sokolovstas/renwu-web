@@ -17,6 +17,10 @@ module.exports = {
     ),
     '^mermaid$': join(workspaceRoot, 'jest.stubs/mermaid.ts'),
     '^oz$': join(workspaceRoot, 'jest.stubs/oz.ts'),
+    '^@angular-architects/native-federation$': join(
+      workspaceRoot,
+      'jest.stubs/native-federation.ts',
+    ),
     '^projects/components/src/public-api$': join(
       workspaceRoot,
       'libs/components/src/index.ts',
