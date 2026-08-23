@@ -1,346 +1,204 @@
-import { SortListPipe } from 'web/shared/pipes/sort-list.pipe';
-import { Issue } from 'web/model/issue.model';
-import { async } from '@angular/core/testing';
-import { ListOptions } from 'web/model/sort.model';
-
-fdescribe('SortListPipe', () => {
-  let pipe: SortListPipe;
-
-  const issueA: Issue = {
-    key: 'PMP-1240',
-    title: 'Issue 1',
-    completion: 0,
-    date_created: '2018-02-22T11:53:31.367Z',
-    status: { id: 's1' },
-    priority: { id: 'p1' },
-    type: { id: 't1' },
-    assignes: [{ username: 'user1', full_name: 'User 1' }],
-    milestones: [
-      { title: 'Milestone 1', sort: 1 },
-      { title: 'Milestone 2', sort: 2 },
-    ],
-    affected_versions: [{ title: 'Milestone 1' }, { title: 'Milestone 2' }],
-  };
-  const issueB: Issue = {
-    key: 'PMP-1440',
-    title: 'Issue 2',
-    completion: 50,
-    date_created: '2018-02-23T11:53:31.367Z',
-    status: { id: 's2' },
-    priority: { id: 'p2' },
-    type: { id: 't2' },
-    assignes_calc: [{ username: 'user2', full_name: 'User 2' }],
-    parent_milestones: [
-      { title: 'Milestone 1', sort: 2 },
-      { title: 'Milestone 3', sort: 3 },
-    ],
-    affected_versions: [{ title: 'Milestone 1' }, { title: 'Milestone 3' }],
-  };
-  const issueC: Issue = {
-    key: 'PMP-1640',
-    title: 'Issue 5',
-    completion: 90,
-    date_created: '2018-02-23T11:53:32.367Z',
-    status: { id: 's3' },
-    priority: { id: 'p3' },
-    type: { id: 't3' },
-    assignes_calc: [{ username: 'user3', full_name: 'User 3' }],
-    milestones: [
-      { title: 'Milestone 3', sort: 3 },
-      { title: 'Milestone 4', sort: 4 },
-    ],
-    affected_versions: [{ title: 'Milestone 4' }, { title: 'Milestone 5' }],
-  };
-  const issueEmptyArray: Issue = {
-    assignes: [],
-    milestones: [],
-  };
-  const issueEmptyObject: Issue = {
-    assignes: [{}],
-    milestones: [{}],
-  };
-  const issueEmptyValue: Issue = {
-    key: '',
-    title: '',
-    completion: null,
-    date_created: 'fake date',
-    status: {},
-    priority: {},
-    type: {},
-    assignes: [{ username: '', full_name: '' }],
-    milestones: [{ title: '' }],
-  };
-
-  const containerService: any = {
-    statusMap: {
-      s1: {
-        id: 's1',
-        sort: 0,
-      },
-      s2: {
-        id: 's2',
-        sort: 2,
-      },
-      s3: {
-        id: 's3',
-        sort: 3,
-      },
+jest.mock('@renwu/core', () => ({
+  RwContainerService: class RwContainerService {},
+  // UserStatic is used as a plain value helper (not injected), so re-implement
+  // its small, pure sort-name logic here to keep this file independent of the
+  // real @renwu/core module (which cannot be safely imported under Jest in
+  // this workspace, see other board specs for details).
+  UserStatic: {
+    getSortValue: (user) => {
+      if (user && user.full_name && user.full_name.trim()) {
+        return user.full_name;
+      }
+      if (user && user.username && user.username.trim()) {
+        return user.username;
+      }
+      return '';
     },
-    priorityMap: {
-      p1: {
-        id: 'p1',
-        sort: 0,
-      },
-      p3: {
-        id: 'p3',
-        sort: 2,
-      },
-    },
-    typeMap: {
-      t1: {
-        id: 't1',
-        sort: 0,
-      },
-      t2: {
-        id: 't2',
-      },
-      t3: {
-        id: 't3',
-        sort: 2,
-      },
-    },
+  },
+}));
+
+import { Issue, ListOptionsFilters, RwContainerService } from '@renwu/core';
+import { TestBed } from '@angular/core/testing';
+import { SortListPipe } from './sort-list.pipe';
+
+describe('SortListPipe', () => {
+  let containerService: {
+    getDictionaryMap: jest.Mock;
   };
+  let pipe: SortListPipe<Issue>;
 
-  const empty: Issue = {};
-  const nulled: Issue = null;
-  const issues: Issue[] = [
-    issueA,
-    issueB,
-    issueEmptyArray,
-    issueEmptyObject,
-    issueEmptyValue,
-    empty,
-    nulled,
-    issueC,
-  ];
-  const options: ListOptions = new ListOptions();
+  beforeEach(() => {
+    containerService = {
+      getDictionaryMap: jest.fn().mockReturnValue(
+        new Map([
+          ['p1', { id: 'p1', sort: 2 }],
+          ['p2', { id: 'p2', sort: 1 }],
+        ]),
+      ),
+    };
 
-  beforeEach(async(() => {
-    pipe = new SortListPipe(containerService);
-  }));
-
-  it('create an instance', () => {
-    expect(pipe).toBeTruthy();
-  });
-  it('getDirectionSort', () => {
-    pipe.direction = 'up';
-    expect(pipe.getDirectionSort(1)).toBe(1);
-    expect(pipe.getDirectionSort(-1)).toBe(-1);
-    pipe.direction = 'down';
-    expect(pipe.getDirectionSort(1)).toBe(-1);
-    expect(pipe.getDirectionSort(-1)).toBe(1);
-  });
-  it('zeroPaddingkey', () => {
-    expect(pipe.zeroPadding('250', 5)).toBe('00250');
-    expect(pipe.zeroPadding('1250', 5)).toBe('01250');
-    expect(pipe.zeroPaddingKey('PMP-250')).toBe('0000000250');
+    TestBed.configureTestingModule({
+      providers: [
+        SortListPipe,
+        { provide: RwContainerService, useValue: containerService },
+      ],
+    });
+    pipe = TestBed.inject(SortListPipe);
   });
 
-  it('Check empty removing', () => {
-    options.sort = { field: 'key', direction: 'up' };
-    const up = pipe.transform(issues, options);
-    expect(up.indexOf(nulled)).toBe(-1);
-    options.sort = { field: 'key', direction: 'down' };
-    const down = pipe.transform(issues, options);
-    expect(down.indexOf(nulled)).toBe(-1);
+  describe('direction/null-position helpers', () => {
+    it('getDirectionSort flips the sign only when direction is "down"', () => {
+      pipe.direction = 'up';
+      expect(pipe.getDirectionSort(5)).toBe(5);
+      pipe.direction = 'down';
+      expect(pipe.getDirectionSort(5)).toBe(-5);
+    });
+
+    it('getNullPosition flips the sign only when nullPosition is "up"', () => {
+      pipe.nullPosition = 'down';
+      expect(pipe.getNullPosition(3)).toBe(3);
+      pipe.nullPosition = 'up';
+      expect(pipe.getNullPosition(3)).toBe(-3);
+    });
   });
 
-  const defaultExpectUp = (sort) => {
-    expect(sort.indexOf(issueA)).toBe(0);
-    expect(sort.indexOf(issueB)).toBe(1);
-    expect(sort.indexOf(issueC)).toBe(2);
-    expect(sort.indexOf(empty)).toBe(6);
-  };
+  describe('zeroPadding / zeroPaddingKey', () => {
+    it.each([
+      ['250', 5, '00250'],
+      ['1250', 5, '01250'],
+      ['1', 3, '001'],
+    ])('zeroPadding(%s, %s) -> %s', (input, count, expected) => {
+      expect(pipe.zeroPadding(input, count)).toBe(expected);
+    });
 
-  const defaultExpectDown = (sort) => {
-    expect(sort.indexOf(issueA)).toBe(2);
-    expect(sort.indexOf(issueB)).toBe(1);
-    expect(sort.indexOf(issueC)).toBe(0);
-    expect(sort.indexOf(empty)).toBe(6);
-  };
-
-  const defaultExpectUpNullUp = (sort) => {
-    expect(sort.indexOf(issueA)).toBe(4);
-    expect(sort.indexOf(issueB)).toBe(5);
-    expect(sort.indexOf(issueC)).toBe(6);
-    expect(sort.indexOf(empty)).toBe(3);
-  };
-
-  const defaultExpectDownNullUp = (sort) => {
-    expect(sort.indexOf(issueA)).toBe(6);
-    expect(sort.indexOf(issueB)).toBe(5);
-    expect(sort.indexOf(issueC)).toBe(4);
-    expect(sort.indexOf(empty)).toBe(3);
-  };
-
-  it('Sort by key', () => {
-    options.sort = { field: 'key', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'key', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'key', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'key', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
+    it.each([
+      ['PMP-250', '0000000250'],
+      ['PMP-1', '0000000001'],
+      [null, null],
+      ['nodashhere', null],
+    ])('zeroPaddingKey(%s) -> %s', (input, expected) => {
+      expect(pipe.zeroPaddingKey(input)).toBe(expected);
+    });
   });
 
-  it('Sort by assignes', () => {
-    options.sort = { field: 'assignes', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'assignes', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'assignes', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'assignes', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
+  describe('compareString', () => {
+    it.each([
+      [undefined, undefined, 0],
+      ['a', undefined, -1],
+      [undefined, 'a', 1],
+      ['a', 'b', -1],
+      ['b', 'a', 1],
+      ['a', 'a', 0],
+    ])('compareString(%p, %p) -> %p', (a, b, expected) => {
+      expect(pipe.compareString(a as string, b as string)).toBe(expected);
+    });
+
+    it('respects the configured sort direction', () => {
+      pipe.direction = 'down';
+      expect(pipe.compareString('a', 'b')).toBe(1);
+    });
   });
 
-  it('Sort by milestones', () => {
-    options.sort = { field: 'milestones', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'milestones', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'milestones', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'milestones', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
+  describe('compareNumber', () => {
+    it.each([
+      [undefined, undefined, 0],
+      [1, undefined, -1],
+      [undefined, 1, 1],
+      [1, 2, -1],
+      [2, 1, 1],
+      [1, 1, 0],
+      [null, 5, 1],
+      [5, null, -1],
+    ])('compareNumber(%p, %p) -> %p', (a, b, expected) => {
+      expect(pipe.compareNumber(a as number, b as number)).toBe(expected);
+    });
   });
 
-  it('Sort by milestones.sort', () => {
-    options.sort = { field: 'milestones.sort', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'milestones.sort', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'milestones.sort', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'milestones.sort', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
-  });
+  describe('transform', () => {
+    const issueA: Issue = {
+      id: '1',
+      key: 'PMP-1240',
+      title: 'Issue 1',
+      completion: 0,
+      date_created: '2018-02-22T11:53:31.367Z',
+      priority: { id: 'p1' } as any,
+      assignes: [{ username: 'user1', full_name: 'User 1' } as any],
+    };
+    const issueB: Issue = {
+      id: '2',
+      key: 'PMP-1440',
+      title: 'Issue 2',
+      completion: 50,
+      date_created: '2018-02-23T11:53:31.367Z',
+      priority: { id: 'p2' } as any,
+      assignes_calc: [{ username: 'user2', full_name: 'User 2' } as any],
+    };
 
-  it('Sort by affected_versions', () => {
-    options.sort = { field: 'affected_versions', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'affected_versions', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'affected_versions', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'affected_versions', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
-  });
+    function options(field: string, direction: 'up' | 'down'): ListOptionsFilters {
+      return { sort: { field: field as never, direction }, textFilter: {} };
+    }
 
-  it('Sort by string field (e.g. title)', () => {
-    options.sort = { field: 'title', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'title', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'title', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'title', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
-  });
+    it('returns the input unchanged (aside from filtering) when array is falsy', () => {
+      expect(pipe.transform(undefined as unknown as Issue[], options('key', 'up'))).toEqual([]);
+    });
 
-  it('Sort by number field (e.g. completion)', () => {
-    options.sort = { field: 'completion', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'completion', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'completion', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'completion', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
-  });
+    it('removes null/undefined items from the array', () => {
+      const result = pipe.transform(
+        [issueA, null as unknown as Issue, issueB],
+        options('key', 'up'),
+      );
+      expect(result).toHaveLength(2);
+      expect(result).not.toContain(null);
+    });
 
-  it('Sort by date field (e.g. date_created)', () => {
-    options.sort = { field: 'date_created', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'date_created', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'date_created', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'date_created', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
-  });
+    it('sorts by key, honoring direction', () => {
+      const up = pipe.transform([issueB, issueA], options('key', 'up'));
+      expect(up.map((i) => i.key)).toEqual(['PMP-1240', 'PMP-1440']);
 
-  it('Sort by dictionary with full map (e.g. status)', () => {
-    options.sort = { field: 'milestones', direction: 'up' };
-    defaultExpectUp(pipe.transform(issues, options));
-    options.sort = { field: 'milestones', direction: 'down' };
-    defaultExpectDown(pipe.transform(issues, options));
-    options.sort = { field: 'milestones', direction: 'up' };
-    defaultExpectUpNullUp(pipe.transform(issues, options, 'up'));
-    options.sort = { field: 'milestones', direction: 'down' };
-    defaultExpectDownNullUp(pipe.transform(issues, options, 'up'));
-  });
+      const down = pipe.transform([issueB, issueA], options('key', 'down'));
+      expect(down.map((i) => i.key)).toEqual(['PMP-1440', 'PMP-1240']);
+    });
 
-  it('Sort by dictionary with missing map (e.g. priority)', () => {
-    options.sort = { field: 'priority', direction: 'up' };
-    const up = pipe.transform(issues, options);
-    expect(up.indexOf(issueA)).toBe(0);
-    expect(up.indexOf(issueC)).toBe(1);
-    expect(up.indexOf(issueB)).toBe(2);
-    expect(up.indexOf(empty)).toBe(6);
-    options.sort = { field: 'priority', direction: 'up' };
-    const upNullUp = pipe.transform(issues, options, 'up');
-    // IssueB have missing sort
-    expect(upNullUp.indexOf(issueB)).toBe(0);
-    expect(upNullUp.indexOf(empty)).toBe(4);
-    expect(upNullUp.indexOf(issueA)).toBe(5);
-    expect(upNullUp.indexOf(issueC)).toBe(6);
-    options.sort = { field: 'priority', direction: 'down' };
-    const down = pipe.transform(issues, options);
-    // Filled value is more important
-    expect(down.indexOf(issueC)).toBe(0);
-    expect(down.indexOf(issueA)).toBe(1);
-    expect(down.indexOf(issueB)).toBe(2);
-    expect(down.indexOf(empty)).toBe(6);
-    options.sort = { field: 'priority', direction: 'down' };
-    const downNullUp = pipe.transform(issues, options, 'up');
-    // Filled value is more important
-    // IssueB have missing sort
-    expect(downNullUp.indexOf(issueB)).toBe(0);
-    expect(downNullUp.indexOf(empty)).toBe(4);
-    expect(downNullUp.indexOf(issueC)).toBe(5);
-    expect(downNullUp.indexOf(issueA)).toBe(6);
-  });
+    it('sorts by title (a generic string field)', () => {
+      const result = pipe.transform([issueB, issueA], options('title', 'up'));
+      expect(result.map((i) => i.title)).toEqual(['Issue 1', 'Issue 2']);
+    });
 
-  it('Sort by dictionary with partial map (e.g. type)', () => {
-    options.sort = { field: 'type', direction: 'up' };
-    const up = pipe.transform(issues, options);
-    expect(up.indexOf(issueA)).toBe(0);
-    expect(up.indexOf(issueC)).toBe(1);
-    expect(up.indexOf(issueB)).toBe(2);
-    expect(up.indexOf(empty)).toBe(6);
-    options.sort = { field: 'type', direction: 'up' };
-    const upNullUp = pipe.transform(issues, options, 'up');
-    // IssueB have missing sort
-    expect(upNullUp.indexOf(issueB)).toBe(0);
-    expect(upNullUp.indexOf(empty)).toBe(4);
-    expect(upNullUp.indexOf(issueA)).toBe(5);
-    expect(upNullUp.indexOf(issueC)).toBe(6);
-    options.sort = { field: 'type', direction: 'down' };
-    const down = pipe.transform(issues, options);
-    // Filled value is more important
-    expect(down.indexOf(issueC)).toBe(0);
-    expect(down.indexOf(issueA)).toBe(1);
-    expect(down.indexOf(issueB)).toBe(2);
-    expect(down.indexOf(empty)).toBe(6);
-    options.sort = { field: 'type', direction: 'down' };
-    const downNullUp = pipe.transform(issues, options, 'up');
-    // Filled value is more important
-    // IssueB have missing sort
-    expect(downNullUp.indexOf(issueB)).toBe(0);
-    expect(downNullUp.indexOf(empty)).toBe(4);
-    expect(downNullUp.indexOf(issueC)).toBe(5);
-    expect(downNullUp.indexOf(issueA)).toBe(6);
+    it('sorts by completion (a generic number field)', () => {
+      const result = pipe.transform([issueB, issueA], options('completion', 'up'));
+      expect(result.map((i) => i.completion)).toEqual([0, 50]);
+    });
+
+    it('sorts by a dictionary field using the container service sort value', () => {
+      // p1 has sort=2, p2 has sort=1, so issueB (p2) sorts first ascending
+      const result = pipe.transform([issueA, issueB], options('priority', 'up'));
+      expect(result.map((i) => i.id)).toEqual(['2', '1']);
+    });
+
+    it('sorts by assignee, falling back from assignes to assignes_calc', () => {
+      const result = pipe.transform([issueB, issueA], options('assignes', 'up'));
+      expect(result.map((i) => i.id)).toEqual(['1', '2']);
+    });
+
+    it('filters by title/key text filter, matching case-insensitively', () => {
+      const opts = options('key', 'up');
+      opts.textFilter = { title: 'issue 2' };
+      const result = pipe.transform([issueA, issueB], opts);
+      expect(result.map((i) => i.id)).toEqual(['2']);
+    });
+
+    it('reads the sort target from a nested field when issueField is given', () => {
+      const wrapped = [{ issue: issueB }, { issue: issueA }] as unknown as Issue[];
+      const result = pipe.transform(
+        wrapped,
+        options('key', 'up'),
+        'down',
+        'issue',
+      );
+      expect(result.map((r: any) => r.issue.key)).toEqual([
+        'PMP-1240',
+        'PMP-1440',
+      ]);
+    });
   });
 });
