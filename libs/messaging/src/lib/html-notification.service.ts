@@ -9,7 +9,7 @@ import { RwMessageService } from './message.service';
 @Injectable({
   providedIn: 'root',
 })
-export class RenwuWepPushService {
+export class RwWebPushService {
   swPush = inject(SwPush);
   dataService = inject(RwDataService);
   messagingDataService = inject(RwMessagingDataService);

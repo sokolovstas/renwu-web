@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { catchError, firstValueFrom, of, tap } from 'rxjs';
 import { RwMessagingDataService } from './data/messaging-data.service';
-import { RenwuWepPushService } from './html-notification.service';
+import { RwWebPushService } from './html-notification.service';
 import { RwMessageService } from './message.service';
 
 function initMessenger(): () => Promise<void> {
@@ -20,7 +20,7 @@ function initMessenger(): () => Promise<void> {
 
 function initWebPushApp(): () => Promise<void> {
   const dataService = inject(RwMessagingDataService);
-  const pushService = inject(RenwuWepPushService);
+  const pushService = inject(RwWebPushService);
 
   return async (): Promise<void> => {
     await firstValueFrom(

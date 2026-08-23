@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { RwAlertService } from '@renwu/components';
-import { RenwuWepPushService } from '@renwu/messaging';
+import { RwWebPushService } from '@renwu/messaging';
 import { interval } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CheckForUpdateService {
-  webPushService = inject(RenwuWepPushService);
+  webPushService = inject(RwWebPushService);
   private updates = inject(SwUpdate);
   private alertService = inject(RwAlertService);
 
