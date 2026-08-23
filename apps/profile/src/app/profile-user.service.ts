@@ -7,7 +7,7 @@ import { filterFalsy } from '@renwu/utils';
 import { BehaviorSubject, switchMap, tap } from 'rxjs';
 
 @Injectable()
-export class UserService {
+export class ProfileUserService {
   private dataService = inject(RwDataService);
   private userService = inject(RwUserService);
   private toastService = inject(RwToastService);

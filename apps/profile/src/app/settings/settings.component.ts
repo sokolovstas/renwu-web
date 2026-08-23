@@ -39,7 +39,7 @@ import {
   startWith,
   switchMap,
 } from 'rxjs';
-import { UserService } from '../user.service';
+import { ProfileUserService } from '../profile-user.service';
 
 @Component({
   selector: 'renwu-profile-settings',
@@ -61,7 +61,7 @@ import { UserService } from '../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
-  userService = inject(UserService);
+  userService = inject(ProfileUserService);
   transloco = inject(TranslocoService);
 
   @ViewChild(AvatarEditorComponent)

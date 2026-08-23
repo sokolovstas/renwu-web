@@ -5,7 +5,7 @@ import { JiraComponent } from '../jira/jira.component';
 import { MainComponent } from '../main/main.component';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { SettingsComponent } from '../settings/settings.component';
-import { UserService } from '../user.service';
+import { ProfileUserService } from '../profile-user.service';
 
 export { VIEW_ROUTES } from './view.routes';
 
@@ -22,14 +22,16 @@ const createInlineLoader = (languages: Array<string>): InlineLoader => {
 };
 
 const setCurrentProject = (route: ActivatedRouteSnapshot) => {
-  inject(UserService).currentUserKey.next(route.paramMap.get('username'));
+  inject(ProfileUserService).currentUserKey.next(
+    route.paramMap.get('username'),
+  );
 };
 
 export const ROUTES: Route[] = [
   {
     path: ':username',
     providers: [
-      UserService,
+      ProfileUserService,
       {
         provide: TRANSLOCO_SCOPE,
         useValue: {
