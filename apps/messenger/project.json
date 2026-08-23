@@ -4,7 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/messenger/src",
   "prefix": "renwu-messenger",
-  "tags": [],
+  "tags": ["scope:app"],
   "targets": {
     "esbuild": {
       "executor": "@angular-devkit/build-angular:application",
