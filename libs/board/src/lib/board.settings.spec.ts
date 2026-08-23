@@ -180,16 +180,14 @@ describe('BoardSettings.groupFields', () => {
     });
   });
 
-  // NOTE: the date-based group fields ('sdate-d/-w/-m/-q' and
-  // 'log-date-d/-w/-m/-q') build their bucket keys via date-fns `format()`
-  // using legacy v1-style tokens (e.g. 'DDMMYYYY'). The installed date-fns
-  // version (v3) throws on those tokens, and `group()`'s internal try/catch
-  // silently swallows the error per-issue, so every issue is currently
-  // dropped from these groupings. Documented here rather than skipped, so
-  // this test fails loudly (as a signal to update it) if the tokens are
-  // ever fixed to the modern date-fns format.
+  // The date-based group fields ('sdate-d/-w/-m/-q' and 'log-date-d/-w/-m/-q')
+  // build their bucket keys via date-fns `format()`. They used to use legacy
+  // v1-style tokens (e.g. 'DDMMYYYY') that the installed date-fns v3 throws
+  // on, silently dropping every issue via group()'s per-issue try/catch —
+  // fixed to modern tokens (e.g. 'ddMMyyyy'); these tests now assert the
+  // real grouping behavior instead of documenting the drop.
   describe('start date by day (dateGroup helper)', () => {
-    it('currently drops every issue because date-fns rejects the legacy format tokens', () => {
+    it('groups issues by their start date', () => {
       const issues: Issue[] = [
         { id: 'i1', date_start_calc: '2024-03-05T10:00:00.000Z' },
         { id: 'i2', date_start_calc: '2024-03-06T10:00:00.000Z' },
@@ -197,12 +195,14 @@ describe('BoardSettings.groupFields', () => {
 
       const groups = groupBy('sdate-d', issues);
 
-      expect(Object.keys(groups)).toHaveLength(0);
+      expect(Object.keys(groups).sort()).toEqual(['05032024', '06032024']);
+      expect(groups['05032024'].items).toHaveLength(1);
+      expect(groups['05032024'].items[0].id).toBe('i1');
     });
   });
 
   describe('timelog date by day (logdateGroup helper)', () => {
-    it('currently drops every issue because date-fns rejects the legacy format tokens', () => {
+    it('groups timelog entries by their creation date', () => {
       const issues: Issue[] = [
         {
           id: 'i1',
@@ -214,7 +214,8 @@ describe('BoardSettings.groupFields', () => {
 
       const groups = groupBy('log-date-d', issues);
 
-      expect(Object.keys(groups)).toHaveLength(0);
+      expect(Object.keys(groups)).toEqual(['05032024']);
+      expect(groups['05032024'].items).toHaveLength(1);
     });
   });
 
