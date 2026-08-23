@@ -197,6 +197,8 @@
   "ai-workflows": "AI workflows",
   "ai-jobs": "AI jobs",
   "ai-enabled": "Enable AI automation",
+  "ai-run-via-runner": "通过本地运行器执行",
+  "ai-run-via-runner-hint": "开启后，云端服务将不再获取该租户的 AI 任务队列——只有已注册的本地运行器（见「AI 运行器」标签页）会领取并执行任务。关闭时（默认）——和之前一样，由云端服务自己执行任务。",
   "ai-provider": "AI provider",
   "ai-agent-url": "Agent API URL",
   "ai-agent-web-url": "Agent web URL",

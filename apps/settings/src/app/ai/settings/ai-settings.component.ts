@@ -46,6 +46,7 @@ export class AiSettingsComponent {
   readonly gatesModeModel = new SelectModelBase<string>();
   readonly form = new FormGroup({
     enabled: new FormControl(false, { nonNullable: true }),
+    run_via_runner: new FormControl(false, { nonNullable: true }),
     agent_provider: new FormControl('opencode', { nonNullable: true }),
     agent_base_url: new FormControl('', { nonNullable: true }),
     agent_web_base_url: new FormControl('', { nonNullable: true }),
@@ -175,7 +176,7 @@ export class AiSettingsComponent {
     const known = this.modelModel.staticData.some((x) => x.id === next);
     if (next && !known) {
       if (opts?.dropUnknown || provider === 'claude_code') {
-        next = this.modelModel.staticData[0]?.id || '';
+        next = String(this.modelModel.staticData[0]?.id ?? '');
         this.form.controls.default_model.setValue(next);
         this.form.controls.default_model.markAsDirty();
       } else {
@@ -230,6 +231,7 @@ export class AiSettingsComponent {
     try {
       this.form.patchValue({
         enabled: !!settings.enabled,
+        run_via_runner: !!settings.run_via_runner,
         agent_provider: settings.agent_provider || 'opencode',
         agent_base_url: baseUrl,
         agent_web_base_url: webUrl,

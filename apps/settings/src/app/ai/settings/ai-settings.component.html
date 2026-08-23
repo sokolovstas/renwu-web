@@ -4,6 +4,13 @@
     {{ 'settings.ai-enabled' | transloco }}
   </label>
   <p class="form-supporting-text">{{ 'settings.ai-bot-hint' | transloco }}</p>
+  <label class="flex items-center gap-2">
+    <input type="checkbox" formControlName="run_via_runner" />
+    {{ 'settings.ai-run-via-runner' | transloco }}
+  </label>
+  <p class="form-supporting-text">
+    {{ 'settings.ai-run-via-runner-hint' | transloco }}
+  </p>
   <div class="grid gap-4 lg:grid-cols-2">
     <rw-select
       formControlName="agent_provider"

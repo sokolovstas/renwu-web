@@ -40,6 +40,8 @@ export interface AICreateRunnerResponse {
 
 export interface AISettings {
   enabled?: boolean;
+  /** When true, only a registered local runner executes this tenant's jobs — the cloud service stops claiming its queue (still reclaims stuck jobs as a safety net). See the Runners tab. */
+  run_via_runner?: boolean;
   /** Agent harness id (default: opencode). */
   agent_provider?: string;
   agent_base_url?: string;

@@ -197,6 +197,8 @@
   "ai-workflows": "AI workflows",
   "ai-jobs": "AI jobs",
   "ai-enabled": "Enable AI automation",
+  "ai-run-via-runner": "Execute via local runner",
+  "ai-run-via-runner-hint": "When on, the cloud service stops claiming this tenant's AI job queue — only a registered local runner (see the Runners tab) picks up and executes jobs. When off (default), the cloud service executes jobs itself, as before.",
   "ai-provider": "AI provider",
   "ai-agent-url": "Agent API URL",
   "ai-agent-web-url": "Agent web URL",
