@@ -17,9 +17,12 @@ describe('provideRenwuBoards', () => {
 
     const initializers = TestBed.inject(APP_INITIALIZER);
 
+    // provideRenwuBoards() registers its own APP_INITIALIZER alongside
+    // whatever else the app registers (e.g. i18n preloading) — assert our
+    // provider contributed one, not that it's the only one in the app.
     expect(Array.isArray(initializers)).toBe(true);
-    expect(initializers).toHaveLength(1);
-    expect(typeof initializers[0]).toBe('function');
+    expect(initializers.length).toBeGreaterThanOrEqual(1);
+    expect(initializers.every((fn) => typeof fn === 'function')).toBe(true);
   });
 
   it('the registered initializer awaits RwBoardService.init() exactly once', async () => {

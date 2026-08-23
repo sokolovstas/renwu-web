@@ -117,6 +117,7 @@ describe('BoardGroupsConfig', () => {
             fixed: ['m1', 'm2'],
             group_only: false,
             show_empty: true,
+            status_columns: [],
           },
         ],
         view: 'cards-v',
@@ -126,6 +127,8 @@ describe('BoardGroupsConfig', () => {
         show_logs: false,
         hide_parents: false,
         collapse_empty: false,
+        card_density: 'normal',
+        color_mode: 'status',
       };
 
       const roundTripped = BoardGroupsConfig.fromServer(serverConfig).toServer();
