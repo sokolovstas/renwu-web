@@ -22,6 +22,22 @@ export interface AIProviderInfo {
   needs_web_url?: boolean;
 }
 
+export interface AIRunner {
+  id: string;
+  name: string;
+  provider?: string;
+  hostname?: string;
+  created_at: string;
+  last_seen_at?: string;
+  revoked_at?: string;
+}
+
+/** Response to registering a runner — token is shown exactly once. */
+export interface AICreateRunnerResponse {
+  runner: AIRunner;
+  token: string;
+}
+
 export interface AISettings {
   enabled?: boolean;
   /** Agent harness id (default: opencode). */

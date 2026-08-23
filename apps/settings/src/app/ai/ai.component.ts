@@ -16,8 +16,9 @@ import { AiWorkspacesComponent } from './workspaces/ai-workspaces.component';
 import { AiSkillsComponent } from './skills/ai-skills.component';
 import { AiWorkflowsComponent } from './workflows/ai-workflows.component';
 import { AiJobsComponent } from './jobs/ai-jobs.component';
+import { AiRunnersComponent } from './runners/ai-runners.component';
 
-type AiTab = 'settings' | 'workspaces' | 'skills' | 'workflows' | 'jobs';
+type AiTab = 'settings' | 'workspaces' | 'skills' | 'workflows' | 'jobs' | 'runners';
 
 @Component({
   selector: 'renwu-settings-ai',
@@ -31,6 +32,7 @@ type AiTab = 'settings' | 'workspaces' | 'skills' | 'workflows' | 'jobs';
     AiSkillsComponent,
     AiWorkflowsComponent,
     AiJobsComponent,
+    AiRunnersComponent,
   ],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.scss',
@@ -50,6 +52,7 @@ export class AiComponent {
     { id: 'skills', labelKey: 'settings.ai-skills' },
     { id: 'workflows', labelKey: 'settings.ai-workflows' },
     { id: 'jobs', labelKey: 'settings.ai-jobs' },
+    { id: 'runners', labelKey: 'settings.ai-runners' },
   ];
   readonly activeTab = signal<AiTab>('settings');
   readonly busy = signal(false);

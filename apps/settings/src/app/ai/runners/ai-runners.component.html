@@ -1,0 +1,101 @@
+<section>
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-xl font-light">{{ 'settings.ai-runners' | transloco }}</h2>
+    <rw-button typeButton="secondary" (clicked)="load()">{{
+      'settings.ai-refresh' | transloco
+    }}</rw-button>
+  </div>
+  <p class="form-supporting-text mb-4">
+    {{ 'settings.ai-runners-hint' | transloco }}
+  </p>
+
+  @if (freshToken(); as token) {
+    <div
+      class="runner-token-banner border rounded p-3 mb-4 flex flex-col gap-2"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <strong>{{ 'settings.ai-runner-token-created' | transloco }}</strong>
+        <rw-button typeButton="icon" iconClass="close" (clicked)="dismissToken()" />
+      </div>
+      <code class="runner-token-value break-all">{{ token }}</code>
+      <div>
+        <rw-button typeButton="secondary" (clicked)="copyToken()">{{
+          'settings.ai-runner-token-copy' | transloco
+        }}</rw-button>
+      </div>
+    </div>
+  }
+
+  <form
+    [formGroup]="form"
+    class="flex items-end gap-2 mb-4"
+    (ngSubmit)="register()"
+  >
+    <rw-text-input
+      class="flex-1"
+      [live]="true"
+      formControlName="name"
+      prompt="{{ 'settings.ai-runner-name-placeholder' | transloco }}"
+    />
+    <rw-button
+      typeButton="primary"
+      [disabled]="!form.controls.name.value.trim() || registering()"
+      (clicked)="register()"
+    >
+      {{ 'settings.ai-runner-add' | transloco }}
+    </rw-button>
+  </form>
+
+  @if (items()?.length) {
+    <div class="overflow-auto border rounded">
+      <table class="w-full text-sm">
+        <thead>
+          <tr>
+            <th class="text-left p-3">{{ 'settings.ai-name' | transloco }}</th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-runner-provider' | transloco }}
+            </th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-runner-hostname' | transloco }}
+            </th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-runner-last-seen' | transloco }}
+            </th>
+            <th class="text-left p-3">
+              {{ 'settings.ai-runner-status' | transloco }}
+            </th>
+            <th class="p-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.id) {
+            <tr class="border-t">
+              <td class="p-3">{{ item.name }}</td>
+              <td class="p-3">{{ item.provider || '—' }}</td>
+              <td class="p-3">{{ item.hostname || '—' }}</td>
+              <td class="p-3">{{ item.last_seen_at || ('settings.ai-runner-never' | transloco) }}</td>
+              <td class="p-3">
+                <span class="runner-status runner-status-{{ status(item) }}">
+                  {{ statusLabelKey(item) | transloco }}
+                </span>
+              </td>
+              <td class="p-3">
+                @if (!item.revoked_at) {
+                  <div class="flex justify-end">
+                    <rw-button typeButton="secondary" (clicked)="revoke(item)">{{
+                      'settings.ai-runner-revoke' | transloco
+                    }}</rw-button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="form-supporting-text">
+      {{ 'settings.ai-empty-runners' | transloco }}
+    </p>
+  }
+</section>

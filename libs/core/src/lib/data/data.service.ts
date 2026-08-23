@@ -77,9 +77,11 @@ import {
 } from './common.model';
 import {
   AIConfigBundle,
+  AICreateRunnerResponse,
   AIJob,
   AIOpenCodeModel,
   AIProviderInfo,
+  AIRunner,
   AISessionRefreshResult,
   AISettings,
   AISkill,
@@ -1182,6 +1184,16 @@ export class RwDataService {
   /** Re-apply last OpenCode assistant message without starting a new LLM turn. */
   aiApplySessionJob(id: string): Observable<AIJob> {
     return this.sendToAiAPI('post', `/jobs/${id}/apply-session`, {});
+  }
+  aiListRunners(): Observable<AIRunner[]> {
+    return this.sendToAiAPI('get', '/runners');
+  }
+  /** Token is returned exactly once — the backend never exposes it again. */
+  aiCreateRunner(name: string): Observable<AICreateRunnerResponse> {
+    return this.sendToAiAPI('post', '/runners', { name });
+  }
+  aiRevokeRunner(id: string): Observable<unknown> {
+    return this.sendToAiAPI('delete', `/runners/${id}`);
   }
   /** Chat `/refresh`: probe running agent session and extend wait budget. */
   aiRefreshIssueSession(issueId: string): Observable<AISessionRefreshResult> {
