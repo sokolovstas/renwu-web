@@ -5,14 +5,12 @@ import {
   Component,
   inject,
 } from '@angular/core';
-import {
-  Router
-} from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
-  RenwuPageComponent,
-  RenwuPageWithSidebarComponent,
-  RenwuSidebarService,
+  RwPageComponent,
+  RwPageWithSidebarComponent,
+  RwSidebarService,
 } from '@renwu/app-ui';
 import { RwPagerComponent } from '@renwu/components';
 import {
@@ -29,8 +27,8 @@ import { BehaviorSubject, combineLatest, map, shareReplay } from 'rxjs';
   selector: 'renwu-dashboard-main',
   standalone: true,
   imports: [
-    RenwuPageComponent,
-    RenwuPageWithSidebarComponent,
+    RwPageComponent,
+    RwPageWithSidebarComponent,
     RwIssueTableComponent,
     RwPagerComponent,
     AsyncPipe,
@@ -46,7 +44,7 @@ export class MainComponent implements AfterViewInit {
   searchService = inject(RwSearchService);
   issueTableService = inject(IssueTableService);
   dataService = inject(RwDataService);
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   router = inject(Router);
 
   issuesPage = new BehaviorSubject<number>(0);

@@ -13,7 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuSidebarService, RenwuTourAnchorDirective } from '@renwu/app-ui';
+import { RwSidebarService, RwTourAnchorDirective } from '@renwu/app-ui';
 import { RwDropDownComponent, RwIconComponent } from '@renwu/components';
 import {
   AvatarComponent,
@@ -36,7 +36,7 @@ import { RwMessageService } from '@renwu/messaging';
     AsyncPipe,
     RouterLink,
     TranslocoPipe,
-    RenwuTourAnchorDirective,
+    RwTourAnchorDirective,
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
@@ -48,7 +48,7 @@ export class SidebarComponent implements OnInit {
   dataService = inject(RwDataService);
   siteDataService = inject(RwSiteDataService);
   userService = inject(RwUserService);
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   coreSettings = inject(RW_CORE_SETTINGS);
   router = inject(Router);
 

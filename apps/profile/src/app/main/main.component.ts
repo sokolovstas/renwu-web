@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageWithSidebarComponent } from '@renwu/app-ui';
+import { RwPageWithSidebarComponent } from '@renwu/app-ui';
 
 @Component({
   selector: 'renwu-profile-main',
@@ -10,7 +10,7 @@ import { RenwuPageWithSidebarComponent } from '@renwu/app-ui';
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    RenwuPageWithSidebarComponent,
+    RwPageWithSidebarComponent,
     TranslocoPipe,
   ],
   templateUrl: './main.component.html',

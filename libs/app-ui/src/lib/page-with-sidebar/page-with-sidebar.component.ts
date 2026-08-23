@@ -8,7 +8,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   styleUrl: './page-with-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RenwuPageWithSidebarComponent {
+export class RwPageWithSidebarComponent {
   @Input()
   sidebarClass: string;
 }

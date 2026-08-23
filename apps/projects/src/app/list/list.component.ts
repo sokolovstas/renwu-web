@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
-  RenwuPageComponent,
-  RenwuPageWithSidebarComponent,
-  RenwuTourAnchorDirective,
+  RwPageComponent,
+  RwPageWithSidebarComponent,
+  RwTourAnchorDirective,
 } from '@renwu/app-ui';
 import {
   RwButtonComponent,
@@ -27,8 +27,8 @@ import { ProjectService } from '../project.service';
   standalone: true,
   imports: [
     AsyncPipe,
-    RenwuPageComponent,
-    RenwuPageWithSidebarComponent,
+    RwPageComponent,
+    RwPageWithSidebarComponent,
     FormsModule,
     RouterLink,
     RwCheckboxComponent,
@@ -37,7 +37,7 @@ import { ProjectService } from '../project.service';
     RwSortTableColumnDirective,
     RwSortTableColumnHeadDirective,
     RwButtonComponent,
-    RenwuTourAnchorDirective,
+    RwTourAnchorDirective,
     TranslocoPipe,
   ],
   templateUrl: './list.component.html',

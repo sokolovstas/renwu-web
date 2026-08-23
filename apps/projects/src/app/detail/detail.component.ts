@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
-  RenwuPageWithSidebarComponent,
-  RenwuSidebarService,
-  RenwuTourAnchorDirective,
+  RwPageWithSidebarComponent,
+  RwSidebarService,
+  RwTourAnchorDirective,
 } from '@renwu/app-ui';
 
 import { ProjectService } from '../project.service';
@@ -18,8 +18,8 @@ import { ProjectService } from '../project.service';
     RouterLink,
     RouterLinkActive,
     AsyncPipe,
-    RenwuPageWithSidebarComponent,
-    RenwuTourAnchorDirective,
+    RwPageWithSidebarComponent,
+    RwTourAnchorDirective,
     TranslocoPipe,
   ],
   templateUrl: './detail.component.html',
@@ -30,7 +30,7 @@ export class DetailComponent {
   private projectService = inject(ProjectService);
 
   project = this.projectService.currentProject;
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
 
   sidebarClick() {
     this.sidebarService.scrollToMain();

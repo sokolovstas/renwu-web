@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageWithSidebarComponent } from './page-with-sidebar.component';
+import { RwPageWithSidebarComponent } from './page-with-sidebar.component';
 
-describe('RenwuPageWithSidebarComponent', () => {
-  let component: RenwuPageWithSidebarComponent;
-  let fixture: ComponentFixture<RenwuPageWithSidebarComponent>;
+describe('RwPageWithSidebarComponent', () => {
+  let component: RwPageWithSidebarComponent;
+  let fixture: ComponentFixture<RwPageWithSidebarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RenwuPageWithSidebarComponent, TranslocoPipe],
+      imports: [RwPageWithSidebarComponent, TranslocoPipe],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RenwuPageWithSidebarComponent);
+    fixture = TestBed.createComponent(RwPageWithSidebarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

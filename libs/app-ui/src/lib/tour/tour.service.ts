@@ -25,7 +25,7 @@ const defaultSettings: TourSettings = {
 @Injectable({
   providedIn: 'root',
 })
-export class RenwuTourService {
+export class RwTourService {
   tour = inject(TourService);
   tooltipService = inject(RwTooltipService);
 

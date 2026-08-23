@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import { RwToastService } from '@renwu/components';
 import { RwSettingsService, StateService } from '@renwu/core';
 import { RwMessageService } from '@renwu/messaging';
@@ -57,7 +57,7 @@ describe('DetailComponent', () => {
           },
         },
         {
-          provide: RenwuSidebarService,
+          provide: RwSidebarService,
           useValue: { currentTask: new BehaviorSubject(null) },
         },
         { provide: StateService, useValue: {} },

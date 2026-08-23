@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import { RwDatePipe, RwRangeComponent } from '@renwu/components';
 import { RwContainerService } from '@renwu/core';
 import { map, switchMap } from 'rxjs';
@@ -14,7 +14,7 @@ import { ProjectService } from '../project.service';
   selector: 'renwu-projects-summary',
   standalone: true,
   imports: [
-    RenwuPageComponent,
+    RwPageComponent,
     AsyncPipe,
     BacklogComponent,
     RwRangeComponent,

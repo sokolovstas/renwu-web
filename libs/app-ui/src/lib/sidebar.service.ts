@@ -31,7 +31,7 @@ export interface SidebarSection {
 @Injectable({
   providedIn: 'root',
 })
-export class RenwuSidebarService {
+export class RwSidebarService {
   scrollValue = 0;
   transloco = inject(TranslocoService);
   policyService = inject(RwPolicyService);

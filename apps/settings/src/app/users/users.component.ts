@@ -2,19 +2,15 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwModalService,
   RwSortTableColumnDirective,
   RwSortTableDirective,
-  RwSortTableRowDirective
+  RwSortTableRowDirective,
 } from '@renwu/components';
-import {
-  AvatarComponent,
-  RwUserService,
-  User
-} from '@renwu/core';
+import { AvatarComponent, RwUserService, User } from '@renwu/core';
 import { AddUserComponent } from '../add-user/add-user.component';
 
 @Component({
@@ -27,7 +23,7 @@ import { AddUserComponent } from '../add-user/add-user.component';
     RwSortTableRowDirective,
     RwSortTableColumnDirective,
     AvatarComponent,
-    RenwuPageComponent,
+    RwPageComponent,
     TranslocoPipe,
   ],
   templateUrl: './users.component.html',

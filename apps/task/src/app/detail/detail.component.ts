@@ -16,7 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import {
   RwAlertService,
   RwButtonComponent,
@@ -41,7 +41,7 @@ import {
   DestinationType,
   MessageInputComponent,
   MessageThreadComponent,
-  RwMessageService
+  RwMessageService,
 } from '@renwu/messaging';
 import {
   catchError,
@@ -90,7 +90,7 @@ import { SectionWrapperComponent } from '../section-wrapper/section-wrapper.comp
     TranslocoPipe,
     SectionWrapperComponent,
     TaskDetailFieldSettingsComponent,
-    ],
+  ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.scss',
   // providers: [RwIssueService],
@@ -107,7 +107,7 @@ export class DetailComponent implements OnDestroy {
   alertService = inject(RwAlertService);
   dataService = inject(RwDataService);
   stateService = inject(StateService);
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   destroy = inject(DestroyRef);
   transloco = inject(TranslocoService);
   settingsService = inject(RwSettingsService);

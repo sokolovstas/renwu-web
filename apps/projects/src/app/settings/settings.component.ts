@@ -15,12 +15,12 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwCheckboxComponent,
   RwSelectComponent,
-  RwTextInputComponent
+  RwTextInputComponent,
 } from '@renwu/components';
 import {
   Container,
@@ -36,7 +36,7 @@ import { ProjectService } from '../project.service';
   standalone: true,
   imports: [
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     ReactiveFormsModule,
     RwSelectComponent,
     RwButtonComponent,

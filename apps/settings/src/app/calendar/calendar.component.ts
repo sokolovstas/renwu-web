@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 
 @Component({
   selector: 'renwu-settings-calendar',
   standalone: true,
-  imports: [RenwuPageComponent, TranslocoPipe],
+  imports: [RwPageComponent, TranslocoPipe],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

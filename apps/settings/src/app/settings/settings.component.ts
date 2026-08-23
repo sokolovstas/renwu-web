@@ -1,8 +1,7 @@
-
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageWithSidebarComponent } from '@renwu/app-ui';
+import { RwPageWithSidebarComponent } from '@renwu/app-ui';
 
 import { RW_CORE_SETTINGS } from '@renwu/core';
 
@@ -12,7 +11,7 @@ import { RW_CORE_SETTINGS } from '@renwu/core';
   imports: [
     RouterOutlet,
     RouterLink,
-    RenwuPageWithSidebarComponent,
+    RwPageWithSidebarComponent,
     RouterLinkActive,
     TranslocoPipe,
   ],

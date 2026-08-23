@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TourService } from 'ngx-ui-tour-core';
-import { RenwuTourAnchorDirective } from './tour-anchor.directive';
+import { RwTourAnchorDirective } from './tour-anchor.directive';
 
 @Component({
   standalone: true,
-  imports: [RenwuTourAnchorDirective],
+  imports: [RwTourAnchorDirective],
   template: `<div renwuTourAnchor="test"></div>`,
 })
 class HostComponent {}
 
-describe('RenwuTourAnchorDirective', () => {
+describe('RwTourAnchorDirective', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HostComponent],

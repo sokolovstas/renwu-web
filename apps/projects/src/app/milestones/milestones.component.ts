@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwCheckboxComponent,
@@ -43,7 +43,7 @@ import { ProjectService } from '../project.service';
   imports: [
     AsyncPipe,
     RwCheckboxComponent,
-    RenwuPageComponent,
+    RwPageComponent,
     RwButtonComponent,
     RouterLink,
     RwSortTableColumnDirective,

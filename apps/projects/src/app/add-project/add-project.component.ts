@@ -1,5 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, Output, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  OnDestroy,
+  Output,
+  inject,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,7 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuTourAnchorDirective } from '@renwu/app-ui';
+import { RwTourAnchorDirective } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwModalBodyDirective,
@@ -15,7 +22,7 @@ import {
   RwModalFooterDirective,
   RwModalService,
   RwSelectComponent,
-  RwTextInputComponent
+  RwTextInputComponent,
 } from '@renwu/components';
 import {
   Container,
@@ -36,7 +43,7 @@ import {
     RwTextInputComponent,
     RwSelectComponent,
     ReactiveFormsModule,
-    RenwuTourAnchorDirective,
+    RwTourAnchorDirective,
     TranslocoPipe,
   ],
   templateUrl: './add-project.component.html',

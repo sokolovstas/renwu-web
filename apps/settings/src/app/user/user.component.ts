@@ -14,7 +14,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   AppDateFormat,
   RwButtonComponent,
@@ -63,7 +63,7 @@ import {
     AvatarComponent,
     AvatarEditorComponent,
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     ReactiveFormsModule,
     TranslocoPipe,
   ],

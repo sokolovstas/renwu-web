@@ -14,7 +14,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwSelectComponent,
@@ -50,7 +50,7 @@ type GroupedTransitions = FormArray<GroupedTransition>;
   selector: 'renwu-settings-workflow',
   standalone: true,
   imports: [
-    RenwuPageComponent,
+    RwPageComponent,
     RwButtonComponent,
     AsyncPipe,
     RwTextInputComponent,

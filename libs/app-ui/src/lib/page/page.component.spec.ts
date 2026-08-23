@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from './page.component';
+import { RwPageComponent } from './page.component';
 
 describe('PageComponent', () => {
-  let component: RenwuPageComponent;
-  let fixture: ComponentFixture<RenwuPageComponent>;
+  let component: RwPageComponent;
+  let fixture: ComponentFixture<RwPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RenwuPageComponent, TranslocoPipe],
+      imports: [RwPageComponent, TranslocoPipe],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RenwuPageComponent);
+    fixture = TestBed.createComponent(RwPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

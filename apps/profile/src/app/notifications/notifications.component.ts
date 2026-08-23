@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwCheckboxComponent,
@@ -25,7 +25,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'renwu-profile-notifications',
   standalone: true,
   imports: [
-    RenwuPageComponent,
+    RwPageComponent,
     RwCheckboxComponent,
     RwSortTableDirective,
     RwSortTableColumnDirective,

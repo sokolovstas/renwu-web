@@ -10,7 +10,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent, RenwuSidebarService } from '@renwu/app-ui';
+import { RwPageComponent, RwSidebarService } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwModalService,
@@ -38,7 +38,7 @@ import { SaveFilterComponent } from '../save-filter/save-filter.component';
   imports: [
     IssuesStatusBarComponent,
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     RwIssueTableComponent,
     QueryBuilderComponent,
     RwButtonComponent,
@@ -50,7 +50,7 @@ import { SaveFilterComponent } from '../save-filter/save-filter.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent implements OnDestroy {
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   dataService = inject(RwDataService);
   searchService = inject(RwSearchService);
   queryBuilderService = inject(RwQueryBuilderService);

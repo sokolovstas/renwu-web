@@ -9,11 +9,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwSelectComponent,
-  RwTimePickerComponent
+  RwTimePickerComponent,
 } from '@renwu/components';
 import { Priority, Status, Type } from '@renwu/core';
 import { firstValueFrom } from 'rxjs';
@@ -24,7 +24,7 @@ import { ProjectService } from '../project.service';
   standalone: true,
   imports: [
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     ReactiveFormsModule,
     RwTimePickerComponent,
     RwButtonComponent,

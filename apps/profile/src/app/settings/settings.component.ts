@@ -13,7 +13,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   AppDateFormat,
   RwButtonComponent,
@@ -52,7 +52,7 @@ import { UserService } from '../user.service';
     RwCheckboxComponent,
     RwButtonComponent,
     ReactiveFormsModule,
-    RenwuPageComponent,
+    RwPageComponent,
     AsyncPipe,
     TranslocoPipe,
   ],

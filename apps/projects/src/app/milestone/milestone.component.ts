@@ -8,11 +8,11 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent, RenwuSidebarService } from '@renwu/app-ui';
+import { RwPageComponent, RwSidebarService } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwDatePipe,
-  RwModalService
+  RwModalService,
 } from '@renwu/components';
 import {
   Issue,
@@ -43,7 +43,7 @@ import { ProjectService } from '../project.service';
   standalone: true,
   imports: [
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     RwDatePipe,
     RwButtonComponent,
     RwIssueTableComponent,
@@ -57,7 +57,7 @@ import { ProjectService } from '../project.service';
 })
 export class MilestoneComponent {
   queryBuilderService = inject(RwQueryBuilderService);
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   issueTableService = inject(IssueTableService);
   issueService = inject(RwIssueService);
   dataService = inject(RwDataService);

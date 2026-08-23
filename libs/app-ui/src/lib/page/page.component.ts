@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RwIconComponent } from '@renwu/components';
-import { RenwuSidebarService } from '../sidebar.service';
+import { RwSidebarService } from '../sidebar.service';
 
 @Component({
   selector: 'renwu-page',
@@ -18,8 +18,8 @@ import { RenwuSidebarService } from '../sidebar.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class RenwuPageComponent {
-  sidebarService = inject(RenwuSidebarService);
+export class RwPageComponent {
+  sidebarService = inject(RwSidebarService);
   @Input()
   title: string;
 

@@ -17,7 +17,7 @@ import {
   selector: '[renwuTourAnchor]',
   standalone: true,
 })
-export class RenwuTourAnchorDirective
+export class RwTourAnchorDirective
   implements OnInit, OnDestroy, TourAnchorDirective
 {
   private readonly tourService = inject(TourService);

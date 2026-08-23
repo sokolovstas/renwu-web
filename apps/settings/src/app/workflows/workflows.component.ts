@@ -2,7 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwSortTableColumnDirective,
@@ -18,7 +18,7 @@ import { shareReplay } from 'rxjs';
   imports: [
     AsyncPipe,
     RouterLink,
-    RenwuPageComponent,
+    RwPageComponent,
     RwButtonComponent,
     RwSortTableDirective,
     RwSortTableColumnDirective,

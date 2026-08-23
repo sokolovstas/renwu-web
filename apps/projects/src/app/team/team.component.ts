@@ -2,11 +2,8 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
-import {
-  ISelectItem,
-  RwSelectComponent
-} from '@renwu/components';
+import { RwPageComponent } from '@renwu/app-ui';
+import { ISelectItem, RwSelectComponent } from '@renwu/components';
 import {
   AvatarComponent,
   RwUserService,
@@ -22,7 +19,7 @@ import { ProjectService } from '../project.service';
   standalone: true,
   imports: [
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     AvatarComponent,
     RwSelectComponent,
     AvatarComponent,

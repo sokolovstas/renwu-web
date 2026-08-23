@@ -7,8 +7,8 @@ import {
 } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
-  RenwuPageWithSidebarComponent,
-  RenwuSidebarService,
+  RwPageWithSidebarComponent,
+  RwSidebarService,
 } from '@renwu/app-ui';
 import { RwSearchService } from '@renwu/core';
 
@@ -16,7 +16,7 @@ import { RwSearchService } from '@renwu/core';
   selector: 'renwu-tasks-main',
   standalone: true,
   imports: [
-    RenwuPageWithSidebarComponent,
+    RwPageWithSidebarComponent,
     RouterLink,
     RouterLinkActive,
     AsyncPipe,
@@ -28,7 +28,7 @@ import { RwSearchService } from '@renwu/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainComponent {
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   searchService = inject(RwSearchService);
   queries = this.searchService.savedQueries;
 

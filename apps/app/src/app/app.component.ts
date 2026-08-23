@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
-import { RenwuSidebarService, RenwuTourService } from '@renwu/app-ui';
+import { RwSidebarService, RwTourService } from '@renwu/app-ui';
 import {
   RwAlertService,
   RwModalService,
@@ -19,9 +19,7 @@ import { filter, map } from 'rxjs';
 import { CheckForUpdateService } from './sw-check.service';
 import { SearchSpotlightHostComponent } from './search-spotlight-host/search-spotlight-host.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import {
-  RouterOutlet,
-} from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import {
   RwAlertComponent,
   RwModalContainerDirective,
@@ -47,7 +45,7 @@ import {
 })
 export class AppComponent implements AfterViewInit {
   protected stateService = inject(StateService);
-  protected sidebarService = inject(RenwuSidebarService);
+  protected sidebarService = inject(RwSidebarService);
   protected router = inject(Router);
   protected title = inject(RwTitleService);
   protected loaderService = inject(RwLoaderService);
@@ -76,7 +74,7 @@ export class AppComponent implements AfterViewInit {
     map((e) => (e as NavigationEnd).url.includes('section:')),
   );
   checkUpdate = inject(CheckForUpdateService);
-  tour = inject(RenwuTourService);
+  tour = inject(RwTourService);
 
   ngAfterViewInit(): void {
     this.initSidebarScrollHost();

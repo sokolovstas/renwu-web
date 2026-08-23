@@ -2,9 +2,9 @@ import { AsyncPipe } from '@angular/common';
 import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  RenwuPageComponent,
-  RenwuPageWithSidebarComponent,
-  RenwuSidebarService,
+  RwPageComponent,
+  RwPageWithSidebarComponent,
+  RwSidebarService,
 } from '@renwu/app-ui';
 import {
   DestinationComponent,
@@ -30,8 +30,8 @@ import {
   selector: 'renwu-messenger-main',
   standalone: true,
   imports: [
-    RenwuPageComponent,
-    RenwuPageWithSidebarComponent,
+    RwPageComponent,
+    RwPageWithSidebarComponent,
     DestinationsComponent,
     MessageThreadComponent,
     MessageSubDestinationsComponent,
@@ -45,7 +45,7 @@ import {
 })
 export class MainComponent {
   messageService = inject(RwMessageService);
-  sidebarService = inject(RenwuSidebarService);
+  sidebarService = inject(RwSidebarService);
   router = inject(Router);
   route = inject(ActivatedRoute);
   destinationParam = this.route.paramMap.pipe(

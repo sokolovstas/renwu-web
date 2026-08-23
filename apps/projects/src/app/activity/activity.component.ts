@@ -1,7 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+} from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import { IssueHistoryItemComponent } from '@renwu/core';
 import {
   DestinationType,
@@ -17,7 +22,7 @@ import { ProjectService } from '../project.service';
   imports: [
     IssueHistoryItemComponent,
     AsyncPipe,
-    RenwuPageComponent,
+    RwPageComponent,
     TranslocoPipe,
   ],
   templateUrl: './activity.component.html',
