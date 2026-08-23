@@ -4,7 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/timeline/src",
   "prefix": "renwu-timeline",
-  "tags": [],
+  "tags": ["scope:app"],
   "targets": {
     "esbuild": {
       "executor": "@angular-devkit/build-angular:application",

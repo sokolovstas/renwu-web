@@ -4,7 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/dashboard/src",
   "prefix": "renwu-dashboard",
-  "tags": [],
+  "tags": ["scope:app"],
   "targets": {
     "esbuild": {
       "executor": "@angular-devkit/build-angular:application",

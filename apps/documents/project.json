@@ -4,7 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/documents/src",
   "prefix": "renwu-documents",
-  "tags": [],
+  "tags": ["scope:app"],
   "targets": {
     "esbuild": {
       "executor": "@angular-devkit/build-angular:application",
