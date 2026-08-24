@@ -12,7 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE, TranslocoPipe } from '@jsverse/transloco';
-import { RenwuSearchOverlayService, RenwuSidebarService } from '@renwu/app-ui';
+import { RenwuSearchOverlayService, RwSidebarService } from '@renwu/app-ui';
 import { RwIconComponent } from '@renwu/components';
 import {
   AvatarComponent,
@@ -89,7 +89,7 @@ export class SearchSpotlightComponent implements OnInit {
   private readonly dataService = inject(RwDataService);
   private readonly userService = inject(RwUserService);
   private readonly router = inject(Router);
-  private readonly sidebarService = inject(RenwuSidebarService);
+  private readonly sidebarService = inject(RwSidebarService);
   readonly overlay = inject(RenwuSearchOverlayService);
   private readonly destroy = inject(DestroyRef);
 

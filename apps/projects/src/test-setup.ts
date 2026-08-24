@@ -1,7 +1,7 @@
 import 'jest-zone-transloco-setup';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import { RwAlertService, RwToastService } from '@renwu/components';
 import {
   RW_CORE_SETTINGS,
@@ -54,7 +54,7 @@ beforeEach(() => {
       { provide: RwToastService, useValue: { error: jest.fn() } },
       { provide: RwAlertService, useValue: { confirm: jest.fn() } },
       {
-        provide: RenwuSidebarService,
+        provide: RwSidebarService,
         useValue: {
           scrollToMain: jest.fn(),
           currentTask: new BehaviorSubject(null),

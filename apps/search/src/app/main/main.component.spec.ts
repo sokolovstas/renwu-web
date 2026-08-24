@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { RenwuSearchOverlayService, RenwuSidebarService } from '@renwu/app-ui';
+import { RenwuSearchOverlayService, RwSidebarService } from '@renwu/app-ui';
 import { RwDataService, RwUserService } from '@renwu/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { MainComponent } from './main.component';
@@ -26,7 +26,7 @@ describe('MainComponent', () => {
           useValue: { userList: new BehaviorSubject([]) },
         },
         {
-          provide: RenwuSidebarService,
+          provide: RwSidebarService,
           useValue: { setCurrentTask: () => undefined },
         },
         RenwuSearchOverlayService,

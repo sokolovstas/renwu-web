@@ -17,7 +17,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import { RwTooltipDirective } from '@renwu/components';
 import {
   AvatarComponent,
@@ -150,7 +150,7 @@ export class TimelineComponent {
   private readonly dataService = inject(TimelineDataService);
   private readonly coreTimelineService = inject(CoreTimelineService);
   private readonly stateService = inject(TimelineStateService);
-  private readonly sidebarService = inject(RenwuSidebarService);
+  private readonly sidebarService = inject(RwSidebarService);
   private readonly renderer = inject(Renderer2);
   private readonly injector = inject(Injector);
   private readonly issueDateTimeSvc = inject(RwIssueDateTimeService);

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import {
   Instance,
   RW_CORE_SETTINGS,
@@ -40,7 +40,7 @@ describe('SidebarComponent', () => {
           provide: RwUserService,
           useValue: { todos: of([]) },
         },
-        { provide: RenwuSidebarService, useValue: {} },
+        { provide: RwSidebarService, useValue: {} },
         {
           provide: RwMessageService,
           useValue: {

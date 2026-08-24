@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import { RwButtonComponent, RwPagerComponent } from '@renwu/components';
 import {
   Issue,
@@ -55,7 +55,7 @@ export class ViewTasksComponent {
   private readonly userService = inject(RwUserService);
   private readonly searchService = inject(RwSearchService);
   private readonly issueTableService = inject(IssueTableService);
-  private readonly sidebarService = inject(RenwuSidebarService);
+  private readonly sidebarService = inject(RwSidebarService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly page = new BehaviorSubject(0);

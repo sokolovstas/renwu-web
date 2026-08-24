@@ -17,7 +17,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import {
   BoardGroup,
   BoardGroupComponent,
@@ -88,7 +88,7 @@ export class BoardComponent {
   private readonly searchService = inject(RwSearchService);
   private readonly containerService = inject(RwContainerService);
   private readonly websocketService = inject(RwWebsocketService);
-  private readonly sidebarService = inject(RenwuSidebarService);
+  private readonly sidebarService = inject(RwSidebarService);
   private readonly userService = inject(RwUserService);
 
   private readonly refreshTasks$ = new Subject<void>();

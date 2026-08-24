@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { RenwuSidebarService, RenwuTourService } from '@renwu/app-ui';
+import { RwSidebarService, RwTourService } from '@renwu/app-ui';
 import {
   RwAlertService,
   RwModalService,
@@ -19,14 +19,14 @@ describe('AppComponent', () => {
       providers: [
         provideRouter([]),
         { provide: StateService, useValue: {} },
-        { provide: RenwuSidebarService, useValue: { init: () => undefined } },
+        { provide: RwSidebarService, useValue: { init: () => undefined } },
         { provide: RwTitleService, useValue: {} },
         { provide: RwLoaderService, useValue: {} },
         { provide: RwModalService, useValue: {} },
         { provide: RwAlertService, useValue: {} },
         { provide: RwTooltipService, useValue: {} },
         { provide: CheckForUpdateService, useValue: {} },
-        { provide: RenwuTourService, useValue: {} },
+        { provide: RwTourService, useValue: {} },
       ],
     }).compileComponents();
   });

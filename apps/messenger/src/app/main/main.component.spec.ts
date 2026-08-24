@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import { RwMessageService } from '@renwu/messaging';
 import { of } from 'rxjs';
 import { MainComponent } from './main.component';
@@ -19,7 +19,7 @@ describe('MainComponent', () => {
             getDestination: jest.fn().mockReturnValue(of(null)),
           },
         },
-        { provide: RenwuSidebarService, useValue: { scrollToMain: jest.fn() } },
+        { provide: RwSidebarService, useValue: { scrollToMain: jest.fn() } },
       ],
     })
       .overrideComponent(MainComponent, {

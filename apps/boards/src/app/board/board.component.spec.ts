@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { RenwuSidebarService } from '@renwu/app-ui';
+import { RwSidebarService } from '@renwu/app-ui';
 import {
   BoardGroup,
   BoardGroupConfig,
@@ -108,7 +108,7 @@ describe('BoardComponent', () => {
           },
         },
         {
-          provide: RenwuSidebarService,
+          provide: RwSidebarService,
           useValue: {
             currentTask: new BehaviorSubject(null),
           },

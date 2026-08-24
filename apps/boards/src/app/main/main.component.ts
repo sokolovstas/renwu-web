@@ -8,7 +8,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageWithSidebarComponent } from '@renwu/app-ui';
+import { RwPageWithSidebarComponent } from '@renwu/app-ui';
 import { RwBoardService } from '@renwu/board';
 
 @Component({
@@ -16,7 +16,7 @@ import { RwBoardService } from '@renwu/board';
   standalone: true,
   imports: [
     AsyncPipe,
-    RenwuPageWithSidebarComponent,
+    RwPageWithSidebarComponent,
     RouterLink,
     RouterLinkActive,
     RouterOutlet,
