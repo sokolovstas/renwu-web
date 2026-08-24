@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
-import { UserService } from '../user.service';
+import { ProfileUserService } from '../profile-user.service';
 import { ViewChatComponent } from '../view/chat/chat.component';
 import { ViewInfoComponent } from '../view/info/info.component';
 import { ViewTasksComponent } from '../view/tasks/tasks.component';
@@ -20,7 +20,7 @@ const createInlineLoader = (languages: Array<string>): InlineLoader => {
 };
 
 const setCurrentUser = (route: ActivatedRouteSnapshot) => {
-  inject(UserService).currentUserKey.next(route.paramMap.get('username'));
+  inject(ProfileUserService).currentUserKey.next(route.paramMap.get('username'));
 };
 
 /** Public user profile for `section:user/:username` (info / tasks / chat). */
@@ -28,7 +28,7 @@ export const VIEW_ROUTES: Route[] = [
   {
     path: ':username',
     providers: [
-      UserService,
+      ProfileUserService,
       {
         provide: TRANSLOCO_SCOPE,
         useValue: {

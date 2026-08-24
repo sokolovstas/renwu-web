@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { UserService } from '../../user.service';
+import { ProfileUserService } from '../../profile-user.service';
 
 @Component({
   selector: 'renwu-profile-view-info',
@@ -12,9 +12,9 @@ import { UserService } from '../../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewInfoComponent {
-  private readonly profileUserService = inject(UserService);
+  private readonly profileProfileUserService = inject(ProfileUserService);
 
-  readonly user = this.profileUserService.currentUser.asObservable();
+  readonly user = this.profileProfileUserService.currentUser.asObservable();
 
   timezoneName(user: {
     settings?: { time_zone_name?: string };

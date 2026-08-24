@@ -6,7 +6,7 @@ import { RwSidebarService } from '@renwu/app-ui';
 import { RwButtonComponent } from '@renwu/components';
 import { AvatarComponent, RwUserService } from '@renwu/core';
 import { map } from 'rxjs';
-import { UserService } from '../user.service';
+import { ProfileUserService } from '../profile-user.service';
 
 @Component({
   selector: 'renwu-profile-view-main',
@@ -25,12 +25,12 @@ import { UserService } from '../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewMainComponent {
-  private readonly profileUserService = inject(UserService);
+  private readonly profileProfileUserService = inject(ProfileUserService);
   private readonly userService = inject(RwUserService);
   private readonly router = inject(Router);
   private readonly sidebarService = inject(RwSidebarService);
 
-  readonly user = this.profileUserService.currentUser.asObservable();
+  readonly user = this.profileProfileUserService.currentUser.asObservable();
 
   readonly isSelf = this.user.pipe(
     map((u) => !!u?.id && this.userService.getIsCurrent(u.id)),

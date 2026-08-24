@@ -8,12 +8,12 @@ import {
   StateService,
 } from '@renwu/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { UserService } from './app/user.service';
+import { ProfileUserService } from './app/profile-user.service';
 
 beforeEach(() => {
   TestBed.configureTestingModule({
     providers: [
-      UserService,
+      ProfileUserService,
       {
         provide: CheckUserValidator,
         useValue: { validate: () => Promise.resolve(null) },

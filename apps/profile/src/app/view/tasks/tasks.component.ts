@@ -32,7 +32,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { UserService } from '../../user.service';
+import { ProfileUserService } from '../../profile-user.service';
 
 @Component({
   selector: 'renwu-profile-view-tasks',
@@ -51,7 +51,7 @@ import { UserService } from '../../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewTasksComponent {
-  private readonly profileUserService = inject(UserService);
+  private readonly profileProfileUserService = inject(ProfileUserService);
   private readonly userService = inject(RwUserService);
   private readonly searchService = inject(RwSearchService);
   private readonly issueTableService = inject(IssueTableService);
@@ -99,7 +99,7 @@ export class ViewTasksComponent {
   );
 
   constructor() {
-    this.profileUserService.currentUser
+    this.profileProfileUserService.currentUser
       .pipe(
         filter((u): u is User => Boolean(u?.id || u?.username)),
         distinctUntilChanged((a, b) => a?.id === b?.id),

@@ -7,7 +7,7 @@ import {
   RwMessageService,
 } from '@renwu/messaging';
 import { filter, map, of, shareReplay, switchMap } from 'rxjs';
-import { UserService } from '../../user.service';
+import { ProfileUserService } from '../../profile-user.service';
 
 @Component({
   selector: 'renwu-profile-view-chat',
@@ -18,10 +18,10 @@ import { UserService } from '../../user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewChatComponent {
-  private readonly profileUserService = inject(UserService);
+  private readonly profileProfileUserService = inject(ProfileUserService);
   private readonly messageService = inject(RwMessageService);
 
-  readonly thread = this.profileUserService.currentUser.pipe(
+  readonly thread = this.profileProfileUserService.currentUser.pipe(
     map((u) => u?.id),
     filter((id): id is string => !!id),
     switchMap((id) =>
