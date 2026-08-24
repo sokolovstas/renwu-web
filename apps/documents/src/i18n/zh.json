@@ -1,1 +1,9 @@
-{}
+{
+  "new-title": "新建文档",
+  "title-placeholder": "文档标题",
+  "create": "创建",
+  "untitled": "无标题",
+  "loading": "加载中…",
+  "not-found": "文档不存在或你无权访问。",
+  "back": "返回"
+}

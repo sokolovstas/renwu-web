@@ -89,6 +89,11 @@ import {
   AIWorkspace,
 } from './ai.model';
 import {
+  RwDocument,
+  RwDocumentStepsResponse,
+  RwDocumentSubmitStepsRequest,
+} from './documents.model';
+import {
   JiraConfigBundle,
   JiraDiffRequest,
   JiraImportByKeyResult,
@@ -1201,6 +1206,105 @@ export class RwDataService {
       'post',
       `/issues/${encodeURIComponent(issueId)}/session/refresh`,
       {},
+    );
+  }
+
+  // DOCUMENTS — real-time collaborative docs (renwu.documents, base `/api/documents/v1`)
+  sendToDocumentsAPI<T>(
+    method: 'get' | 'post' | 'put' | 'delete',
+    url: string,
+    data: DataObject | ParamsObject = null,
+  ): Observable<T> {
+    const loader = this.loaderService.setLoader();
+    const options = {
+      headers: new HttpHeaders(this.headers),
+      withCredentials: true,
+      params: new HttpParams(),
+    };
+    if (method === 'get') {
+      options.params = new HttpParams({
+        fromObject: (data || {}) as ParamsObject,
+      });
+      return this.http
+        .get<T>(this.settings.documentsApiUrl + url, options)
+        .pipe(
+          catchError((err: unknown) =>
+            this.catchHandler(err as HttpErrorResponse, loader, false),
+          ),
+          finalize(() => this.finallyHandler(loader)),
+        );
+    }
+    if (method === 'post') {
+      return this.http
+        .post<T>(this.settings.documentsApiUrl + url, data, options)
+        .pipe(
+          catchError((err: unknown) =>
+            this.catchHandler(err as HttpErrorResponse, loader, false),
+          ),
+          finalize(() => this.finallyHandler(loader)),
+        );
+    }
+    return this.http
+      .delete<T>(this.settings.documentsApiUrl + url, options)
+      .pipe(
+        catchError((err: unknown) =>
+          this.catchHandler(err as HttpErrorResponse, loader, false),
+        ),
+        finalize(() => this.finallyHandler(loader)),
+      );
+  }
+  docsListDocuments(issueId?: string): Observable<RwDocument[]> {
+    return this.sendToDocumentsAPI(
+      'get',
+      '/documents',
+      issueId ? { issue_id: issueId } : undefined,
+    );
+  }
+  docsCreateDocument(data: {
+    title: string;
+    issue_id?: string;
+    container_id?: string;
+  }): Observable<RwDocument> {
+    return this.sendToDocumentsAPI('post', '/documents', data);
+  }
+  docsGetDocument(id: string): Observable<RwDocument> {
+    return this.sendToDocumentsAPI('get', `/documents/${id}`);
+  }
+  docsDeleteDocument(id: string): Observable<unknown> {
+    return this.sendToDocumentsAPI('delete', `/documents/${id}`);
+  }
+  /**
+   * Long-polls (server-side, ~25s) for steps after `version`. Bypasses
+   * sendToDocumentsAPI's shared catchHandler on purpose — it swallows every
+   * non-401 error into EMPTY and pops an error toast, which is wrong for a
+   * background sync loop that runs every few seconds and where transient
+   * network errors are routine, not user-facing failures. Errors propagate
+   * to the caller instead, silently.
+   */
+  docsGetSteps(
+    id: string,
+    version: number,
+  ): Observable<RwDocumentStepsResponse> {
+    const params = new HttpParams({ fromObject: { version: String(version) } });
+    return this.http.get<RwDocumentStepsResponse>(
+      `${this.settings.documentsApiUrl}/documents/${id}/steps`,
+      { headers: new HttpHeaders(this.headers), withCredentials: true, params },
+    );
+  }
+  /**
+   * Submits a steps batch. Also bypasses the shared error pipeline: a 409
+   * VERSION_CONFLICT here is an expected, routine part of the collab
+   * protocol (two editors typed at once) — the caller rebases and retries,
+   * it is never a user-facing error, and must never toast one.
+   */
+  docsSubmitSteps(
+    id: string,
+    body: RwDocumentSubmitStepsRequest,
+  ): Observable<RwDocument> {
+    return this.http.post<RwDocument>(
+      `${this.settings.documentsApiUrl}/documents/${id}/steps`,
+      body,
+      { headers: new HttpHeaders(this.headers), withCredentials: true },
     );
   }
 

@@ -22,6 +22,7 @@ export class RwCoreSettings {
    */
   jiraApiUrl: string;
   aiApiUrl: string;
+  documentsApiUrl: string;
   maxSizeAttachment = 200 * 1024 * 1024;
 
   constructor() {
@@ -56,6 +57,7 @@ export class RwCoreSettings {
     this.messagesApiUrl = `${http}://${this._root}/api/messenger/v1`;
     this.jiraApiUrl = `${http}://${this._root}/api/jira/v1`;
     this.aiApiUrl = `${http}://${this._root}/api/ai/v1`;
+    this.documentsApiUrl = `${http}://${this._root}/api/documents/v1`;
   }
 }
 

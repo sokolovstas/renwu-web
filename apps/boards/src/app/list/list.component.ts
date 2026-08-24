@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import { BoardGroupsConfig, RwBoardService } from '@renwu/board';
 import {
   RwButtonComponent,
@@ -20,7 +20,7 @@ import {
   imports: [
     AsyncPipe,
     FormsModule,
-    RenwuPageComponent,
+    RwPageComponent,
     RouterLink,
     RouterLinkActive,
     RwButtonComponent,

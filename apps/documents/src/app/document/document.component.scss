@@ -1,0 +1,58 @@
+@import 'prosemirror-view/style/prosemirror.css';
+@import 'prosemirror-menu/style/menu.css';
+@import 'prosemirror-example-setup/style/style.css';
+@import 'prosemirror-gapcursor/style/gapcursor.css';
+
+.documents-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.documents-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-weight: 300;
+    font-size: 1.5rem;
+  }
+}
+
+.documents-loading {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.documents-create {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 480px;
+}
+
+.documents-create-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.documents-editor {
+  border: 1px solid var(--rw-border-color, #d9d9d9);
+  border-radius: 6px;
+  min-height: 60vh;
+}
+
+.documents-editor .ProseMirror {
+  padding: 1rem 1.25rem;
+  min-height: 55vh;
+  outline: none;
+}
+
+.documents-error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

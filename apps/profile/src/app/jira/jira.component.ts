@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   RwButtonComponent,
   RwTextInputComponent,
@@ -24,7 +24,7 @@ import { defaultIfEmpty, firstValueFrom, Observable } from 'rxjs';
   selector: 'renwu-profile-jira',
   standalone: true,
   imports: [
-    RenwuPageComponent,
+    RwPageComponent,
     ReactiveFormsModule,
     RwTextInputComponent,
     RwButtonComponent,

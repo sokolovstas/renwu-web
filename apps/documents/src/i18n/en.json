@@ -1,1 +1,9 @@
-{}
+{
+  "new-title": "New document",
+  "title-placeholder": "Document title",
+  "create": "Create",
+  "untitled": "Untitled",
+  "loading": "Loading…",
+  "not-found": "Document not found or you don't have access to it.",
+  "back": "Back"
+}

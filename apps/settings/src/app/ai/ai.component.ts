@@ -6,7 +6,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RwAlertService, RwButtonComponent, RwToastService } from '@renwu/components';
 import { AIConfigBundle, RwDataService } from '@renwu/core';
@@ -24,7 +24,7 @@ type AiTab = 'settings' | 'workspaces' | 'skills' | 'workflows' | 'jobs' | 'runn
   selector: 'renwu-settings-ai',
   standalone: true,
   imports: [
-    RenwuPageComponent,
+    RwPageComponent,
     RwButtonComponent,
     TranslocoPipe,
     AiSettingsComponent,

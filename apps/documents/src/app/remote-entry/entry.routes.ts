@@ -24,7 +24,7 @@ export const ROUTES: Route[] = [
       {
         provide: TRANSLOCO_SCOPE,
         useValue: {
-          scope: 'profile',
+          scope: 'documents',
           loader: createInlineLoader(['en', 'ru', 'zh']),
         },
       },

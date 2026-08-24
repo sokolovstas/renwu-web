@@ -1,1 +1,34 @@
-<p>document works!</p>
+<div class="documents-page">
+  @if (!documentId()) {
+    <div class="documents-create">
+      <h1>{{ 'documents.new-title' | transloco }}</h1>
+      <div class="documents-create-form">
+        <rw-text-input
+          [live]="true"
+          [formControl]="newTitle"
+          prompt="{{ 'documents.title-placeholder' | transloco }}"
+        />
+        <rw-button
+          typeButton="primary"
+          [disabled]="!newTitle.value.trim() || creating()"
+          (clicked)="createDocument()"
+        >
+          {{ 'documents.create' | transloco }}
+        </rw-button>
+      </div>
+    </div>
+  } @else if (fatalError()) {
+    <div class="documents-error">
+      <p>{{ 'documents.not-found' | transloco }}</p>
+      <a routerLink="..">{{ 'documents.back' | transloco }}</a>
+    </div>
+  } @else {
+    <div class="documents-header">
+      <h1>{{ title() || ('documents.untitled' | transloco) }}</h1>
+      @if (loading()) {
+        <span class="documents-loading">{{ 'documents.loading' | transloco }}</span>
+      }
+    </div>
+    <div class="documents-editor" #editorHost></div>
+  }
+</div>

@@ -17,7 +17,7 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { RenwuPageComponent } from '@renwu/app-ui';
+import { RwPageComponent } from '@renwu/app-ui';
 import {
   ISelectItem,
   RwAlertService,
@@ -74,7 +74,7 @@ type JiraSettingsTab =
     FormsModule,
     ReactiveFormsModule,
     RouterLink,
-    RenwuPageComponent,
+    RwPageComponent,
     RwButtonComponent,
     RwCheckboxComponent,
     RwSelectComponent,
