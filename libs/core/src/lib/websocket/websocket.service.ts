@@ -25,8 +25,6 @@ export class RwWebsocketService {
 
   transloco = inject(TranslocoService);
 
-  token = '';
-  tenant = '';
   connected = new BehaviorSubject<boolean>(false);
   subject: RxWebsocketSubject<CoreSendCommand, CoreEventWrapper>;
   displayDisconnected: boolean;
@@ -48,20 +46,9 @@ export class RwWebsocketService {
       this.subject.complete();
     }
 
-    this.token = localStorage.getItem('renwu_auth') || ''
-
-    if(this.token === '') {
-      this.token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('renwu-auth'))
-        ?.split('=')[1];
-    }
-
-
-
-    this.subject = new RxWebsocketSubject(
-      `${this.settings.wsServerUrl}?renwu-token=${this.token}`,
-    );
+    // Auth is via the HttpOnly `renwu-auth` cookie, which the browser
+    // attaches to the WS handshake automatically — no token in JS reach.
+    this.subject = new RxWebsocketSubject(this.settings.wsServerUrl);
 
     this.subject.connectionStatus.subscribe((isConnected) => {
       this.connected.next(isConnected);

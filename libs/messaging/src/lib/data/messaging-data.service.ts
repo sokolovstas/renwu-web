@@ -59,11 +59,6 @@ export class RwMessagingDataService {
     this.headers = {
       'Content-Type': 'application/json',
     };
-    const token = localStorage.getItem('renwu_auth') || ''
-
-    if(token) {
-      this.headers['Authorization']=`Bearer ${token}`
-    }
   }
 
   private redirectToLogin(): void {
