@@ -1,68 +1,68 @@
-<renwu-page-with-sidebar>
-  <div sidebar>
-    <!-- <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
-    {{ 'dashboard.dashboard' | transloco }}
-  </div> -->
-  <ul>
-    <li>
-      <a class="active">{{ 'dashboard.tasks' | transloco }}</a>
-    </li>
-  </ul>
-</div>
-<renwu-page title="{{ 'dashboard.tasks' | transloco }}">
-  @if ((issues | async)?.length) {
-    <div class="font-extralight text-2xl mb-6">
-      {{ 'dashboard.assigned-to-me' | transloco }}
+<renwu-page
+  [hideTitle]="!!dashboard()"
+  [title]="dashboard()?.title || ('dashboard.my-day' | transloco)"
+>
+  @if (dashboard(); as current) {
+    <div subtitle class="dashboard-title">
+      @if (canEdit()) {
+        <input
+          class="dashboard-title__input"
+          [ngModel]="titleDraft()"
+          (ngModelChange)="titleDraft.set($event)"
+          (blur)="commitTitle()"
+          (keydown.enter)="onTitleEnter($event)"
+          [attr.placeholder]="'dashboard.rename' | transloco"
+          [attr.aria-label]="'dashboard.rename' | transloco"
+        />
+        <rw-icon
+          class="dashboard-title__pen"
+          icon="pen"
+          size="normal"
+          [attr.title]="'dashboard.rename' | transloco"
+        />
+      } @else {
+        <div class="dashboard-title__text">{{ current.title }}</div>
+      }
     </div>
-    <renwu-issue-table
-      class="w-full flex-shrink-0"
-      (clicked)="issueClick($event)"
-      [issues]="issuesDisplay | async"
-      ><div footer class="flex w-full justify-end mt-4">
-      <rw-pager [currentPage]="issuesPage | async"
-        [pagesCountLimit]="3"
-        [pageSize]="rows"
-        [rowsCount]="(issues | async)?.length"
-        [showPages]="true"
-        (pageChanged)="issuesPage.next($event)"
-       /></div
-    ></renwu-issue-table>
-  }
-  @if ((recentIssues | async)?.length) {
-    <div class="font-extralight text-2xl mb-6">
-      {{ 'dashboard.recently-opened' | transloco }}
+    <div class="dashboard-toolbar">
+      @if (canEdit()) {
+        <label class="dashboard-share">
+          <rw-checkbox
+            [ngModel]="current.shared"
+            (ngModelChange)="setShared($event)"
+          />
+          <span>{{ 'dashboard.shared' | transloco }}</span>
+        </label>
+        <rw-button typeButton="link" (clicked)="addWidget()">
+          {{ 'dashboard.add-widget' | transloco }}
+        </rw-button>
+        <rw-button typeButton="link" (clicked)="resetLayout()">
+          {{ 'dashboard.reset-layout' | transloco }}
+        </rw-button>
+      } @else {
+        <div class="dashboard-view-only">
+          {{ 'dashboard.view-only' | transloco }}
+        </div>
+      }
     </div>
-    <renwu-issue-table
-      class="w-full flex-shrink-0"
-      (clicked)="issueClick($event)"
-      [issues]="recentIssuesDisplay | async"
-      ><div footer class="flex w-full justify-end mt-4">
-      <rw-pager [currentPage]="recentIssuesPage | async"
-        [pagesCountLimit]="3"
-        [pageSize]="rows"
-        [rowsCount]="(recentIssues | async)?.length"
-        [showPages]="true"
-        (pageChanged)="recentIssuesPage.next($event)"
-       /></div
-    ></renwu-issue-table>
-  }
-  @if ((watched | async)?.length) {
-    <div class="font-extralight text-2xl mb-6">
-      {{ 'dashboard.watched' | transloco }}
+    <div class="dashboard-grid">
+      @for (widget of widgets(); track widget.id; let i = $index) {
+        <renwu-dashboard-widget
+          class="dashboard-grid__item"
+          [class.dashboard-grid__item--full]="widget.cols === 2"
+          [widget]="widget"
+          [editable]="canEdit()"
+          [dragging]="dragFrom() === i"
+          [dropTarget]="dropOver() === i && dragFrom() !== i"
+          (changed)="onWidgetChange(i, $event)"
+          (removed)="removeWidget(i)"
+          (issueClick)="issueClick($event)"
+          (dragHandleStart)="onDragStart(i, $event)"
+          (dragHandleEnd)="onDragEnd()"
+          (dragover)="onDragOver(i, $event)"
+          (drop)="onDrop(i, $event)"
+        />
+      }
     </div>
-    <renwu-issue-table
-      class="w-full flex-shrink-0 mb-4"
-      (clicked)="issueClick($event)"
-      [issues]="watchedDisplay | async"
-      ><div footer class="flex w-full justify-end mt-4">
-      <rw-pager [currentPage]="watchedPage | async"
-        [pagesCountLimit]="3"
-        [pageSize]="rows"
-        [rowsCount]="(watched | async)?.length"
-        [showPages]="true"
-        (pageChanged)="watchedPage.next($event)"
-       /></div
-    ></renwu-issue-table>
   }
 </renwu-page>
-</renwu-page-with-sidebar>

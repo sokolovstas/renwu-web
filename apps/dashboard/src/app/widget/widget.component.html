@@ -1,0 +1,173 @@
+<div
+  class="dashboard-widget"
+  [class.dashboard-widget--dragging]="dragging()"
+  [class.dashboard-widget--drop-target]="dropTarget()"
+>
+  <div class="dashboard-widget__header">
+    @if (editable()) {
+      <div
+        class="dashboard-widget__drag"
+        draggable="true"
+        (dragstart)="onDragHandleStart($event)"
+        (dragend)="dragHandleEnd.emit()"
+        [attr.title]="'dashboard.drag-widget' | transloco"
+      >
+        <rw-icon icon="menu" size="normal" />
+      </div>
+    }
+    @if (settingsOpen() && editable()) {
+      <input
+        class="dashboard-widget__title-input"
+        [ngModel]="titleDraft()"
+        (ngModelChange)="titleDraft.set($event)"
+        (blur)="commitTitle(titleDraft())"
+        (keydown.enter)="onTitleEnter($event)"
+      />
+    } @else if (editable()) {
+      <button
+        type="button"
+        class="dashboard-widget__title"
+        (click)="startEditTitle()"
+      >
+        {{ displayTitle() }}
+      </button>
+    } @else {
+      <div class="dashboard-widget__title">{{ displayTitle() }}</div>
+    }
+    @if (editable()) {
+      <div class="dashboard-widget__actions">
+        <rw-icon
+          class="dashboard-widget__action"
+          icon="pen"
+          size="normal"
+          cursor="pointer"
+          [attr.title]="'dashboard.edit-widget' | transloco"
+          (click)="toggleSettings()"
+        />
+        <rw-icon
+          class="dashboard-widget__action"
+          icon="trash"
+          size="normal"
+          cursor="pointer"
+          [attr.title]="'dashboard.delete-widget' | transloco"
+          (click)="removed.emit()"
+        />
+      </div>
+    }
+  </div>
+
+  @if (settingsOpen() && editable()) {
+    <div class="dashboard-widget__settings">
+      <div class="dashboard-widget__chips">
+        <rw-button
+          typeButton="link"
+          [selected]="widget().source === 'query'"
+          (clicked)="patch({ source: 'query' })"
+          >{{ 'dashboard.source-query' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().source === 'recent'"
+          (clicked)="patch({ source: 'recent' })"
+          >{{ 'dashboard.source-recent' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().source === 'watcher'"
+          (clicked)="patch({ source: 'watcher' })"
+          >{{ 'dashboard.source-watched' | transloco }}</rw-button
+        >
+      </div>
+      @if (widget().source === 'query') {
+        <renwu-query-builder
+          class="dashboard-widget__query"
+          [query]="widget().query"
+          [emitOnChange]="true"
+          (queryChange)="onQueryChange($event)"
+        />
+      }
+      <div class="dashboard-widget__chips">
+        <rw-button
+          typeButton="link"
+          [selected]="widget().cols === 1"
+          (clicked)="patch({ cols: 1 })"
+          >{{ 'dashboard.half-width' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().cols === 2"
+          (clicked)="patch({ cols: 2 })"
+          >{{ 'dashboard.full-width' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().density === 'compact'"
+          (clicked)="patch({ density: 'compact' })"
+          >{{ 'dashboard.compact' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().density === 'normal'"
+          (clicked)="patch({ density: 'normal' })"
+          >{{ 'dashboard.comfortable' | transloco }}</rw-button
+        >
+      </div>
+      <div class="dashboard-widget__chips">
+        <rw-button
+          typeButton="link"
+          [selected]="widget().groupBy === 'none'"
+          (clicked)="setGroupBy('none')"
+          >{{ 'dashboard.group-none' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().groupBy === 'schedule'"
+          (clicked)="setGroupBy('schedule')"
+          >{{ 'dashboard.group-schedule' | transloco }}</rw-button
+        >
+        <rw-button
+          typeButton="link"
+          [selected]="widget().groupBy === 'day'"
+          (clicked)="setGroupBy('day')"
+          >{{ 'dashboard.group-day' | transloco }}</rw-button
+        >
+      </div>
+    </div>
+  }
+
+  @if (groups$ | async; as groups) {
+    @if (!groups.length) {
+      <div class="dashboard-widget__empty">
+        {{ 'dashboard.empty' | transloco }}
+      </div>
+    } @else {
+      <div class="dashboard-widget__groups">
+        @for (group of groups; track group.id) {
+          @if (group.kind !== 'all') {
+            <div class="dashboard-widget__group-title">
+              @if (group.kind === 'day' && group.date) {
+                {{ group.date | rwDate: 'P' }}
+              } @else {
+                {{ groupLabel(group) }}
+              }
+              <span class="dashboard-widget__count">{{ group.issues.length }}</span>
+            </div>
+          }
+          <div class="dashboard-widget__issues">
+            @for (issue of group.issues; track issue.id || issue.key) {
+              <div
+                class="dashboard-widget__issue"
+                (click)="issueClick.emit(issue)"
+              >
+                <renwu-issue-card
+                  [issue]="issue"
+                  [density]="widget().density"
+                />
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

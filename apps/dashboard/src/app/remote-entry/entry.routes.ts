@@ -1,6 +1,8 @@
 import { Route } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
+import { RwQueryBuilderService, RwSearchService } from '@renwu/core';
 import { MainComponent } from '../main/main.component';
+import { ShellComponent } from '../shell/shell.component';
 
 const createInlineLoader = (languages: Array<string>): InlineLoader => {
   const translocoInlineLoader: InlineLoader = {};
@@ -17,6 +19,7 @@ const createInlineLoader = (languages: Array<string>): InlineLoader => {
 export const ROUTES: Route[] = [
   {
     path: '',
+    component: ShellComponent,
     providers: [
       {
         provide: TRANSLOCO_SCOPE,
@@ -25,7 +28,18 @@ export const ROUTES: Route[] = [
           loader: createInlineLoader(['en', 'ru', 'zh']),
         },
       },
+      RwQueryBuilderService,
+      RwSearchService,
     ],
-    component: MainComponent,
+    children: [
+      {
+        path: '',
+        component: MainComponent,
+      },
+      {
+        path: ':id',
+        component: MainComponent,
+      },
+    ],
   },
 ];

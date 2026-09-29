@@ -1,0 +1,31 @@
+<renwu-page-with-sidebar>
+  <div sidebar>
+    <div class="text-2xl p-4 pt-0 flex flex-row font-extralight">
+      <a class="flex" routerLink="/">{{ 'dashboard.tasks' | transloco }}</a>
+    </div>
+    <ul class="flex flex-col overflow-auto w-full mb-4">
+      @for (dashboard of dashboardService.dashboards(); track dashboard.id) {
+        <li>
+          <a
+            class="flex p-4 items-center gap-2"
+            [class.router-link-active]="dashboardService.activeId() === dashboard.id"
+            [routerLink]="['/dashboard', dashboard.id]"
+          >
+            <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+              {{ dashboard.title }}
+            </span>
+            @if (dashboard.shared) {
+              <rw-icon icon="share" size="small" />
+            }
+          </a>
+        </li>
+      }
+    </ul>
+    <div class="px-4 pb-4">
+      <rw-button typeButton="link" iconClass="add-bold" (clicked)="createDashboard()">
+        {{ 'dashboard.add-dashboard' | transloco }}
+      </rw-button>
+    </div>
+  </div>
+  <router-outlet />
+</renwu-page-with-sidebar>

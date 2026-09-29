@@ -51,6 +51,11 @@ export const appRoutes: Route[] = [
           loadRemoteModule('dashboard', './routes').then((m) => m.ROUTES),
       },
       {
+        path: 'dashboard',
+        loadChildren: () =>
+          loadRemoteModule('dashboard', './routes').then((m) => m.ROUTES),
+      },
+      {
         path: 'task',
         outlet: 'section',
         loadChildren: () =>

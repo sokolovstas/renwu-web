@@ -67,6 +67,7 @@ import {
   BoardBucketsResponse,
   BoardGroupsConfigServer,
 } from './board.model';
+import { Dashboard } from './dashboard.model';
 import {
   OptionsResponse,
   ResponseOk,
@@ -951,6 +952,26 @@ export class RwDataService {
   }
   deleteBoard(id: string): Observable<ResponseOk> {
     return this.sendToAPI<ResponseOk>('delete', `/board/${id}`);
+  }
+
+  getDashboards(): Observable<Dashboard[]> {
+    return this.sendToAPI<Dashboard[]>('get', '/dashboard');
+  }
+  getDashboard(id: string): Observable<Dashboard> {
+    return this.sendToAPI<Dashboard>('get', `/dashboard/${id}`);
+  }
+  saveDashboard(dashboard: Dashboard): Observable<Dashboard> {
+    return this.sendToAPI<Dashboard>(
+      'put',
+      `/dashboard/${dashboard.id}`,
+      dashboard,
+    );
+  }
+  addDashboard(dashboard: Dashboard): Observable<Dashboard> {
+    return this.sendToAPI<Dashboard>('post', '/dashboard', dashboard);
+  }
+  deleteDashboard(id: string): Observable<ResponseOk> {
+    return this.sendToAPI<ResponseOk>('delete', `/dashboard/${id}`);
   }
 
   // BOARDS

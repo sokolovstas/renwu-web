@@ -12,6 +12,7 @@ export * from './lib/container/team-balance.model';
 export * from './lib/container/team.model';
 export * from './lib/counter/counter.component';
 export * from './lib/data/board.model';
+export * from './lib/data/dashboard.model';
 export * from './lib/data/common.model';
 export * from './lib/data/data.service';
 export * from './lib/data/ai.model';
