@@ -20,6 +20,8 @@ export interface AIProviderInfo {
   description?: string;
   needs_base_url?: boolean;
   needs_web_url?: boolean;
+  needs_runner?: boolean;
+  needs_effort?: boolean;
 }
 
 export interface AIRunner {
@@ -38,12 +40,22 @@ export interface AICreateRunnerResponse {
   token: string;
 }
 
+export interface AIProviderSettings {
+  base_url?: string;
+  web_base_url?: string;
+  run_via_runner?: boolean;
+  default_model?: string;
+  default_effort?: string;
+}
+
 export interface AISettings {
   enabled?: boolean;
-  /** When true, only a registered local runner executes this tenant's jobs — the cloud service stops claiming its queue (still reclaims stuck jobs as a safety net). See the Runners tab. */
-  run_via_runner?: boolean;
-  /** Agent harness id (default: opencode). */
+  /** Selected harness id (default: opencode). Connection fields live under providers[id]. */
   agent_provider?: string;
+  /** Per-provider URLs, default model, and run-via-runner flag. */
+  providers?: Record<string, AIProviderSettings>;
+  /** Flattened selected provider slot; prefer providers[agent_provider]. */
+  run_via_runner?: boolean;
   agent_base_url?: string;
   agent_web_base_url?: string;
   /** @deprecated Prefer agent_base_url; kept for backward compatibility. */
@@ -53,6 +65,8 @@ export interface AISettings {
   actor_user_id?: string;
   max_concurrent_jobs?: number;
   default_model?: string;
+  /** Codex model_reasoning_effort. Empty = the model's default_reasoning_level. */
+  default_effort?: string;
   /** Global gate mode: shadow (advisory) | enforce. */
   gates_mode?: 'shadow' | 'enforce';
   max_fix_iterations?: number;
@@ -84,6 +98,7 @@ export interface AIWorkspace {
   name?: string;
   workdir?: string;
   default_branch?: string;
+  /** @deprecated Workspace-wide command list cannot cover many repos. Leave empty. */
   verify_commands?: string;
   enabled?: boolean;
   /** Optional override; empty inherits tenant AI settings. */
@@ -105,13 +120,19 @@ export interface AISkill {
   model?: string;
   timeout_sec?: number;
   enabled?: boolean;
-  /** JSON Schema for RENWU_RESULT; grooming should require affected_projects[]. */
+  /** Leftover JSON Schema for RENWU_RESULT. Leave empty — answers are YAML + markdown. */
   result_schema?: Record<string, unknown>;
   result_marker?: string;
   allowed_tools?: string[];
   permission_mode?: string;
   max_budget_usd?: number;
   max_turns?: number;
+  /** Codex reasoning effort. Empty = tenant default. */
+  effort?: string;
+  /** Optional subset of workspace.gates after this skill (step run_gates_after). Empty = archetype. */
+  gate_names?: string[];
+  /** After hermetic gates, run this skill as the agent review pass (e.g. vkgo-review). */
+  review_skill_id?: string;
 }
 export interface AIWorkflowStep {
   id?: string;

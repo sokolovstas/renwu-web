@@ -156,7 +156,8 @@
     "add-task": "renwu.add-task",
     "settings": "renwu.settings",
     "profile": "renwu.profile",
-    "search": "搜索"
+    "search": "搜索",
+    "documents": "文档"
   },
   "task": {
     "related": "关联任务",
@@ -238,6 +239,10 @@
     "attachments-tooltip-post": "发送到任务消息",
     "attachments-tooltip-download": "下载",
     "attachments-tooltip-delete": "删除",
+    "documents": "文档",
+    "documents-empty": "暂无文档",
+    "documents-open": "打开",
+    "documents-error": "无法加载文档。",
     "time-log-save-first": "请先保存任务后再记录工时。",
     "time-log-total": "已记录",
     "time-log-completion": "完成度",

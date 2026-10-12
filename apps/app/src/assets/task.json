@@ -22,6 +22,13 @@
       "wrapperClass": "col-span-2"
     },
     {
+      "element": "renwu-task-custom-fields",
+      "order": 27,
+      "icon": "link",
+      "titleKey": "task.custom-fields",
+      "wrapperClass": "col-span-2"
+    },
+    {
       "element": "renwu-task-related",
       "order": 30,
       "icon": "share",
@@ -40,6 +47,13 @@
       "order": 50,
       "icon": "picture",
       "titleKey": "task.attachments",
+      "wrapperClass": "col-span-2"
+    },
+    {
+      "element": "renwu-task-documents",
+      "order": 52,
+      "icon": "document",
+      "titleKey": "task.documents",
       "wrapperClass": "col-span-2"
     },
     {

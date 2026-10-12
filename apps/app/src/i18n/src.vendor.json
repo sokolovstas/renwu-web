@@ -156,6 +156,7 @@
     "add-task": "renwu.add-task",
     "settings": "renwu.settings",
     "profile": "renwu.profile",
-    "search": "renwu.search"
+    "search": "renwu.search",
+    "documents": "renwu.documents"
   }
 }

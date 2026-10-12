@@ -4,19 +4,34 @@
     {{ 'settings.ai-enabled' | transloco }}
   </label>
   <p class="form-supporting-text">{{ 'settings.ai-bot-hint' | transloco }}</p>
-  <label class="flex items-center gap-2">
-    <input type="checkbox" formControlName="run_via_runner" />
-    {{ 'settings.ai-run-via-runner' | transloco }}
-  </label>
-  <p class="form-supporting-text">
-    {{ 'settings.ai-run-via-runner-hint' | transloco }}
-  </p>
   <div class="grid gap-4 lg:grid-cols-2">
     <rw-select
       formControlName="agent_provider"
       [model]="providerModel"
       prompt="{{ 'settings.ai-provider' | transloco }}"
     />
+    <rw-select
+      formControlName="actor_user_id"
+      [model]="actorModel"
+      prompt="{{ 'settings.ai-actor' | transloco }}"
+    />
+  </div>
+  @if (selectedProvider?.description) {
+    <p class="form-supporting-text">{{ selectedProvider?.description }}</p>
+  }
+
+  <label class="flex items-center gap-2">
+    <input type="checkbox" formControlName="run_via_runner" />
+    {{ 'settings.ai-run-via-runner' | transloco }}
+  </label>
+  <p class="form-supporting-text">
+    @if (runnerRequired) {
+      {{ 'settings.ai-run-via-runner-required' | transloco }}
+    } @else {
+      {{ 'settings.ai-run-via-runner-hint' | transloco }}
+    }
+  </p>
+  <div class="grid gap-4 lg:grid-cols-2">
     @if (selectedProvider?.needs_base_url !== false) {
       <rw-text-input
         [live]="true"
@@ -31,11 +46,6 @@
         prompt="{{ 'settings.ai-agent-web-url' | transloco }}"
       />
     }
-    <rw-select
-      formControlName="actor_user_id"
-      [model]="actorModel"
-      prompt="{{ 'settings.ai-actor' | transloco }}"
-    />
     <div class="flex flex-col gap-2">
       <rw-select
         formControlName="default_model"
@@ -46,6 +56,21 @@
         'settings.ai-refresh-models' | transloco
       }}</rw-button>
     </div>
+    @if (effortVisible) {
+      <rw-select
+        formControlName="default_effort"
+        [model]="effortModel"
+        prompt="{{ 'settings.ai-effort' | transloco }}"
+      />
+    }
+  </div>
+  @if (effortVisible) {
+    <p class="form-supporting-text">
+      {{ 'settings.ai-effort-hint' | transloco }}
+    </p>
+  }
+
+  <div class="grid gap-4 lg:grid-cols-2">
     <rw-text-input
       [live]="true"
       formControlName="max_concurrent_jobs"
@@ -79,9 +104,6 @@
   <p class="form-supporting-text">
     {{ 'settings.ai-gates-mode-hint' | transloco }}
   </p>
-  @if (selectedProvider?.description) {
-    <p class="form-supporting-text">{{ selectedProvider?.description }}</p>
-  }
 
   <rw-button action (clicked)="save()">{{
     'settings.save' | transloco

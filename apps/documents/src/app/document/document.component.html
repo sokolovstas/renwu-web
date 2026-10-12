@@ -1,7 +1,9 @@
-<div class="documents-page">
+<div class="documents-page flex flex-col flex-1 w-full h-full min-h-0">
   @if (!documentId()) {
-    <div class="documents-create">
-      <h1>{{ 'documents.new-title' | transloco }}</h1>
+    <div class="documents-create mx-2 mt-4">
+      <h1 class="font-extralight text-2xl mb-2">
+        {{ 'documents.new-title' | transloco }}
+      </h1>
       <div class="documents-create-form">
         <rw-text-input
           [live]="true"
@@ -18,17 +20,19 @@
       </div>
     </div>
   } @else if (fatalError()) {
-    <div class="documents-error">
+    <div class="documents-error mx-2 mt-4">
       <p>{{ 'documents.not-found' | transloco }}</p>
       <a routerLink="..">{{ 'documents.back' | transloco }}</a>
     </div>
   } @else {
-    <div class="documents-header">
-      <h1>{{ title() || ('documents.untitled' | transloco) }}</h1>
+    <div class="documents-header mt-4 mx-2 font-extralight text-2xl mb-2">
+      <h1 class="font-extralight text-2xl">
+        {{ title() || ('documents.untitled' | transloco) }}
+      </h1>
       @if (loading()) {
         <span class="documents-loading">{{ 'documents.loading' | transloco }}</span>
       }
     </div>
-    <div class="documents-editor" #editorHost></div>
+    <div class="documents-editor pt-0 mx-2 flex-1 min-h-0" #editorHost></div>
   }
 </div>

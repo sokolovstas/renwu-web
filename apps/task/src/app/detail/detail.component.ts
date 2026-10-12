@@ -5,8 +5,8 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  EnvironmentInjector,
   HostListener,
-  Injector,
   OnDestroy,
   signal,
   ViewChild,
@@ -100,7 +100,7 @@ export class DetailComponent implements OnDestroy {
   route = inject(ActivatedRoute);
   cd = inject(ChangeDetectorRef);
   router = inject(Router);
-  injector = inject(Injector);
+  environmentInjector = inject(EnvironmentInjector);
   issueService = inject(RwIssueService);
   messageServce = inject(RwMessageService);
   toastService = inject(RwToastService);
@@ -182,7 +182,7 @@ export class DetailComponent implements OnDestroy {
         (a, b) => (a.order ?? 0) - (b.order ?? 0),
       );
       const tags = sorted.map((s) => s.element);
-      return from(registerTaskSectionElements(this.injector, tags)).pipe(
+      return from(registerTaskSectionElements(this.environmentInjector, tags)).pipe(
         map(() => sorted),
       );
     }),
@@ -191,7 +191,18 @@ export class DetailComponent implements OnDestroy {
 
   sections = combineLatest([this.sectionsConfig, this.layoutRefresh$]).pipe(
     map(([sorted]) => this.taskLayout.filterSections(sorted)),
-    tap((visible) => this.syncActiveSection(visible)),
+    distinctUntilChanged(
+      (prev, next) =>
+        prev.length === next.length &&
+        prev.every((section, index) => section.element === next[index]?.element),
+    ),
+    tap((visible) => {
+      console.info(
+        '[task-section] visible tabs',
+        visible.map((section) => section.element),
+      );
+      this.syncActiveSection(visible);
+    }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
@@ -216,6 +227,22 @@ export class DetailComponent implements OnDestroy {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
+  private documentsTotal = this.issueService.issue.pipe(
+    map((issue) => issue?.id),
+    distinctUntilChanged(),
+    switchMap((id) => {
+      if (!id || id === 'new') {
+        return of(0);
+      }
+      return this.dataService.docsListDocuments(String(id)).pipe(
+        map((docs) => docs.length),
+        catchError(() => of(0)),
+      );
+    }),
+    startWith(0),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
   sectionCounts = combineLatest([
     this.issueService.issueForm.valueChanges.pipe(
       startWith(this.issueService.issueForm.getRawValue()),
@@ -223,9 +250,16 @@ export class DetailComponent implements OnDestroy {
     this.issueService.issue,
     this.issueService.pendingSubtasks.pipe(startWith([])),
     this.loadedChildsTotal,
+    this.documentsTotal,
   ]).pipe(
-    map(([form, issue, pending, childsTotal]) =>
-      computeTaskSectionCounts(form, issue, pending?.length ?? 0, childsTotal),
+    map(([form, issue, pending, childsTotal, documentsTotal]) =>
+      computeTaskSectionCounts(
+        form,
+        issue,
+        pending?.length ?? 0,
+        childsTotal,
+        documentsTotal,
+      ),
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
@@ -251,15 +285,22 @@ export class DetailComponent implements OnDestroy {
     const tags = visible.map((s) => s.element);
     const current = this.activeSection();
     if (!tags.length) {
+      console.warn('[task-section] no visible tabs, collapsing active section');
       this.activeSection.set(null);
       return;
     }
     if (!this.activeSectionBootstrapped) {
       this.activeSectionBootstrapped = true;
+      console.info('[task-section] activate first tab', tags[0]);
       this.activeSection.set(tags[0]);
       return;
     }
     if (current && !tags.includes(current)) {
+      console.warn('[task-section] active tab missing, switching', {
+        current,
+        next: tags[0],
+        tags,
+      });
       this.activeSection.set(tags[0]);
     }
   }
@@ -359,9 +400,7 @@ export class DetailComponent implements OnDestroy {
     return;
   }
   close() {
-    this.router.navigate(['../..'], { relativeTo: this.route });
-    this.sidebarService.currentTask.next(null);
-    // this.issueService.key.next(null);
+    this.sidebarService.closeSection();
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -519,8 +558,7 @@ export class DetailComponent implements OnDestroy {
   async remove() {
     const deleted = await firstValueFrom(this.issueService.delete());
     if (deleted) {
-      this.router.navigate(['../..'], { relativeTo: this.route });
-      this.sidebarService.currentTask.next(null);
+      this.sidebarService.closeSection();
     }
     return;
   }

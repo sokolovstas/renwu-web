@@ -18,7 +18,6 @@ const createInlineLoader = (languages: Array<string>): InlineLoader => {
 export const ROUTES: Route[] = [
   {
     path: '',
-    pathMatch: 'full',
     component: MainComponent,
     providers: [
       {
@@ -32,6 +31,7 @@ export const ROUTES: Route[] = [
     children: [
       {
         path: '',
+        pathMatch: 'full',
         component: DocumentComponent,
       },
       {

@@ -156,7 +156,8 @@
     "add-task": "Add task",
     "settings": "Settings",
     "profile": "Profile",
-    "search": "Search"
+    "search": "Search",
+    "documents": "Documents"
   },
   "task": {
     "add_new_task": "Add new task",
@@ -257,6 +258,10 @@
     "attachments-tooltip-post": "Post to task messages",
     "attachments-tooltip-download": "Download",
     "attachments-tooltip-delete": "Delete",
+    "documents": "Documents",
+    "documents-empty": "No documents",
+    "documents-open": "Open",
+    "documents-error": "Could not load documents.",
     "time-log-save-first": "Save the task first to log time.",
     "time-log-total": "Logged",
     "time-log-completion": "Completion",

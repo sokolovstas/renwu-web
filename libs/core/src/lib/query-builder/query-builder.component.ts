@@ -114,8 +114,8 @@ export class QueryBuilderComponent {
 
   isEmpty = computed(
     () =>
-      !this.tree()?.children[0] ||
-      (this.tree()?.children[0] as AtomContext).getChildCount() === 0,
+      !this.tree()?.children?.[0] ||
+      (this.tree()?.children?.[0] as AtomContext)?.getChildCount() === 0,
   );
 
   showTextInput = signal(false);

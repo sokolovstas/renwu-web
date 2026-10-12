@@ -1,0 +1,17 @@
+{
+  "title": "Search",
+  "placeholder": "Search tasks, people and projects",
+  "empty": "Type a query to find tasks, people and projects.",
+  "no-results": "Nothing found",
+  "people": "People",
+  "projects": "Projects",
+  "recent": "Recent",
+  "close": "Close search",
+  "hint-nav": "to navigate",
+  "hint-open": "to open",
+  "field-description": "in description",
+  "field-comment": "in comment",
+  "field-todo": "in todo",
+  "field-title": "in title",
+  "field-key": "in key"
+}

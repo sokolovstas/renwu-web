@@ -4,7 +4,6 @@ import { TranslocoService } from '@jsverse/transloco';
 import { IconName } from '@renwu/components';
 import { Issue, RwPolicyService } from '@renwu/core';
 import { JSONUtils } from '@renwu/utils';
-import { RenwuSearchOverlayService } from './search-overlay.service';
 import {
   BehaviorSubject,
   Observable,
@@ -25,7 +24,6 @@ export interface SidebarSection {
   scrollTo?: 'sidebar' | 'main' | 'section';
   outlet?: string;
   place: 'sidebar' | 'profile';
-  action?: 'spotlight';
 }
 
 @Injectable({
@@ -36,7 +34,6 @@ export class RwSidebarService {
   transloco = inject(TranslocoService);
   policyService = inject(RwPolicyService);
   router = inject(Router);
-  private searchOverlay = inject(RenwuSearchOverlayService);
   currentTask = new BehaviorSubject<Issue>(null);
   currentSection = new BehaviorSubject<SidebarSection>(null);
   lastRoutes: Record<string, string> = JSONUtils.parseLocalStorage(
@@ -77,15 +74,14 @@ export class RwSidebarService {
       icon: 'search',
       hint: this.transloco.selectTranslate('renwu.search'),
       path: 'search',
-      action: 'spotlight',
       place: 'sidebar',
     },
-    // {
-    //   icon: 's-document',
-    //   hint: this.transloco.selectTranslate('renwu.documents'),
-    //   path: 'document',
-    //   place: 'sidebar',
-    // },
+    {
+      icon: 'document',
+      hint: this.transloco.selectTranslate('renwu.documents'),
+      path: 'document',
+      place: 'sidebar',
+    },
     {
       icon: 's-message',
       hint: this.transloco.selectTranslate('renwu.messenger'),
@@ -169,6 +165,40 @@ export class RwSidebarService {
           }, 200);
         }
       });
+
+    window.addEventListener('keydown', this.onWindowKeydown);
+  }
+
+  private readonly onWindowKeydown = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented) {
+      return;
+    }
+    if (event.key !== 'Escape' && event.code !== 'Escape') {
+      return;
+    }
+    if (this.closeSection()) {
+      event.preventDefault();
+    }
+  };
+
+  /** True when the named `section` outlet (task / profile panel) is in the URL. */
+  private sectionOutletOpen(): boolean {
+    return !!this.router.parseUrl(this.router.url).root?.children['section'];
+  }
+
+  /**
+   * Close the section outlet and return to the main view.
+   * @returns whether a section was open and navigation was started
+   */
+  closeSection(): boolean {
+    if (!this.sectionOutletOpen()) {
+      return false;
+    }
+    this.currentTask.next(null);
+    void this.router.navigate([{ outlets: { section: null } }]).then(() => {
+      this.scrollToMain();
+    });
+    return true;
   }
 
   /**
@@ -186,10 +216,6 @@ export class RwSidebarService {
     this.scrollContainer = scrollContainer;
   }
   setSection(section: SidebarSection) {
-    if (section?.action === 'spotlight') {
-      this.searchOverlay.show();
-      return Promise.resolve(true);
-    }
     // Find and change current section lastURL
     const currentSection = this.sections
       .getValue()

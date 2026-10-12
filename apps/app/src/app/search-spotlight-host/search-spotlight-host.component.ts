@@ -38,8 +38,8 @@ export class SearchSpotlightHostComponent implements OnInit, AfterViewInit {
   private pendingLoad = false;
 
   constructor() {
-    const keyK = this.shortcuts.subscribe(
-      'KeyK',
+    const space = this.shortcuts.subscribe(
+      'Space',
       () => this.overlay.toggle(),
       { meta: true, skipInput: false },
     );
@@ -48,7 +48,7 @@ export class SearchSpotlightHostComponent implements OnInit, AfterViewInit {
       skipInput: true,
     });
     this.destroy.onDestroy(() => {
-      keyK.unsubscribe();
+      space.unsubscribe();
       slash.unsubscribe();
     });
   }

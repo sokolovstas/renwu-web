@@ -50,6 +50,7 @@ import {
   map,
   merge,
   of,
+  skip,
   switchMap,
 } from 'rxjs';
 import { TimelineItemComponent } from './graph/timeline-item.component';
@@ -263,7 +264,9 @@ export class TimelineComponent {
 
   protected readonly selectedUsers = signal<User[]>([]);
   protected readonly queryString = signal('');
-  protected readonly queryHash = signal('');
+  protected readonly queryHash = signal(
+    this.route.snapshot.queryParamMap.get('query_hash') || '',
+  );
   protected readonly selectMilestone = signal<SelectedMilestone>(null);
   protected readonly linesOnly = signal(false);
   protected readonly rootChild = signal<IssueTreeRoot>({
@@ -479,6 +482,21 @@ export class TimelineComponent {
   private preservedCenterVirtual: number | null = null;
   @ViewChild('graphScroll') private graphScroll?: ElementRef<HTMLDivElement>;
 
+  /** Hash we just wrote to the URL. Route echo of this value must not reload. */
+  private pushedQueryHash =
+    this.route.snapshot.queryParamMap.get('query_hash') || '';
+
+  private readonly routeContainerKey = toSignal(
+    this.route.queryParamMap.pipe(
+      map((qp) => qp.get('container_key') || ''),
+      distinctUntilChanged(),
+    ),
+    {
+      initialValue:
+        this.route.snapshot.queryParamMap.get('container_key') || '',
+    },
+  );
+
   private readonly queryParams = toSignal(
     this.route.queryParamMap.pipe(
       map((qp) => ({
@@ -490,7 +508,13 @@ export class TimelineComponent {
           a.containerKey === b.containerKey && a.queryHash === b.queryHash,
       ),
     ),
-    { initialValue: { containerKey: '', queryHash: '' } },
+    {
+      initialValue: {
+        containerKey:
+          this.route.snapshot.queryParamMap.get('container_key') || '',
+        queryHash: this.route.snapshot.queryParamMap.get('query_hash') || '',
+      },
+    },
   );
   private readonly reloadCounter = signal(0);
 
@@ -537,11 +561,12 @@ export class TimelineComponent {
     });
 
     effect((onCleanup) => {
-      const params = this.queryParams();
-      const routeContainerKey = params.containerKey;
-      const queryHash = this.queryHash() || params.queryHash;
+      const routeContainerKey = this.routeContainerKey();
+      const queryHash = this.queryHash();
+      const query = this.queryString();
       const grouping = this.settingsService.grouping() || 'none';
       const hierarchy = this.settingsService.hierarchyMode() || 'subtasks';
+      const sort = this.settingsService.sortParam() || 'status';
       this.reloadCounter();
       this.loading.set(true);
       const sub = this.dataService
@@ -567,19 +592,19 @@ export class TimelineComponent {
                 queryParamsHandling: 'merge',
               });
             }
-            const query = this.queryString();
             const treeFilters = {
               hierarchy,
+              sort,
               ...(query ? { q: query } : {}),
               ...(queryHash ? { query_hash: queryHash } : {}),
             };
             return forkJoin({
-              groups: this.dataService.loadIssueTree(
-                container.id,
-                grouping,
-                treeFilters,
-              ),
-              milestones: this.dataService.loadMilestones(container.id),
+              groups: this.dataService
+                .loadIssueTree(container.id, grouping, treeFilters)
+                .pipe(map((groups) => (Array.isArray(groups) ? groups : []))),
+              milestones: this.dataService
+                .loadMilestones(container.id)
+                .pipe(catchError(() => of([] as Milestone[]))),
             });
           }),
         )
@@ -593,7 +618,7 @@ export class TimelineComponent {
               this.captureCameraCenter();
             }
 
-            const apiGroups = groups ?? [];
+              const apiGroups = Array.isArray(groups) ? groups : [];
             this.applyServerGroups(apiGroups);
             this.roadmapItems.set(milestones || []);
             const timezone = this.userService.getTimeZone(this.currentUser() ?? undefined) || 'UTC';
@@ -713,31 +738,52 @@ export class TimelineComponent {
       untracked(() => this.clampPanToBounds());
     });
 
-    // Keep local state in sync with route and resolve query string from hash.
+    // Adopt query_hash only when the URL changes from outside.
+    // A selection writes the hash locally first; the following navigate()
+    // must not pull the previous hash back and cancel that load.
     effect(() => {
       const routeHash = this.queryParams().queryHash;
-      if (routeHash && routeHash !== this.queryHash()) {
-        this.queryHash.set(routeHash);
-        const options = new ListOptions();
-        options.hash = routeHash;
-        this.searchService.setListOptions(options);
+      if (routeHash === this.pushedQueryHash) {
+        return;
       }
+      this.pushedQueryHash = routeHash;
+      this.queryHash.set(routeHash);
+      if (!routeHash) {
+        this.queryString.set('');
+        return;
+      }
+      const options = new ListOptions();
+      options.hash = routeHash;
+      this.searchService.setListOptions(options);
     });
 
     this.searchService.listOptions
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(skip(1), takeUntilDestroyed(this.destroyRef))
       .subscribe((options) => {
         const nextHash = options?.hash || '';
         const nextQuery = options?.queryString || '';
+        if (
+          nextHash === this.queryHash() &&
+          nextQuery === this.queryString()
+        ) {
+          return;
+        }
         this.queryString.set(nextQuery);
         this.queryHash.set(nextHash);
-        this.router.navigate([], {
+        this.pushedQueryHash = nextHash;
+        void this.router.navigate([], {
           relativeTo: this.route,
           queryParams: { query_hash: nextHash || null },
           queryParamsHandling: 'merge',
         });
         this.requestReload();
       });
+
+    if (this.queryHash() && !this.queryString()) {
+      const options = new ListOptions();
+      options.hash = this.queryHash();
+      this.searchService.setListOptions(options);
+    }
 
     const nowLineInterval = setInterval(
       () => this.nowClock.update((n) => n + 1),
@@ -1165,6 +1211,7 @@ export class TimelineComponent {
       // RwSearchService.onChange() ignores empty query — clear filter locally.
       this.queryString.set('');
       this.queryHash.set('');
+      this.pushedQueryHash = '';
       void this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { query_hash: null },
@@ -1223,7 +1270,8 @@ export class TimelineComponent {
    * (`_SHOWCHILDS`) and group titles for display.
    */
   private applyServerGroups(groups: IssueGroup[]): void {
-    const childs = (groups || []).map((group, index) => {
+    const list = Array.isArray(groups) ? groups : [];
+    const childs = list.map((group, index) => {
       const id = this.serverGroupId(group, index);
       return {
         id,

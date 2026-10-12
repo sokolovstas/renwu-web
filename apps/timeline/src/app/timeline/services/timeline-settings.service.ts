@@ -11,6 +11,7 @@ import {
   TimelineTicksId,
 } from '@renwu/core';
 import { TimelineSettings } from '../models/timeline-settings.model';
+import { timelineSortParam } from './timeline-sort';
 
 const STORAGE_PREFIX = 'renwu_timeline_settings_';
 
@@ -30,7 +31,7 @@ const ZOOM_TICKS: TimelineTicksId[] = [
 
 const DEFAULT_SORT: ListOptionsFilters['sort'] = {
   field: 'status',
-  direction: 'down',
+  direction: 'up',
 };
 
 /** Issue/graph row height bounds (px). Bars and table text scale with this. */
@@ -87,6 +88,10 @@ export class TimelineSettingsService {
   readonly hierarchyMode = computed(
     () => this.settingsSignal().hierarchyMode || 'subtasks',
   );
+  readonly sort = computed(() => this.settingsSignal().sort ?? DEFAULT_SORT);
+
+  /** Flat API sort param: `status`, `-status`, `date_start_calc`, … */
+  readonly sortParam = computed(() => timelineSortParam(this.sort()));
 
   getTimeline(): TimelineSettings {
     return this.settingsSignal();
@@ -125,6 +130,17 @@ export class TimelineSettingsService {
 
   setHierarchyMode(value: TimelineHierarchyMode): void {
     this.settingsSignal.update((s) => ({ ...s, hierarchyMode: value }));
+    this.persist();
+  }
+
+  setSort(field: string, direction: 'up' | 'down' = 'up'): void {
+    this.settingsSignal.update((s) => ({
+      ...s,
+      sort: {
+        field: field as NonNullable<ListOptionsFilters['sort']>['field'],
+        direction,
+      },
+    }));
     this.persist();
   }
 
@@ -167,7 +183,7 @@ export class TimelineSettingsService {
   ): boolean {
     const s = this.settingsSignal();
     let tick = s.scaleTick;
-    let value = Math.round(s.scaleValue);
+    const value = Math.round(s.scaleValue);
 
     let next = Math.round(value * factor);
     if (next === value && Math.abs(factor - 1) > 0.001) {

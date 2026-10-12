@@ -13,8 +13,10 @@ import {
   UserWorkloadIssues,
 } from '@renwu/core';
 
-type IssueTreeFilters = ListOptionsFilters & {
+type IssueTreeFilters = Omit<ListOptionsFilters, 'sort'> & {
   hierarchy?: string;
+  /** Flat API sort: `status`, `-status`, `date_start_calc`, … */
+  sort?: string;
   q?: string;
   query_hash?: string;
 };

@@ -6,6 +6,7 @@
     textAlign="left"
     class="renwu-messaging-destination__item"
     [class.item-active]="itemActive"
+    [class.renwu-messaging-destination__item--with-status]="showStatusActions"
     >
     @if (destination.info.destination.type === DestinationType.FAV) {
       <div class="renwu-messaging-destination__item__icon">
@@ -55,6 +56,26 @@
           {{ issue.title }}
         </div>
       </div>
+      @if (showStatusActions) {
+        <div
+          class="renwu-messaging-destination__item__transitions"
+          (click)="$event.stopPropagation()"
+        >
+          @for (t of transitions$ | async; track t.to?.id || t.label) {
+            <rw-button
+              class="color-white shrink-0"
+              [color]="t.to.color"
+              [borderColor]="t.to.color"
+              padding="0 0.5rem"
+              typeButton="secondary"
+              borderRadius="0.5rem"
+              [disabled]="busy"
+              (clicked)="transit(issue, t)"
+              >{{ t.label || t.to.label }}</rw-button
+            >
+          }
+        </div>
+      }
       <renwu-message-counter [allowMark]="true"
         [destination]="destination"
         (unreadClick)="onUnreadClick()"

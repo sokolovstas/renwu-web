@@ -27,12 +27,24 @@ environments/environment.ts
 
 ### Запуск проекта
 
+Бэкенд в Docker, фронт обычно на хосте (13 `nx serve` не влезают в типичные 8 GB Docker Desktop):
+
 ```
-npm run start
+cd ../services && docker compose up --build   # API + лендинг :8080
+npm run start                                 # Angular :4200–4212
 ```
 
-Приложение доступно по адресу http://localhost:4200
-Микрофронты стартуют по порту 4201 и выше http://localhost:4201
+Приложение: http://localhost:4200 (API — http://localhost:8080).
+Микрофронты: http://localhost:4201 и выше.
+
+Если в Docker Desktop ≥16 GB RAM, фронт тоже можно в Compose:
+
+```
+cd ../services
+docker compose --profile web up --build
+```
+
+`node_modules` / `.nx` / `.angular` тогда в Linux-volumes. Не запускай хостовый `npm start` параллельно с профилем `web` — порты совпадут.
 
 ### Экстрак локалей
 

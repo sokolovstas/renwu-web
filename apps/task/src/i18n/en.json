@@ -26,6 +26,8 @@
   "jira-open": "Open in Jira",
   "jira-sync-from": "Sync from Jira",
   "jira-sync-to": "Sync to Jira",
+  "custom-fields": "External links",
+  "custom-field-mentioned-on": "Mentioned on",
   "jira-create-confirm-title": "Create in Jira?",
   "jira-create-confirm-text": "This task is not linked to Jira. Create a Jira issue?",
   "jira-import-done": "Synced from Jira",

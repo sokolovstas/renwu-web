@@ -15,16 +15,16 @@
     }
     <div
       class="search-spotlight__panel"
-      role="dialog"
-      aria-modal="true"
+      [attr.role]="variant === 'overlay' ? 'dialog' : null"
+      [attr.aria-modal]="variant === 'overlay' ? true : null"
       [attr.aria-label]="'search.title' | transloco"
     >
       <div class="search-spotlight__input-row">
-        <rw-icon icon="search" size="1.25em" />
+        <rw-icon icon="search" size="large" />
         <input
           #queryInput
           class="search-spotlight__input"
-          type="search"
+          type="text"
           autocomplete="off"
           spellcheck="false"
           [value]="query | async"
@@ -66,55 +66,116 @@
                   (mouseenter)="activeIndex.next(view.items.indexOf(item))"
                   (click)="openItem(item)"
                 >
-                  <div class="search-spotlight__item-icon">
-                    @if (item.kind === 'user') {
-                      <renwu-avatar
-                        [user]="item.user"
-                        [showOnline]="false"
-                        [showTooltip]="false"
-                        size="1.75em"
-                      />
-                    } @else if (item.kind === 'issue' && item.issue?.type) {
-                      <renwu-issue-type [value]="item.issue.type" />
-                    } @else if (item.kind === 'project') {
-                      <rw-icon icon="s-project" size="1.1em" />
-                    } @else {
-                      <rw-icon icon="history" size="1.1em" />
-                    }
-                  </div>
+                  @if (!(variant === 'page' && item.kind === 'issue')) {
+                    <div class="search-spotlight__item-icon">
+                      @if (item.kind === 'user') {
+                        <renwu-avatar
+                          [user]="item.user"
+                          [showOnline]="false"
+                          [showTooltip]="false"
+                          size="1.75em"
+                        />
+                      } @else if (item.kind === 'issue' && item.issue?.type) {
+                        <renwu-issue-type [value]="item.issue.type" />
+                      } @else if (item.kind === 'project') {
+                        <rw-icon icon="s-project" size="normal" />
+                      } @else {
+                        <rw-icon icon="history" size="normal" />
+                      }
+                    </div>
+                  }
                   <div class="search-spotlight__item-body">
                     <div class="search-spotlight__item-title">
-                      {{ item.title }}
-                      @if (item.subtitle) {
+                      @if (item.kind === 'issue' && item.subtitle) {
                         <span class="search-spotlight__item-key">{{
                           item.subtitle
                         }}</span>
+                        @if (variant === 'page' && item.issue) {
+                          <span class="search-spotlight__item-meta">
+                            @if (item.issue.type) {
+                              <span
+                                class="search-spotlight__item-meta-slot search-spotlight__item-meta-slot--type"
+                              >
+                                <renwu-issue-type [value]="item.issue.type" />
+                              </span>
+                            }
+                            @if (item.issue.priority) {
+                              <span
+                                class="search-spotlight__item-meta-slot search-spotlight__item-meta-slot--priority"
+                              >
+                                <renwu-issue-priority
+                                  [value]="item.issue.priority"
+                                />
+                              </span>
+                            }
+                            @if (item.issue.status) {
+                              <renwu-issue-status
+                                [value]="item.issue.status"
+                              />
+                            }
+                            <span class="search-spotlight__item-assignee">
+                              <renwu-issue-assignees
+                                [issue]="item.issue"
+                                avatarSize="18px"
+                              />
+                              @if (assigneeName(item.issue); as name) {
+                                <span
+                                  class="search-spotlight__item-assignee-name"
+                                  >{{ name }}</span
+                                >
+                              }
+                            </span>
+                          </span>
+                        } @else {
+                          <span class="search-spotlight__item-name">{{
+                            item.title
+                          }}</span>
+                        }
+                      } @else {
+                        <span class="search-spotlight__item-name">{{
+                          item.title
+                        }}</span>
+                        @if (item.subtitle) {
+                          <span class="search-spotlight__item-key">{{
+                            item.subtitle
+                          }}</span>
+                        }
                       }
                     </div>
+                    @if (
+                      variant === 'page' &&
+                      item.kind === 'issue' &&
+                      item.subtitle
+                    ) {
+                      <div class="search-spotlight__item-name">
+                        {{ item.title }}
+                      </div>
+                    }
                     @if (item.snippet) {
                       <div class="search-spotlight__item-snippet">
                         {{ item.snippet }}
                       </div>
                     }
                   </div>
-                  @if (item.badge) {
-                    <span
-                      class="search-spotlight__badge"
-                      [style.background]="item.badgeColor || '#e5e7eb'"
-                      >{{ item.badge }}</span
-                    >
-                  }
                 </button>
               }
             </section>
           }
         </div>
       }
-      <div class="search-spotlight__hint">
-        <span><kbd class="search-spotlight__kbd">↑</kbd><kbd class="search-spotlight__kbd">↓</kbd> {{ 'search.hint-nav' | transloco }}</span>
-        <span><kbd class="search-spotlight__kbd">↵</kbd> {{ 'search.hint-open' | transloco }}</span>
-        <span><kbd class="search-spotlight__kbd">⌘K</kbd></span>
-      </div>
+      @if (variant === 'overlay') {
+        <div class="search-spotlight__hint">
+          <span
+            ><kbd class="search-spotlight__kbd">↑</kbd
+            ><kbd class="search-spotlight__kbd">↓</kbd>
+            {{ 'search.hint-nav' | transloco }}</span
+          >
+          <span
+            ><kbd class="search-spotlight__kbd">↵</kbd>
+            {{ 'search.hint-open' | transloco }}</span
+          >
+        </div>
+      }
     </div>
   </div>
 }

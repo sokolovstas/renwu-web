@@ -1,1 +1,5 @@
-{}
+{
+  "list-title": "documents.list-title",
+  "empty": "documents.empty",
+  "list-error": "documents.list-error"
+}

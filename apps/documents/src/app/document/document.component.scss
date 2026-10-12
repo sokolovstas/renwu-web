@@ -1,24 +1,28 @@
+@use '../../../../../libs/components/src/styles/rw_variables.scss' as *;
+@use '../../../../../libs/components/src/styles/prosemirror-theme.scss';
 @import 'prosemirror-view/style/prosemirror.css';
-@import 'prosemirror-menu/style/menu.css';
-@import 'prosemirror-example-setup/style/style.css';
 @import 'prosemirror-gapcursor/style/gapcursor.css';
 
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .documents-page {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
 }
 
 .documents-header {
   display: flex;
+  flex: 0 0 auto;
   align-items: baseline;
   gap: 0.75rem;
-  margin-bottom: 1rem;
-
-  h1 {
-    font-weight: 300;
-    font-size: 1.5rem;
-  }
 }
 
 .documents-loading {
@@ -40,14 +44,38 @@
 }
 
 .documents-editor {
-  border: 1px solid var(--rw-border-color, #d9d9d9);
-  border-radius: 6px;
-  min-height: 60vh;
+  @include component();
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-bottom: $rw-control-default-border solid $rw-control-border-color;
+  background-color: $rw-control-bg-color;
+  padding: $rw-control-default-padding $rw-control-default-padding * 2;
+  border-radius: $rw-control-border-radius $rw-control-border-radius 0 0;
+}
+
+.documents-editor:focus-within:not(.disabled):not(.borderless) {
+  border-bottom: $rw-control-default-border solid var(--accent-secondary-color);
+}
+
+.documents-editor .ProseMirror-menubar-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.documents-editor .ProseMirror-menubar {
+  flex: 0 0 auto;
 }
 
 .documents-editor .ProseMirror {
-  padding: 1rem 1.25rem;
-  min-height: 55vh;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: $rw-control-default-padding 0;
   outline: none;
 }
 

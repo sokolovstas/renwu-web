@@ -18,9 +18,17 @@ const TASK_SECTION_LOADERS: Record<
     import('../related/related.component').then((m) => m.RelatedComponent),
   'renwu-task-links': () =>
     import('../links/links.component').then((m) => m.LinksComponent),
+  'renwu-task-custom-fields': () =>
+    import('../custom-fields/custom-fields.component').then(
+      (m) => m.CustomFieldsComponent,
+    ),
   'renwu-task-attachments': () =>
     import('../attachments/attachments.component').then(
       (m) => m.AttachmentsComponent,
+    ),
+  'renwu-task-documents': () =>
+    import('../documents/documents.component').then(
+      (m) => m.TaskDocumentsComponent,
     ),
   'renwu-task-sub-task': () =>
     import('../sub-task/sub-task.component').then((m) => m.SubTaskComponent),
@@ -43,14 +51,16 @@ export async function registerTaskSectionElements(
     unique.map(async (tag) => {
       const loader = TASK_SECTION_LOADERS[tag];
       if (!loader) {
-        console.warn(`[task] Unknown section element "${tag}", skipping.`);
+        console.warn(`[task-section] unknown element "${tag}", skipping`);
         return;
       }
       if (customElements.get(tag)) {
+        console.info('[task-section] already defined', tag);
         return;
       }
       const component = await loader();
       customElements.define(tag, createCustomElement(component, { injector }));
+      console.info('[task-section] defined', tag);
     }),
   );
 }

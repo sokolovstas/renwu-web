@@ -58,7 +58,10 @@ describe('DetailComponent', () => {
         },
         {
           provide: RwSidebarService,
-          useValue: { currentTask: new BehaviorSubject(null) },
+          useValue: {
+            currentTask: new BehaviorSubject(null),
+            closeSection: jest.fn(),
+          },
         },
         { provide: StateService, useValue: {} },
         {
@@ -158,5 +161,11 @@ describe('DetailComponent', () => {
       component.onCreateShortcut(enterEvent({ ctrlKey: true }));
       expect(createSpy).not.toHaveBeenCalled();
     });
+  });
+
+  it('closes the section outlet', () => {
+    const sidebar = TestBed.inject(RwSidebarService);
+    component.close();
+    expect(sidebar.closeSection).toHaveBeenCalled();
   });
 });

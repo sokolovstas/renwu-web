@@ -10,6 +10,7 @@ import {
   HostListener,
   inject,
   Input,
+  NgZone,
   OnDestroy,
   OnInit,
   Output,
@@ -38,7 +39,12 @@ import {
   mySchema,
 } from './prosemirror-schema';
 
-export { markdownParser, markdownSerializer, mySchema } from './prosemirror-schema';
+export {
+  markdownParser,
+  markdownSerializer,
+  mySchema,
+  openMarkdownLinkOnClick,
+} from './prosemirror-schema';
 
 const noop = () => {
   return;
@@ -65,6 +71,7 @@ export class RwTextAreaComponent
 {
   el = inject(ElementRef);
   private cd = inject(ChangeDetectorRef);
+  private zone = inject(NgZone);
 
   @Input()
   @HostBinding('class.required')
@@ -152,6 +159,16 @@ export class RwTextAreaComponent
 
   editor: EditorView;
 
+  /** Plugin instances must stay stable across `updateState` (menu DOM). */
+  private cachedPlugins: Plugin[] | null = null;
+
+  /**
+   * Doc was applied while an ancestor had `[hidden]` (`display: none`).
+   * Chrome drops contenteditable text painted in that state — repaint when shown.
+   */
+  private deferredPaint = false;
+  private visibilityObserver: IntersectionObserver | null = null;
+
   private onTouchedCallback: () => void = noop;
 
   private onChangeCallback: (_: string | number) => void = noop;
@@ -167,9 +184,15 @@ export class RwTextAreaComponent
 
   writeValue(value: string) {
     this.value = value ?? '';
-    if (this.editor) {
-      this.parseValue();
+    if (!this.editor) {
+      return;
     }
+    if (this.isHostHidden()) {
+      this.deferredPaint = true;
+      return;
+    }
+    this.deferredPaint = false;
+    this.parseValue();
   }
 
   registerOnChange(fn: (_: string | number) => void): void {
@@ -246,6 +269,17 @@ export class RwTextAreaComponent
       });
     }
     this.editor.editable = false;
+    if (this.isHostHidden()) {
+      // Painted while display:none — Chrome will not show this text later.
+      this.deferredPaint = true;
+    } else if (
+      (this.value || '').trim() &&
+      !this.editor.state.doc.textContent.trim()
+    ) {
+      // writeValue landed during EditorView setup, after the doc was captured.
+      this.parseValue();
+    }
+    this.observeVisibility();
     this.onModelChanged
       .pipe(
         debounceTime(this.liveDebounce),
@@ -258,7 +292,41 @@ export class RwTextAreaComponent
   }
 
   ngOnDestroy() {
+    this.visibilityObserver?.disconnect();
+    this.visibilityObserver = null;
     this.editor?.destroy();
+  }
+
+  /** `[hidden]` on a tab panel is `display: none`; contenteditable painted there stays blank. */
+  private isHostHidden(): boolean {
+    const host = this.el.nativeElement as HTMLElement | null;
+    return !!host?.closest?.('[hidden]');
+  }
+
+  private observeVisibility(): void {
+    if (typeof IntersectionObserver === 'undefined' || !this.el?.nativeElement) {
+      return;
+    }
+    this.zone.runOutsideAngular(() => {
+      this.visibilityObserver = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) {
+          return;
+        }
+        this.zone.run(() => this.repaintIfDeferred());
+      });
+      this.visibilityObserver.observe(this.el.nativeElement);
+    });
+  }
+
+  private repaintIfDeferred(): void {
+    if (!this.deferredPaint || !this.editor || this.editor.isDestroyed) {
+      return;
+    }
+    if (this.isHostHidden()) {
+      return;
+    }
+    this.deferredPaint = false;
+    this.parseValue();
   }
 
   onFocusOut() {
@@ -338,16 +406,33 @@ export class RwTextAreaComponent
   }
 
   private createEditorState(): EditorState {
+    if (!this.cachedPlugins) {
+      this.cachedPlugins = this.createPlugins();
+    }
     let doc: ProseMirrorNode;
     try {
       doc = markdownParser.parse(this.value || '');
-    } catch {
-      doc = mySchema.node('doc', null, [mySchema.node('paragraph')]);
+    } catch (err) {
+      console.error('rw-text-area: markdown parse failed', err);
+      doc = this.plainTextDoc(this.value || '');
     }
     return EditorState.create({
       doc,
-      plugins: this.createPlugins(),
+      plugins: this.cachedPlugins,
     });
+  }
+
+  /** Keep the source visible when the markdown schema rejects it. */
+  private plainTextDoc(text: string): ProseMirrorNode {
+    const lines = text.split('\n');
+    const paragraphs = (lines.length ? lines : ['']).map((line) =>
+      mySchema.node(
+        'paragraph',
+        null,
+        line ? [mySchema.text(line)] : [],
+      ),
+    );
+    return mySchema.node('doc', null, paragraphs);
   }
 
   private createPlugins(): Plugin[] {

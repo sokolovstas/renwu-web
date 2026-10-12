@@ -18,6 +18,15 @@
       />
     </span>
 
+    <span class="scale-field">
+      <span class="scale-field-label">{{ 'timeline.sort' | transloco }}:</span>
+      <rw-select
+        [model]="sortModel"
+        [borderless]="true"
+        (changed)="onSortChanged($event)"
+      />
+    </span>
+
     <rw-checkbox
       [label]="'timeline.showMilestones' | transloco"
       [ngModel]="settings().showMilestones"

@@ -1,9 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { defaultIfEmpty, mergeMap } from 'rxjs/operators';
 import { Md5 } from 'ts-md5';
 import { RwDataService } from '../data/data.service';
-import { SearchQuery, SearchResponse } from '../search/search.model';
+import {
+  SavedSearchQuery,
+  SearchQuery,
+  SearchResponse,
+} from '../search/search.model';
 import { OQLParseListener } from './oql/OQLParseListener';
 import { ListOptions, SortFields } from './sort.model';
 
@@ -71,8 +75,11 @@ export class RwSearchService {
         this._listOptions.hash = nextHash;
         this.dataService
           .getSearchQuery(this._listOptions.hash)
+          .pipe(
+            defaultIfEmpty({ query_string: '' } as SavedSearchQuery),
+          )
           .subscribe((query) => {
-            this._listOptions.queryString = query.query_string;
+            this._listOptions.queryString = query?.query_string || '';
             this.onChange();
           });
         return;

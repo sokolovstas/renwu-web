@@ -1173,6 +1173,21 @@ export class JiraComponent {
     );
   }
 
+  /** Preset: Jira remote links (Mentioned on / GitLab MR) → custom_fields.mentioned_on. */
+  addRemoteLinksField(): void {
+    this.selectedTemplateFields()?.push(
+      this.createFieldGroup({
+        source_field: 'remotelinks',
+        source_label: 'Mentioned on',
+        target_field: 'custom_fields:mentioned_on',
+        target_label: 'Mentioned on',
+        direction: '>',
+        source_script:
+          'OUT = JIRA_REMOTE_LINKS(); if (!OUT || !OUT.length) { SKIP = true; }',
+      }),
+    );
+  }
+
   /** Preset: parent Renwu Epic → Jira Epic Link (export only). */
   addEpicLinkField(): void {
     this.selectedTemplateFields()?.push(

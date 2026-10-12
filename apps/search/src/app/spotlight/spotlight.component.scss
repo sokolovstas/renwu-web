@@ -1,9 +1,12 @@
+@use '../../../../../libs/components/src/styles/rw_variables.scss' as *;
+
 :host {
   display: contents;
 }
 
 .search-spotlight {
   font-family: inherit;
+  color: $black;
 }
 
 .search-spotlight--overlay {
@@ -30,35 +33,52 @@
 .search-spotlight__panel {
   position: relative;
   z-index: 1;
-  width: min(640px, 100%);
-  max-height: min(560px, 72vh);
   display: flex;
   flex-direction: column;
-  background: #fff;
+  overflow: hidden;
+  background: $white;
+}
+
+.search-spotlight--overlay .search-spotlight__panel {
+  width: min(640px, 100%);
+  max-height: min(560px, 72vh);
   border-radius: 16px;
   box-shadow:
     0 24px 80px rgba(15, 23, 42, 0.28),
     0 2px 8px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
 }
 
 .search-spotlight--page {
   display: flex;
-  justify-content: center;
-  padding: 2rem 1rem;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
 }
 
 .search-spotlight--page .search-spotlight__panel {
-  max-height: calc(100vh - 4rem);
-  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+  width: 100%;
+  height: 100%;
+  background: transparent;
 }
 
 .search-spotlight__input-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-spotlight--overlay .search-spotlight__input-row {
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid $gray-200;
+}
+
+.search-spotlight--page .search-spotlight__input-row {
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: $rw-control-default-border solid $rw-control-border-color;
+  border-radius: $rw-control-border-radius;
+  background: $rw-control-bg-color;
 }
 
 .search-spotlight__input {
@@ -66,31 +86,43 @@
   border: 0;
   outline: none;
   background: transparent;
-  font-size: 1.05rem;
-  line-height: 1.4;
+  font-size: $global-fontsize;
+  line-height: $global-lineheight;
   min-width: 0;
+  color: $rw-control-text-color;
+  font-weight: $global-weight-normal;
+  appearance: none;
+
+  &::placeholder {
+    color: $rw-control-prompt-color;
+    font-weight: $rw-control-prompt-font-weight;
+  }
 }
 
 .search-spotlight__results {
   flex: 1 1 auto;
   overflow: auto;
-  padding: 0.5rem 0 0.25rem;
+  padding: 0.25rem 0;
 }
 
 .search-spotlight__empty {
   padding: 2rem 1.25rem;
   text-align: center;
-  color: #6b7280;
-  font-size: 0.9rem;
+  color: $gray-500;
 }
 
 .search-spotlight__group-title {
-  margin: 0.4rem 1rem 0.25rem;
-  font-size: 0.7rem;
-  font-weight: 600;
+  margin: 0.5rem 1rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: $global-weight-bolder;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: $gray-500;
+}
+
+.search-spotlight--page .search-spotlight__group-title {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .search-spotlight__item {
@@ -103,11 +135,18 @@
   text-align: left;
   padding: 0.55rem 1rem;
   cursor: pointer;
-  color: inherit;
+  color: $black;
+}
+
+.search-spotlight--page .search-spotlight__item {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  border-radius: $rw-control-border-radius;
 }
 
 .search-spotlight__item--active {
-  background: #eef2ff;
+  background: $rw-control-hover-color;
+  color: $rw-control-text-interactive-color;
 }
 
 .search-spotlight__item-icon {
@@ -116,6 +155,7 @@
   align-items: center;
   justify-content: center;
   width: 1.75rem;
+  color: $gray-500;
 }
 
 .search-spotlight__item-body {
@@ -127,53 +167,119 @@
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  font-size: 0.92rem;
-  font-weight: 500;
-  white-space: nowrap;
+  min-width: 0;
+  font-weight: $global-weight-bold;
+}
+
+.search-spotlight__item-name {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-spotlight__item-key {
-  color: #6b7280;
-  font-size: 0.75rem;
-  font-weight: 400;
+  flex: 0 0 auto;
+  color: $gray-500;
+  font-size: 0.8em;
+  font-weight: $global-weight-bolder;
+}
+
+.search-spotlight--page .search-spotlight__item-title {
+  align-items: center;
+}
+
+.search-spotlight--page .search-spotlight__item-name {
+  display: block;
+  margin-top: 0.15rem;
+  font-weight: $global-weight-bold;
+}
+
+.search-spotlight__item-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: $global-weight-normal;
+}
+
+.search-spotlight__item-meta-slot {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-spotlight__item-meta-slot--type,
+.search-spotlight__item-meta-slot--priority {
+  width: 1.15rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.search-spotlight__item-assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.search-spotlight__item-assignee-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: $gray-600;
+  font-size: 0.8em;
+  font-weight: $global-weight-normal;
+}
+
+.search-spotlight__item-meta ::ng-deep .status {
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  line-height: 1.2;
 }
 
 .search-spotlight__item-snippet {
-  margin-top: 0.15rem;
-  color: #6b7280;
-  font-size: 0.78rem;
+  margin-top: 0.2rem;
+  color: $gray-500;
+  font-size: 0.85em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.search-spotlight__badge {
-  flex: 0 0 auto;
-  border-radius: 999px;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.68rem;
-  color: #111827;
+.search-spotlight--page .search-spotlight__item-snippet {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
 }
 
 .search-spotlight__hint {
   display: flex;
   gap: 1rem;
-  padding: 0.55rem 1rem;
-  border-top: 1px solid #e5e7eb;
-  color: #9ca3af;
+  padding: 0.7rem 1.25rem;
+  border-top: 1px solid $gray-200;
+  color: $gray-500;
   font-size: 0.72rem;
 }
 
 .search-spotlight__kbd {
   display: inline-block;
   min-width: 1.4em;
-  padding: 0.05rem 0.35rem;
+  padding: 0.15rem 0.4rem;
   margin: 0 0.1rem;
   border-radius: 4px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: $gray-100;
+  border: 1px solid $gray-200;
+  color: $gray-600;
   font-size: 0.68rem;
   font-family: inherit;
   text-align: center;

@@ -3,6 +3,7 @@ import { RwAlertService, RwToastService } from '@renwu/components';
 import { getUnixTime, parseISO } from 'date-fns';
 import {
   BehaviorSubject,
+  EMPTY,
   Observable,
   Subject,
   firstValueFrom,
@@ -18,11 +19,10 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  repeat,
   shareReplay,
   switchMap,
-  takeUntil,
   tap,
+  withLatestFrom,
 } from 'rxjs/operators';
 // import { TimelogComponent } from 'projects/core/src/lib/issue/timelog/timelog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -146,7 +146,18 @@ export class RwIssueService implements OnDestroy {
     filter((e) => e.type !== 'issue_delete'),
   );
 
-  issue = this.issueInt.pipe(
+  issue = merge(
+    this.issueInt,
+    this.refresher.pipe(
+      withLatestFrom(this.issueInt),
+      switchMap(([, task]) => {
+        if (!task?.key || task.key === 'new' || task.id === 'new') {
+          return EMPTY;
+        }
+        return from(this.initIssue({ key: task.key }));
+      }),
+    ),
+  ).pipe(
     debounceTime(100),
     tap((t) => {
       this.patchIssue(t, { reset: true });
@@ -157,8 +168,6 @@ export class RwIssueService implements OnDestroy {
       this.websocketService.pushId('issuedetail', t.id);
       this.websocketService.sendView();
     }),
-    takeUntil(this.refresher),
-    repeat(),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 

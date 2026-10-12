@@ -8,7 +8,7 @@ export class RwToastService {
   toasts: ToastData[] = [];
   error(text: string): void {
     this.add({
-      ...{ timeout: 5000, level: 'error', persistant: false },
+      ...{ timeout: 5000, level: 'error', persistant: true },
       text,
     });
   }

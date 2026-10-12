@@ -40,24 +40,41 @@ export class AiSkillsComponent {
   private readonly cd = inject(ChangeDetectorRef);
   readonly items = signal<AISkill[]>([]);
   readonly modelModel = new SelectModelBase<string>();
+  readonly effortModel = new SelectModelBase<string>();
+  readonly reviewSkillModel = new SelectModelBase<string>();
   readonly form = new FormGroup({
     id: new FormControl<string | undefined>(undefined),
     name: new FormControl('', { nonNullable: true }),
     slug: new FormControl('', { nonNullable: true }),
     body: new FormControl('', { nonNullable: true }),
     model: new FormControl('', { nonNullable: true }),
+    effort: new FormControl('', { nonNullable: true }),
     timeout_sec: new FormControl(300, { nonNullable: true }),
     enabled: new FormControl(true, { nonNullable: true }),
     permission_mode: new FormControl('', { nonNullable: true }),
     allowed_tools: new FormControl('', { nonNullable: true }),
     max_turns: new FormControl(0, { nonNullable: true }),
     max_budget_usd: new FormControl(0, { nonNullable: true }),
-    result_schema_json: new FormControl('', { nonNullable: true }),
+    gate_names: new FormControl('', { nonNullable: true }),
+    review_skill_id: new FormControl('', { nonNullable: true }),
   });
 
   constructor() {
     this.modelModel.allowNull = true;
     this.modelModel.loadSelected = true;
+    this.effortModel.allowNull = true;
+    this.effortModel.loadSelected = true;
+    this.effortModel.staticData = [
+      this.option('', this.transloco.translate('settings.ai-effort-inherit')),
+      this.option('low', this.transloco.translate('settings.ai-effort-low')),
+      this.option('medium', this.transloco.translate('settings.ai-effort-medium')),
+      this.option('high', this.transloco.translate('settings.ai-effort-high')),
+      this.option('xhigh', this.transloco.translate('settings.ai-effort-xhigh')),
+      this.option('max', this.transloco.translate('settings.ai-effort-max')),
+      this.option('ultra', this.transloco.translate('settings.ai-effort-ultra')),
+    ];
+    this.reviewSkillModel.allowNull = true;
+    this.reviewSkillModel.loadSelected = true;
     void this.load();
   }
 
@@ -70,6 +87,9 @@ export class AiSkillsComponent {
         ),
       ]);
       this.items.set(skills || []);
+      this.reviewSkillModel.staticData = (skills || []).map((s) =>
+        this.option(s.id || '', s.name || s.slug || s.id || ''),
+      );
       this.modelModel.staticData = (modelsResponse?.models || []).map((m) =>
         this.option(m.id, m.label || m.id),
       );
@@ -80,22 +100,20 @@ export class AiSkillsComponent {
 
   edit(item?: AISkill): void {
     this.form.reset({
-      timeout_sec: 300,
-      enabled: true,
-      permission_mode: '',
-      allowed_tools: '',
-      max_turns: 0,
-      max_budget_usd: 0,
-      result_schema_json: '',
-      ...(item
-        ? {
-            ...item,
-            allowed_tools: (item.allowed_tools || []).join(', '),
-            result_schema_json: item.result_schema
-              ? JSON.stringify(item.result_schema, null, 2)
-              : '',
-          }
-        : {}),
+      id: item?.id,
+      name: item?.name || '',
+      slug: item?.slug || '',
+      body: item?.body || '',
+      model: item?.model || '',
+      effort: item?.effort || '',
+      timeout_sec: item?.timeout_sec ?? 300,
+      enabled: item?.enabled ?? true,
+      permission_mode: item?.permission_mode || '',
+      allowed_tools: (item?.allowed_tools || []).join(', '),
+      max_turns: item?.max_turns || 0,
+      max_budget_usd: item?.max_budget_usd || 0,
+      gate_names: (item?.gate_names || []).join(', '),
+      review_skill_id: item?.review_skill_id || '',
     });
     const current = this.form.controls.model.value;
     if (current && !this.modelModel.staticData?.some((x) => x.id === current)) {
@@ -110,19 +128,11 @@ export class AiSkillsComponent {
   async save(): Promise<void> {
     (document.activeElement as HTMLElement | null)?.blur?.();
     const raw = this.form.getRawValue();
-    let result_schema: Record<string, unknown> | undefined;
-    const schemaText = (raw.result_schema_json || '').trim();
-    if (schemaText) {
-      try {
-        result_schema = JSON.parse(schemaText) as Record<string, unknown>;
-      } catch {
-        this.toast.error(
-          this.transloco.translate('settings.ai-result-schema-invalid'),
-        );
-        return;
-      }
-    }
     const allowed_tools = (raw.allowed_tools || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const gate_names = (raw.gate_names || '')
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
@@ -134,13 +144,15 @@ export class AiSkillsComponent {
           slug: raw.slug,
           body: raw.body,
           model: raw.model,
+          effort: raw.effort || undefined,
           timeout_sec: raw.timeout_sec,
           enabled: raw.enabled,
           allowed_tools,
-          result_schema,
           max_turns: raw.max_turns || undefined,
           max_budget_usd: raw.max_budget_usd || undefined,
           permission_mode: raw.permission_mode || undefined,
+          gate_names: gate_names.length ? gate_names : undefined,
+          review_skill_id: raw.review_skill_id?.trim() || undefined,
         })
         .pipe(defaultIfEmpty(null)),
     );

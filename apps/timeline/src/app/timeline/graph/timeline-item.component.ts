@@ -14,11 +14,15 @@ import { Issue, IssueCardComponent, Status } from '@renwu/core';
 import { TimelineCreateDirection } from '../issue-to-link';
 import { TimelineIssue } from '../models/timeline-issue.model';
 import { visibleRowsBeforeChild } from '../row-striping';
+import { unixSecondsVirtual } from '../virtual-hours';
 import {
   timelineIssueBarEnd,
   timelineIssueBarStart,
 } from './timeline-bar-dates';
-import { unixSecondsVirtual } from '../virtual-hours';
+import {
+  TimelineLaneBar,
+  timelineGroupLaneBars,
+} from './timeline-group-lane';
 
 /** Original UI: 18px bar height inside a 37px row — scale bar with `issueRowHeightPx`. */
 const TIMELINE_BAR_TO_ROW_RATIO = 18 / 37;
@@ -97,6 +101,8 @@ export class TimelineItemComponent implements OnChanges {
   protected titleLabel = '';
   protected isGroup = false;
   protected hasChildIssues = false;
+  /** Task bars drawn on a collapsed group row. */
+  protected laneBars: TimelineLaneBar[] = [];
 
   protected get issueCardTooltipData(): {
     issue: Issue;
@@ -109,8 +115,23 @@ export class TimelineItemComponent implements OnChanges {
     this.recalculate();
   }
 
+  protected laneTooltip(bar: TimelineLaneBar): {
+    issue: Issue;
+    asTooltip: boolean;
+  } {
+    return { issue: bar.issue as Issue, asTooltip: true };
+  }
+
+  protected onLaneClick(event: MouseEvent, bar: TimelineLaneBar): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.scrollTo.emit(bar.issue);
+  }
+
   protected recalculate(): void {
+    this.laneBars = [];
     if (!this.item || !this.dateStart || !this.dateEnd || !this.scale) {
+      this.width = 0;
       return;
     }
 
@@ -141,20 +162,30 @@ export class TimelineItemComponent implements OnChanges {
 
     this.isAutoScheduled = Boolean(this.item.auto_scheduling);
 
+    const h24 = this.hours24InDay;
+    const dateStartUnix = unixSecondsVirtual(this.dateStart, h24, '');
+    const dateEndUnix = unixSecondsVirtual(this.dateEnd, h24, '');
+    this.lineWidth = (dateEndUnix - dateStartUnix) / this.scale;
+
+    if (this.isGroup && this.item._SHOWCHILDS === false) {
+      this.laneBars = timelineGroupLaneBars(this.item, {
+        dateStart: this.dateStart,
+        scale: this.scale,
+        hours24InDay: h24,
+      });
+    }
+
     const start = timelineIssueBarStart(this.item);
     const end = timelineIssueBarEnd(this.item);
     if (!start || !end) {
       this.width = 0;
+      this.offsetForItem = 0;
+      this.widthProgress = 0;
       return;
     }
 
-    const h24 = this.hours24InDay;
     const startUnix = unixSecondsVirtual(start, h24, 'start');
     const endUnix = unixSecondsVirtual(end, h24, 'end');
-    const dateStartUnix = unixSecondsVirtual(this.dateStart, h24, '');
-    const dateEndUnix = unixSecondsVirtual(this.dateEnd, h24, '');
-
-    this.lineWidth = (dateEndUnix - dateStartUnix) / this.scale;
     this.offsetForItem = (startUnix - dateStartUnix) / this.scale;
     this.width = Math.max((endUnix - startUnix) / this.scale, 5);
     this.widthProgress =

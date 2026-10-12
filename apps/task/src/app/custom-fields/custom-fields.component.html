@@ -1,0 +1,49 @@
+@let fields = fields$ | async;
+@if (fields?.length) {
+  <div class="mt-4 mx-2">
+    <div
+      class="font-extralight text-2xl mb-2 flex flex-row flex-wrap items-center justify-between gap-2"
+    >
+      <span>{{ 'task.custom-fields' | transloco }}</span>
+    </div>
+    <div class="flex flex-col gap-3">
+      @for (field of fields; track field.key) {
+        <section class="custom-field-block">
+          <h3 class="text-sm font-medium opacity-70 mb-1">
+            @if (field.labelKey) {
+              {{ field.labelKey | transloco }}
+            } @else {
+              {{ field.key }}
+            }
+          </h3>
+          @if (field.links?.length) {
+            <ul class="flex flex-col gap-1 px-1">
+              @for (link of field.links; track link.url || link.title) {
+                <li class="text-sm min-w-0">
+                  @if (link.url) {
+                    <button
+                      type="button"
+                      class="custom-field-link"
+                      (click)="openLink(link.url)"
+                    >
+                      {{ link.title }}
+                    </button>
+                  } @else {
+                    <span>{{ link.title }}</span>
+                  }
+                  @if (link.application || link.relationship) {
+                    <span class="opacity-50 text-xs ml-2">
+                      {{ link.application || link.relationship }}
+                    </span>
+                  }
+                </li>
+              }
+            </ul>
+          } @else if (field.text) {
+            <p class="text-sm px-1 break-words">{{ field.text }}</p>
+          }
+        </section>
+      }
+    </div>
+  </div>
+}

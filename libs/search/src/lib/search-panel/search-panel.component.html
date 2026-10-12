@@ -1,0 +1,99 @@
+<div
+  class="search-panel"
+  [class.search-panel--page]="layout === 'page'"
+  (keydown)="onKeydown($event)"
+>
+  <div class="search-panel__input-row">
+    <rw-icon icon="search" size="large" />
+    <input
+      #queryInput
+      class="search-panel__input"
+      type="text"
+      autocomplete="off"
+      spellcheck="false"
+      [value]="search.query | async"
+      [placeholder]="'search.placeholder' | transloco"
+      (input)="onQueryInput($event)"
+    />
+    <ng-content select="[searchInputAddon]" />
+  </div>
+  @if (search.view$ | async; as view) {
+    <div class="search-panel__results" role="listbox">
+      @if (view.items.length === 0) {
+        <div class="search-panel__empty">
+          {{
+            ((search.query | async) || '').trim()
+              ? ('search.no-results' | transloco)
+              : ('search.empty' | transloco)
+          }}
+        </div>
+      }
+      @for (group of view.groups; track group.id) {
+        <section class="search-panel__group">
+          <h3 class="search-panel__group-title">
+            {{ groupKey(group) ? (groupKey(group) | transloco) : group.label }}
+          </h3>
+          @for (item of group.items; track item.id) {
+            <button
+              type="button"
+              class="search-panel__item"
+              role="option"
+              [class.search-panel__item--active]="
+                view.items.indexOf(item) === (search.activeIndex | async)
+              "
+              (mouseenter)="onItemEnter(item, view.items.indexOf(item))"
+              (click)="openItem(item)"
+            >
+              <div class="search-panel__item-icon">
+                @if (item.kind === 'user') {
+                  <renwu-avatar
+                    [user]="item.user"
+                    [showOnline]="false"
+                    [showTooltip]="false"
+                    size="1.75em"
+                  />
+                } @else if (item.kind === 'issue' && item.issue?.type) {
+                  <renwu-issue-type [value]="item.issue.type" />
+                } @else if (item.kind === 'project') {
+                  <rw-icon icon="s-project" size="normal" />
+                } @else {
+                  <rw-icon icon="history" size="normal" />
+                }
+              </div>
+              <div class="search-panel__item-body">
+                <div class="search-panel__item-title">
+                  @if (item.kind === 'issue' && item.subtitle) {
+                    <span class="search-panel__item-key">{{
+                      item.subtitle
+                    }}</span>
+                    <span
+                      class="search-panel__item-name"
+                      [innerHTML]="item.titleHtml || item.title"
+                    ></span>
+                  } @else {
+                    <span [innerHTML]="item.titleHtml || item.title"></span>
+                    @if (item.subtitle) {
+                      <span class="search-panel__item-key">{{
+                        item.subtitle
+                      }}</span>
+                    }
+                  }
+                </div>
+                @if (item.snippetHtml || item.snippet) {
+                  <div class="search-panel__item-snippet">
+                    @if (layout === 'page' && fieldKey(item)) {
+                      <span class="search-panel__item-field">{{
+                        fieldKey(item) | transloco
+                      }}</span>
+                    }
+                    <span [innerHTML]="item.snippetHtml || item.snippet"></span>
+                  </div>
+                }
+              </div>
+            </button>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

@@ -27,4 +27,16 @@ describe('RwToastComponent', () => {
   it('should create', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
+
+  it('shows the close control when the toast is persistent', () => {
+    fixture.componentInstance.persistant = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.item-close')).toBeTruthy();
+  });
+
+  it('hides the close control when the toast auto-dismisses', () => {
+    fixture.componentInstance.persistant = false;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.item-close')).toBeFalsy();
+  });
 });

@@ -8,6 +8,8 @@ import {
 } from 'prosemirror-markdown';
 import {
   DOMOutputSpec,
+  Mark,
+  MarkSpec,
   Node,
   NodeSpec,
   NodeType,
@@ -22,7 +24,10 @@ function createMarkdownTokenizer() {
   if (typeof MarkdownIt !== 'function') {
     throw new Error('markdown-it factory is unavailable');
   }
-  return MarkdownIt('commonmark', { html: false }).enable('table');
+  return MarkdownIt('commonmark', { html: false, linkify: true }).enable([
+    'table',
+    'linkify',
+  ]);
 }
 
 const mentionUserSpec: NodeSpec = {
@@ -131,6 +136,34 @@ const nodesWithMentions = markdownSchema.spec.nodes.append({
 
 const headingSpec = nodesWithMentions.get('heading');
 
+const linkMark: MarkSpec = {
+  attrs: {
+    href: {},
+    title: { default: null },
+  },
+  inclusive: false,
+  parseDOM: [
+    {
+      tag: 'a[href]',
+      getAttrs: (dom: HTMLElement) => ({
+        href: dom.getAttribute('href'),
+        title: dom.getAttribute('title'),
+      }),
+    },
+  ],
+  toDOM(node: Mark): DOMOutputSpec {
+    const attrs: Record<string, string> = {
+      href: node.attrs['href'],
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    };
+    if (node.attrs['title']) {
+      attrs['title'] = node.attrs['title'];
+    }
+    return ['a', attrs];
+  },
+};
+
 /** Markdown schema with GFM tables and @user / #ISSUE mention atoms. */
 export const mySchema = new Schema({
   nodes: nodesWithMentions.update('heading', {
@@ -141,8 +174,35 @@ export const mySchema = new Schema({
     toDOM: headingSpec.toDOM,
     attrs: headingSpec.attrs,
   }),
-  marks: markdownSchema.spec.marks,
+  marks: markdownSchema.spec.marks.update('link', linkMark),
 });
+
+/** Open markdown `<a>` clicks in a new tab (read-only ProseMirror views). */
+export function openMarkdownLinkOnClick(
+  _view: unknown,
+  _pos: number,
+  event: MouseEvent,
+): boolean {
+  if (event.button !== 0) {
+    return false;
+  }
+  const raw = event.target;
+  if (!(raw instanceof globalThis.Node)) {
+    return false;
+  }
+  const el = raw instanceof Element ? raw : raw.parentElement;
+  const a = el?.closest('a[href]');
+  if (!(a instanceof HTMLAnchorElement)) {
+    return false;
+  }
+  const href = a.getAttribute('href') ?? '';
+  if (!href || href.toLowerCase().startsWith('javascript:')) {
+    return false;
+  }
+  event.preventDefault();
+  window.open(a.href, '_blank', 'noopener,noreferrer');
+  return true;
+}
 
 /** CommonMark + GFM tables (prosemirror-markdown default tokenizer has no tables). */
 const markdownTokenizer = createMarkdownTokenizer();

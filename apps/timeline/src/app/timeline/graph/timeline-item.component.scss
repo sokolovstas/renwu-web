@@ -24,6 +24,14 @@ $timeline-layer-bar: 4;
   &.timeline-row-highlight::after {
     background: var(--gray-300);
   }
+
+  &--lane .bar-lane {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    opacity: 0.82;
+  }
 }
 
 .timeline-item {

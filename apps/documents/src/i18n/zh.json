@@ -5,5 +5,8 @@
   "untitled": "无标题",
   "loading": "加载中…",
   "not-found": "文档不存在或你无权访问。",
-  "back": "返回"
+  "back": "返回",
+  "list-title": "文档",
+  "empty": "暂无文档",
+  "list-error": "无法加载文档。"
 }

@@ -26,6 +26,8 @@
   "jira-open": "Открыть в Jira",
   "jira-sync-from": "Синхронизировать из Jira",
   "jira-sync-to": "Синхронизировать в Jira",
+  "custom-fields": "Внешние ссылки",
+  "custom-field-mentioned-on": "Упоминания (Mentioned on)",
   "jira-create-confirm-title": "Создать в Jira?",
   "jira-create-confirm-text": "Задача не связана с Jira. Создать задачу в Jira?",
   "jira-import-done": "Синхронизировано из Jira",

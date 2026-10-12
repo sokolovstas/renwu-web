@@ -45,7 +45,6 @@ export class AiWorkspacesComponent {
     container_id: new FormControl('', { nonNullable: true }),
     workdir: new FormControl('', { nonNullable: true }),
     default_branch: new FormControl('', { nonNullable: true }),
-    verify_commands: new FormControl('', { nonNullable: true }),
     enabled: new FormControl(true, { nonNullable: true }),
     agent_provider: new FormControl('', { nonNullable: true }),
     agent_base_url: new FormControl('', { nonNullable: true }),
@@ -102,7 +101,6 @@ export class AiWorkspacesComponent {
       container_id: item?.container_id || '',
       workdir: item?.workdir || '',
       default_branch: item?.default_branch || '',
-      verify_commands: item?.verify_commands || '',
       enabled: item?.enabled ?? true,
       agent_provider: item?.agent_provider || '',
       agent_base_url: item?.agent_base_url || '',
@@ -120,11 +118,19 @@ export class AiWorkspacesComponent {
       );
       return;
     }
+    const current = this.items().find((item) => item.id === raw.id);
     const payload: AIWorkspace = {
+      ...current,
       ...raw,
       agent_provider: raw.agent_provider?.trim() || undefined,
       agent_base_url: raw.agent_base_url?.trim() || undefined,
       agent_web_base_url: raw.agent_web_base_url?.trim() || undefined,
+      verify_commands: undefined,
+      gates: current?.gates,
+      archetypes: current?.archetypes,
+      project_boundary: current?.project_boundary,
+      default_archetype: current?.default_archetype,
+      lock_scope: current?.lock_scope,
     };
     const saved = await firstValueFrom(
       this.data.aiSaveWorkspace(payload).pipe(defaultIfEmpty(null)),

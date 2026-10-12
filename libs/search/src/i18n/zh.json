@@ -1,0 +1,17 @@
+{
+  "title": "搜索",
+  "placeholder": "搜索任务、人员和项目",
+  "empty": "输入查询以查找任务、人员和项目。",
+  "no-results": "未找到结果",
+  "people": "人员",
+  "projects": "项目",
+  "recent": "最近",
+  "close": "关闭搜索",
+  "hint-nav": "导航",
+  "hint-open": "打开",
+  "field-description": "描述中",
+  "field-comment": "评论中",
+  "field-todo": "待办中",
+  "field-title": "标题中",
+  "field-key": "键中"
+}

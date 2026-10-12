@@ -92,9 +92,10 @@ export class RwWebsocketService {
   ) {
     return this.issue.pipe(
       filter((e) => {
+        const related = Array.isArray(e.issues) ? e.issues : [];
         const idInt =
           ids[0] === '*' ||
-          ids.filter((x) => [...e.issues, e.container].includes(x)).length > 0;
+          ids.some((x) => related.includes(x) || x === e.container);
         const eventInt = events[0] === '*' || events.includes(e.type);
         return idInt && eventInt;
       }),

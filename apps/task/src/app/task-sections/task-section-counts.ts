@@ -34,6 +34,7 @@ export function computeTaskSectionCounts(
   issue: Issue | null | undefined,
   pendingSubtasks = 0,
   loadedChildsTotal?: number | null,
+  documentsTotal = 0,
 ): TaskSectionCounts {
   const links = formValue?.links ?? issue?.links;
   const todos = formValue?.todos ?? issue?.todos;
@@ -63,6 +64,7 @@ export function computeTaskSectionCounts(
     'renwu-task-related': linkCount(links, ['related']),
     'renwu-task-sub-task': childsTotal,
     'renwu-task-attachments': attachments?.length ?? 0,
+    'renwu-task-documents': documentsTotal,
     'renwu-task-time-log': timeLogs?.length ?? 0,
     'renwu-task-history': 0,
   };

@@ -331,6 +331,18 @@ ng-component {
   overflow: hidden;
 }
 
+/* Routed remotes with a selector (unlike ng-component) still need to fill
+   .app-main-view — otherwise the documents editor shrinks to content. */
+renwu-documents-main,
+renwu-documents-document {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 img.logo {
   filter: drop-shadow(0px 0px 11px #0004);
   width: 3rem;

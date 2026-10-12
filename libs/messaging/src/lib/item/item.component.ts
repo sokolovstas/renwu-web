@@ -22,6 +22,7 @@ import {
   RwToastService,
   RwTooltipDirective,
   markdownParser,
+  openMarkdownLinkOnClick,
 } from '@renwu/components';
 import {
   AvatarComponent,
@@ -32,6 +33,7 @@ import {
   RwSettingsService,
   RwUserService,
   StateService,
+  stripAgentFrontMatter,
 } from '@renwu/core';
 import { copyToClipboard } from '@renwu/utils';
 import { EditorState } from 'prosemirror-state';
@@ -246,7 +248,7 @@ export class MessageItemComponent implements OnDestroy {
     }
     let doc;
     try {
-      doc = markdownParser.parse(text || '');
+      doc = markdownParser.parse(stripAgentFrontMatter(text || ''));
     } catch {
       doc = markdownParser.parse('');
     }
@@ -258,6 +260,7 @@ export class MessageItemComponent implements OnDestroy {
         state,
         editable: () => false,
         nodeViews: this.mentionViews,
+        handleClick: openMarkdownLinkOnClick,
       });
     }
     this.cd.markForCheck();

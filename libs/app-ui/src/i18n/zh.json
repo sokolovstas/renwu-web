@@ -2,6 +2,7 @@
   "dashboard": "renwu.dashboard",
   "projects": "renwu.projects",
   "tasks": "renwu.tasks",
+  "documents": "文档",
   "messenger": "renwu.messenger",
   "add-task": "renwu.add-task",
   "settings": "renwu.settings",

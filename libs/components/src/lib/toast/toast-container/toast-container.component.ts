@@ -19,6 +19,10 @@ export class RwToastContainerComponent {
     if (toast.onClick) {
       toast.onClick();
     }
+    // Error toasts stay until the user clicks the close control.
+    if (toast.level === 'error') {
+      return;
+    }
     this.toastService.close(toast);
   }
   closeToast(toast: ToastData, eventMouser: MouseEvent): void {

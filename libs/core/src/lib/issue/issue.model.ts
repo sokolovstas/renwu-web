@@ -82,7 +82,7 @@ export interface Issue {
   skill?: string;
   childs?: Issue[];
   auto_scheduling?: boolean;
-  custom_fields?: { [key: string]: string };
+  custom_fields?: { [key: string]: unknown };
   external_links?: { [key: string]: string };
   parent_milestones?: MilestoneD[];
   parents_title?: string;

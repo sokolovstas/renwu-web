@@ -25,6 +25,17 @@
     },
     "e2e": {
       "inputs": ["default", "^production"]
+    },
+    "serve": {
+      "options": {
+        "open": false
+      }
+    },
+    "serve-original": {
+      "options": {
+        "host": "0.0.0.0",
+        "poll": 1000
+      }
     }
   },
   "namedInputs": {

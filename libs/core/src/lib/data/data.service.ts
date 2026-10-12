@@ -354,9 +354,10 @@ export class RwDataService {
   getContainerIssueTreeGrouped(
     id: string,
     group_by: string,
-    filters: ListOptionsFilters & {
+    filters: Omit<ListOptionsFilters, 'sort'> & {
       group_by?: string;
       hierarchy?: string;
+      sort?: string;
       q?: string;
       query?: string;
       query_hash?: string;
@@ -1296,12 +1297,18 @@ export class RwDataService {
    * background sync loop that runs every few seconds and where transient
    * network errors are routine, not user-facing failures. Errors propagate
    * to the caller instead, silently.
+   *
+   * Pass `{ wait: false }` for a one-shot read (version-conflict rebase).
    */
   docsGetSteps(
     id: string,
     version: number,
+    options?: { wait?: boolean },
   ): Observable<RwDocumentStepsResponse> {
-    const params = new HttpParams({ fromObject: { version: String(version) } });
+    let params = new HttpParams({ fromObject: { version: String(version) } });
+    if (options?.wait === false) {
+      params = params.set('wait', '0');
+    }
     return this.http.get<RwDocumentStepsResponse>(
       `${this.settings.documentsApiUrl}/documents/${id}/steps`,
       { headers: new HttpHeaders(this.headers), withCredentials: true, params },

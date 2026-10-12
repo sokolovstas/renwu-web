@@ -15,7 +15,7 @@ function applyZoom(
     TimelineTicksId.QUARTER,
   ];
   let tick = scaleTick;
-  let value = Math.round(scaleValue);
+  const value = Math.round(scaleValue);
   let next = Math.round(value * factor);
   if (next === value && Math.abs(factor - 1) > 0.001) {
     next = factor > 1 ? value + 1 : value - 1;

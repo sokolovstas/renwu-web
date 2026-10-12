@@ -17,10 +17,13 @@ import { RwIconComponent } from '@renwu/components';
 import {
   AvatarComponent,
   Container,
+  Issue,
+  IssueAssigneesComponent,
+  IssuePriorityComponent,
+  IssueStatusComponent,
   IssueTypeComponent,
   RwDataService,
   RwUserService,
-  SearchHistory,
   SearchResponse,
 } from '@renwu/core';
 import {
@@ -66,6 +69,9 @@ const createInlineLoader = (languages: Array<string>): InlineLoader => {
     RwIconComponent,
     AvatarComponent,
     IssueTypeComponent,
+    IssuePriorityComponent,
+    IssueStatusComponent,
+    IssueAssigneesComponent,
   ],
   providers: [
     {
@@ -112,21 +118,7 @@ export class SearchSpotlightComponent implements OnInit {
     switchMap(([query, users, projects]) => {
       const trimmed = query.trim();
       if (!trimmed) {
-        return this.dataService.searchHistory().pipe(
-          catchError(() => of([] as SearchHistory[])),
-          map((history) =>
-            this.toView(
-              buildSpotlightItems({
-                query: '',
-                issues: [],
-                hits: [],
-                users: [],
-                projects: [],
-                history,
-              }),
-            ),
-          ),
-        );
+        return of(this.toView([]));
       }
       return this.dataService.quickSearch(trimmed).pipe(
         catchError(() => of({ issues: [], hits: [] } as SearchResponse)),
@@ -150,20 +142,20 @@ export class SearchSpotlightComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.overlay.open$
-      .pipe(takeUntilDestroyed(this.destroy))
-      .subscribe((open) => {
-        if (open || this.variant === 'page') {
-          this.activeIndex.next(0);
-          setTimeout(() => this.queryInput?.nativeElement.focus());
-        }
-        if (!open && this.variant === 'overlay') {
-          this.query.next('');
-        }
-      });
-    if (this.variant === 'page') {
-      setTimeout(() => this.queryInput?.nativeElement.focus());
+    if (this.variant === 'overlay') {
+      this.overlay.open$
+        .pipe(takeUntilDestroyed(this.destroy))
+        .subscribe((open) => {
+          if (open) {
+            this.activeIndex.next(0);
+            setTimeout(() => this.queryInput?.nativeElement.focus());
+          } else {
+            this.query.next('');
+          }
+        });
+      return;
     }
+    setTimeout(() => this.queryInput?.nativeElement.focus());
   }
 
   onQuery(value: string): void {
@@ -213,7 +205,7 @@ export class SearchSpotlightComponent implements OnInit {
     }
     if (item.kind === 'issue' && item.issue) {
       this.sidebarService.setCurrentTask(item.issue);
-      this.overlay.hide();
+      this.closeOverlay();
       return;
     }
     if (item.kind === 'user') {
@@ -221,12 +213,12 @@ export class SearchSpotlightComponent implements OnInit {
       if (username) {
         void this.router.navigate([{ outlets: { section: ['user', username] } }]);
       }
-      this.overlay.hide();
+      this.closeOverlay();
       return;
     }
     if (item.kind === 'project' && item.project?.key) {
       void this.router.navigate(['/project', item.project.key]);
-      this.overlay.hide();
+      this.closeOverlay();
     }
   }
 
@@ -234,6 +226,11 @@ export class SearchSpotlightComponent implements OnInit {
     if (this.variant === 'overlay') {
       this.overlay.hide();
     }
+  }
+
+  assigneeName(issue?: Issue): string {
+    const user = issue?.assignes?.[0] || issue?.assignes_calc?.[0];
+    return user?.full_name || user?.username || '';
   }
 
   groupTranslateKey(group: SpotlightGroup): string {

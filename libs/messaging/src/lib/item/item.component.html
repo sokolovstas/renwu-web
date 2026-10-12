@@ -13,7 +13,7 @@
   @switch (message.type ?? MessageType.REGULAR) {
     @case (MessageType.REGULAR) {
   <div
-    [@newMessage]="!!message"
+    animate.enter="rw-new-message-enter"
     class="renwu-messaging-item__message-wrapper"
     [class.no-avatar]="(message.displayAvatar | async) === false"
     [class.hover]="!textOnly"

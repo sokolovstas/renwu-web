@@ -36,5 +36,20 @@
     &__counter {
       margin-right: 0.25rem;
     }
+    &__transitions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      flex: 1 1 auto;
+      min-width: 8rem;
+      margin-left: 1rem;
+      margin-right: 0.5rem;
+    }
+    &--with-status &__label {
+      width: auto;
+      flex: 0 1 16rem;
+    }
   }
 }

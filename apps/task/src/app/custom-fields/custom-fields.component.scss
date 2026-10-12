@@ -1,0 +1,19 @@
+.custom-field-block {
+  padding-top: 0.15rem;
+}
+
+.custom-field-link {
+  color: var(--accent-color, #2563eb);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}

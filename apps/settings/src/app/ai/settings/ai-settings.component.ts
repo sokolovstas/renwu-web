@@ -14,7 +14,7 @@ import {
   RwToastService,
   SelectModelBase,
 } from '@renwu/components';
-import { AIProviderInfo, AISettings, RwDataService, UserType } from '@renwu/core';
+import { AIProviderInfo, AIProviderSettings, AISettings, RwDataService, UserType } from '@renwu/core';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 
 @Component({
@@ -42,8 +42,11 @@ export class AiSettingsComponent {
   readonly modelModel = new SelectModelBase<string>();
   readonly providerModel = new SelectModelBase<string>();
   providers: AIProviderInfo[] = [];
+  private lastProvider = '';
+  private readonly providerDrafts: Record<string, ProviderDraft> = {};
 
   readonly gatesModeModel = new SelectModelBase<string>();
+  readonly effortModel = new SelectModelBase<string>();
   readonly form = new FormGroup({
     enabled: new FormControl(false, { nonNullable: true }),
     run_via_runner: new FormControl(false, { nonNullable: true }),
@@ -52,7 +55,8 @@ export class AiSettingsComponent {
     agent_web_base_url: new FormControl('', { nonNullable: true }),
     actor_user_id: new FormControl('', { nonNullable: true }),
     default_model: new FormControl('', { nonNullable: true }),
-    max_concurrent_jobs: new FormControl(1, { nonNullable: true }),
+    default_effort: new FormControl('', { nonNullable: true }),
+    max_concurrent_jobs: new FormControl(10, { nonNullable: true }),
     gates_mode: new FormControl<'shadow' | 'enforce'>('shadow', {
       nonNullable: true,
     }),
@@ -70,6 +74,9 @@ export class AiSettingsComponent {
     this.providerModel.loadSelected = true;
     this.gatesModeModel.allowNull = false;
     this.gatesModeModel.loadSelected = true;
+    this.effortModel.allowNull = true;
+    this.effortModel.loadSelected = true;
+    this.effortModel.staticData = this.effortOptions(false);
     this.gatesModeModel.staticData = [
       {
         id: 'shadow',
@@ -80,16 +87,20 @@ export class AiSettingsComponent {
         label: this.transloco.translate('settings.ai-gates-mode-enforce'),
       },
     ];
-    this.form.controls.agent_provider.valueChanges.subscribe(() => {
+    this.form.controls.agent_provider.valueChanges.subscribe((id) => {
       if (this.suppressProviderReload) {
         return;
       }
-      void this.onProviderChanged();
+      void this.onProviderChanged(id);
     });
     void this.load();
   }
 
-  private async onProviderChanged(): Promise<void> {
+  private async onProviderChanged(nextId: string): Promise<void> {
+    this.stashProviderDraft(this.lastProvider);
+    this.lastProvider = nextId || 'opencode';
+    this.applyProviderDraft(this.lastProvider);
+    this.syncRunnerRequirement();
     await this.loadModels({
       dropUnknown: true,
       preferredModel: this.form.controls.default_model.value,
@@ -100,6 +111,26 @@ export class AiSettingsComponent {
   get selectedProvider(): AIProviderInfo | undefined {
     const id = this.form.controls.agent_provider.value;
     return this.providers.find((p) => p.id === id);
+  }
+
+  get runnerRequired(): boolean {
+    return this.selectedProvider?.needs_runner === true;
+  }
+
+  get effortVisible(): boolean {
+    return this.selectedProvider?.needs_effort === true;
+  }
+
+  private syncRunnerRequirement(): void {
+    const ctl = this.form.controls.run_via_runner;
+    if (this.runnerRequired) {
+      ctl.setValue(true);
+      ctl.disable({ emitEvent: false });
+      return;
+    }
+    if (ctl.disabled) {
+      ctl.enable({ emitEvent: false });
+    }
   }
 
   async load(): Promise<void> {
@@ -151,14 +182,17 @@ export class AiSettingsComponent {
     provider?: string;
     baseUrl?: string;
   }): Promise<void> {
-    const baseUrl =
-      opts?.baseUrl?.trim() ||
-      this.form.controls.agent_base_url.value?.trim() ||
-      undefined;
     const provider =
       opts?.provider?.trim() ||
       this.form.controls.agent_provider.value?.trim() ||
       undefined;
+    const providerInfo = this.providers.find((p) => p.id === provider);
+    const baseUrl =
+      providerInfo?.needs_base_url === false
+        ? undefined
+        : opts?.baseUrl?.trim() ||
+          this.form.controls.agent_base_url.value?.trim() ||
+          undefined;
     const response = await firstValueFrom(
       this.data
         .aiListAgentModels(baseUrl, provider)
@@ -175,7 +209,7 @@ export class AiSettingsComponent {
       '';
     const known = this.modelModel.staticData.some((x) => x.id === next);
     if (next && !known) {
-      if (opts?.dropUnknown || provider === 'claude_code') {
+      if (opts?.dropUnknown || provider === 'claude_code' || provider === 'codex') {
         next = String(this.modelModel.staticData[0]?.id ?? '');
         this.form.controls.default_model.setValue(next);
         this.form.controls.default_model.markAsDirty();
@@ -195,11 +229,13 @@ export class AiSettingsComponent {
   async save(): Promise<void> {
     (document.activeElement as HTMLElement | null)?.blur?.();
     try {
+      this.stashProviderDraft(this.form.controls.agent_provider.value);
       const raw = this.form.getRawValue();
       const payload: AISettings = {
         ...raw,
         opencode_base_url: raw.agent_base_url,
         opencode_web_base_url: raw.agent_web_base_url,
+        providers: this.providersPayload(raw.agent_provider),
       };
       const settings = await firstValueFrom(
         this.data.aiSaveSettings(payload).pipe(defaultIfEmpty(null)),
@@ -223,42 +259,175 @@ export class AiSettingsComponent {
   }
 
   private patchSettings(settings: AISettings): void {
-    const baseUrl =
-      settings.agent_base_url || settings.opencode_base_url || '';
-    const webUrl =
-      settings.agent_web_base_url || settings.opencode_web_base_url || '';
+    this.loadProviderDrafts(settings);
+    const provider = settings.agent_provider || 'opencode';
+    const draft = this.providerDrafts[provider] || this.emptyDraft();
     this.suppressProviderReload = true;
     try {
       this.form.patchValue({
         enabled: !!settings.enabled,
-        run_via_runner: !!settings.run_via_runner,
-        agent_provider: settings.agent_provider || 'opencode',
-        agent_base_url: baseUrl,
-        agent_web_base_url: webUrl,
+        run_via_runner: draft.run_via_runner,
+        agent_provider: provider,
+        agent_base_url: draft.agent_base_url,
+        agent_web_base_url: draft.agent_web_base_url,
         actor_user_id: settings.actor_user_id || '',
-        default_model: settings.default_model || '',
-        max_concurrent_jobs: settings.max_concurrent_jobs || 1,
+        default_model: draft.default_model || settings.default_model || '',
+        default_effort: draft.default_effort || settings.default_effort || '',
+        max_concurrent_jobs: settings.max_concurrent_jobs || 10,
         gates_mode: settings.gates_mode === 'enforce' ? 'enforce' : 'shadow',
         max_fix_iterations: settings.max_fix_iterations || 0,
         lock_wait_timeout_sec: settings.lock_wait_timeout_sec || 0,
         gate_timeout_sec: settings.gate_timeout_sec || 0,
+      });
+      this.lastProvider = provider;
+      this.syncRunnerRequirement();
+    } finally {
+      this.suppressProviderReload = false;
+    }
+  }
+
+  private loadProviderDrafts(settings: AISettings): void {
+    for (const key of Object.keys(this.providerDrafts)) {
+      delete this.providerDrafts[key];
+    }
+    for (const [id, slot] of Object.entries(settings.providers || {})) {
+      this.providerDrafts[id] = this.draftFromSlot(slot);
+    }
+    const current = settings.agent_provider || 'opencode';
+    this.providerDrafts[current] = {
+      agent_base_url:
+        settings.agent_base_url ||
+        settings.opencode_base_url ||
+        this.providerDrafts[current]?.agent_base_url ||
+        '',
+      agent_web_base_url:
+        settings.agent_web_base_url ||
+        settings.opencode_web_base_url ||
+        this.providerDrafts[current]?.agent_web_base_url ||
+        '',
+      run_via_runner:
+        settings.run_via_runner ??
+        this.providerDrafts[current]?.run_via_runner ??
+        false,
+      default_model:
+        settings.default_model ||
+        this.providerDrafts[current]?.default_model ||
+        '',
+      default_effort:
+        settings.default_effort ||
+        this.providerDrafts[current]?.default_effort ||
+        '',
+    };
+  }
+
+  private stashProviderDraft(id: string): void {
+    const provider = (id || '').trim();
+    if (!provider) {
+      return;
+    }
+    this.providerDrafts[provider] = {
+      agent_base_url: this.form.controls.agent_base_url.value || '',
+      agent_web_base_url: this.form.controls.agent_web_base_url.value || '',
+      run_via_runner: this.runnerRequired
+        ? true
+        : !!this.form.controls.run_via_runner.value,
+      default_model: this.form.controls.default_model.value || '',
+      default_effort: this.form.controls.default_effort.value || '',
+    };
+  }
+
+  private applyProviderDraft(id: string): void {
+    const draft = this.providerDrafts[id] || this.emptyDraft();
+    this.form.patchValue({
+      run_via_runner: draft.run_via_runner,
+      agent_base_url: draft.agent_base_url,
+      agent_web_base_url: draft.agent_web_base_url,
+      default_model: draft.default_model,
+      default_effort: draft.default_effort,
+    });
+  }
+
+  private providersPayload(selected: string): Record<string, AIProviderSettings> {
+    this.stashProviderDraft(selected);
+    const out: Record<string, AIProviderSettings> = {};
+    for (const [id, draft] of Object.entries(this.providerDrafts)) {
+      out[id] = {
+        base_url: draft.agent_base_url,
+        web_base_url: draft.agent_web_base_url,
+        run_via_runner: draft.run_via_runner,
+        default_model: draft.default_model,
+        default_effort: draft.default_effort,
+      };
+    }
+    return out;
+  }
+
+  private draftFromSlot(slot: AIProviderSettings): ProviderDraft {
+    return {
+      agent_base_url: slot.base_url || '',
+      agent_web_base_url: slot.web_base_url || '',
+      run_via_runner: !!slot.run_via_runner,
+      default_model: slot.default_model || '',
+      default_effort: slot.default_effort || '',
+    };
+  }
+
+  private emptyDraft(): ProviderDraft {
+    return {
+      agent_base_url: '',
+      agent_web_base_url: '',
+      run_via_runner: false,
+      default_model: '',
+      default_effort: '',
+    };
+  }
+
+  /** Re-apply select values so labels resolve after staticData updates. */
+  private rebindSelects(): void {
+    this.suppressProviderReload = true;
+    try {
+      this.form.patchValue({
+        agent_provider: this.form.controls.agent_provider.value,
+        actor_user_id: this.form.controls.actor_user_id.value,
+        default_model: this.form.controls.default_model.value,
+        default_effort: this.form.controls.default_effort.value,
+        gates_mode: this.form.controls.gates_mode.value,
       });
     } finally {
       this.suppressProviderReload = false;
     }
   }
 
-  /** Re-apply select values so labels resolve after staticData updates. */
-  private rebindSelects(): void {
-    this.form.patchValue({
-      agent_provider: this.form.controls.agent_provider.value,
-      actor_user_id: this.form.controls.actor_user_id.value,
-      default_model: this.form.controls.default_model.value,
-      gates_mode: this.form.controls.gates_mode.value,
-    });
-  }
-
   private option(id: string, label: string): ISelectItem<string> {
     return { id, label };
   }
+
+  private effortOptions(includeInherit: boolean): ISelectItem<string>[] {
+    const levels: ISelectItem<string>[] = [
+      this.option('low', this.transloco.translate('settings.ai-effort-low')),
+      this.option('medium', this.transloco.translate('settings.ai-effort-medium')),
+      this.option('high', this.transloco.translate('settings.ai-effort-high')),
+      this.option('xhigh', this.transloco.translate('settings.ai-effort-xhigh')),
+      this.option('max', this.transloco.translate('settings.ai-effort-max')),
+      this.option('ultra', this.transloco.translate('settings.ai-effort-ultra')),
+    ];
+    if (!includeInherit) {
+      return [
+        this.option('', this.transloco.translate('settings.ai-effort-model-default')),
+        ...levels,
+      ];
+    }
+    return [
+      this.option('', this.transloco.translate('settings.ai-effort-inherit')),
+      ...levels,
+    ];
+  }
 }
+
+type ProviderDraft = {
+  agent_base_url: string;
+  agent_web_base_url: string;
+  run_via_runner: boolean;
+  default_model: string;
+  default_effort: string;
+};

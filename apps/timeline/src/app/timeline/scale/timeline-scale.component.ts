@@ -54,6 +54,14 @@ const HIERARCHY_OPTIONS = [
   { id: 'leaves', key: 'hierarchyLeaves' },
 ] as const;
 
+/** Combined field + direction for the sort select (`-` = desc). */
+const SORT_OPTIONS = [
+  { id: 'status', key: 'sortStatusAsc' },
+  { id: '-status', key: 'sortStatusDesc' },
+  { id: 'date_start_calc', key: 'sortDateStartAsc' },
+  { id: '-date_start_calc', key: 'sortDateStartDesc' },
+] as const;
+
 @Component({
   selector: 'renwu-timeline-scale',
   standalone: true,
@@ -90,6 +98,7 @@ export class TimelineScaleComponent implements OnInit {
 
   protected groupingModel = this.createGroupingModel();
   protected hierarchyModel = this.createHierarchyModel();
+  protected sortModel = this.createSortModel();
   protected scaleTickModel = this.createScaleTickModel();
 
   /** Reactive snapshot; use in template as `settings()` so OnPush updates when storage/slider changes. */
@@ -135,6 +144,14 @@ export class TimelineScaleComponent implements OnInit {
     this.settingsService.setHierarchyMode(
       value === 'leaves' ? 'leaves' : 'subtasks',
     );
+    this.changed.emit();
+  }
+
+  protected onSortChanged(items: ISelectItem<unknown>[]): void {
+    const raw = String(items?.[0]?.id || 'status');
+    const desc = raw.startsWith('-');
+    const field = desc ? raw.slice(1) : raw;
+    this.settingsService.setSort(field || 'status', desc ? 'down' : 'up');
     this.changed.emit();
   }
 
@@ -205,6 +222,13 @@ export class TimelineScaleComponent implements OnInit {
             .pipe(take(1)),
         ),
       ),
+      sort: forkJoin(
+        SORT_OPTIONS.map((option) =>
+          this.transloco
+            .selectTranslate(option.key, {}, this.translocoScope)
+            .pipe(take(1)),
+        ),
+      ),
       ticks: forkJoin(
         tickOptions.map((option) =>
           this.transloco
@@ -214,7 +238,7 @@ export class TimelineScaleComponent implements OnInit {
       ),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ grouping, hierarchy, ticks }) => {
+      .subscribe(({ grouping, hierarchy, sort, ticks }) => {
         this.groupingModel.staticData = GROUPING_OPTIONS.map((option, index) => ({
           id: option.id,
           label: grouping[index],
@@ -234,6 +258,13 @@ export class TimelineScaleComponent implements OnInit {
         void this.hierarchyModel.setData(hierarchyValue);
         void this.hierarchyModel.loadPage(0);
 
+        this.sortModel.staticData = SORT_OPTIONS.map((option, index) => ({
+          id: option.id,
+          label: sort[index],
+        }));
+        void this.sortModel.setData(this.currentSortSelectId());
+        void this.sortModel.loadPage(0);
+
         this.scaleTickModel.staticData = tickOptions.map((option, index) => ({
           id: option.id,
           label: ticks[index],
@@ -244,6 +275,10 @@ export class TimelineScaleComponent implements OnInit {
 
         this.cdr.markForCheck();
       });
+  }
+
+  private currentSortSelectId(): string {
+    return this.settingsService.sortParam() || 'status';
   }
 
   private getScaleTickOptions(): Array<{ id: TimelineTicksId; key: string }> {
@@ -287,6 +322,17 @@ export class TimelineScaleComponent implements OnInit {
     void model.setData(
       this.settingsService.getTimeline().hierarchyMode || 'subtasks',
     );
+    return model;
+  }
+
+  private createSortModel(): SelectModelBase<string> {
+    const model = new SelectModelBase<string>();
+    model.loadSelected = true;
+    model.staticData = SORT_OPTIONS.map((option) => ({
+      id: option.id,
+      label: option.id,
+    }));
+    void model.setData(this.currentSortSelectId());
     return model;
   }
 

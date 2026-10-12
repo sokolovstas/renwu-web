@@ -11,7 +11,7 @@ import {
   RwButtonComponent,
   RwToastService,
 } from '@renwu/components';
-import { AIJob, RwDataService } from '@renwu/core';
+import { AIJob, RwDataService, stripAgentFrontMatter } from '@renwu/core';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 
 @Component({
@@ -51,6 +51,18 @@ export class AiJobsComponent {
     } finally {
       this.cd.markForCheck();
     }
+  }
+
+  summaryPreview(job: AIJob): string {
+    const raw = (job.summary || job.error || '').trim();
+    if (!raw) {
+      return '—';
+    }
+    return compactJobSummary(raw);
+  }
+
+  fullSummary(job: AIJob): string {
+    return stripAgentFrontMatter((job.summary || job.error || '').trim());
   }
 
   sessionUrl(job: AIJob): string | null {
@@ -145,4 +157,16 @@ export class AiJobsComponent {
     );
     await this.load();
   }
+}
+
+/** One-line-ish preview for the jobs table; full text stays on hover. */
+function compactJobSummary(text: string, max = 160): string {
+  let s = stripAgentFrontMatter(text).trim();
+  s = s.replace(/[#>*`_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (s.length <= max) {
+    return s;
+  }
+  const cut = s.slice(0, max);
+  const sp = cut.lastIndexOf(' ');
+  return `${sp > 80 ? cut.slice(0, sp) : cut}…`;
 }

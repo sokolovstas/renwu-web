@@ -53,6 +53,11 @@
         [model]="modelModel"
         prompt="{{ 'settings.ai-model' | transloco }}"
       />
+      <rw-select
+        formControlName="effort"
+        [model]="effortModel"
+        prompt="{{ 'settings.ai-effort' | transloco }}"
+      />
       <rw-text-input
         [live]="true"
         formControlName="timeout_sec"
@@ -81,18 +86,22 @@
         type="number"
         prompt="{{ 'settings.ai-max-budget-usd' | transloco }}"
       />
+      <rw-text-input
+        [live]="true"
+        formControlName="gate_names"
+        prompt="{{ 'settings.ai-skill-gate-names' | transloco }}"
+      />
+      <rw-select
+        formControlName="review_skill_id"
+        [model]="reviewSkillModel"
+        prompt="{{ 'settings.ai-skill-review-skill' | transloco }}"
+      />
     </div>
     <p class="form-supporting-text">
       {{ 'settings.ai-allowed-tools-hint' | transloco }}
     </p>
-    <rw-text-input
-      [live]="true"
-      [multiline]="true"
-      formControlName="result_schema_json"
-      prompt="{{ 'settings.ai-result-schema' | transloco }}"
-    />
     <p class="form-supporting-text">
-      {{ 'settings.ai-result-schema-hint' | transloco }}
+      {{ 'settings.ai-skill-gates-hint' | transloco }}
     </p>
     <label class="flex items-center gap-2"
       ><input type="checkbox" formControlName="enabled" />{{

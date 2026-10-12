@@ -5,5 +5,8 @@
   "untitled": "Untitled",
   "loading": "Loading…",
   "not-found": "Document not found or you don't have access to it.",
-  "back": "Back"
+  "back": "Back",
+  "list-title": "Documents",
+  "empty": "No documents",
+  "list-error": "Could not load documents."
 }

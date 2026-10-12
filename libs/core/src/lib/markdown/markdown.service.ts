@@ -8,6 +8,7 @@ import { RwDataService } from '../data/data.service';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 import { RwUserService } from '../user/user.service';
 import MentionPlugin from './markdown_mention.plugin';
+import { stripAgentFrontMatter } from './strip-agent-frontmatter';
 
 @Injectable({
   providedIn: 'root',
@@ -81,6 +82,7 @@ export class RwMarkdownService {
     if (!text) {
       return '';
     }
+    text = stripAgentFrontMatter(text);
     // Jira table
     text = text.replace(
       /^(\|\|)+((.|[\s\S])*?)(\|\|)+(.?)+$/gm,

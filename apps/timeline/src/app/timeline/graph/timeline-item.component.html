@@ -2,12 +2,37 @@
   @if (isGroup) {
     <div
       class="timeline-item-group"
+      [class.timeline-item-group--lane]="laneBars.length"
       [class.timeline-row-highlight]="rowHighlighted"
       [style.height.px]="issueRowHeightPx()"
+      [style.width.px]="lineWidth"
       (mouseenter)="onRowHover(true)"
       (mouseleave)="onRowHover(false)"
     >
-      <!-- group row placeholder - no bar -->
+      @for (bar of laneBars; track bar.id) {
+        <div
+          class="bar bar-lane"
+          [style.left.px]="bar.left"
+          [style.width.px]="bar.width"
+          [style.height.px]="barHeightPx()"
+          [style.background]="bar.color"
+          [attr.title]="bar.title"
+          [tooltipType]="showIssueCardOnHover ? issueCardTooltipType : undefined"
+          [tooltipData]="laneTooltip(bar)"
+          [tooltipDisabled]="!showIssueCardOnHover"
+          [tooltipTimeout]="200"
+          tooltipPlacement="top"
+          rwTooltip
+          (click)="onLaneClick($event, bar)"
+        >
+          @if (bar.width >= 40) {
+            <span
+              class="bar-title-inside"
+              [style.font-size.px]="barTitleFontSizePx()"
+            >{{ bar.title }}</span>
+          }
+        </div>
+      }
     </div>
   } @else if (width > 0) {
     <div

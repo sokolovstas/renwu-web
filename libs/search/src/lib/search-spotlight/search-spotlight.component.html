@@ -1,0 +1,32 @@
+@if (search.overlayOpen$ | async) {
+  <div class="search-spotlight" (keydown)="onKeydown($event)">
+    <button
+      type="button"
+      class="search-spotlight__backdrop"
+      (click)="search.hideOverlay()"
+      [attr.aria-label]="'search.close' | transloco"
+    ></button>
+    <div
+      class="search-spotlight__panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'search.title' | transloco"
+    >
+      <renwu-search-panel>
+        <span searchInputAddon class="search-spotlight__kbd">esc</span>
+      </renwu-search-panel>
+      <div class="search-spotlight__hint">
+        <span
+          ><span class="search-spotlight__kbd">↑</span
+          ><span class="search-spotlight__kbd">↓</span>
+          {{ 'search.hint-nav' | transloco }}</span
+        >
+        <span
+          ><span class="search-spotlight__kbd">↵</span>
+          {{ 'search.hint-open' | transloco }}</span
+        >
+        <span class="search-spotlight__kbd">⌥Space</span>
+      </div>
+    </div>
+  </div>
+}

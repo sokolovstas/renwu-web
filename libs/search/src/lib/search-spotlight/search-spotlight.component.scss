@@ -1,0 +1,65 @@
+@use '../../../../components/src/styles/rw_variables.scss' as *;
+
+:host {
+  display: contents;
+}
+
+.search-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 1rem 2rem;
+}
+
+.search-spotlight__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: $rw-modal-overlay-background;
+  backdrop-filter: blur(4px);
+  cursor: default;
+}
+
+.search-spotlight__panel {
+  position: relative;
+  z-index: 1;
+  width: min(40rem, 100%);
+  max-height: min(35rem, 72vh);
+  display: flex;
+  flex-direction: column;
+  background: $rw-modal-background;
+  border-radius: 28px;
+  box-shadow: $modal-wrapper-box-shadow;
+  overflow: hidden;
+  color: $black;
+}
+
+.search-spotlight__hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.65rem $rw-modal-padding-h;
+  border-top: 1px solid $gray-200;
+  color: $gray-500;
+  font-size: 0.75rem;
+  background: $gray-100;
+}
+
+.search-spotlight__kbd {
+  display: inline-block;
+  min-width: 1.4em;
+  padding: 0.05rem 0.35rem;
+  margin: 0 0.1rem;
+  border-radius: $rw-control-border-radius;
+  background: $white;
+  border: 1px solid $gray-300;
+  font-size: 0.7rem;
+  font-family: inherit;
+  text-align: center;
+  color: $gray-600;
+}

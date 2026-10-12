@@ -1,0 +1,35 @@
+@let docs = documents$ | async;
+<div class="mt-4 mx-2">
+  <div class="font-extralight text-2xl mb-2">
+    <span>{{ 'task.documents' | transloco }}</span>
+  </div>
+  @if (docs === null) {
+    <span class="text-sm opacity-50 px-1">{{ 'task.documents-error' | transloco }}</span>
+  } @else if (docs.length === 0) {
+    <span class="text-sm opacity-50 px-1">{{ 'task.documents-empty' | transloco }}</span>
+  } @else {
+    <div class="flex flex-col gap-2 px-1 text-sm">
+      @for (doc of docs; track doc.id) {
+        <div
+          class="flex flex-row flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-1"
+          >
+          <button type="button"
+            class="truncate text-blue-600 hover:underline min-w-0 flex-1 text-left"
+            (click)="openDocument(doc)"
+            >{{ doc.title || ('task.documents-open' | transloco) }}</button
+            >
+          <div class="flex flex-row flex-wrap items-center gap-1 shrink-0 opacity-80 text-xs">
+            <span class="whitespace-nowrap">{{ doc.updated_at | rwDate: 'PPp' }}</span>
+            <rw-icon size="small"
+              cursor="pointer"
+              class="opacity-70 hover:opacity-100"
+              icon="external"
+              [rwTooltip]="'task.documents-open' | transloco"
+              (click)="openDocument(doc)"
+             />
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -16,13 +16,13 @@ describe('SearchSpotlightHostComponent', () => {
     fixture.detectChanges();
   });
 
-  it('opens the overlay on Cmd/Ctrl+K', () => {
+  it('opens the overlay on Alt/Option+Space', () => {
     expect(overlay.isOpen).toBe(false);
     window.dispatchEvent(
       new KeyboardEvent('keydown', {
-        key: 'k',
-        code: 'KeyK',
-        metaKey: true,
+        key: ' ',
+        code: 'Space',
+        altKey: true,
         bubbles: true,
       }),
     );

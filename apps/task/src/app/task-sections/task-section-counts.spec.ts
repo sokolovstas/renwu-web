@@ -43,4 +43,11 @@ describe('computeTaskSectionCounts', () => {
     const counts = computeTaskSectionCounts({}, { childs_total: 0 }, 0, 10);
     expect(counts['renwu-task-sub-task']).toBe(10);
   });
+
+  it('passes through the documents total, defaulting to 0', () => {
+    expect(computeTaskSectionCounts({}, null)['renwu-task-documents']).toBe(0);
+    expect(
+      computeTaskSectionCounts({}, null, 0, 0, 3)['renwu-task-documents'],
+    ).toBe(3);
+  });
 });

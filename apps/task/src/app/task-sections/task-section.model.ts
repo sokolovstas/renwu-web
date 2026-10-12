@@ -28,6 +28,7 @@ export const TASK_SECTION_META: Record<
   'renwu-task-related': { icon: 'share', titleKey: 'task.related' },
   'renwu-task-sub-task': { icon: 'list', titleKey: 'task.subtask' },
   'renwu-task-attachments': { icon: 'picture', titleKey: 'task.attachments' },
+  'renwu-task-documents': { icon: 'document', titleKey: 'task.documents' },
   'renwu-task-time-log': { icon: 'timelapse', titleKey: 'task.timelog' },
   'renwu-task-history': { icon: 'history', titleKey: 'task.history' },
 };

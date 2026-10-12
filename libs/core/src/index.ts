@@ -38,6 +38,7 @@ export * from './lib/issue/issue.datetime';
 export * from './lib/issue/issue.model';
 export * from './lib/issue/issue.service';
 export * from './lib/loader/loader.service';
+export { stripAgentFrontMatter } from './lib/markdown/strip-agent-frontmatter';
 export * from './lib/mention/chat-command.model';
 export * from './lib/mention/mention-items/mention-command.component';
 export * from './lib/mention/mention-items/mention-emoji.component';
