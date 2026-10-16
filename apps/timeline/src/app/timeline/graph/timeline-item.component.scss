@@ -25,6 +25,11 @@ $timeline-layer-bar: 4;
     background: var(--gray-300);
   }
 
+  .bar-initiative {
+    position: relative;
+    z-index: $timeline-layer-bar;
+  }
+
   &--lane .bar-lane {
     position: absolute;
     top: 50%;

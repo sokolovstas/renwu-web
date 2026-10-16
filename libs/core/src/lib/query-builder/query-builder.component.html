@@ -20,6 +20,14 @@
         (keyup)="onSearchKeyUp($event)"
       />
     </div>
+    @if (queryString()) {
+      <rw-icon
+        class="icon icon-clear"
+        icon="close"
+        cursor="pointer"
+        (mousedown)="onClear($event)"
+      />
+    }
     <rw-icon
       class="icon"
       icon="search"

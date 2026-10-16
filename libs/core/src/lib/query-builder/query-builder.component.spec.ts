@@ -35,4 +35,22 @@ describe('QueryBuilderComponent', () => {
   it('should create', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
+
+  it('clears the query from the search field', () => {
+    const emitted: string[] = [];
+    fixture.componentInstance.queryChange.subscribe((query) =>
+      emitted.push(query),
+    );
+    fixture.componentInstance.query = 'parent = "VKVIDEO-98393"';
+    fixture.detectChanges();
+
+    const clear = fixture.nativeElement.querySelector(
+      '.icon-clear',
+    ) as HTMLElement;
+    expect(clear).toBeTruthy();
+    clear.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    expect(fixture.componentInstance.queryString()).toBe('');
+    expect(emitted).toEqual(['']);
+  });
 });

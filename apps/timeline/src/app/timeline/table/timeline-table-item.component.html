@@ -9,6 +9,7 @@
       (mouseenter)="onHover(true)"
       (mouseleave)="onHover(false)"
       (click)="onItemClick()"
+      (dblclick)="onDrillClick($event)"
     >
       @if (item.childs?.length) {
         <button type="button" class="expand-btn" (click)="$event.stopPropagation(); toggleExpand()">
@@ -29,6 +30,7 @@
       (mouseenter)="onHover(true)"
       (mouseleave)="onHover(false)"
       (click)="onItemClick()"
+      (dblclick)="onDrillClick($event)"
     >
       <span class="td-col td-key">{{ item.key }}</span>
       <span class="td-col td-type">
@@ -84,6 +86,7 @@
         [treeRevision]="treeRevision"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
+        (drill)="drill.emit($event)"
         (expanded)="expanded.emit($event)"
       />
     }

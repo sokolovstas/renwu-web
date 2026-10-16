@@ -79,6 +79,7 @@ export class TimelineItemComponent implements OnChanges {
 
   @Output() selected = new EventEmitter<TimelineIssue>();
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
+  @Output() drill = new EventEmitter<TimelineIssue>();
   @Output() createRelated = new EventEmitter<{
     issue: TimelineIssue;
     direction: TimelineCreateDirection;
@@ -167,6 +168,23 @@ export class TimelineItemComponent implements OnChanges {
     const dateEndUnix = unixSecondsVirtual(this.dateEnd, h24, '');
     this.lineWidth = (dateEndUnix - dateStartUnix) / this.scale;
 
+    const start = timelineIssueBarStart(this.item);
+    const end = timelineIssueBarEnd(this.item);
+    if (!start || !end) {
+      this.width = 0;
+      this.offsetForItem = 0;
+      this.widthProgress = 0;
+    } else {
+      const startUnix = unixSecondsVirtual(start, h24, 'start');
+      const endUnix = unixSecondsVirtual(end, h24, 'end');
+      this.offsetForItem = (startUnix - dateStartUnix) / this.scale;
+      this.width = Math.max((endUnix - startUnix) / this.scale, 5);
+      this.widthProgress =
+        ((this.item.completion ?? 0) * this.width) / 100;
+    }
+
+    // Collapsed group: every task on this one line, including a parent task
+    // that also has its own dates.
     if (this.isGroup && this.item._SHOWCHILDS === false) {
       this.laneBars = timelineGroupLaneBars(this.item, {
         dateStart: this.dateStart,
@@ -174,22 +192,19 @@ export class TimelineItemComponent implements OnChanges {
         hours24InDay: h24,
       });
     }
+  }
 
-    const start = timelineIssueBarStart(this.item);
-    const end = timelineIssueBarEnd(this.item);
-    if (!start || !end) {
-      this.width = 0;
-      this.offsetForItem = 0;
-      this.widthProgress = 0;
-      return;
-    }
+  protected onDrillClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.canDrill(this.item)) return;
+    this.drill.emit(this.item);
+  }
 
-    const startUnix = unixSecondsVirtual(start, h24, 'start');
-    const endUnix = unixSecondsVirtual(end, h24, 'end');
-    this.offsetForItem = (startUnix - dateStartUnix) / this.scale;
-    this.width = Math.max((endUnix - startUnix) / this.scale, 5);
-    this.widthProgress =
-      ((this.item.completion ?? 0) * this.width) / 100;
+  private canDrill(item: TimelineIssue | undefined): boolean {
+    if (!item?.key) return false;
+    if (String(item.type) === 'group') return true;
+    return Boolean(item.childs?.length || item.have_childs);
   }
 
   protected childStripeIndex(childIndex: number): number {

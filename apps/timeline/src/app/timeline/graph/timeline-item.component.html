@@ -8,7 +8,22 @@
       [style.width.px]="lineWidth"
       (mouseenter)="onRowHover(true)"
       (mouseleave)="onRowHover(false)"
+      (dblclick)="onDrillClick($event)"
     >
+      @if (width > 0 && !laneBars.length) {
+        <div
+          class="bar bar-initiative"
+          [style.marginLeft.px]="offsetForItem"
+          [style.width.px]="width"
+          [style.height.px]="barHeightPx()"
+          [style.background]="barColor"
+        >
+          <span
+            class="bar-title-inside"
+            [style.font-size.px]="barTitleFontSizePx()"
+          >{{ titleLabel }}</span>
+        </div>
+      }
       @for (bar of laneBars; track bar.id) {
         <div
           class="bar bar-lane"
@@ -60,6 +75,7 @@
         tooltipPlacement="top"
         rwTooltip
         (click)="onItemClick()"
+        (dblclick)="onDrillClick($event)"
       >
         <div
           class="progress"
@@ -153,6 +169,7 @@
         [showIssueCardOnHover]="showIssueCardOnHover"
         (selected)="selected.emit($event)"
         (scrollTo)="scrollTo.emit($event)"
+        (drill)="drill.emit($event)"
         (createRelated)="createRelated.emit($event)"
         (issueLaidOut)="issueLaidOut.emit($event)"
         (scrollRight)="scrollRight.emit()"

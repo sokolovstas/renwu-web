@@ -60,4 +60,10 @@ describe('OQLParseListener', () => {
     p.switchValueInAtom('sort', 2, 'date_start');
     expect(p.query).toBe('status = Closed sort = date_start');
   });
+
+  it('adds parent to an empty query without undefined', () => {
+    const p = new OQLParseListener('');
+    p.switchValueInAtom('parent', 2, '"VKVIDEO-98393"');
+    expect(p.query).toBe('parent = "VKVIDEO-98393"');
+  });
 });

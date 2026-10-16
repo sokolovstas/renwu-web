@@ -47,6 +47,7 @@ const GROUPING_OPTIONS = [
   { id: 'type', key: 'groupingType' },
   { id: 'status', key: 'groupingStatus' },
   { id: 'assignee', key: 'groupingAssignee' },
+  { id: 'parent', key: 'groupingParent' },
 ] as const;
 
 const HIERARCHY_OPTIONS = [
@@ -95,6 +96,8 @@ export class TimelineScaleComponent implements OnInit {
   @Output() changed = new EventEmitter<void>();
   @Output() fitToScreen = new EventEmitter<void>();
   @Output() nowClicked = new EventEmitter<void>();
+  @Output() collapseAll = new EventEmitter<void>();
+  @Output() expandAll = new EventEmitter<void>();
 
   protected groupingModel = this.createGroupingModel();
   protected hierarchyModel = this.createHierarchyModel();

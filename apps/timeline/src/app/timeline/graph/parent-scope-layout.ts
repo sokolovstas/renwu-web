@@ -55,15 +55,6 @@ function collectVisibleScopeDateBounds(
   let maxUnix: number | null = null;
 
   const visit = (n: TimelineIssue): void => {
-    if (String(n.type) === 'group') {
-      if (n._SHOWCHILDS !== false && n.childs?.length) {
-        for (const c of n.childs) {
-          visit(c);
-        }
-      }
-      return;
-    }
-
     const start = timelineIssueBarStart(n);
     const end = timelineIssueBarEnd(n);
     if (start) {
@@ -119,9 +110,6 @@ export function buildTimelineParentScopeLayouts(
   const flat = flattenVisibleTimelinePreorder(roots);
   const rowById = new Map<string, number>();
   flat.forEach((node, index) => {
-    if (String(node.type) === 'group') {
-      return;
-    }
     const id = node.id;
     if (id !== undefined && id !== null && String(id).length > 0) {
       rowById.set(String(id), index);
@@ -132,14 +120,13 @@ export function buildTimelineParentScopeLayouts(
   const layouts: TimelineParentScopeLayout[] = [];
 
   const walk = (node: TimelineIssue, depth: number): void => {
-    const isIssue =
-      String(node.type) !== 'group' &&
+    const hasId =
       node.id !== undefined &&
       node.id !== null &&
       String(node.id).length > 0;
 
     if (
-      isIssue &&
+      hasId &&
       node.childs?.length &&
       node._SHOWCHILDS !== false &&
       hasVisibleChildIssues(node)
@@ -177,7 +164,7 @@ export function buildTimelineParentScopeLayouts(
 
     if (node._SHOWCHILDS !== false && node.childs?.length) {
       for (const child of node.childs) {
-        walk(child, isIssue ? depth + 1 : depth);
+        walk(child, hasId ? depth + 1 : depth);
       }
     }
   };

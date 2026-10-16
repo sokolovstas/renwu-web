@@ -435,6 +435,14 @@ export class QueryBuilderComponent {
     this.clearHints();
     this.queryChange.next(this.queryString());
   }
+
+  onClear(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.queryString.set('');
+    this.clearHints();
+    this.queryChange.next('');
+  }
   setQueryString(queryString: string) {
     this.queryString.set(queryString ?? '');
     if (this.emitOnChange && this.errors() === 0) {

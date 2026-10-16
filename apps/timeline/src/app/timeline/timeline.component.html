@@ -24,6 +24,8 @@
     (changed)="onScaleChanged()"
     (fitToScreen)="onFitToScreen()"
     (nowClicked)="onCenterNow()"
+    (collapseAll)="setAllBranches(false)"
+    (expandAll)="setAllBranches(true)"
   />
 
   <div
@@ -139,6 +141,7 @@
                 [showIssueCardOnHover]="!settings().showTable"
                 (selected)="onSelected($event)"
                 (scrollTo)="onOpenTask($event)"
+                (drill)="onDrillInto($event)"
                 (createRelated)="onCreateRelated($event)"
               />
             }
@@ -214,6 +217,7 @@
               [treeRevision]="treeRevision()"
               (selected)="onSelected($event)"
               (scrollTo)="onScrollTo($event)"
+              (drill)="onDrillInto($event)"
               (expanded)="onTreeExpanded()"
             />
           }

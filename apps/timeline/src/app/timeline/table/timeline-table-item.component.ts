@@ -72,6 +72,7 @@ export class TimelineTableItemComponent {
 
   @Output() selected = new EventEmitter<TimelineIssue>();
   @Output() scrollTo = new EventEmitter<TimelineIssue>();
+  @Output() drill = new EventEmitter<TimelineIssue>();
   @Output() expanded = new EventEmitter<TimelineIssue>();
 
   protected readonly isGroup = computed(
@@ -117,6 +118,16 @@ export class TimelineTableItemComponent {
 
   protected onItemClick(): void {
     this.scrollTo.emit(this.item);
+  }
+
+  protected onDrillClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.item?.key) return;
+    if (!this.isGroup() && !this.item.childs?.length && !this.item.have_childs) {
+      return;
+    }
+    this.drill.emit(this.item);
   }
 
   protected toggleExpand(): void {

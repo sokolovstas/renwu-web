@@ -7,6 +7,16 @@
         [borderless]="true"
         (changed)="onGroupingChanged($event)"
       />
+      <rw-button
+        [text]="'timeline.collapseAll' | transloco"
+        padding="2px 10px"
+        (clicked)="collapseAll.emit()"
+      />
+      <rw-button
+        [text]="'timeline.expandAll' | transloco"
+        padding="2px 10px"
+        (clicked)="expandAll.emit()"
+      />
     </span>
 
     <span class="scale-field">

@@ -26,6 +26,7 @@ import {
   IssueLinks,
   ListOptions,
   Milestone,
+  OQLParseListener,
   QueryBuilderComponent,
   RwDataService,
   RwIssueDateTimeService,
@@ -1205,6 +1206,37 @@ export class TimelineComponent {
     return sum;
   }
 
+  protected setAllBranches(opened: boolean): void {
+    const openIndex: Record<string, boolean> = {};
+    const openGroups: Record<string, boolean> = {};
+    const walk = (node: TimelineIssue | undefined): void => {
+      if (!node?.childs?.length) return;
+      node._SHOWCHILDS = opened;
+      const id = node.id != null && node.id !== '' ? String(node.id) : '';
+      if (id) {
+        if (String(node.type) === 'group') {
+          openGroups[id] = opened;
+        } else {
+          openIndex[id] = opened;
+        }
+      }
+      node.childs.forEach(walk);
+    };
+    const root = this.rootChild();
+    root.childs?.forEach(walk);
+    this.rootChild.set({ ...root });
+    this.settingsService.replaceOpenIndexes(openIndex, openGroups);
+    this.treeRevision.update((value) => value + 1);
+  }
+
+  protected onDrillInto(item: TimelineIssue): void {
+    const issueKey = item?.key;
+    if (!issueKey) return;
+    const listener = new OQLParseListener(this.queryString());
+    listener.switchValueInAtom('parent', 2, `"${issueKey}"`);
+    this.onQueryChanged(listener.query || '');
+  }
+
   protected onQueryChanged(query: string): void {
     const next = (query || '').trim();
     if (!next) {
@@ -1271,15 +1303,43 @@ export class TimelineComponent {
    */
   private applyServerGroups(groups: IssueGroup[]): void {
     const list = Array.isArray(groups) ? groups : [];
-    const childs = list.map((group, index) => {
+    const byParent = this.settingsService.grouping() === 'parent';
+    const childs: TimelineIssue[] = [];
+    list.forEach((group, index) => {
+      const issues = this.applyExpandState((group.issues || []) as TimelineIssue[]);
+      if (byParent && group.key == null) {
+        const id = 'without-parent';
+        childs.push({
+          id,
+          type: 'group' as const,
+          title: this.translocoService.translate('timeline.withoutParent'),
+          _SHOWCHILDS: this.groupShowChildsById(id),
+          childs: issues,
+        });
+        return;
+      }
       const id = this.serverGroupId(group, index);
-      return {
+      const parentKey = group.key as {
+        key?: string;
+        date_start_calc?: string;
+        date_end_calc?: string;
+        date_start_progress?: string;
+        status?: TimelineIssue['status'];
+        type?: TimelineIssue['type'];
+      } | null;
+      childs.push({
         id,
         type: 'group' as const,
+        key: parentKey?.key,
         title: this.getGroupTitle(group),
+        status: parentKey?.status,
+        date_start_calc: parentKey?.date_start_calc as TimelineIssue['date_start_calc'],
+        date_end_calc: parentKey?.date_end_calc as TimelineIssue['date_end_calc'],
+        date_start_progress:
+          parentKey?.date_start_progress as TimelineIssue['date_start_progress'],
         _SHOWCHILDS: this.groupShowChildsById(id),
-        childs: this.applyExpandState((group.issues || []) as TimelineIssue[]),
-      };
+        childs: issues,
+      });
     });
     this.rootChild.set({
       type: 'root',

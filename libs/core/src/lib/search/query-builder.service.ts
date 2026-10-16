@@ -752,6 +752,31 @@ export class RwQueryBuilderService {
             }),
           );
       case 'assignee':
+        return this.dataService.getDictionary('user/options').pipe(
+          map((items) => {
+            return [
+              {
+                label: 'Current user',
+                data: '$me',
+                type: SearchHintType.VALUE,
+                start: start,
+                stop: stop,
+              },
+              {
+                label: 'Team',
+                data: '$team',
+                type: SearchHintType.VALUE,
+                start: start,
+                stop: stop,
+              },
+              ...items
+                .sort((a: User, b: User) => {
+                  return UserStatic.compareForSearch(a, b, query);
+                })
+                .map(mapUser),
+            ];
+          }),
+        );
       case 'reporter':
         return this.dataService.getDictionary('user/options').pipe(
           map((items) => {

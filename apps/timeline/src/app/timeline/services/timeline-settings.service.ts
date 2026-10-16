@@ -287,6 +287,18 @@ export class TimelineSettingsService {
     this.persist();
   }
 
+  replaceOpenIndexes(
+    openIndex: Record<string, boolean>,
+    openIndexGroup: Record<string, boolean>,
+  ): void {
+    this.settingsSignal.update((s) => ({
+      ...s,
+      open_index: openIndex,
+      open_index_group: openIndexGroup,
+    }));
+    this.persist();
+  }
+
   get ticks(): TimelineScaleTick[] {
     return this.settingsSignal().ticks;
   }

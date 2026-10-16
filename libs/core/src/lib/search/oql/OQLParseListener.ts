@@ -87,7 +87,11 @@ export class OQLParseListener implements OQLListener {
   }
 
   parseOQL(query: string) {
-    if (!query) {
+    this.query = query || '';
+    if (!this.query) {
+      this.index = [];
+      this.exp = [];
+      this.errors = [];
       return;
     }
     const inputStream = new CharStream(query);
@@ -245,7 +249,8 @@ export class OQLParseListener implements OQLListener {
     const newValue = this.convertValueToSearchString(value);
     if (value) {
       if (indexes.length === 0) {
-        this.query = `${name}=${value} ${this.query}`;
+        const rest = (this.query || '').trim();
+        this.query = rest ? `${name}=${value} ${rest}` : `${name}=${value}`;
         this.parseOQL(this.query);
         return this;
       }
@@ -277,10 +282,13 @@ export class OQLParseListener implements OQLListener {
         : this.convertValueToSearchString(value);
     if (nextValue) {
       if (indexes.length === 0) {
+        const rest = (this.query || '').trim();
         if (name === 'sort') {
-          this.query = `${this.query} ${name} = ${nextValue}`;
+          this.query = rest ? `${rest} ${name} = ${nextValue}` : `${name} = ${nextValue}`;
         } else {
-          this.query = `${name} = ${nextValue} ${this.query}`;
+          this.query = rest
+            ? `${name} = ${nextValue} ${rest}`
+            : `${name} = ${nextValue}`;
         }
         this.parseOQL(this.query);
         return this;
