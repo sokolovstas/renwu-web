@@ -8,5 +8,8 @@
   "back": "Back",
   "list-title": "Documents",
   "empty": "No documents",
-  "list-error": "Could not load documents."
+  "list-error": "Could not load documents.",
+  "history": "History",
+  "version": "Version",
+  "history-readonly": "Read only"
 }

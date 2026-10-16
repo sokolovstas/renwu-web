@@ -14,14 +14,16 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RwButtonComponent, RwTextInputComponent } from '@renwu/components';
-import { RwDataService, RwDocument, RwDocumentStepsResponse } from '@renwu/core';
+import {
+  RwDataService,
+  RwDocument,
+  RwDocumentRevision,
+  RwDocumentStepsResponse,
+} from '@renwu/core';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { Schema } from 'prosemirror-model';
-import { schema as basicSchema } from 'prosemirror-schema-basic';
-import { addListNodes } from 'prosemirror-schema-list';
 import { exampleSetup } from 'prosemirror-example-setup';
 import {
   collab,
@@ -31,17 +33,9 @@ import {
 } from 'prosemirror-collab';
 import { Step } from 'prosemirror-transform';
 
-// A plain writing surface (paragraphs, headings, lists, marks) — enough for
-// AI job reports / review notes / plans. Extend the node set here if a
-// document ever needs tables/images, not by hand-rolling a bespoke schema.
-// Exported so specs can build ProseMirror states/steps against the exact
-// same schema instance the component uses (steps decoded against a
-// different — even structurally identical — Schema object are not
-// interchangeable with a doc built from this one).
-export const docSchema = new Schema({
-  nodes: addListNodes(basicSchema.spec.nodes, 'paragraph block*', 'block'),
-  marks: basicSchema.spec.marks,
-});
+import { docSchema, documentFromJSON } from './markdown-doc';
+
+export { docSchema } from './markdown-doc';
 
 /** How long to wait before retrying after a network error in the background sync loop. */
 const SYNC_RETRY_DELAY_MS = 3000;
@@ -84,8 +78,12 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
   readonly creating = signal(false);
   /** Surfaced only for genuinely unrecoverable states (e.g. deleted mid-session). */
   readonly fatalError = signal<string | null>(null);
+  readonly revisions = signal<RwDocumentRevision[]>([]);
+  /** Set while an older snapshot is open. Null means the live document. */
+  readonly viewingRevision = signal<number | null>(null);
 
   readonly newTitle = new FormControl('', { nonNullable: true });
+  private historyMode = false;
 
   private view: EditorView | null = null;
   private readonly clientID = Math.floor(Math.random() * 0xffffffff);
@@ -104,6 +102,9 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
       this.syncGeneration++; // invalidate any in-flight loop for the previous document
       this.view?.destroy();
       this.view = null;
+      this.revisions.set([]);
+      this.viewingRevision.set(null);
+      this.historyMode = false;
       if (id) {
         void this.openDocument(id, this.syncGeneration);
       }
@@ -115,7 +116,7 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
     if (this.pendingDoc) {
       const doc = this.pendingDoc;
       this.pendingDoc = null;
-      this.mountEditor(doc);
+      this.mountEditor(doc, this.historyMode);
       const id = this.documentId();
       if (id && this.view) {
         this.ngZone.runOutsideAngular(() => {
@@ -153,10 +154,14 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
       const doc = await firstValueFrom(this.data.docsGetDocument(id));
       if (generation !== this.syncGeneration) return; // navigated away meanwhile
       this.title.set(doc.title);
+      await this.loadRevisions(id);
+      const historical = await this.historicalSnapshot(id, doc);
+      const toShow = historical ?? doc;
+      this.historyMode = historical !== null;
       if (this.viewReady) {
-        this.mountEditor(doc);
+        this.mountEditor(toShow, this.historyMode);
       } else {
-        this.pendingDoc = doc;
+        this.pendingDoc = toShow;
       }
       // Do not poll until the editor exists — catchUp no-ops without a
       // view, and a tight while() around that freezes the tab.
@@ -176,26 +181,120 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private mountEditor(doc: RwDocument): void {
+  private mountEditor(doc: RwDocument, readonly = false): void {
     const host = this.editorHost()?.nativeElement;
     if (!host) return;
     this.view?.destroy();
-    const pmDoc = docSchema.nodeFromJSON(doc.doc);
-    const state = EditorState.create({
-      doc: pmDoc,
-      plugins: [
-        ...exampleSetup({
-          schema: docSchema,
-          menuBar: true,
-          floatingMenu: false,
-        }),
-        collab({ version: doc.version, clientID: this.clientID }),
-      ],
-    });
+    // Markdown source stored as plain paragraphs is shown as the rendered
+    // document (headings, lists, tables, marks) and edited in place.
+    // The collab version stays the server's: the parsed tree is deterministic,
+    // and the first real edit persists that tree as the new snapshot.
+    const pmDoc = documentFromJSON(doc.doc);
+    const plugins = [
+      ...exampleSetup({
+        schema: docSchema,
+        menuBar: !readonly,
+        floatingMenu: false,
+      }),
+    ];
+    if (!readonly) {
+      plugins.push(collab({ version: doc.version, clientID: this.clientID }));
+    }
     this.view = new EditorView(host, {
-      state,
-      dispatchTransaction: (tr) => this.onDispatch(tr),
+      state: EditorState.create({ doc: pmDoc, plugins }),
+      editable: () => !readonly,
+      dispatchTransaction: (tr) => {
+        if (!this.view) return;
+        if (readonly || this.historyMode) {
+          this.view.updateState(this.view.state.apply(tr));
+          return;
+        }
+        this.onDispatch(tr);
+      },
     });
+  }
+
+  isRevisionActive(number: number): boolean {
+    const viewing = this.viewingRevision();
+    if (viewing !== null) return viewing === number;
+    return number === this.latestRevision();
+  }
+
+  async showRevision(number: number): Promise<void> {
+    const id = this.documentId();
+    if (!id) return;
+    const latest = this.latestRevision();
+    if (!latest || number === latest) {
+      this.historyMode = false;
+      this.viewingRevision.set(null);
+      await this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { revision: null },
+        queryParamsHandling: 'merge',
+      });
+      const doc = await firstValueFrom(this.data.docsGetDocument(id));
+      this.ngZone.run(() => this.mountEditor(doc, false));
+      return;
+    }
+    this.historyMode = true;
+    this.viewingRevision.set(number);
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { revision: number },
+      queryParamsHandling: 'merge',
+    });
+    const snapshot = await firstValueFrom(this.data.docsGetRevision(id, number));
+    const doc: RwDocument = {
+      id,
+      title: this.title(),
+      doc: snapshot.doc ?? { type: 'doc', content: [] },
+      version: 0,
+      created_at: snapshot.created_at,
+      updated_at: snapshot.created_at,
+    };
+    this.ngZone.run(() => this.mountEditor(doc, true));
+  }
+
+  private latestRevision(): number {
+    return this.revisions().reduce((max, rev) => Math.max(max, rev.number), 0);
+  }
+
+  private requestedRevision(): number | null {
+    const raw = this.route.snapshot?.queryParamMap?.get('revision');
+    if (!raw) return null;
+    const n = Number(raw);
+    return Number.isInteger(n) && n > 0 ? n : null;
+  }
+
+  private async loadRevisions(id: string): Promise<void> {
+    try {
+      const list = await firstValueFrom(this.data.docsListRevisions(id));
+      this.revisions.set(list ?? []);
+    } catch {
+      this.revisions.set([]);
+    }
+  }
+
+  /** Older snapshot requested via ?revision=, or null to show the live document. */
+  private async historicalSnapshot(id: string, live: RwDocument): Promise<RwDocument | null> {
+    const requested = this.requestedRevision();
+    const latest = this.latestRevision();
+    if (!requested || !latest || requested === latest) {
+      this.viewingRevision.set(null);
+      return null;
+    }
+    try {
+      const snapshot = await firstValueFrom(this.data.docsGetRevision(id, requested));
+      this.viewingRevision.set(requested);
+      return {
+        ...live,
+        doc: snapshot.doc ?? live.doc,
+        version: 0,
+      };
+    } catch {
+      this.viewingRevision.set(null);
+      return null;
+    }
   }
 
   private onDispatch(tr: Transaction): void {
@@ -206,7 +305,7 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
 
   /** Pushes locally-unconfirmed steps to the server, retrying through a rebase on conflict. */
   private async maybeSend(): Promise<void> {
-    if (!this.view || this.sending || this.destroyed) return;
+    if (!this.view || this.sending || this.destroyed || this.historyMode) return;
     if (Date.now() < this.sendNotBefore) {
       this.scheduleSendRetry(this.sendNotBefore - Date.now());
       return;
@@ -280,7 +379,7 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
     id: string,
     options?: { wait?: boolean },
   ): Promise<void> {
-    if (!this.view) return;
+    if (!this.view || this.historyMode) return;
     const wait = options?.wait !== false;
     if (wait) {
       if (this.catchingUp) return;
@@ -301,12 +400,12 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
             ),
           );
       const resp = await firstValueFrom(get$);
-      if (!this.view) return;
+      if (!this.view || this.historyMode) return;
       if (!resp.ok) {
         if (!wait) return;
         // Gap in the step log — the only correct move is a full refetch.
         const fresh = await firstValueFrom(this.data.docsGetDocument(id));
-        this.ngZone.run(() => this.mountEditor(fresh));
+        this.ngZone.run(() => this.mountEditor(fresh, false));
         return;
       }
       // Re-read version after the await: maybeSend may have confirmed the
@@ -332,8 +431,8 @@ export class DocumentComponent implements AfterViewInit, OnDestroy {
    */
   private async syncLoop(id: string, generation: number): Promise<void> {
     while (!this.destroyed && generation === this.syncGeneration) {
-      if (!this.view) {
-        await new Promise((r) => setTimeout(r, 50));
+      if (!this.view || this.historyMode) {
+        await new Promise((r) => setTimeout(r, this.historyMode ? 400 : 50));
         continue;
       }
       const versionBefore = getVersion(this.view.state);

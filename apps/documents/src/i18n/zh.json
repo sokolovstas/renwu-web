@@ -8,5 +8,8 @@
   "back": "返回",
   "list-title": "文档",
   "empty": "暂无文档",
-  "list-error": "无法加载文档。"
+  "list-error": "无法加载文档。",
+  "history": "历史",
+  "version": "版本",
+  "history-readonly": "只读"
 }

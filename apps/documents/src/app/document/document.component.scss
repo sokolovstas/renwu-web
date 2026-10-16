@@ -30,6 +30,29 @@
   opacity: 0.6;
 }
 
+.documents-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.documents-history button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.documents-history button.is-active {
+  font-weight: 600;
+  text-decoration: none;
+  cursor: default;
+}
+
 .documents-create {
   display: flex;
   flex-direction: column;
@@ -75,8 +98,11 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  padding: $rw-control-default-padding 0;
+  padding: $rw-control-default-padding 0 2rem;
   outline: none;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  max-width: 52rem;
 }
 
 .documents-error {

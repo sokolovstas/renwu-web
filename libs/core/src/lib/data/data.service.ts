@@ -91,6 +91,7 @@ import {
 } from './ai.model';
 import {
   RwDocument,
+  RwDocumentRevision,
   RwDocumentStepsResponse,
   RwDocumentSubmitStepsRequest,
 } from './documents.model';
@@ -1286,6 +1287,12 @@ export class RwDataService {
   }
   docsGetDocument(id: string): Observable<RwDocument> {
     return this.sendToDocumentsAPI('get', `/documents/${id}`);
+  }
+  docsListRevisions(id: string): Observable<RwDocumentRevision[]> {
+    return this.sendToDocumentsAPI('get', `/documents/${id}/revisions`);
+  }
+  docsGetRevision(id: string, number: number): Observable<RwDocumentRevision> {
+    return this.sendToDocumentsAPI('get', `/documents/${id}/revisions/${number}`);
   }
   docsDeleteDocument(id: string): Observable<unknown> {
     return this.sendToDocumentsAPI('delete', `/documents/${id}`);

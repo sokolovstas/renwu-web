@@ -32,7 +32,24 @@
       @if (loading()) {
         <span class="documents-loading">{{ 'documents.loading' | transloco }}</span>
       }
+      @if (viewingRevision() !== null) {
+        <span class="documents-loading">{{ 'documents.history-readonly' | transloco }}</span>
+      }
     </div>
+    @if (revisions().length > 0) {
+      <nav class="documents-history mx-2 mb-2">
+        <span>{{ 'documents.history' | transloco }}</span>
+        @for (rev of revisions(); track rev.number) {
+          <button
+            type="button"
+            [class.is-active]="isRevisionActive(rev.number)"
+            (click)="showRevision(rev.number)"
+          >
+            {{ 'documents.version' | transloco }} {{ rev.number }}
+          </button>
+        }
+      </nav>
+    }
     <div class="documents-editor pt-0 mx-2 flex-1 min-h-0" #editorHost></div>
   }
 </div>
