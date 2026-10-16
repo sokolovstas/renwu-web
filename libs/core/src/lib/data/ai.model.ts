@@ -98,6 +98,8 @@ export interface AIWorkspace {
   name?: string;
   workdir?: string;
   default_branch?: string;
+  /** Single path segment between username and slug. Empty means `ai`. */
+  branch_prefix?: string;
   /** @deprecated Workspace-wide command list cannot cover many repos. Leave empty. */
   verify_commands?: string;
   enabled?: boolean;

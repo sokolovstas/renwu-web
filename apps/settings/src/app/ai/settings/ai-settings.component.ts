@@ -209,7 +209,7 @@ export class AiSettingsComponent {
       '';
     const known = this.modelModel.staticData.some((x) => x.id === next);
     if (next && !known) {
-      if (opts?.dropUnknown || provider === 'claude_code' || provider === 'codex') {
+      if (opts?.dropUnknown || providerInfo?.needs_runner) {
         next = String(this.modelModel.staticData[0]?.id ?? '');
         this.form.controls.default_model.setValue(next);
         this.form.controls.default_model.markAsDirty();

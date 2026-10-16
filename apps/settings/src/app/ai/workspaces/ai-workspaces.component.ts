@@ -122,6 +122,7 @@ export class AiWorkspacesComponent {
     const payload: AIWorkspace = {
       ...current,
       ...raw,
+      branch_prefix: current?.branch_prefix,
       agent_provider: raw.agent_provider?.trim() || undefined,
       agent_base_url: raw.agent_base_url?.trim() || undefined,
       agent_web_base_url: raw.agent_web_base_url?.trim() || undefined,

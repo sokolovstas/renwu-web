@@ -248,6 +248,8 @@
   "ai-body": "Prompt",
   "ai-timeout": "Timeout (seconds)",
   "ai-branch": "Default branch",
+  "ai-branch-prefix": "Branch prefix",
+  "ai-branch-prefix-hint": "Branch: st.sokolov/<task_type>/<slug>.",
   "ai-verify-commands": "Verification commands",
   "ai-on-enter-status": "On enter status",
   "ai-on-success-status": "On success status",

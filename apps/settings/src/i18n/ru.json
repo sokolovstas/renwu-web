@@ -248,6 +248,8 @@
   "ai-body": "Промпт",
   "ai-timeout": "Таймаут (секунды)",
   "ai-branch": "Ветка по умолчанию",
+  "ai-branch-prefix": "Префикс ветки",
+  "ai-branch-prefix-hint": "Ветка: st.sokolov/<task_type>/<slug>.",
   "ai-verify-commands": "Команды проверки",
   "ai-on-enter-status": "Статус при входе",
   "ai-on-success-status": "Статус при успехе",
