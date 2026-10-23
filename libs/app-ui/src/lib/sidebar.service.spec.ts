@@ -74,7 +74,10 @@ describe('RwSidebarService', () => {
     service.closeSection();
 
     expect(service.currentTask.getValue()).toBeNull();
-    expect(router.navigate).toHaveBeenCalledWith([{ outlets: { section: null } }]);
+    expect(router.navigate).toHaveBeenCalledWith(
+      [{ outlets: { section: null } }],
+      { queryParamsHandling: 'preserve' },
+    );
     return router.navigate.mock.results[0].value.then(() => {
       expect(scrollSpy).toHaveBeenCalled();
     });
@@ -99,7 +102,10 @@ describe('RwSidebarService', () => {
       }),
     );
 
-    expect(router.navigate).toHaveBeenCalledWith([{ outlets: { section: null } }]);
+    expect(router.navigate).toHaveBeenCalledWith(
+      [{ outlets: { section: null } }],
+      { queryParamsHandling: 'preserve' },
+    );
   });
 
   it('does not close the section on Escape when default is prevented', () => {

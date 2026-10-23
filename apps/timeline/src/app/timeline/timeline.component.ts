@@ -915,7 +915,9 @@ export class TimelineComponent {
         break;
     }
 
-    await this.router.navigate([{ outlets: { section: ['task', 'new'] } }]);
+    await this.router.navigate([{ outlets: { section: ['task', 'new'] } }], {
+      queryParamsHandling: 'preserve',
+    });
     setTimeout(() => {
       this.issueService.updateFromTemplate({
         container: issue.container,

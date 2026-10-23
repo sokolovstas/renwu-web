@@ -158,7 +158,9 @@ export class RwSidebarService {
         const shouldScroll = this.scrollToSectionOnTaskOpen;
         this.scrollToSectionOnTaskOpen = true;
         // Section URL must update even if scroll host init runs late (ViewChild inside @if).
-        void this.router.navigate([{ outlets: { section: ['task', key] } }]);
+        void this.router.navigate([{ outlets: { section: ['task', key] } }], {
+          queryParamsHandling: 'preserve',
+        });
         if (shouldScroll && this.scrollContainer?.nativeElement) {
           setTimeout(() => {
             this.scrollToSection();
@@ -195,7 +197,9 @@ export class RwSidebarService {
       return false;
     }
     this.currentTask.next(null);
-    void this.router.navigate([{ outlets: { section: null } }]).then(() => {
+    void this.router.navigate([{ outlets: { section: null } }], {
+      queryParamsHandling: 'preserve',
+    }).then(() => {
       this.scrollToMain();
     });
     return true;
