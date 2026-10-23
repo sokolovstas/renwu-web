@@ -1,11 +1,15 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  ElementRef,
+  HostListener,
   OnInit,
+  ViewChild,
   inject,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -13,7 +17,11 @@ import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { RwSidebarService, RwTourAnchorDirective } from '@renwu/app-ui';
+import {
+  RwSidebarService,
+  RwTourAnchorDirective,
+  SidebarSection,
+} from '@renwu/app-ui';
 import { RwDropDownComponent, RwIconComponent } from '@renwu/components';
 import {
   AvatarComponent,
@@ -25,6 +33,15 @@ import {
   RwUserService,
 } from '@renwu/core';
 import { RwMessageService } from '@renwu/messaging';
+import {
+  loadSidebarRecents,
+  MOBILE_NAV_SLOT_COUNT,
+  partitionSidebarSections,
+  rememberSidebarSection,
+  saveSidebarRecents,
+  sidebarSectionStorageKey,
+} from './sidebar-overflow';
+
 @Component({
   selector: 'renwu-sidebar',
   standalone: true,
@@ -42,7 +59,7 @@ import { RwMessageService } from '@renwu/messaging';
   styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, AfterViewInit {
   cd = inject(ChangeDetectorRef);
   messageService = inject(RwMessageService);
   dataService = inject(RwDataService);
@@ -73,6 +90,34 @@ export class SidebarComponent implements OnInit {
   closedTimeout = -1;
 
   tasksCurrentView = '';
+
+  @ViewChild('navRow')
+  navRow?: ElementRef<HTMLElement>;
+
+  @ViewChild('overflowRoot')
+  overflowRoot?: ElementRef<HTMLElement>;
+
+  visibleSections: SidebarSection[] = [];
+  overflowSections: SidebarSection[] = [];
+  overflowOpen = false;
+
+  private allSections: SidebarSection[] = [];
+  private activeKey: string | null = null;
+  private recentKeys = loadSidebarRecents();
+  private slotCount?: number;
+  private fittedWidth = -1;
+  private mobileNav = false;
+  private mobileQuery?: MediaQueryList;
+  private resizeObserver?: ResizeObserver;
+  private fitFrame = 0;
+  private fitting = false;
+
+  private readonly onMobileChange = (): void => {
+    this.mobileNav = this.mobileQuery?.matches ?? false;
+    this.slotCount = undefined;
+    this.fittedWidth = -1;
+    this.scheduleFit();
+  };
 
   // @HostListener('mouseleave', [])
   // onMouseLeave(layerX: any) {
@@ -144,7 +189,164 @@ export class SidebarComponent implements OnInit {
   }
 
   ngOnInit() {
-    return;
+    this.mobileQuery = window.matchMedia('(width < 852px)');
+    this.mobileNav = this.mobileQuery.matches;
+    this.mobileQuery.addEventListener('change', this.onMobileChange);
+    this.destroy.onDestroy(() => {
+      this.mobileQuery?.removeEventListener('change', this.onMobileChange);
+      this.resizeObserver?.disconnect();
+      cancelAnimationFrame(this.fitFrame);
+    });
+
+    combineLatest([
+      this.sidebarService.sidebarSections,
+      this.sidebarService.currentSection,
+    ])
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe(([sections, current]) => {
+        this.allSections = sections ?? [];
+        this.activeKey = current ? sidebarSectionStorageKey(current) : null;
+        this.noteVisit(current);
+        this.applySplit(this.slotCount ?? this.defaultSlotCount());
+        this.cd.markForCheck();
+        this.scheduleFit();
+      });
+  }
+
+  ngAfterViewInit(): void {
+    const row = this.navRow?.nativeElement;
+    if (row && typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (!this.fitting) {
+          this.scheduleFit();
+        }
+      });
+      this.resizeObserver.observe(row);
+    }
+    this.scheduleFit();
+  }
+
+  get overflowHasMessenger(): boolean {
+    return this.overflowSections.some(
+      (section) => section.path === 'messenger',
+    );
+  }
+
+  sectionTrack(section: SidebarSection): string {
+    return `${section.icon}:${section.path ?? ''}:${section.tour ?? ''}`;
+  }
+
+  toggleOverflow(): void {
+    this.overflowOpen = !this.overflowOpen;
+    this.cd.markForCheck();
+  }
+
+  selectSection(section: SidebarSection): void {
+    this.noteVisit(section);
+    const key = sidebarSectionStorageKey(section);
+    if (key != null) {
+      this.activeKey = key;
+    }
+    this.sidebarService.setSection(section);
+    this.overflowOpen = false;
+    this.applySplit(this.slotCount ?? this.defaultSlotCount());
+    this.cd.markForCheck();
+    this.scheduleFit();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.overflowOpen) {
+      return;
+    }
+    const root = this.overflowRoot?.nativeElement;
+    if (root?.contains(event.target as Node)) {
+      return;
+    }
+    this.overflowOpen = false;
+    this.cd.markForCheck();
+  }
+
+  private noteVisit(section: SidebarSection | null | undefined): void {
+    if (!section) {
+      return;
+    }
+    const next = rememberSidebarSection(this.recentKeys, section);
+    if (
+      next.length === this.recentKeys.length &&
+      next.every((key, index) => key === this.recentKeys[index])
+    ) {
+      return;
+    }
+    this.recentKeys = next;
+    saveSidebarRecents(this.recentKeys);
+  }
+
+  private defaultSlotCount(): number {
+    if (!this.mobileNav) {
+      return Number.POSITIVE_INFINITY;
+    }
+    return Math.min(this.allSections.length, MOBILE_NAV_SLOT_COUNT);
+  }
+
+  private applySplit(slotCount: number): boolean {
+    const split = partitionSidebarSections(
+      this.allSections,
+      slotCount,
+      this.activeKey,
+      this.recentKeys,
+    );
+    const sameVisible =
+      split.visible.length === this.visibleSections.length &&
+      split.visible.every(
+        (section, index) => section === this.visibleSections[index],
+      );
+    const sameOverflow =
+      split.overflow.length === this.overflowSections.length &&
+      split.overflow.every(
+        (section, index) => section === this.overflowSections[index],
+      );
+    this.slotCount = slotCount;
+    if (sameVisible && sameOverflow) {
+      return false;
+    }
+    this.visibleSections = split.visible;
+    this.overflowSections = split.overflow;
+    if (!split.overflow.length) {
+      this.overflowOpen = false;
+    }
+    return true;
+  }
+
+  private scheduleFit(): void {
+    cancelAnimationFrame(this.fitFrame);
+    this.fitFrame = requestAnimationFrame(() => this.fitNav());
+  }
+
+  private fitNav(): void {
+    if (this.fitting) {
+      return;
+    }
+    const row = this.navRow?.nativeElement;
+    if (!row || !this.allSections.length) {
+      return;
+    }
+    this.fitting = true;
+    try {
+      if (!this.mobileNav) {
+        if (this.applySplit(Number.POSITIVE_INFINITY)) {
+          this.cd.detectChanges();
+        }
+        return;
+      }
+
+      if (this.applySplit(MOBILE_NAV_SLOT_COUNT)) {
+        this.cd.detectChanges();
+      }
+      this.fittedWidth = row.clientWidth;
+    } finally {
+      this.fitting = false;
+    }
   }
 
   // onSetState(state: string) {

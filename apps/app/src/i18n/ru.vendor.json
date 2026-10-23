@@ -157,7 +157,8 @@
     "settings": "Настройки",
     "profile": "Профиль",
     "search": "Поиск",
-    "documents": "Документы"
+    "documents": "Документы",
+    "more": "Ещё"
   },
   "task": {
     "add_new_task": "Добавить новую задачу",

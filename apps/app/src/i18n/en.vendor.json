@@ -157,7 +157,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "search": "Search",
-    "documents": "Documents"
+    "documents": "Documents",
+    "more": "More"
   },
   "task": {
     "add_new_task": "Add new task",

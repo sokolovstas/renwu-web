@@ -157,7 +157,8 @@
     "settings": "renwu.settings",
     "profile": "renwu.profile",
     "search": "搜索",
-    "documents": "文档"
+    "documents": "文档",
+    "more": "更多"
   },
   "task": {
     "related": "关联任务",

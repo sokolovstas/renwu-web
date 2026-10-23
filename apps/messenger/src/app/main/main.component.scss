@@ -20,7 +20,51 @@ renwu-messenger-main {
       }
     }
   }
-  renwu-messaging-input {
-    border-top: 2px solid var(--gray-200);
+  .messenger-thread {
+    renwu-messaging-thread {
+      position: absolute;
+      inset: 0;
+    }
+
+    .renwu-messaging-thread__scroller {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding-bottom: 4.75rem;
+    }
+  }
+
+  renwu-messaging-input.messenger-composer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    border-top: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--white) 62%, transparent) 0%,
+      color-mix(in srgb, var(--white) 34%, transparent) 58%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+
+    .renwu-messaging-input__message-input-box,
+    .renwu-messaging-input__message-input-box:after {
+      background: transparent;
+      border-top-color: transparent;
+    }
+  }
+}
+
+@media (width < 852px) {
+  renwu-messenger-main {
+    .messenger-thread .renwu-messaging-thread__scroller {
+      padding-bottom: calc(4.75rem + 68px + env(safe-area-inset-bottom));
+    }
+
+    renwu-messaging-input.messenger-composer {
+      bottom: calc(68px + env(safe-area-inset-bottom));
+    }
   }
 }

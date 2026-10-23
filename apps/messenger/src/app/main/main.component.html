@@ -23,14 +23,14 @@
        />
     </div>
 
-    <div class="overflow-hidden h-full w-full flex flex-col relative">
+    <div class="messenger-thread overflow-hidden h-full w-full relative min-h-0">
       <renwu-messaging-thread class="flex h-full overflow-hidden"
         [autoload]="true"
         [destination]="thread | async"
         (clickSubDestination)="selectSubDestination($event)"
        />
       <renwu-messaging-input #input
-        class="flex pb-2"
+        class="messenger-composer"
         [destination]="thread | async"
        />
     </div>

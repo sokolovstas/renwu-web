@@ -361,11 +361,55 @@ img.logo {
 .app-sidebar {
   user-select: none;
   position: fixed;
-  height: calc(70px + env(safe-area-inset-bottom));
+  // Tall enough for a fade above the icons; clicks pass through the fade.
+  height: calc(148px + env(safe-area-inset-bottom));
   width: 100%;
   bottom: 0;
   left: 0;
+  z-index: 20;
   flex-shrink: 0;
+  pointer-events: none;
+  background: transparent;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    // Soft wash, never a solid plate: icons sit on the blurred list.
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--white) 50%, transparent) 0%,
+      color-mix(in srgb, var(--white) 18%, transparent) 52%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-mask-image: linear-gradient(
+      to top,
+      #000 0%,
+      #000 58%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      #000 0%,
+      #000 58%,
+      transparent 100%
+    );
+  }
+
+  .app-tabbar {
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-tabbar a,
+  .app-tabbar button,
+  .app-tabbar .sidebar-overflow-menu {
+    pointer-events: auto;
+  }
+
   .main-sidebar__section-button {
     opacity: 0.7;
   }
@@ -378,11 +422,94 @@ img.logo {
 }
 html.keyboard .app-sidebar {
   height: 0;
+  overflow: hidden;
 }
 
 .app-main-view,
 .app-task-view {
-  height: calc(100% - (70px + env(safe-area-inset-bottom)));
+  height: 100%;
+}
+
+// The tab bar is position:fixed and about 148px tall. Padding on a flex
+// scrollport is not added to the scroll height, so the clearance is an
+// in-flow spacer after the list content. Nested full-height scrollers do
+// not get a second spacer.
+$tabbar-clearance: calc(148px + env(safe-area-inset-bottom));
+
+@mixin tabbar-end-spacer {
+  content: '';
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  height: $tabbar-clearance;
+  min-height: $tabbar-clearance;
+  pointer-events: none;
+}
+
+@media (width < 852px) {
+  .app-main-view :is(.overflow-auto, .overflow-y-auto).h-full > .h-full::after,
+  .app-task-view :is(.overflow-auto, .overflow-y-auto).h-full > .h-full::after,
+  .app-main-view :is(.overflow-auto, .overflow-y-auto).h-full:not(:has(> .h-full))::after,
+  .app-task-view :is(.overflow-auto, .overflow-y-auto).h-full:not(:has(> .h-full))::after {
+    @include tabbar-end-spacer;
+  }
+
+  .app-main-view :is(.overflow-auto, .overflow-y-auto).h-full :is(.overflow-auto, .overflow-y-auto).h-full::after,
+  .app-task-view :is(.overflow-auto, .overflow-y-auto).h-full :is(.overflow-auto, .overflow-y-auto).h-full::after {
+    content: none;
+    height: 0;
+    min-height: 0;
+  }
+
+  // Messenger keeps the composer pinned to the icon row. The list spacer
+  // would open an empty band under the input.
+  .app-main-view renwu-messenger-main :is(.overflow-auto, .overflow-y-auto).h-full > .h-full::after,
+  .app-main-view renwu-messenger-main :is(.overflow-auto, .overflow-y-auto).h-full::after {
+    content: none;
+    height: 0;
+    min-height: 0;
+  }
+
+  // Composer overlays the thread and stops at the icon row.
+  renwu-messenger-main renwu-messaging-input.flex,
+  renwu-messenger-main renwu-messaging-input.messenger-composer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    bottom: calc(52px + env(safe-area-inset-bottom));
+    padding-bottom: 0;
+    border-top: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--white) 62%, transparent) 0%,
+      color-mix(in srgb, var(--white) 34%, transparent) 58%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+
+    .renwu-messaging-input__message-input-box,
+    .renwu-messaging-input__message-input-box:after {
+      background: transparent;
+      border-top-color: transparent;
+    }
+  }
+
+  renwu-messenger-main .renwu-messaging-thread__scroller {
+    padding-bottom: calc(4.75rem + 52px + env(safe-area-inset-bottom));
+  }
+}
+
+html.keyboard {
+  .app-main-view :is(.overflow-auto, .overflow-y-auto).h-full > .h-full::after,
+  .app-task-view :is(.overflow-auto, .overflow-y-auto).h-full > .h-full::after,
+  .app-main-view :is(.overflow-auto, .overflow-y-auto).h-full:not(:has(> .h-full))::after,
+  .app-task-view :is(.overflow-auto, .overflow-y-auto).h-full:not(:has(> .h-full))::after {
+    content: none;
+    height: 0;
+    min-height: 0;
+  }
 }
 
 html.keyboard .app-main-view,
@@ -478,6 +605,12 @@ html.keyboard .app-task-view {
     position: initial;
     height: 100%;
     width: 80px;
+    pointer-events: auto;
+    background: transparent;
+
+    &::before {
+      content: none;
+    }
   }
   .app-second-sidebar {
     position: initial;

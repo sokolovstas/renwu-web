@@ -33,6 +33,7 @@ export const ICON_NAMES = [
   'markdown',
   'menu',
   'more',
+  'more_horiz',
   'renwu',
   'pen',
   'picture',

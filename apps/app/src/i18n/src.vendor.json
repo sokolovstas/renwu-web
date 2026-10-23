@@ -157,6 +157,7 @@
     "settings": "renwu.settings",
     "profile": "renwu.profile",
     "search": "renwu.search",
-    "documents": "renwu.documents"
+    "documents": "renwu.documents",
+    "more": "renwu.more"
   }
 }

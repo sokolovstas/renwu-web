@@ -1,0 +1,45 @@
+button.main-sidebar__section-button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  appearance: none;
+}
+
+.sidebar-overflow-menu {
+  position: absolute;
+  z-index: 40;
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 11.5rem;
+  max-width: min(18rem, calc(100vw - 1rem));
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  background: var(--white);
+  color: var(--gray-900, #111);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.18);
+  pointer-events: auto;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+  }
+
+  button.active {
+    background: var(--accent-200);
+  }
+}

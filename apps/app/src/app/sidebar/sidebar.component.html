@@ -1,23 +1,26 @@
 <div
-  class="flex text-sidebar-text flex-row md:flex-col h-full bg-gray-100 border-gray-200 border-t-2 md:border-t-0 md:border-r-2 justify-center"
+  class="app-tabbar flex text-sidebar-text flex-row md:flex-col h-full w-full min-w-0 items-end md:items-stretch md:bg-gray-100 md:border-r-2 border-gray-200 justify-center pb-[env(safe-area-inset-bottom)] md:pb-0"
 >
-  <ul class="flex flex-row md:flex-col w-full md:w-auto">
+  <ul
+    #navRow
+    class="flex flex-row md:flex-col w-full min-w-0 md:w-auto md:min-w-0"
+  >
     <a
       routerLink="/"
       class="items-center flex-col p-4 pt-6 md:pt-4 cursor-pointer hidden md:flex"
     >
       <img class="logo" src="assets/icons/icon-transparent.png" />
     </a>
-    @for (section of sidebarService.sidebarSections | async; track section) {
+    @for (section of visibleSections; track sectionTrack(section)) {
       <a
         [renwuTourAnchor]="'sidebar-' + (section.tour || section.path)"
-        class="main-sidebar__section-button items-center flex flex-col px-1 md:px-5 py-1.5 cursor-pointer group relative w-full md:w-auto"
-        (click)="sidebarService.setSection(section)"
+        class="main-sidebar__section-button items-center flex flex-col px-0.5 md:px-5 py-1 cursor-pointer group relative w-full md:w-auto"
+        (click)="selectSection(section)"
         [class.active]="
           (sidebarService.currentSection | async)?.path === section.path
         "
       >
-        <rw-icon class="text-lg px-5 py-1.5 mb-1 rounded-full"
+        <rw-icon class="text-lg px-2 md:px-5 py-1 mb-0.5 md:mb-1 rounded-full"
           [icon]="section.icon"
           size="inherit"
          />
@@ -29,8 +32,58 @@
             }"
            />
         }
-        <div class="text-xs text-center">{{ section.hint | async }}</div>
+        <div class="text-[11px] md:text-xs leading-tight text-center whitespace-nowrap">{{ section.hint | async }}</div>
       </a>
+    }
+    @if (overflowSections.length) {
+      <div #overflowRoot class="sidebar-overflow relative w-full md:hidden">
+        <button
+          type="button"
+          class="main-sidebar__section-button items-center flex flex-col px-0.5 py-1 cursor-pointer group relative w-full"
+          (click)="toggleOverflow()"
+          [attr.aria-expanded]="overflowOpen"
+          aria-haspopup="menu"
+        >
+          <rw-icon class="text-lg px-2 py-1 mb-0.5 rounded-full"
+            icon="more_horiz"
+            size="inherit"
+           />
+          @if (overflowHasMessenger) {
+            <renwu-message-counter class="absolute left-2/3 top-1"
+              [destination]="{
+                unreadCount: messageService.unreadCount,
+                pulseCount: messageService.pulseCount
+              }"
+             />
+          }
+          <div class="text-[11px] leading-tight text-center whitespace-nowrap">{{ 'renwu.more' | transloco }}</div>
+        </button>
+        @if (overflowOpen) {
+          <div class="sidebar-overflow-menu" role="menu">
+            @for (section of overflowSections; track sectionTrack(section)) {
+              <button
+                type="button"
+                role="menuitem"
+                [class.active]="
+                  (sidebarService.currentSection | async)?.path === section.path
+                "
+                (click)="selectSection(section)"
+              >
+                <rw-icon [icon]="section.icon" size="inherit" />
+                <span class="min-w-0">{{ section.hint | async }}</span>
+                @if (section.path === 'messenger') {
+                  <renwu-message-counter class="ml-auto"
+                    [destination]="{
+                      unreadCount: messageService.unreadCount,
+                      pulseCount: messageService.pulseCount
+                    }"
+                   />
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
     }
   </ul>
   <ul class="h-full hidden md:flex"></ul>
