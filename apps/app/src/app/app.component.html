@@ -20,7 +20,9 @@
 </div>
 
 @if (stateService.ready | async) {
-  <div class="flex flex-row w-full">
+  <div class="app-window">
+  <div class="app-titlebar">{{ windowTitle$ | async }}</div>
+  <div class="flex flex-row w-full flex-1 min-h-0">
     <div #scrollContainer class="app-scroll-container">
       <div class="app-snap-left"></div>
       <div class="app-snap-center"></div>
@@ -56,5 +58,6 @@
     <renwu-search-spotlight-host />
     <rw-toast-container />
     <rw-tooltip-container />
+  </div>
   </div>
 }

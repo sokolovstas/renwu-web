@@ -6,7 +6,9 @@ import {
   afterNextRender,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 import { RwSidebarService, RwTourService } from '@renwu/app-ui';
 import {
@@ -15,7 +17,7 @@ import {
   RwTooltipService,
 } from '@renwu/components';
 import { RwLoaderService, RwTitleService, StateService } from '@renwu/core';
-import { filter, map } from 'rxjs';
+import { filter, map, of, switchMap } from 'rxjs';
 import { CheckForUpdateService } from './sw-check.service';
 import { SearchSpotlightHostComponent } from './search-spotlight-host/search-spotlight-host.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
@@ -48,14 +50,24 @@ export class AppComponent implements AfterViewInit {
   protected sidebarService = inject(RwSidebarService);
   protected router = inject(Router);
   protected title = inject(RwTitleService);
+  private documentTitle = inject(Title);
   protected loaderService = inject(RwLoaderService);
   protected modalService = inject(RwModalService);
   protected alertService = inject(RwAlertService);
   protected tooltipService = inject(RwTooltipService);
 
+  windowTitle$ = this.sidebarService.currentSection.pipe(
+    switchMap((section) => section?.hint ?? of('')),
+  );
+
   constructor() {
     // #scrollContainer lives inside @if (ready); afterNextRender runs when it actually exists.
     afterNextRender(() => this.initSidebarScrollHost());
+    this.windowTitle$.pipe(takeUntilDestroyed()).subscribe((windowTitle) => {
+      if (windowTitle) {
+        this.documentTitle.setTitle(windowTitle);
+      }
+    });
   }
 
   @ViewChild('scrollContainer', { read: ElementRef })
