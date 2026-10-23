@@ -40,9 +40,12 @@ import {
 } from './prosemirror-schema';
 
 export {
+  handleMarkdownLinkClick,
+  markdownLinkAction,
   markdownParser,
   markdownSerializer,
   mySchema,
+  normalizeCodexSessionUrl,
   openMarkdownLinkOnClick,
 } from './prosemirror-schema';
 

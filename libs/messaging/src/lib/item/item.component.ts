@@ -21,8 +21,8 @@ import {
   RwIconComponent,
   RwToastService,
   RwTooltipDirective,
+  handleMarkdownLinkClick,
   markdownParser,
-  openMarkdownLinkOnClick,
 } from '@renwu/components';
 import {
   AvatarComponent,
@@ -260,7 +260,15 @@ export class MessageItemComponent implements OnDestroy {
         state,
         editable: () => false,
         nodeViews: this.mentionViews,
-        handleClick: openMarkdownLinkOnClick,
+        handleClick: (_view, _pos, event) =>
+          handleMarkdownLinkClick(event, {
+            copy: (text) => {
+              void copyToClipboard(text).then(
+                () => this.toastService.success('Command copied'),
+                () => this.toastService.error('Unable to copy'),
+              );
+            },
+          }),
       });
     }
     this.cd.markForCheck();

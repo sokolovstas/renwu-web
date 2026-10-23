@@ -1,8 +1,10 @@
 import { DOMSerializer } from 'prosemirror-model';
 import {
+  markdownLinkAction,
   markdownParser,
   markdownSerializer,
   mySchema,
+  normalizeCodexSessionUrl,
   openMarkdownLinkOnClick,
 } from './prosemirror-schema';
 
@@ -177,5 +179,46 @@ describe('prosemirror mention schema', () => {
       'noopener,noreferrer',
     );
     open.mockRestore();
+  });
+
+  it('keeps agent session deep-links', () => {
+    const html = renderMarkdownHtml(
+      '[Открыть сессию](codex://threads/ses_new)\n\n[old](codex://ses_old?cwd=%2Ftmp%2Fwt)\n\n[z](zcode://ses_z?cwd=%2Ftmp)',
+    );
+    const hrefs = Array.from(html.querySelectorAll('a')).map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(hrefs).toEqual([
+      'codex://threads/ses_new',
+      'codex://threads/ses_old',
+      'zcode://ses_z?cwd=%2Ftmp',
+    ]);
+    expect(html.querySelector('a[href^="codex:"]')?.getAttribute('target')).toBeNull();
+  });
+
+  it('rewrites old Codex session urls to threads/', () => {
+    expect(normalizeCodexSessionUrl('codex://ses_old?cwd=%2Ftmp%2Fwt')).toBe(
+      'codex://threads/ses_old',
+    );
+    expect(normalizeCodexSessionUrl('codex://threads/ses_new')).toBe(
+      'codex://threads/ses_new',
+    );
+  });
+
+  it('copies zcode/claude resume commands instead of opening a tab', () => {
+    expect(
+      markdownLinkAction('zcode://ses_1?cwd=%2Ftmp%2Fwt'),
+    ).toEqual({
+      kind: 'copy',
+      text: 'cd "/tmp/wt" && zcode --resume ses_1',
+    });
+    expect(markdownLinkAction('claude-code://ses_1')).toEqual({
+      kind: 'copy',
+      text: 'claude -r ses_1',
+    });
+    expect(markdownLinkAction('codex://ses_old?cwd=%2Ftmp')).toEqual({
+      kind: 'protocol',
+      href: 'codex://threads/ses_old',
+    });
   });
 });

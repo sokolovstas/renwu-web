@@ -136,6 +136,114 @@ const nodesWithMentions = markdownSchema.spec.nodes.append({
 
 const headingSpec = nodesWithMentions.get('heading');
 
+function schemeOf(href: string): string {
+  const colon = href.indexOf(':');
+  if (colon <= 0) {
+    return '';
+  }
+  return href.slice(0, colon).toLowerCase();
+}
+
+function isAppProtocol(href: string): boolean {
+  const scheme = schemeOf(href);
+  return scheme === 'codex' || scheme === 'zcode' || scheme === 'claude-code';
+}
+
+/** Old comments stored `codex://<id>?cwd=…`; the app only opens `codex://threads/<id>`. */
+export function normalizeCodexSessionUrl(href: string): string {
+  const raw = href.trim();
+  try {
+    const u = new URL(raw);
+    if (u.protocol.toLowerCase() !== 'codex:') {
+      return raw;
+    }
+    let id = '';
+    if (u.hostname.toLowerCase() === 'threads') {
+      id = u.pathname.replace(/^\/+/, '').split('/')[0] ?? '';
+    } else if (u.pathname.toLowerCase().startsWith('/threads/')) {
+      id = u.pathname.slice('/threads/'.length).split('/')[0] ?? '';
+    } else {
+      id = (u.hostname || u.pathname.replace(/^\/+/, '')).split('/')[0] ?? '';
+    }
+    id = id.trim();
+    return id ? `codex://threads/${id}` : '';
+  } catch {
+    const m = raw.match(/^codex:\/\/(?:threads\/)?([^/?#]+)/i);
+    return m?.[1] ? `codex://threads/${m[1]}` : '';
+  }
+}
+
+function resumeCommandFromDeepLink(
+  href: string,
+  kind: 'claude' | 'zcode',
+): string {
+  try {
+    const u = new URL(href);
+    const sid = (u.hostname || u.pathname.replace(/^\/+/, ''))
+      .split('/')[0]
+      ?.trim();
+    if (!sid) {
+      return '';
+    }
+    const cwd = u.searchParams.get('cwd')?.trim() ?? '';
+    const cmd =
+      kind === 'claude' ? `claude -r ${sid}` : `zcode --resume ${sid}`;
+    return cwd ? `cd ${JSON.stringify(cwd)} && ${cmd}` : cmd;
+  } catch {
+    return '';
+  }
+}
+
+export type MarkdownLinkAction =
+  | { kind: 'open-tab'; href: string }
+  | { kind: 'protocol'; href: string }
+  | { kind: 'copy'; text: string };
+
+export function markdownLinkAction(
+  attrHref: string,
+  resolvedHref = '',
+): MarkdownLinkAction | null {
+  const raw = attrHref.trim();
+  if (!raw || raw.toLowerCase().startsWith('javascript:')) {
+    return null;
+  }
+  const scheme = schemeOf(raw);
+  if (scheme === 'codex') {
+    const next = normalizeCodexSessionUrl(raw);
+    return next ? { kind: 'protocol', href: next } : null;
+  }
+  if (scheme === 'claude-code') {
+    const text = resumeCommandFromDeepLink(raw, 'claude');
+    return { kind: 'copy', text: text || raw };
+  }
+  if (scheme === 'zcode') {
+    const text = resumeCommandFromDeepLink(raw, 'zcode');
+    return { kind: 'copy', text: text || raw };
+  }
+  return { kind: 'open-tab', href: resolvedHref || raw };
+}
+
+function displayHref(href: string): string {
+  const scheme = schemeOf(href);
+  if (scheme === 'codex') {
+    return normalizeCodexSessionUrl(href) || href;
+  }
+  return href;
+}
+
+function launchCustomProtocol(url: string): void {
+  try {
+    window.location.assign(url);
+  } catch {
+    const a = document.createElement('a');
+    a.href = url;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+}
+
 const linkMark: MarkSpec = {
   attrs: {
     href: {},
@@ -152,11 +260,12 @@ const linkMark: MarkSpec = {
     },
   ],
   toDOM(node: Mark): DOMOutputSpec {
-    const attrs: Record<string, string> = {
-      href: node.attrs['href'],
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    };
+    const href = displayHref(String(node.attrs['href'] ?? ''));
+    const attrs: Record<string, string> = { href };
+    if (!isAppProtocol(href)) {
+      attrs['target'] = '_blank';
+      attrs['rel'] = 'noopener noreferrer';
+    }
     if (node.attrs['title']) {
       attrs['title'] = node.attrs['title'];
     }
@@ -177,11 +286,9 @@ export const mySchema = new Schema({
   marks: markdownSchema.spec.marks.update('link', linkMark),
 });
 
-/** Open markdown `<a>` clicks in a new tab (read-only ProseMirror views). */
-export function openMarkdownLinkOnClick(
-  _view: unknown,
-  _pos: number,
+export function handleMarkdownLinkClick(
   event: MouseEvent,
+  hooks?: { copy?: (text: string) => void },
 ): boolean {
   if (event.button !== 0) {
     return false;
@@ -195,13 +302,32 @@ export function openMarkdownLinkOnClick(
   if (!(a instanceof HTMLAnchorElement)) {
     return false;
   }
-  const href = a.getAttribute('href') ?? '';
-  if (!href || href.toLowerCase().startsWith('javascript:')) {
+  const action = markdownLinkAction(a.getAttribute('href') ?? '', a.href);
+  if (!action) {
     return false;
   }
   event.preventDefault();
-  window.open(a.href, '_blank', 'noopener,noreferrer');
+  if (action.kind === 'open-tab') {
+    window.open(action.href, '_blank', 'noopener,noreferrer');
+  } else if (action.kind === 'protocol') {
+    launchCustomProtocol(action.href);
+  } else if (action.text) {
+    if (hooks?.copy) {
+      hooks.copy(action.text);
+    } else if (navigator.clipboard?.writeText) {
+      void navigator.clipboard.writeText(action.text);
+    }
+  }
   return true;
+}
+
+/** Open markdown `<a>` clicks: http(s) in a new tab, app protocols without `_blank`. */
+export function openMarkdownLinkOnClick(
+  _view: unknown,
+  _pos: number,
+  event: MouseEvent,
+): boolean {
+  return handleMarkdownLinkClick(event);
 }
 
 /** CommonMark + GFM tables (prosemirror-markdown default tokenizer has no tables). */
