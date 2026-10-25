@@ -1,33 +1,12 @@
-import { inject } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  Route,
-  createUrlTreeFromSnapshot,
-} from '@angular/router';
+import { Route } from '@angular/router';
 import { InlineLoader, TRANSLOCO_SCOPE } from '@jsverse/transloco';
-import { RwDataService, RwQueryBuilderService, RwSearchService } from '@renwu/core';
-import { firstValueFrom } from 'rxjs';
+import { RwQueryBuilderService, RwSearchService } from '@renwu/core';
 import { FiltersListComponent } from '../filters-list/filters-list.component';
 import { ListComponent } from '../list/list.component';
 import { MainComponent } from '../main/main.component';
 import { TimelineComponent } from '../timeline/timeline.component';
 import { TreeComponent } from '../tree/tree.component';
-
-const checkEmptyFilter = async (route: ActivatedRouteSnapshot) => {
-  const queries = await firstValueFrom(
-    inject(RwDataService).getSearchQueries(),
-  );
-  const id = route.paramMap.get('id');
-
-  if (!id) {
-    return true;
-  }
-
-  if (!queries?.length || queries.findIndex((v) => v.id === id) === -1) {
-    return createUrlTreeFromSnapshot(route, ['..']);
-  }
-  return true;
-};
+import { checkEmptyFilter } from './saved-filter.guard';
 
 const createInlineLoader = (languages: Array<string>): InlineLoader => {
   const translocoInlineLoader: InlineLoader = {};

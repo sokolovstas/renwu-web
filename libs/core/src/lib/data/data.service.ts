@@ -14,6 +14,7 @@ import {
   buffer,
   catchError,
   debounceTime,
+  defaultIfEmpty,
   finalize,
   map,
   mergeMap,
@@ -1232,8 +1233,12 @@ export class RwDataService {
     method: 'get' | 'post' | 'put' | 'delete',
     url: string,
     data: DataObject | ParamsObject = null,
+    background = false,
   ): Observable<T> {
-    const loader = this.loaderService.setLoader();
+    let loader: Loader;
+    if (!background) {
+      loader = this.loaderService.setLoader();
+    }
     const options = {
       headers: new HttpHeaders(this.headers),
       withCredentials: true,
@@ -1247,7 +1252,7 @@ export class RwDataService {
         .get<T>(this.settings.documentsApiUrl + url, options)
         .pipe(
           catchError((err: unknown) =>
-            this.catchHandler(err as HttpErrorResponse, loader, false),
+            this.catchHandler(err as HttpErrorResponse, loader, background),
           ),
           finalize(() => this.finallyHandler(loader)),
         );
@@ -1257,7 +1262,7 @@ export class RwDataService {
         .post<T>(this.settings.documentsApiUrl + url, data, options)
         .pipe(
           catchError((err: unknown) =>
-            this.catchHandler(err as HttpErrorResponse, loader, false),
+            this.catchHandler(err as HttpErrorResponse, loader, background),
           ),
           finalize(() => this.finallyHandler(loader)),
         );
@@ -1266,16 +1271,19 @@ export class RwDataService {
       .delete<T>(this.settings.documentsApiUrl + url, options)
       .pipe(
         catchError((err: unknown) =>
-          this.catchHandler(err as HttpErrorResponse, loader, false),
+          this.catchHandler(err as HttpErrorResponse, loader, background),
         ),
         finalize(() => this.finallyHandler(loader)),
       );
   }
   docsListDocuments(issueId?: string): Observable<RwDocument[]> {
+    // The documents service is optional. A 404 must not toast "Not Found"
+    // while a task (which only asks for a count) is opening.
     return this.sendToDocumentsAPI(
       'get',
       '/documents',
       issueId ? { issue_id: issueId } : undefined,
+      true,
     );
   }
   docsCreateDocument(data: {
@@ -1433,7 +1441,13 @@ export class RwDataService {
   }
 
   jiraGetIssueLink(id: string): Observable<JiraIssueLink> {
-    return this.sendToJiraAPI<JiraIssueLink>('get', `/issue/${id}/link`);
+    // No Jira link is a normal 404. Opening a task must not toast "Not Found".
+    return this.sendToJiraAPI<JiraIssueLink>(
+      'get',
+      `/issue/${id}/link`,
+      null,
+      true,
+    );
   }
 
   jiraSaveIssueLink(
@@ -1539,7 +1553,11 @@ export class RwDataService {
   }
 
   getSearchQueries(): Observable<SavedSearchQuery[]> {
-    return this.sendToAPI<SavedSearchQuery[]>('get', '/search/query', '', true);
+    // Background failures complete without a value (catchHandler → EMPTY).
+    // The filters screen treats that as "never loaded" and stays blank.
+    return this.sendToAPI<SavedSearchQuery[]>('get', '/search/query', '', true).pipe(
+      defaultIfEmpty([] as SavedSearchQuery[]),
+    );
   }
 
   getSearchQuery(id: string): Observable<SavedSearchQuery> {
