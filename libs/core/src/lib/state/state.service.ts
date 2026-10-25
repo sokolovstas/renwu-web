@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, Observer } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { RwDatePipe } from '@renwu/components';
 import { AppThemes, ProfileSettingsModel } from '../settings/settings.model';
+import { keyboardViewportState } from './keyboard-viewport';
 
 @Injectable({
   providedIn: 'root',
@@ -69,11 +70,68 @@ export class StateService {
       document.referrer.includes('android-app://')
     );
   };
+  private keyboardMeasureTimers: ReturnType<typeof setTimeout>[] = [];
+
+  /**
+   * The layout viewport stays full height on iPhone (`height=device-height`),
+   * and a focused composer does not scroll it (`pageTop` stays 0). Measure
+   * visualViewport on resize and focus so the shell can sit in the visible band.
+   */
   initKeyboardListener() {
-    if (this.isStandalone) {
-      window.visualViewport.addEventListener('scroll', (event) => {
-        this.keyboard.next((event.target as VisualViewport).pageTop > 0);
-      });
+    if (
+      typeof window === 'undefined' ||
+      !window.visualViewport ||
+      !globalThis.document?.documentElement
+    ) {
+      return;
+    }
+    const onChange = () => this.scheduleKeyboardMeasure();
+    window.visualViewport.addEventListener('resize', onChange);
+    window.visualViewport.addEventListener('scroll', onChange);
+    window.addEventListener('resize', onChange);
+    document.addEventListener('focusin', onChange);
+    document.addEventListener('focusout', onChange);
+    this.scheduleKeyboardMeasure();
+  }
+
+  private scheduleKeyboardMeasure() {
+    for (const id of this.keyboardMeasureTimers) {
+      clearTimeout(id);
+    }
+    this.keyboardMeasureTimers = [];
+    this.applyKeyboardViewport();
+    if (typeof window === 'undefined') {
+      return;
+    }
+    for (const delay of [50, 160, 360, 600]) {
+      this.keyboardMeasureTimers.push(
+        window.setTimeout(() => this.applyKeyboardViewport(), delay),
+      );
+    }
+  }
+
+  private applyKeyboardViewport() {
+    const viewport = window.visualViewport;
+    const root = globalThis.document?.documentElement;
+    if (!viewport || !root) {
+      return;
+    }
+    const narrow = window.innerWidth < 852;
+    const state = keyboardViewportState(
+      {
+        width: viewport.width,
+        height: viewport.height,
+        offsetTop: viewport.offsetTop,
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+      },
+      narrow,
+    );
+    root.style.setProperty('--vv-height', `${state.height}px`);
+    root.style.setProperty('--vv-offset-top', `${state.offsetTop}px`);
+    root.style.setProperty('--keyboard-inset', `${state.inset}px`);
+    if (this.keyboard.value !== state.open) {
+      this.keyboard.next(state.open);
     }
   }
 

@@ -5,13 +5,27 @@ renwu-messaging-item {
   flex: 0 0 auto;
   flex-direction: column;
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   img {
     border: 2px solid var(--gray-300);
     border-radius: 10px;
     margin: 10px 0px;
   }
+  // display:none drops the text after the caret image on WebKit and leaves a
+  // gap after the first letter. Keep the official zero-width inline spacer.
   img.ProseMirror-separator {
-    display: none !important;
+    display: inline !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 0 !important;
+    max-width: none !important;
+    height: 1em !important;
+    vertical-align: baseline;
   }
 
   .rw-mention-host {
@@ -37,6 +51,23 @@ renwu-messaging-item {
       box-sizing: border-box;
     }
   }
+}
+
+.renwu-messaging-item__prose {
+  flex: 1 1 0%;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.renwu-messaging-item__prose .ProseMirror {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .renwu-messaging-item__pulse {
@@ -81,6 +112,10 @@ renwu-messaging-item {
 .renwu-messaging-item__message-wrapper {
   padding: 0 7px 0 16px;
   display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   margin: 1px;
 
   &:hover {
@@ -206,29 +241,41 @@ renwu-messaging-item {
 .renwu-messaging-item__message-body {
   padding-left: 16px;
   display: flex;
-  flex: 1 1 100%;
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: 100%;
   position: relative;
   line-height: 1.7;
   overflow: hidden;
 
   &__message {
-    flex: 1 1 100%;
+    flex: 1 1 0%;
     flex-direction: column;
     display: flex;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
-    word-break: break-all;
+    word-break: break-word;
   }
   &__text {
     display: flex;
-    flex: 0 0 auto;
-    overflow-y: auto;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
     margin-right: 30px;
     word-spacing: 0;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
     word-break: break-word;
   }
   &__text > div {
-    overflow: auto;
+    flex: 1 1 0%;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
   &__text.not-sent {
     opacity: 0.5;

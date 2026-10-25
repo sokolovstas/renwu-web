@@ -67,4 +67,14 @@ renwu-messenger-main {
       bottom: calc(68px + env(safe-area-inset-bottom));
     }
   }
+
+  html.keyboard renwu-messenger-main {
+    .messenger-thread .renwu-messaging-thread__scroller {
+      padding-bottom: 4.75rem;
+    }
+
+    renwu-messaging-input.messenger-composer {
+      bottom: 0;
+    }
+  }
 }

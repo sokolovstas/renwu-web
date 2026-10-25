@@ -35,7 +35,7 @@ import {
 } from '@renwu/core';
 import { destroyObservable } from '@renwu/utils';
 import { Plugin } from 'prosemirror-state';
-import { firstValueFrom, Subject, merge } from 'rxjs';
+import { filter, firstValueFrom, Subject, merge } from 'rxjs';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import {
   DestinationType,
@@ -194,7 +194,29 @@ export class MessageInputComponent implements OnInit {
     }
     this.canReceiveFiles = true;
     // this.stateService.messagingOpened.getValue() && this.fromSidebar;
+    this.stateService.keyboard
+      ?.pipe(
+        filter((open) => open),
+        takeUntilDestroyed(this.destroy),
+      )
+      .subscribe(() => this.pinThreadAboveKeyboard());
     this.cd.markForCheck();
+  }
+
+  /** Keep the latest messages in view once the shell shrinks above the keyboard. */
+  private pinThreadAboveKeyboard() {
+    const root = this.el.nativeElement as HTMLElement;
+    const scroller = root
+      .closest('.messenger-thread')
+      ?.querySelector(
+        '.renwu-messaging-thread__scroller',
+      ) as HTMLElement | null;
+    if (!scroller) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      scroller.scrollTop = scroller.scrollHeight;
+    });
   }
 
   initDestination() {

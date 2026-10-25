@@ -4,6 +4,10 @@ renwu-messaging-input {
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .renwu-messaging-input {
   &__message-input-box {
@@ -12,7 +16,11 @@ renwu-messaging-input {
     overflow: visible;
     display: flex;
     flex-direction: row;
-    flex: 1 1 100%;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     padding: 5px 5px 5px 10px;
     align-items: flex-end;
   }
@@ -26,15 +34,40 @@ renwu-messaging-input {
     pointer-events: none;
   }
   &__text-area {
-    flex: 1 1 100%;
+    display: block;
+    flex: 1 1 0%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     max-height: 400px;
+    box-sizing: border-box;
   }
 
+  // iOS sizes a contenteditable flex item to one character after the first
+  // keystroke (white-space: break-spaces min-content). A zero basis ignores
+  // that intrinsic width and the field stays the row width.
   &__input-container {
-    flex: 1 1 100%;
+    flex: 1 1 0%;
     display: flex;
     position: relative;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
+  }
+
+  &__text-area .rw-text-area,
+  &__text-area .rw-text-area-container,
+  &__text-area .ProseMirror {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  &__text-area .ProseMirror {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   &__buttons {
     cursor: pointer;

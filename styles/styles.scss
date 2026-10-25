@@ -517,6 +517,25 @@ html.keyboard .app-task-view {
   height: 100%;
 }
 
+// iPhone does not shrink the layout viewport when the keyboard opens.
+// StateService writes --vv-height / --vv-offset-top from visualViewport.
+@media (width < 852px) {
+  html.keyboard .app-window {
+    height: var(--vv-height, 100%);
+    position: relative;
+    top: var(--vv-offset-top, 0px);
+  }
+
+  html.keyboard renwu-messenger-main renwu-messaging-input.messenger-composer,
+  html.keyboard renwu-messenger-main renwu-messaging-input.flex {
+    bottom: 0;
+  }
+
+  html.keyboard renwu-messenger-main .renwu-messaging-thread__scroller {
+    padding-bottom: 4.75rem;
+  }
+}
+
 .app-main-view {
   position: absolute;
   left: 0;
